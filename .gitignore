@@ -1,0 +1,60 @@
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Build outputs  
+_site/
+dist/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Backup files with version numbers
+*\ 2.*
+*\ 3.*
+
+# Coverage directory
+coverage/
+
+# Temporary folders
+tmp/
+temp/
+
+# Optional npm cache
+.npm
+
+# Yarn
+.yarn-integrity
+yarn-debug.log*
+yarn-error.log*
+
+# CSS maps
+*.css.map

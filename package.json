@@ -1,0 +1,33 @@
+{
+  "name": "cafe-com-vendas-landing",
+  "version": "1.0.0",
+  "description": "Landing page for Café com Vendas event - an intimate business event for female entrepreneurs in Portugal",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rm -rf _site",
+    "tokens:build": "node scripts/build-tokens.js",
+    "build:css": "TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npx postcss ./src/assets/css/main.css -o ./_site/tailwind.css",
+    "build": "npm run clean && npm run tokens:build && npm run build:css && eleventy",
+    "start": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && eleventy --serve",
+    "dev": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && eleventy --serve --watch"
+  },
+  "keywords": [
+    "landing-page",
+    "eleventy",
+    "11ty",
+    "entrepreneurship",
+    "business-event",
+    "portugal"
+  ],
+  "author": "Café com Vendas",
+  "license": "ISC",
+  "devDependencies": {
+    "@11ty/eleventy": "^2.0.1",
+    "@fontsource/lora": "^5.2.6",
+    "@tailwindcss/postcss": "^4.1.11",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1",
+    "tailwindcss": "^4.1.11"
+  }
+}

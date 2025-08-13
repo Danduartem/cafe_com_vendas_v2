@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>{{ title | default("Café com Vendas - Evento para Empreendedoras em Portugal") }}</title>
+    <meta name="description" content="{{ description | default("Chega de usar o burnout como medalha de honra. O evento presencial e intimista que lhe dará o mapa para trocar o 'trabalhar duro' pelo 'trabalhar com inteligência'. Para empreendedoras em Portugal.") }}">
+    <meta name="keywords" content="evento empreendedoras portugal, estratégia de vendas portugal, negócio estagnado, empreendedora sobrecarregada, aumentar lucro negócio, café com vendas">
+    <meta name="author" content="Juçanã Maximiliano">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cafecomvendas.com/">
+    <meta property="og:title" content="Café com Vendas - Evento para Empreendedoras">
+    <meta property="og:description" content="Sucesso de verdade é ter paz, não exaustão. O evento presencial e intimista que lhe dará o mapa para trocar o trabalhar duro pelo trabalhar com inteligência.">
+    <meta property="og:locale" content="pt_PT">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://cafecomvendas.com/">
+    <meta property="twitter:title" content="Café com Vendas - Evento para Empreendedoras">
+    <meta property="twitter:description" content="Chega de usar o burnout como medalha de honra. Evento para empreendedoras em Portugal.">
+    
+    <!-- Schema.org Event Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Event",
+      "name": "Café com Vendas",
+      "description": "Evento presencial e intimista para empreendedoras que querem reestruturar os seus negócios com estratégia, leveza e liberdade",
+      "eventStatus": "https://schema.org/EventScheduled",
+      "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+      "location": {
+        "@type": "Place",
+        "name": "Casarão Secular",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "PT"
+        }
+      },
+      "organizer": {
+        "@type": "Person",
+        "name": "Juçanã Maximiliano",
+        "description": "Mentora de negócios para empreendedoras em Portugal"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://cafecomvendas.com/",
+        "price": "XXX",
+        "priceCurrency": "EUR",
+        "availability": "https://schema.org/LimitedAvailability",
+        "description": "Vagas limitadas para garantir uma experiência de transformação profunda e individual"
+      },
+      "inLanguage": "pt-PT",
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Empreendedoras"
+      }
+    }
+    </script>
+    
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="/tailwind.css">
+    
+    <!-- Fonts are served locally via @font-face in /assets/css/main.css -->
+    
+</head>
+<body class="antialiased">
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-navy-deep text-white p-2 z-50">Saltar para o conteúdo principal</a>
+    
+    <!-- TOP WARNING BANNER (full-width, fixed, no CTA) -->
+    <div id="topBanner"
+         role="status"
+         aria-live="polite"
+         class="fixed top-0 inset-x-0 z-50 bg-gradient-to-r from-burgundy-700 to-navy-800 text-white/95 shadow-md">
+      <div class="max-w-[1200px] mx-auto px-4 sm:px-6 py-2.5 text-center">
+        <span class="font-lora font-semibold uppercase tracking-wide text-sm sm:text-base">
+          ⚡ APENAS 8 VAGAS — PRIMEIRO LOTE • 25% DESCONTO
+        </span>
+      </div>
+    </div>
+    
+    <main id="main-content" role="main">
+        {{ content | safe }}
+    </main>
+    
+    <!-- WhatsApp Contact Button - Global -->
+    {% include "components/whatsapp-button.njk" %}
+    
+    <!-- Analytics and Performance Scripts -->
+    <script src="/assets/js/main.js" defer></script>
+</body>
+</html>

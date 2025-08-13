@@ -1,0 +1,84 @@
+{# hero.njk - full file #}
+
+<!-- Hero Section Start -->
+<section
+  id="hero"
+  class="hero-bg relative flex items-center justify-center bg-cover bg-center overflow-hidden w-full h-screen pt-14 before:absolute before:inset-0 before:bg-gradient-to-br before:from-navy-900/85 before:to-navy-900/70"
+  role="banner"
+  aria-label="Seção principal do evento Café com Vendas"
+>
+  <!-- decorative SVG (low contrast) -->
+  <svg aria-hidden="true" class="absolute right-0 top-0 h-full pointer-events-none z-10 w-[55vw]" viewBox="0 0 800 1200" preserveAspectRatio="xMaxYMin slice">
+    <defs>
+      <linearGradient id="g1" x1="0" x2="1">
+        <stop offset="0" stop-color="white" stop-opacity="0.02"></stop>
+        <stop offset="1" stop-color="burgundy-700" stop-opacity="0.02"></stop>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="800" height="1200" fill="url(#g1)"></rect>
+  </svg>
+
+  <!-- Content container -->
+  <div class="relative z-20 mx-auto text-center w-full px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center max-w-3xl py-8 sm:py-12">
+    <!-- Accent -->
+    <div class="mb-4 sm:mb-6 w-full">
+      <span class="inline-block w-20 sm:w-28 h-1.5 rounded-full bg-gradient-to-r from-neutral-200 to-burgundy-700 opacity-90"></span>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="font-lora font-extrabold text-[clamp(3rem,6.5vw,4.6rem)] leading-[1.04] text-white" id="hero-title">
+      Menos Esforço. Mais Lucro.
+    </h1>
+
+    <!-- Subheadline -->
+    <p class="font-lora italic text-[clamp(1rem,3.6vw,1.8rem)] text-peach-300" aria-describedby="hero-title">
+      O mapa para a empreendedora que se recusa a escolher entre sucesso e liberdade.
+    </p>
+
+    <!-- Badge -->
+    <div class="inline-flex items-center gap-2 rounded-full bg-white/6 backdrop-blur-md border border-white/12 px-3 py-1.5 mb-6 mt-6 text-neutral-200 text-[clamp(0.72rem,2.8vw,0.95rem)] shadow-[0_6px_30px_rgba(2,6,23,0.35)]" role="img" aria-label="Evento: 20 de Setembro, Lisboa Portugal, Mesa Corrida">
+      <span>20 de Setembro</span>
+      <span class="text-peach-300" aria-hidden="true">•</span>
+      <span>Lisboa, Portugal</span>
+      <span class="text-peach-300" aria-hidden="true">•</span>
+      <span class="italic">Mesa Corrida</span>
+    </div>
+
+    <!-- Body (your requested classes) -->
+  <p class="font-century text-white text-[clamp(1rem,3.2vw,1.125rem)] leading-relaxed max-w-[60ch] mx-auto mb-6 px-2">
+      Um encontro presencial e intimista em Portugal para reestruturar o seu negócio, recuperar o seu tempo e multiplicar as vendas — sem burnout, com método. Um dia de imersão estratégica, ferramentas accionáveis e um plano de 90 dias para implementar mudanças reais.
+    </p>
+
+    <!-- CTA group -->
+    <div class="flex flex-col sm:flex-row items-center gap-4 mt-2 w-full sm:w-auto">
+      <a href="#inscricao"
+         class="inline-flex items-center justify-center px-6 py-3 min-h-[48px] rounded-[14px] bg-gradient-to-r from-burgundy-700 to-navy-800 text-white font-bold shadow-[0_10px_30px_rgba(2,6,23,0.5)] transform-gpu transition-all duration-300 hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-navy-900"
+         aria-label="Garantir a minha vaga"
+         data-analytics-event="click_hero_cta">
+        Garantir a minha vaga
+        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+        </svg>
+      </a>
+
+      <a href="#solucao" class="text-white/90 underline underline-offset-4 text-sm sm:text-base" data-analytics-event="click_hero_secondary">
+        Quero saber mais
+      </a>
+    </div>
+
+    <div class="mt-6 text-xs text-white/70">Vagas limitadas — sessão com capacidade reduzida para garantir transformação.</div>
+  </div>
+
+  <!-- Scroll Down (hidden on very small screens) -->
+  <button class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 text-white/90 sm:block hidden bg-transparent border-none cursor-pointer transition-all duration-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-navy-900" id="scroll-indicator-btn" aria-label="Role para baixo" type="button">
+    <div class="flex flex-col items-center space-y-1 w-full">
+      <span class="font-lora text-xs">Role para baixo</span>
+      <svg class="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+      </svg>
+    </div>
+  </button>
+</section>
+<!-- Hero Section End -->
+
+

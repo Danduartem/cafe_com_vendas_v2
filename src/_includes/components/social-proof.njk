@@ -1,0 +1,157 @@
+{# social-proof.njk - Video Testimonials Section with YouTube Videos #}
+
+<!-- Social Proof Section Start -->
+<section
+  id="social-proof"
+  class="relative py-16 sm:py-20 lg:py-24 bg-gradient-to-br from-peach-50 to-neutral-100 overflow-hidden"
+  role="region"
+  aria-label="Testemunhos em vídeo do Café com Vendas"
+  data-reveal
+>
+  <!-- Background Decorative Elements -->
+  <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+    <!-- Subtle geometric patterns -->
+    <div class="absolute top-10 right-10 w-32 h-32 bg-gradient-to-r from-peach-200/20 to-gold-200/20 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-20 left-10 w-24 h-24 bg-gradient-to-r from-gold-200/15 to-peach-200/15 rounded-full blur-2xl"></div>
+    
+    <!-- Golden ratio inspired SVG decoration -->
+    <svg class="absolute top-0 left-0 w-full h-full opacity-5" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <pattern id="testimonial-pattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+          <circle cx="40" cy="40" r="1" fill="currentColor" class="text-gold-400"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#testimonial-pattern)"/>
+    </svg>
+  </div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section Header with Golden Ratio Typography -->
+    <div class="text-center mb-12 sm:mb-16 lg:mb-20">
+      <!-- Decorative accent line -->
+      <div class="flex justify-center mb-6 sm:mb-8">
+        <div class="w-20 h-1 bg-gradient-to-r from-transparent via-gold-400 to-transparent rounded-full"></div>
+      </div>
+      
+      <!-- Main headline using Lora - elegant serif for emotional impact -->
+      <h2 class="font-lora font-bold text-[clamp(1.75rem,4vw,2.5rem)] leading-tight text-navy-800 mb-4 sm:mb-6">
+        Elas vieram pela estratégia. Ficaram pela transformação.
+      </h2>
+      
+      <!-- Subtle subtext -->
+      <p class="font-century text-navy-800/70 text-lg leading-relaxed max-w-2xl mx-auto">
+        Histórias reais de empreendedoras que escolheram o mapa para a liberdade
+      </p>
+    </div>
+
+    <!-- Video Testimonials Container with Native Carousel -->
+    <div class="testimonials-carousel-container relative">
+      <!-- Carousel wrapper -->
+      <div class="testimonials-carousel overflow-hidden">
+        <div class="testimonials-track flex gap-6 transition-transform duration-500 ease-out pb-12" data-carousel-track>
+          
+          {# Data-driven video testimonials loop #}
+          {% for video in testimonials.videos %}
+          <div class="carousel-slide flex-shrink-0 w-full sm:w-80 lg:w-96">
+            <div class="video-card group bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/50 hover:shadow-[0_16px_48px_rgba(0,0,0,0.12)] transition-all duration-500 hover:-translate-y-1" data-video-card>
+              <div class="relative aspect-video bg-gradient-to-br from-navy-800 to-burgundy-700 youtube-embed" data-video-id="{{ video.videoId }}">
+                <!-- YouTube Thumbnail -->
+                <img 
+                  src="{{ video.thumbnail }}" 
+                  alt="Testemunho {{ video.name }} - Café com Vendas"
+                  class="absolute inset-0 w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <!-- Play Button Overlay -->
+                <button 
+                  class="absolute inset-0 w-full h-full flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors group youtube-play-btn"
+                  aria-label="Reproduzir testemunho de {{ video.name }}"
+                >
+                  <svg class="w-16 h-16 text-white drop-shadow-lg group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="p-6">
+                <h3 class="font-lora font-semibold text-lg text-navy-800 mb-2">{{ video.name }}</h3>
+                <p class="font-century text-navy-800/60 text-sm">{{ video.profession }} - {{ video.location }}</p>
+                <p class="font-century text-navy-800/80 text-sm mt-3">"{{ video.result }}"</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+
+        </div>
+      </div>
+
+      <!-- Pagination dots with navigation arrows -->
+      <div class="flex justify-center items-center mt-8 space-x-4">
+        <!-- Previous button -->
+        <button 
+          class="carousel-prev w-10 h-10 rounded-full bg-white/90 border border-navy-800/10 flex items-center justify-center text-navy-800/40 hover:text-navy-800 hover:bg-white hover:border-navy-800/20 transition-all duration-300 group"
+          aria-label="Testemunho anterior"
+          data-carousel-prev
+        >
+          <svg class="w-4 h-4 lg:w-5 lg:h-5 group-hover:-translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+
+        <!-- Pagination dots -->
+        <div class="carousel-pagination flex space-x-1" data-carousel-pagination></div>
+
+        <!-- Next button -->
+        <button 
+          class="carousel-next w-10 h-10 rounded-full bg-white/90 border border-navy-800/10 flex items-center justify-center text-navy-800/40 hover:text-navy-800 hover:bg-white hover:border-navy-800/20 transition-all duration-300 group"
+          aria-label="Próximo testemunho"
+          data-carousel-next
+        >
+          <svg class="w-4 h-4 lg:w-5 lg:h-5 group-hover:translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Call-to-action hint -->
+    <div class="text-center mt-16">
+      <p class="font-century text-navy-800/50 text-base italic">
+        Junte-se às empreendedoras que já transformaram os seus negócios
+      </p>
+      
+      <!-- View More Button -->
+      <a href="#oferta" 
+         class="inline-flex items-center justify-center mt-6 px-6 py-3 rounded-[14px] bg-gradient-to-r from-burgundy-700 to-navy-800 text-white font-bold shadow-[0_10px_30px_rgba(2,6,23,0.5)] transform-gpu transition-all duration-250 hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-neutral-200/20"
+         data-analytics-event="click_testimonials_cta">
+        Ver como o método funciona
+        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Social proof carousel will be handled by native JavaScript in main.js -->
+
+<!-- Schema Markup for Video Testimonials - Data-driven -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": [
+    {% for video in testimonials.videos -%}
+    {
+      "@type": "VideoObject",
+      "position": {{ loop.index }},
+      "name": "{{ video.name }} - Testemunho Café com Vendas",
+      "description": "{{ video.result }}",
+      "uploadDate": "2024-01-15"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+
+<!-- Social Proof Section End -->

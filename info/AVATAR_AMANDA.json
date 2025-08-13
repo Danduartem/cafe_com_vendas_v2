@@ -1,0 +1,281 @@
+{
+  "id": "AMANDA_AVATAR_v3",
+  "version": "2025-08-12",
+  "schemaVersion": "1.0.0",
+  "lastUpdated": "2025-08-12",
+  "deprecations": [],
+  "language": "pt-BR",
+  "localization": { "defaultLocale": "pt-BR", "supported": ["pt-BR", "pt-PT"] },
+  "markets": ["BR", "PT"],
+  "currencies": { "primary": "BRL", "supported": ["BRL", "EUR"] },
+  "shortName": "Amanda",
+  "fullName": "Amanda — A Empreendedora em Busca de Liberdade",
+  "shortBio": "Mulher de 35 anos, casada, mãe de 1 filha (5 anos), microempreendedora que trabalha muito e busca transformar esforço em liberdade financeira e de tempo.",
+  "demographics": {
+    "age": 35,
+    "gender": "feminino",
+    "maritalStatus": "casada",
+    "children": "1 filha, 5 anos",
+    "education": "ensino superior completo",
+    "location": "classe média urbana (Brasil e Portugal)",
+    "professionExamples": [
+      "proprietária de clínica/estética",
+      "loja de roupa",
+      "maquiadora",
+      "nutricionista",
+      "arquiteta",
+      "advogada autônoma",
+      "dona de academia"
+    ],
+    "monthlyIncomeBRL": 10000,
+    "businessStage": "microempresa / solo-preneur",
+    "workSetup": "proprietária/gestora operativa, executa e vende diretamente"
+  },
+  "psychographics": {
+    "coreValues": [
+      "trabalho árduo",
+      "responsabilidade familiar",
+      "autonomia",
+      "valorização estética",
+      "crescimento pessoal"
+    ],
+    "primaryBeliefs": [
+      "sucesso vem pelo esforço contínuo",
+      "merecimento depende de sacrifício",
+      "cobrar mais é arriscado"
+    ],
+    "bigFears": [
+      "não ter estabilidade financeira",
+      "falhar e não sustentar a família",
+      "perder clientes se aumentar preços"
+    ],
+    "motivations": [
+      "desejo de liberdade de tempo",
+      "reconhecimento profissional",
+      "capacidade de consumir experiências (viagens, restaurantes, roupas)"
+    ],
+    "personalityTraits": [
+      "determinada",
+      "perfeccionista",
+      "ansiosa em privado",
+      "ambiciosa",
+      "cuidadosa com a imagem"
+    ],
+    "selfImage": "aparece confiante e elegante em público; por dentro sente-se exausta e insegura sobre decisões estratégicas"
+  },
+  "dailyRoutine": {
+    "typicalWorkHours": "8-12 horas/dia",
+    "familyTime": "noite e finais de semana, mas sente que é pouco",
+    "exercise": "treina 3x por semana",
+    "learning": "faz cursos e workshops regularmente, busca formações práticas",
+    "leisure": "pouco tempo para hobbies; prioridades: família, estudos, trabalho"
+  },
+  "primaryPains": [
+    "alto esforço com baixo retorno financeiro",
+    "sobrecarregada e sem tempo para família",
+    "falta de método escalável",
+    "falta de suporte e rede de pessoas com ambição similar",
+    "dificuldade em precificar e vender sem culpa",
+    "dificuldade em vender mais"
+  ],
+  "primaryGoals": [
+    "reduzir horas de trabalho e aumentar faturamento (ex.: 2x-10x com menos esforço)",
+    "ter liberdade para viajar e consumir com conforto",
+    "aumentar preços com segurança",
+    "construir um negócio escalável e com processos",
+    "ser reconhecida como referência no seu nicho",
+    "vender mais e aumentar o faturamento"
+  ],
+  "purchaseBehavior": {
+    "decisionCriteria": [
+      "retorno claro e medível",
+      "prova social (casos reais e números)",
+      "garantia/segurança (reembolso / resultado claro)",
+      "facilidade de implementação (passos práticos)",
+      "tempo e custo justificáveis"
+    ],
+    "priceSensitivity": "média — paga mais por promessa de ROI claro e segurança",
+    "paymentPreferences": ["parcelamento", "boleto", "cartão", "pagamento via Pix"],
+    "averageTicketComfort": "prefere ofertas entre R$200–R$3.000 dependendo do ROI prometido",
+    "salesCycle": "curto-médio (7 dias a 90 dias) dependendo de prova e confiança",
+    "decisionCriteriaWeighted": [
+      { "key": "roi_clarity", "weight": 0.35, "why": "resultado mensurável" },
+      { "key": "social_proof", "weight": 0.25 },
+      { "key": "risk_reversal", "weight": 0.20 },
+      { "key": "ease_of_implementation", "weight": 0.12 },
+      { "key": "time_cost_fit", "weight": 0.08 }
+    ]
+  },
+  "channelsAndFormats": {
+    "priorityChannels": [
+      "Instagram (feed, carrossel e Reels)",
+      "WhatsApp/Telegram (sequências e suporte)",
+      "Email (séries curtas e automações)",
+      "Lives e workshops pagos",
+      "Vídeo curto / depoimentos"
+    ],
+    "contentFormatsPreferred": [
+      "Reels 30–60s com gancho emocional",
+      "Estudos de caso em vídeo",
+      "Mini-workshop (1–2h)",
+      "Sequência de email (4–7 mensagens)",
+      "PDF/Checklist prático",
+      "Depoimentos em texto e vídeo"
+    ],
+    "interactionPreferences": "respostas rápidas, linguagem direta e empática, suporte humano via chat",
+    "constraints": { "maxVideoSec": 60, "reelAspectRatios": ["9:16"], "emailCountRange": [4,7] }
+  },
+  "toneAndVoice": {
+    "primaryTone": "empático, confiante, prático e elegante",
+    "doNotUse": [
+      "jargões técnicos vazios",
+      "linguagem agressiva/masculinizada de 'work harder'",
+      "promessas milagrosas e sensacionalistas",
+      "tom paternalista"
+    ],
+    "preferredPhrases": [
+      "Menos esforço, mais resultado",
+      "Trabalhar melhor — não mais",
+      "Cobrar o que você vale",
+      "Método prático e passo a passo",
+      "Resultados reais, comprovados"
+    ],
+    "languageNotes": "usar PT-BR coloquial, respeitando formalidade moderada; evitar gírias excessivas"
+  },
+  "visualAndUxCues": {
+    "brandAnchors": {
+      "primaryColors": ["#191F3A", "#81171F", "#ECECEC"],
+      "typography": ["Lora (títulos)", "CenturyGothic (corpo)"],
+      "imagery": "lifestyle aspiracional com cenas de família, trabalho elegante, viagens; luz natural; fotos autênticas"
+    },
+    "uiPreferences": [
+      "espaço generoso / sensação de luxo acessível",
+      "CTAs em borgonha com contraste alto",
+      "fundos claros para conteúdos principais",
+      "microinterações sutis e transições elegantes"
+    ],
+    "doNotUseVisuals": [
+      "imagens estereotipadas e muito 'glam' sem autenticidade",
+      "colorações neon ou muito saturadas que quebrem a sofisticação"
+    ]
+  },
+  "objectionsAndShortRebuttals": [
+    {
+      "objection": "Se eu aumentar preço vou perder clientes",
+      "rebuttal": "Você aprende a comunicar valor e segmentar clientes certos; muitos voltam e pagam mais quando veem resultados claros."
+    },
+    {
+      "objection": "Não tenho tempo pra implementar",
+      "rebuttal": "O método é dividido em sprints de 2h/semana com foco em quick-wins que geram caixa rápido."
+    },
+    {
+      "objection": "Já fiz cursos e nada mudou",
+      "rebuttal": "Este sistema combina estratégia + execução com acompanhamento prático e metas mensuráveis — não é só teoria."
+    },
+    {
+      "objection": "Não confio em promessas",
+      "rebuttal": "Mostre provas: cases com números, depoimentos e métricas reais; ofereça garantia curta para reduzir risco."
+    }
+  ],
+  "coreMessagesAndCopyBlocks": {
+    "libraryRefs": { "copyLibrary": "info/AVATAR_COPY_LIBRARY.md" },
+    "elevatorPitch": "Ajudamos empreendedoras a transformar esforço em resultados escaláveis: menos horas, mais faturamento — com método prático, prova social e acompanhamento."
+  },
+  "offersAndPriceAnchors": {
+    "entryOfferExamples": [
+      {
+        "name": "Checklist + Mini-Aula",
+        "priceBRL": 0,
+        "purpose": "captura de leads / confiança"
+      },
+      {
+        "name": "Workshop Rápido (2h)",
+        "priceBRL": 97,
+        "purpose": "qualificar leads e gerar receita"
+      }
+    ],
+    "coreOfferExamples": [
+      {
+        "name": "Programa 90 dias - Implementação",
+        "priceRangeBRL": "997–2997",
+        "valueProposition": "Implementação guiada com metas e acompanhamento; objetivo: aumentar margem e automatizar vendas"
+      }
+    ],
+    "highTicket": [
+      {
+        "name": "Mentoria VIP 3 meses",
+        "priceRangeBRL": "6.000–15.000",
+        "purpose": "transformação completa com suporte intensivo"
+      }
+    ]
+  },
+  "funnelAndCustomerJourney": {
+    "topOfFunnel": {
+      "goal": "identificação e captura",
+      "content": ["Reels de dor/gancho", "Lead magnet (checklist)"],
+      "metrics": ["CTR", "Lead CPL"]
+    },
+    "middleOfFunnel": {
+      "goal": "credibilidade",
+      "content": ["Lives", "Estudos de caso", "Emails educacionais"],
+      "metrics": ["Engajamento", "Assiduidade a lives", "Abertura de emails"]
+    },
+    "bottomOfFunnel": {
+      "goal": "conversão",
+      "content": ["Workshop pago", "Calls 1:1", "Proposta com garantia"],
+      "metrics": ["Taxa de conversão", "CAC", "Tamanho médio do pedido"]
+    },
+    "postPurchase": {
+      "goal": "retenção e upsell",
+      "content": ["Onboarding com quick wins", "Comunidade fechada", "Follow-up semanal"],
+      "metrics": ["Churn", "NPS", "Taxa de upsell"]
+    }
+  },
+  "onboardingFlowForNewCustomers": [
+    "Email de boas-vindas com o primeiro quick-win (checklist estratégico)",
+    "Chamada de diagnóstico 30 min para mapear dores e metas",
+    "Plano de 30/60/90 dias com entregáveis e datas",
+    "Primeiro sprint: implementação de 1 mudança que gere receita",
+    "Grupo ou check-ins semanais para accountability"
+  ],
+  "trustSignals": [
+    "estudos de caso com números",
+    "depoimentos em vídeo",
+    "garantia simples (30 dias/resultado parcial)",
+    "mostra de processos (templates, scripts de vendas)",
+    "métricas e provas de replicabilidade"
+  ],
+  "kpis": {
+    "top": { "ctr_min": 1.5, "lead_cpl_brl_target": 8 },
+    "middle": { "email_open_min": 30, "workshop_attendance_min": 25 },
+    "bottom": { "workshop_to_program_cvr_min": 8, "call_close_rate_min": 20 }
+  },
+  "metricsToTrack": [
+    "leads capturados",
+    "CTR anúncios",
+    "taxa de conversão workshop → programa",
+    "LTV por cliente",
+    "CAC por canal",
+    "taxa de retenção pós-90 dias"
+  ],
+  "segmentation": {
+    "productType": ["servicos", "produtos", "hibrido"],
+    "revenueBandBRL": ["0-10k", "10-30k", "30-100k", "100k+"],
+    "timeAvailability": ["baixa", "media", "alta"],
+    "priceSensitivity": ["baixa", "media", "alta"]
+  },
+  "faqForSales": [
+    {
+      "q": "Tenho medo de aumentar preço e perder clientes. Como funciona?",
+      "a": "Ajudamos a reposicionar sua oferta e a comunicar o valor com provas e scripts. O objetivo é manter clientes certos e atrair novos dispostos a pagar."
+    },
+    {
+      "q": "Quanto tempo preciso dedicar por semana?",
+      "a": "O programa é desenhado em sprints: inicialmente 2–4 horas/semana para implementações que geram resultados rápidos."
+    },
+    {
+      "q": "E se eu já fiz cursos sem resultado?",
+      "a": "Este processo foca em execução com acompanhamento e metas, não só teoria — ajustamos ações ao seu negócio para gerar caixa."
+    }
+  ]
+}
