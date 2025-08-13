@@ -12,11 +12,13 @@ Guidance for Claude Code when working with the Café com Vendas landing page.
 
 ## Commands
 ```bash
-npm run dev          # Development with watch (includes tokens:build + build:css)
+npm run dev          # Development with watch (tokens + CSS + JS + Eleventy)
 npm run start        # Alternative development server 
-npm run build        # Production build  
+npm run build        # Production build (tokens + CSS + JS + Eleventy)
 npm run tokens:build # Generate CSS from JSON tokens
 npm run build:css    # Build Tailwind CSS with PostCSS
+npm run build:js     # Build JavaScript with Vite (production)
+npm run build:js:dev # Build JavaScript with Vite (development + source maps)
 npm run clean        # Clean build directory
 ```
 
@@ -27,7 +29,7 @@ npm run clean        # Clean build directory
 src/
 ├── _includes/
 │   ├── layout.njk           # Base HTML
-│   └── components/*.njk    # Section components
+│   └── components/*.njk     # Section components
 ├── _data/                   # Eleventy data layer
 │   ├── site.js             # Site metadata
 │   ├── event.js            # Loads DATA_event.json
@@ -36,20 +38,50 @@ src/
 │   └── tokens.js           # Loads DATA_design_tokens.json
 ├── index.njk               # Main page (includes components in order)
 └── assets/
-    ├── css/main.css       # Tailwind + tokens
-    ├── js/main.js         # All JS here (no inline)
-    └── fonts/             # Local Lora & Century Gothic
+    ├── css/
+    │   ├── main.css        # Tailwind + tokens entry point
+    │   └── _tokens.generated.css # Generated from JSON tokens
+    ├── js/                 # Modular JavaScript architecture
+    │   ├── main.js         # Entry point (imports app.js)
+    │   ├── app.js          # Application controller
+    │   ├── config/
+    │   │   └── constants.js # Configuration constants
+    │   ├── core/
+    │   │   ├── analytics.js # Analytics tracking
+    │   │   └── state.js    # State management
+    │   ├── utils/
+    │   │   ├── animations.js # Animation utilities
+    │   │   ├── dom.js      # DOM helpers
+    │   │   ├── throttle.js # Performance utilities
+    │   │   └── index.js    # Utils barrel export
+    │   └── components/
+    │       ├── hero.js     # Hero section
+    │       ├── banner.js   # Top banner
+    │       ├── faq.js      # FAQ accordion
+    │       ├── offer.js    # Offer section
+    │       ├── testimonials.js # Testimonials carousel
+    │       ├── footer.js   # Footer interactions
+    │       ├── final-cta.js # Final CTA section
+    │       ├── youtube.js  # YouTube embeds
+    │       ├── navigation.js # Navigation utilities
+    │       └── index.js    # Components barrel export
+    └── fonts/              # Local Lora & Century Gothic
 
-info/                      # Design system & content
-├── DATA_design_tokens.json     # Unified design system (colors, typography, spacing)
-├── DATA_event.json             # Event data (prices, dates)
-├── DATA_avatar.json            # Persona & objections
-├── CONTENT_copy_library.md     # Copy examples & headlines
-├── GUIDE_voice_tone.md         # Voice & tone guidelines
-├── GUIDE_brand_visual.md       # Brand guidelines  
+info/                       # Design system & content
+├── DATA_design_tokens.json      # Unified design system
+├── DATA_event.json              # Event data (prices, dates)
+├── DATA_avatar.json             # Persona & objections
+├── CONTENT_copy_library.md      # Copy examples & headlines
+├── GUIDE_voice_tone.md          # Voice & tone guidelines
+├── GUIDE_brand_visual.md        # Brand guidelines
 ├── GUIDE_claude_instructions.md # Claude context & instructions
-├── BUILD_landing_page.md       # Development blueprint
-└── *.md                        # Other guidelines
+├── BUILD_landing_page.md        # Development blueprint
+└── *.md                         # Other guidelines
+
+docs/
+└── VITE.md                 # Vite configuration guide
+
+vite.config.js              # Vite bundler configuration
 ```
 
 ## Critical Rules
@@ -73,19 +105,39 @@ info/                      # Design system & content
 ### Tech Stack & Architecture
 - **Static Site Generator**: Eleventy (.eleventy.js config)
 - **Templates**: Nunjucks (.njk files) 
+- **Build Tool**: Vite for unified JS/CSS bundling and development server
 - **CSS Framework**: Tailwind v4 with PostCSS (pure CSS-based configuration via @theme)
 - **Data Layer**: Eleventy data files (src/_data/*.js) load from info/*.json
 - **Design System**: JSON tokens → CSS custom properties via build-tokens.js
 - **Fonts**: Local only (Lora display, Century Gothic body)
-- **JavaScript**: Vanilla JS in main.js only
+- **JavaScript**: Modular ES6 architecture with Vite bundling
 
 **Data Flow**: `info/DATA_design_tokens.json` → `scripts/build-tokens.js` → `src/assets/css/_tokens.generated.css` → `@theme` block in main.css
+**JS Architecture**: ES6 modules → Vite bundler → Single optimized IIFE bundle for browser
 
 ### Components
 - Structure: `<section id="name" aria-label="Description">`
 - Animations: Add `data-reveal` attribute
 - Analytics: Add `data-analytics-event="event_name"`
-- Each section in `src/_includes/components/`
+- HTML templates in `src/_includes/components/`
+- JavaScript modules in `src/assets/js/components/`
+
+### JavaScript Architecture
+- **Entry Point**: `main.js` imports and initializes the application
+- **Application Controller**: `app.js` orchestrates all components
+- **Modular Design**: Each component has its own dedicated file
+- **Utilities**: Shared functions in `utils/` (DOM, animations, performance)
+- **Configuration**: Centralized constants and state management
+- **Build Output**: Single optimized IIFE bundle for browser compatibility
+- **Development**: Source maps enabled for debugging
+- **Production**: Minified and tree-shaken for performance
+
+**Component Creation Pattern**:
+1. Create `.njk` template in `src/_includes/components/`
+2. Create `.js` module in `src/assets/js/components/`  
+3. Export component object with `init()` method
+4. Import and register in `src/assets/js/app.js`
+5. Vite automatically bundles everything
 
 ### Design Tokens
 - Colors: Navy `#191F3A`, Burgundy `#81171F`, Neutral `#ECECEC`
@@ -144,15 +196,23 @@ info/                      # Design system & content
 2. `scripts/build-tokens.js` generates `_tokens.generated.css` with CSS custom properties
 3. `@theme` block in main.css defines Tailwind configuration using CSS custom properties
 4. `npm run build:css` processes with PostCSS (Tailwind + Autoprefixer)
-5. Eleventy builds static HTML using data from src/_data layer
+5. `npm run build:js` bundles modular JavaScript with Vite (ES6 modules → IIFE)
+6. Eleventy builds static HTML using data from src/_data layer
 
-**Note**: This project uses Tailwind v4's pure CSS-based configuration. No `tailwind.config.js` file is needed.
+**Vite Benefits**: 
+- Unified build pipeline (single command for dev/prod)
+- Hot reload for both JS and CSS changes
+- Optimized production output (minification, tree-shaking, purging)
+- Direct CSS imports in JavaScript modules
+- Source maps for development debugging
+
+**Note**: This project uses Tailwind v4's pure CSS-based configuration with Vite as the unified build tool.
 
 **MANDATORY Code Review Checklist for ALL Components:**
 - 🚨 **SCAN FOR VIOLATIONS**: Search entire component for `style.`, `<style>`, `style=""`
 - ✅ No `<style>` blocks or `style=""` attributes  
 - ✅ No `element.style.*` assignments in JavaScript
-- ✅ All JavaScript in `main.js` (not inline)
+- ✅ All JavaScript in modular ES6 files (not inline)
 - ✅ Only design token colors (no hex codes like `#f59e0b`)
 - ✅ Standard Tailwind animations (no custom animation classes)
 - ✅ Tailwind utilities only (no custom CSS classes)
