@@ -29,8 +29,9 @@ export const Footer = {
         
         patterns.forEach((pattern, index) => {
             pattern.classList.add('animate-pulse');
-            pattern.style.animationDelay = delays[index % delays.length];
-            pattern.style.animationDuration = durations[index % durations.length];
+            pattern.style.setProperty('--animation-delay', delays[index % delays.length]);
+            pattern.style.setProperty('--animation-duration', durations[index % durations.length]);
+            pattern.classList.add('floating-pattern');
             
             pattern.addEventListener('mouseenter', () => {
                 pattern.classList.add('scale-110', 'transition-transform', 'duration-500');
@@ -51,7 +52,7 @@ export const Footer = {
                 
                 const glowDiv = document.createElement('div');
                 glowDiv.className = 'absolute inset-0 bg-gold-500/10 rounded-2xl blur-lg opacity-0 transition-opacity duration-500';
-                this.style.position = 'relative';
+                this.classList.add('relative');
                 this.appendChild(glowDiv);
                 
                 setTimeout(() => {
@@ -85,11 +86,11 @@ export const Footer = {
             const x = e.clientX - rect.left - size / 2;
             const y = e.clientY - rect.top - size / 2;
             
-            ripple.className = 'absolute rounded-full bg-green-400/30 pointer-events-none';
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            ripple.style.animation = 'ping 0.6s cubic-bezier(0, 0, 0.2, 1)';
+            ripple.className = 'absolute rounded-full bg-green-400/30 pointer-events-none animate-ping';
+            ripple.style.setProperty('--ripple-size', size + 'px');
+            ripple.style.setProperty('--ripple-x', x + 'px');
+            ripple.style.setProperty('--ripple-y', y + 'px');
+            ripple.classList.add('ripple-effect');
             
             this.appendChild(ripple);
             setTimeout(() => ripple.remove(), 600);
@@ -102,9 +103,10 @@ export const Footer = {
         for (let i = 0; i < 6; i++) {
             const particle = document.createElement('div');
             particle.className = 'particle';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 2 + 's';
-            element.style.position = 'relative';
+            particle.style.setProperty('--particle-left', Math.random() * 100 + '%');
+            particle.style.setProperty('--particle-delay', Math.random() * 2 + 's');
+            particle.classList.add('particle-effect');
+            element.classList.add('relative');
             element.appendChild(particle);
             
             setTimeout(() => particle.remove(), 8000);

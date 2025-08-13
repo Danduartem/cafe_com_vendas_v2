@@ -75,7 +75,8 @@ export const Testimonials = {
         
         const updateCarousel = () => {
             const translateX = -currentIndex * (slideWidth + 24);
-            carouselTrack.style.transform = `translateX(${translateX}px)`;
+            carouselTrack.style.setProperty('--carousel-translate-x', `${translateX}px`);
+            carouselTrack.classList.add('carousel-transform');
             this.updatePagination();
             this.updateNavigationButtons();
         };
@@ -116,7 +117,8 @@ export const Testimonials = {
         const initCarousel = () => {
             calculateSlidesPerViewLocal();
             slides.forEach(slide => {
-                slide.style.minWidth = `${slideWidth}px`;
+                slide.style.setProperty('--slide-width', `${slideWidth}px`);
+                slide.classList.add('carousel-slide-width');
             });
             createPagination();
             updateCarousel();
@@ -133,7 +135,8 @@ export const Testimonials = {
         const handleResize = debounce(() => {
             calculateSlidesPerViewLocal();
             slides.forEach(slide => {
-                slide.style.minWidth = `${slideWidth}px`;
+                slide.style.setProperty('--slide-width', `${slideWidth}px`);
+                slide.classList.add('carousel-slide-width');
             });
             createPagination();
             

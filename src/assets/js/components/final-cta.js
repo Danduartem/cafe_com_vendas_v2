@@ -97,9 +97,10 @@ export const FinalCTA = {
         const y = e.clientY - rect.top - size / 2;
         
         ripple.className = 'absolute rounded-full bg-white/20 pointer-events-none animate-ping';
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = x + 'px';
-        ripple.style.top = y + 'px';
+        ripple.style.setProperty('--ripple-size', size + 'px');
+        ripple.style.setProperty('--ripple-x', x + 'px');
+        ripple.style.setProperty('--ripple-y', y + 'px');
+        ripple.classList.add('ripple-effect');
         
         e.currentTarget.appendChild(ripple);
         

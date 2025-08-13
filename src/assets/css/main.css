@@ -145,6 +145,50 @@ html {
 }
 
 
+/* Carousel utilities for testimonials component */
+.carousel-transform {
+  transform: translateX(var(--carousel-translate-x, 0));
+  transition: transform 0.3s ease-in-out;
+}
+
+.carousel-slide-width {
+  min-width: var(--slide-width, auto);
+}
+
+/* Footer component utilities */
+.floating-pattern {
+  animation-delay: var(--animation-delay, 0s);
+  animation-duration: var(--animation-duration, 8s);
+}
+
+.ripple-effect {
+  width: var(--ripple-size, 0);
+  height: var(--ripple-size, 0);
+  left: var(--ripple-x, 0);
+  top: var(--ripple-y, 0);
+}
+
+.particle-effect {
+  left: var(--particle-left, 0);
+  animation-delay: var(--particle-delay, 0s);
+}
+
+/* SVG gradient stops */
+.gradient-stop-navy-start {
+  stop-color: #191F3A;
+  stop-opacity: 1;
+}
+
+.gradient-stop-burgundy-middle {
+  stop-color: #81171F;
+  stop-opacity: 0.8;
+}
+
+.gradient-stop-navy-end {
+  stop-color: #191F3A;
+  stop-opacity: 1;
+}
+
 /* Accessibility - respect user's motion preferences */
 @media (prefers-reduced-motion: reduce) {
   * {
