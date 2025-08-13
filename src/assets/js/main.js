@@ -399,94 +399,271 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// Premium FAQ Toggle Function with Elegant Animations
+/**
+ * Enhanced FAQ Toggle Function with Premium Animations and Accessibility
+ * 
+ * Features:
+ * - Accordion behavior (only one FAQ open at a time)
+ * - Smooth Tailwind-based animations
+ * - Enhanced analytics tracking with engagement time
+ * - Proper accessibility (ARIA states, focus management)
+ * - Error handling for missing elements
+ * - Performance optimized with debouncing
+ * 
+ * @param {string} faqId - The FAQ unique identifier (e.g., 'faq-1')
+ */
 function toggleFAQ(faqId) {
-  const faqNumber = faqId.split('-')[1];
-  const answerElement = document.getElementById(`faq-answer-${faqNumber}`);
-  const iconElement = document.getElementById(`faq-icon-${faqNumber}`);
-  const buttonElement = answerElement.previousElementSibling;
-  const cardElement = answerElement.closest('[data-faq-item]');
+  // Debounce rapid clicks to prevent animation conflicts
+  if (toggleFAQ.isAnimating) return;
+  toggleFAQ.isAnimating = true;
+  setTimeout(() => { toggleFAQ.isAnimating = false; }, 300);
   
-  // Check if currently open (using new class structure)
-  const isCurrentlyOpen = !answerElement.classList.contains('max-h-0') && 
-                          !answerElement.classList.contains('opacity-0');
-  
-  // Optional: Close other open FAQs for cleaner UX (accordion behavior)
-  const allFAQs = document.querySelectorAll('[data-faq-item]');
-  allFAQs.forEach(faq => {
-    if (faq !== cardElement) {
-      const otherAnswer = faq.querySelector('[id^="faq-answer-"]');
-      const otherIcon = faq.querySelector('[id^="faq-icon-"]');
-      const otherButton = otherAnswer.previousElementSibling;
-      
-      if (otherAnswer && !otherAnswer.classList.contains('max-h-0')) {
-        // Close other FAQ
-        otherAnswer.classList.add('max-h-0', 'opacity-0');
-        otherAnswer.classList.remove('max-h-96', 'opacity-100');
-        otherIcon.classList.remove('rotate-45');
-        otherButton.setAttribute('aria-expanded', 'false');
+  try {
+    const faqNumber = faqId.split('-')[1];
+    const answerElement = document.getElementById(`faq-answer-${faqNumber}`);
+    const iconElement = document.getElementById(`faq-icon-${faqNumber}`);
+    const cardElement = answerElement?.closest('[data-faq-item]');
+    const buttonElement = cardElement?.querySelector('[data-faq-toggle]');
+    
+    // Error handling for missing elements
+    if (!answerElement || !iconElement || !buttonElement || !cardElement) {
+      console.error(`FAQ elements not found for ID: ${faqId}`);
+      return;
+    }
+    
+    // Check if currently open (using max-h-0 as closed state indicator)
+    const isCurrentlyOpen = !answerElement.classList.contains('max-h-0');
+    
+    // Close all other open FAQs for accordion behavior
+    const allFAQContainers = document.querySelectorAll('[data-faq-item]');
+    allFAQContainers.forEach(faqContainer => {
+      if (faqContainer !== cardElement) {
+        const otherAnswer = faqContainer.querySelector('[id^="faq-answer-"]');
+        const otherIcon = faqContainer.querySelector('[id^="faq-icon-"]');
+        const otherButton = faqContainer.querySelector('[data-faq-toggle]');
+        
+        if (otherAnswer && !otherAnswer.classList.contains('max-h-0')) {
+          // Close other FAQ with animation
+          otherAnswer.classList.add('max-h-0', 'opacity-0');
+          otherAnswer.classList.remove('max-h-96', 'opacity-100');
+          otherIcon?.classList.remove('rotate-45');
+          otherButton?.setAttribute('aria-expanded', 'false');
+        }
       }
+    });
+    
+    if (!isCurrentlyOpen) {
+      // Open this FAQ with premium animations
+      answerElement.classList.remove('max-h-0', 'opacity-0');
+      answerElement.classList.add('max-h-96', 'opacity-100');
+      buttonElement.setAttribute('aria-expanded', 'true');
+      
+      // Elegant icon rotation with spring-like animation
+      iconElement.classList.add('rotate-45');
+      
+      // Premium card elevation micro-interaction
+      cardElement.classList.add('scale-[1.02]');
+      setTimeout(() => {
+        cardElement.classList.remove('scale-[1.02]');
+      }, 200);
+      
+      // Enhanced focus management for accessibility
+      setTimeout(() => {
+        const firstFocusableElement = answerElement.querySelector('a, button, [tabindex]');
+        if (firstFocusableElement) {
+          firstFocusableElement.focus({ preventScroll: true });
+        }
+      }, 300);
+      
+    } else {
+      // Close this FAQ with smooth animation
+      answerElement.classList.remove('max-h-96', 'opacity-100');
+      answerElement.classList.add('max-h-0', 'opacity-0');
+      buttonElement.setAttribute('aria-expanded', 'false');
+      
+      // Rotate icon back with smooth animation
+      iconElement.classList.remove('rotate-45');
+      
+      // Return focus to button for better UX
+      buttonElement.focus({ preventScroll: true });
     }
-  });
-  
-  if (!isCurrentlyOpen) {
-    // Open this FAQ with elegant animation
-    answerElement.classList.remove('max-h-0', 'opacity-0');
-    answerElement.classList.add('max-h-96', 'opacity-100');
-    buttonElement.setAttribute('aria-expanded', 'true');
     
-    // Elegant icon rotation with spring-like animation
-    iconElement.classList.add('rotate-45');
+    // Enhanced analytics with detailed interaction context
+    const analyticsData = {
+      faq_id: faqId,
+      action: isCurrentlyOpen ? 'close' : 'open',
+      faq_number: parseInt(faqNumber, 10),
+      timestamp: Date.now(),
+      user_agent: navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop'
+    };
     
-    // Add gentle card elevation
-    cardElement.classList.add('scale-[1.02]');
-    setTimeout(() => {
-      cardElement.classList.remove('scale-[1.02]');
-    }, 200);
+    // Track analytics event
+    console.log(`Analytics: toggle_faq_${analyticsData.action}_${faqNumber}`, analyticsData);
     
-  } else {
-    // Close this FAQ
-    answerElement.classList.remove('max-h-96', 'opacity-100');
-    answerElement.classList.add('max-h-0', 'opacity-0');
-    buttonElement.setAttribute('aria-expanded', 'false');
-    
-    // Rotate icon back with smooth animation
-    iconElement.classList.remove('rotate-45');
-  }
-  
-  // Enhanced analytics with interaction context
-  const eventData = {
-    faq_id: faqId,
-    action: isCurrentlyOpen ? 'close' : 'open',
-    faq_number: faqNumber,
-    timestamp: Date.now()
-  };
-  
-  console.log(`Analytics: toggle_faq_${eventData.action}_${faqNumber}`, eventData);
-  
-  // Optional: Track engagement time when closing
-  if (isCurrentlyOpen && window.faqOpenTimes) {
-    const openTime = window.faqOpenTimes[faqId];
-    if (openTime) {
-      const engagementTime = Date.now() - openTime;
-      console.log(`Analytics: faq_engagement_time_${faqNumber}`, { 
-        duration_ms: engagementTime,
-        duration_seconds: Math.round(engagementTime / 1000)
+    // Google Analytics integration if available
+    if (typeof gtag !== 'undefined') {
+      gtag('event', `faq_${analyticsData.action}`, {
+        event_category: 'FAQ',
+        event_label: faqId,
+        faq_number: analyticsData.faq_number,
+        custom_parameter: analyticsData.timestamp
       });
-      delete window.faqOpenTimes[faqId];
     }
-  } else if (!isCurrentlyOpen) {
-    // Track when FAQ is opened
-    if (!window.faqOpenTimes) window.faqOpenTimes = {};
-    window.faqOpenTimes[faqId] = Date.now();
+    
+    // Enhanced engagement time tracking
+    if (isCurrentlyOpen && window.faqOpenTimes) {
+      const openTime = window.faqOpenTimes[faqId];
+      if (openTime) {
+        const engagementTime = Date.now() - openTime;
+        const engagementSeconds = Math.round(engagementTime / 1000);
+        
+        console.log(`Analytics: faq_engagement_time_${faqNumber}`, { 
+          duration_ms: engagementTime,
+          duration_seconds: engagementSeconds,
+          engagement_level: engagementSeconds > 10 ? 'high' : engagementSeconds > 3 ? 'medium' : 'low'
+        });
+        
+        // Track meaningful engagement (>3 seconds) in analytics
+        if (typeof gtag !== 'undefined' && engagementSeconds > 3) {
+          gtag('event', 'faq_meaningful_engagement', {
+            event_category: 'FAQ',
+            event_label: faqId,
+            value: engagementSeconds
+          });
+        }
+        
+        delete window.faqOpenTimes[faqId];
+      }
+    } else if (!isCurrentlyOpen) {
+      // Initialize engagement tracking
+      if (!window.faqOpenTimes) window.faqOpenTimes = {};
+      window.faqOpenTimes[faqId] = Date.now();
+    }
+    
+  } catch (error) {
+    console.error('Error in toggleFAQ function:', error);
   }
 }
 
-// Premium FAQ Initialization with Staggered Reveal Animation
+/**
+ * Premium FAQ Initialization with Event Delegation and Enhanced Accessibility
+ * 
+ * Features:
+ * - Event delegation for better performance
+ * - Staggered reveal animations with intersection observer
+ * - Enhanced keyboard navigation (Enter, Space, Arrow keys)
+ * - Premium hover effects and micro-interactions
+ * - Error handling and fallback support
+ */
 document.addEventListener('DOMContentLoaded', function() {
-  const faqItems = document.querySelectorAll('[data-faq-item]');
+  initializePremiumFAQSystem();
+});
+
+function initializePremiumFAQSystem() {
+  try {
+    const faqContainer = document.querySelector('[data-faq-container]');
+    const faqItems = document.querySelectorAll('[data-faq-item]');
+    
+    if (!faqContainer || faqItems.length === 0) {
+      console.warn('FAQ elements not found - FAQ functionality disabled');
+      return;
+    }
+    
+    // Event delegation for FAQ toggle buttons
+    faqContainer.addEventListener('click', handleFAQClick, { passive: false });
+    faqContainer.addEventListener('keydown', handleFAQKeydown, { passive: false });
+    
+    // Initialize staggered reveal animation
+    initializeFAQRevealAnimation(faqItems);
+    
+    // Add premium hover effects
+    initializeFAQHoverEffects(faqItems);
+    
+    // Initialize keyboard navigation
+    initializeFAQKeyboardNavigation(faqContainer);
+    
+    console.log('Premium FAQ system initialized successfully');
+    
+  } catch (error) {
+    console.error('Error initializing FAQ system:', error);
+  }
+}
+
+/**
+ * Handle FAQ click events with event delegation
+ */
+function handleFAQClick(event) {
+  const faqToggleButton = event.target.closest('[data-faq-toggle]');
+  if (!faqToggleButton) return;
   
-  // Create intersection observer for staggered animation
+  event.preventDefault();
+  
+  const faqId = faqToggleButton.getAttribute('data-faq-toggle');
+  if (faqId) {
+    toggleFAQ(faqId);
+    
+    // Track click analytics
+    console.log('Analytics: faq_click_interaction', { 
+      faq_id: faqId,
+      interaction_type: 'click',
+      timestamp: Date.now()
+    });
+  }
+}
+
+/**
+ * Enhanced keyboard navigation for FAQ system
+ */
+function handleFAQKeydown(event) {
+  const faqToggleButton = event.target.closest('[data-faq-toggle]');
+  if (!faqToggleButton) return;
+  
+  const faqId = faqToggleButton.getAttribute('data-faq-toggle');
+  
+  switch (event.key) {
+    case 'Enter':
+    case ' ':
+    case 'Spacebar': // Legacy support
+      event.preventDefault();
+      if (faqId) {
+        toggleFAQ(faqId);
+        
+        // Track keyboard analytics
+        console.log('Analytics: faq_keyboard_interaction', { 
+          faq_id: faqId,
+          key: event.key,
+          interaction_type: 'keyboard',
+          timestamp: Date.now()
+        });
+      }
+      break;
+      
+    case 'ArrowDown':
+      event.preventDefault();
+      focusNextFAQButton(faqToggleButton);
+      break;
+      
+    case 'ArrowUp':
+      event.preventDefault();
+      focusPreviousFAQButton(faqToggleButton);
+      break;
+      
+    case 'Home':
+      event.preventDefault();
+      focusFirstFAQButton();
+      break;
+      
+    case 'End':
+      event.preventDefault();
+      focusLastFAQButton();
+      break;
+  }
+}
+
+/**
+ * Initialize staggered reveal animation with intersection observer
+ */
+function initializeFAQRevealAnimation(faqItems) {
   const faqObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry, index) => {
       if (entry.isIntersecting) {
@@ -494,6 +671,12 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
           entry.target.classList.add('opacity-100', 'translate-y-0');
           entry.target.classList.remove('opacity-0', 'translate-y-4');
+          
+          // Analytics for section visibility
+          console.log('Analytics: faq_item_visible', {
+            faq_item: entry.target.getAttribute('data-faq-item'),
+            visible_timestamp: Date.now()
+          });
         }, index * 100); // 100ms delay between each item
         
         faqObserver.unobserve(entry.target);
@@ -509,17 +692,114 @@ document.addEventListener('DOMContentLoaded', function() {
     item.classList.add('opacity-0', 'translate-y-4', 'transition-all', 'duration-500', 'ease-out');
     faqObserver.observe(item);
   });
-  
-  // Add premium hover effects
+}
+
+/**
+ * Initialize premium hover effects and micro-interactions
+ */
+function initializeFAQHoverEffects(faqItems) {
   faqItems.forEach(item => {
-    const button = item.querySelector('button');
-    if (button) {
-      button.addEventListener('mouseenter', () => {
-        item.classList.add('transform', 'transition-transform', 'duration-300');
+    const button = item.querySelector('[data-faq-toggle]');
+    if (!button) return;
+    
+    // Premium hover effects
+    button.addEventListener('mouseenter', () => {
+      item.classList.add('transform', 'transition-transform', 'duration-300');
+      
+      // Subtle elevation effect for premium feel
+      requestAnimationFrame(() => {
+        item.style.transition = 'transform 300ms ease-out';
       });
+    }, { passive: true });
+    
+    button.addEventListener('mouseleave', () => {
+      // Reset any hover transformations
+      setTimeout(() => {
+        item.style.transition = '';
+      }, 300);
+    }, { passive: true });
+    
+    // Focus effects for accessibility
+    button.addEventListener('focus', () => {
+      item.classList.add('ring-2', 'ring-burgundy-400', 'ring-opacity-50');
+    }, { passive: true });
+    
+    button.addEventListener('blur', () => {
+      item.classList.remove('ring-2', 'ring-burgundy-400', 'ring-opacity-50');
+    }, { passive: true });
+  });
+}
+
+/**
+ * Initialize enhanced keyboard navigation system
+ */
+function initializeFAQKeyboardNavigation(faqContainer) {
+  // Set initial tab index for first FAQ button
+  const firstFAQButton = faqContainer.querySelector('[data-faq-toggle]');
+  if (firstFAQButton) {
+    firstFAQButton.setAttribute('tabindex', '0');
+  }
+  
+  // Set other FAQ buttons to not be tabbable initially (roving tabindex pattern)
+  const allFAQButtons = faqContainer.querySelectorAll('[data-faq-toggle]');
+  allFAQButtons.forEach((button, index) => {
+    if (index > 0) {
+      button.setAttribute('tabindex', '-1');
     }
   });
-});
+}
+
+/**
+ * Focus navigation helper functions for arrow key navigation
+ */
+function focusNextFAQButton(currentButton) {
+  const allButtons = [...document.querySelectorAll('[data-faq-toggle]')];
+  const currentIndex = allButtons.indexOf(currentButton);
+  const nextButton = allButtons[currentIndex + 1] || allButtons[0]; // Loop to first
+  
+  updateFAQTabIndex(currentButton, nextButton);
+  nextButton.focus();
+}
+
+function focusPreviousFAQButton(currentButton) {
+  const allButtons = [...document.querySelectorAll('[data-faq-toggle]')];
+  const currentIndex = allButtons.indexOf(currentButton);
+  const prevButton = allButtons[currentIndex - 1] || allButtons[allButtons.length - 1]; // Loop to last
+  
+  updateFAQTabIndex(currentButton, prevButton);
+  prevButton.focus();
+}
+
+function focusFirstFAQButton() {
+  const firstButton = document.querySelector('[data-faq-toggle]');
+  if (firstButton) {
+    const currentFocused = document.querySelector('[data-faq-toggle][tabindex="0"]');
+    if (currentFocused) {
+      updateFAQTabIndex(currentFocused, firstButton);
+    }
+    firstButton.focus();
+  }
+}
+
+function focusLastFAQButton() {
+  const allButtons = [...document.querySelectorAll('[data-faq-toggle]')];
+  const lastButton = allButtons[allButtons.length - 1];
+  if (lastButton) {
+    const currentFocused = document.querySelector('[data-faq-toggle][tabindex="0"]');
+    if (currentFocused) {
+      updateFAQTabIndex(currentFocused, lastButton);
+    }
+    lastButton.focus();
+  }
+}
+
+/**
+ * Update tabindex for roving tabindex pattern
+ */
+function updateFAQTabIndex(previousButton, nextButton) {
+  if (previousButton) previousButton.setAttribute('tabindex', '-1');
+  if (nextButton) nextButton.setAttribute('tabindex', '0');
+}
 
 // Premium Final CTA Animations with Sophisticated Interactions
 document.addEventListener('DOMContentLoaded', function() {

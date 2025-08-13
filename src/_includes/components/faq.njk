@@ -1,5 +1,5 @@
 <!-- FAQ Section -->
-<section id="faq" aria-label="Perguntas Frequentes" class="relative py-20 lg:py-32 overflow-hidden">
+<section id="faq" aria-label="{{ faq.meta.section_title }}" class="relative py-20 lg:py-32 overflow-hidden">
   <!-- Elegant Background with Subtle Gradient -->
   <div class="absolute inset-0 bg-gradient-to-br from-neutral-50 via-white to-peach-50/30"></div>
   
@@ -17,204 +17,66 @@
         <div class="h-1 w-16 bg-gradient-to-r from-burgundy-500 to-gold-400 rounded-full mx-auto mb-4"></div>
       </div>
       <h2 class="font-lora text-4xl lg:text-5xl font-bold text-navy-800 mb-6 tracking-tight">
-        Perguntas Frequentes
+        {{ faq.meta.section_title }}
       </h2>
       <p class="font-century text-lg text-navy-600 max-w-2xl mx-auto leading-relaxed">
-        Todas as dúvidas que você pode ter sobre esta experiência transformadora
+        {{ faq.meta.section_subtitle }}
       </p>
     </div>
 
     <!-- Premium FAQ Grid with Golden Ratio -->
-    <div class="space-y-6" data-reveal>
+    <div class="space-y-6" data-reveal data-faq-container>
       
-      <!-- Premium FAQ Item 1 -->
-      <div class="group relative" data-faq-item="1">
-        <!-- Glassmorphism Card -->
-        <div class="relative bg-white/90 backdrop-blur-sm border border-white/50 rounded-2xl overflow-hidden shadow-lg shadow-navy-900/5 transition-all duration-500 hover:shadow-xl hover:shadow-navy-900/10 hover:-translate-y-1">
-          <!-- Subtle gradient overlay -->
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-peach-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      {% for item in faq.items %}
+      <!-- Premium FAQ Item {{ item.number }}{% if item.is_special %} - {{ item.special_badge }} (Critical for Conversion){% endif %} -->
+      <div class="group relative" data-faq-item="{{ item.number }}">
+        <!-- {% if item.is_special %}Premium Card with Special Highlight{% else %}Glassmorphism Card{% endif %} -->
+        <div class="relative {% if item.is_special %}bg-gradient-to-br from-white/95 to-gold-50/50 backdrop-blur-sm border border-gold-300/40{% else %}bg-white/90 backdrop-blur-sm border border-white/50{% endif %} rounded-2xl overflow-hidden shadow-lg {% if item.is_special %}shadow-gold-900/10{% else %}shadow-navy-900/5{% endif %} transition-all duration-500 hover:shadow-xl {% if item.is_special %}hover:shadow-gold-900/20{% else %}hover:shadow-navy-900/10{% endif %} hover:-translate-y-1">
           
-          <!-- Interactive Question Button -->
-          <button 
-            type="button"
-            class="relative w-full text-left px-8 py-7 flex items-start justify-between focus:outline-none focus:ring-2 focus:ring-burgundy-400/50 focus:ring-offset-2 focus:ring-offset-white group transition-all duration-300"
-            onclick="toggleFAQ('faq-1')"
-            aria-expanded="false"
-            aria-controls="faq-answer-1"
-            data-analytics-event="open_faq_business_type"
-          >
-            <div class="flex-1 pr-6">
-              <h3 class="font-lora text-xl lg:text-2xl font-semibold text-navy-800 mb-2 group-hover:text-burgundy-700 transition-colors duration-300 leading-tight">
-                Para que tipo de negócio é este evento?
-              </h3>
-              <p class="font-century text-sm text-navy-500 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                Clique para saber se este evento é ideal para você
-              </p>
-            </div>
-            
-            <!-- Premium Icon with Elegant Animation -->
-            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-burgundy-500 to-burgundy-700 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-burgundy-500/30 transition-all duration-300 group-hover:scale-110">
-              <svg 
-                id="faq-icon-1" 
-                class="w-6 h-6 text-white transform transition-transform duration-500 ease-spring"
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-                stroke-width="2.5"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-              </svg>
-            </div>
-          </button>
-          
-          <!-- Answer Container with Premium Styling -->
-          <div 
-            id="faq-answer-1" 
-            class="overflow-hidden transition-all duration-500 ease-out max-h-0 opacity-0"
-            role="region"
-          >
-            <div class="px-8 pb-8">
-              <!-- Elegant separator -->
-              <div class="h-px bg-gradient-to-r from-transparent via-neutral-300 to-transparent mb-6"></div>
-              
-              <div class="bg-gradient-to-br from-peach-50/50 to-gold-50/30 rounded-xl p-6 border border-peach-200/30">
-                <p class="font-century text-lg text-navy-800 leading-relaxed mb-4">
-                  Para empreendedoras com produto/serviço validado que querem estruturar oferta, melhorar margens e automatizar vendas.
-                </p>
-                <div class="flex items-start space-x-3 text-burgundy-700">
-                  <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                  <p class="font-century text-base text-navy-700">
-                    <strong>Ideal para:</strong> Negócios de serviços, cursos e produtos digitais com foco em escala sustentável
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Premium FAQ Item 2 -->
-      <div class="group relative" data-faq-item="2">
-        <!-- Glassmorphism Card -->
-        <div class="relative bg-white/90 backdrop-blur-sm border border-white/50 rounded-2xl overflow-hidden shadow-lg shadow-navy-900/5 transition-all duration-500 hover:shadow-xl hover:shadow-navy-900/10 hover:-translate-y-1">
-          <!-- Subtle gradient overlay -->
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-gold-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          
-          <!-- Interactive Question Button -->
-          <button 
-            type="button"
-            class="relative w-full text-left px-8 py-7 flex items-start justify-between focus:outline-none focus:ring-2 focus:ring-burgundy-400/50 focus:ring-offset-2 focus:ring-offset-white group transition-all duration-300"
-            onclick="toggleFAQ('faq-2')"
-            aria-expanded="false"
-            aria-controls="faq-answer-2"
-            data-analytics-event="open_faq_time_justification"
-          >
-            <div class="flex-1 pr-6">
-              <h3 class="font-lora text-xl lg:text-2xl font-semibold text-navy-800 mb-2 group-hover:text-burgundy-700 transition-colors duration-300 leading-tight">
-                Não tenho mesmo tempo. Como justificar um dia fora?
-              </h3>
-              <p class="font-century text-sm text-navy-500 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                Descubra como um dia pode transformar semanas
-              </p>
-            </div>
-            
-            <!-- Premium Icon with Elegant Animation -->
-            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-gold-500 to-gold-700 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-gold-500/30 transition-all duration-300 group-hover:scale-110">
-              <svg 
-                id="faq-icon-2" 
-                class="w-6 h-6 text-white transform transition-transform duration-500 ease-spring"
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-                stroke-width="2.5"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-              </svg>
-            </div>
-          </button>
-          
-          <!-- Answer Container with Premium Styling -->
-          <div 
-            id="faq-answer-2" 
-            class="overflow-hidden transition-all duration-500 ease-out max-h-0 opacity-0"
-            role="region"
-          >
-            <div class="px-8 pb-8">
-              <!-- Elegant separator -->
-              <div class="h-px bg-gradient-to-r from-transparent via-neutral-300 to-transparent mb-6"></div>
-              
-              <div class="bg-gradient-to-br from-gold-50/50 to-peach-50/30 rounded-xl p-6 border border-gold-200/30">
-                <p class="font-century text-lg text-navy-800 leading-relaxed mb-4">
-                  O investimento de um dia traz frameworks accionáveis que devolvem horas semanais e aumentam receita.
-                </p>
-                <div class="space-y-3">
-                  <div class="flex items-start space-x-3 text-burgundy-700">
-                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                    <p class="font-century text-base text-navy-700">
-                      <strong>Resultado imediato:</strong> Templates prontos e plano de 90 dias
-                    </p>
-                  </div>
-                  <div class="flex items-start space-x-3 text-burgundy-700">
-                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                    <p class="font-century text-base text-navy-700">
-                      <strong>ROI garantido:</strong> Recupere horas semanais + aumente receita
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Premium FAQ Item 3 - Guarantee (Critical for Conversion) -->
-      <div class="group relative" data-faq-item="3">
-        <!-- Premium Card with Special Highlight -->
-        <div class="relative bg-gradient-to-br from-white/95 to-gold-50/50 backdrop-blur-sm border border-gold-300/40 rounded-2xl overflow-hidden shadow-lg shadow-gold-900/10 transition-all duration-500 hover:shadow-xl hover:shadow-gold-900/20 hover:-translate-y-1">
-          <!-- Golden accent for guarantee -->
+          {% if item.is_special %}
+          <!-- Golden accent for {{ item.special_badge | lower }} -->
           <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold-400 via-gold-500 to-gold-400"></div>
+          {% endif %}
           
           <!-- Subtle gradient overlay -->
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-gold-50/20 to-peach-50/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-{% if item.icon_color == 'gold' %}gold{% elif item.icon_color == 'burgundy' %}peach{% elif item.icon_color == 'navy' %}burgundy{% else %}peach{% endif %}-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           
           <!-- Interactive Question Button -->
           <button 
             type="button"
-            class="relative w-full text-left px-8 py-7 flex items-start justify-between focus:outline-none focus:ring-2 focus:ring-gold-400/50 focus:ring-offset-2 focus:ring-offset-white group transition-all duration-300"
-            onclick="toggleFAQ('faq-3')"
+            class="relative w-full text-left px-8 py-7 flex items-start justify-between focus:outline-none focus:ring-2 focus:ring-{% if item.is_special %}gold{% else %}burgundy{% endif %}-400/50 focus:ring-offset-2 focus:ring-offset-white group transition-all duration-300"
+            data-faq-toggle="{{ item.unique_id }}"
             aria-expanded="false"
-            aria-controls="faq-answer-3"
-            data-analytics-event="open_faq_guarantee"
+            aria-controls="{{ item.answer_id }}"
+            aria-describedby="{{ item.answer_id }}"
+            data-analytics-event="{{ item.analytics_event }}"
           >
             <div class="flex-1 pr-6">
+              {% if item.is_special %}
               <div class="flex items-center space-x-3 mb-2">
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gold-100 text-gold-800 border border-gold-200">
-                  GARANTIA
+                  {{ item.special_badge }}
                 </span>
               </div>
-              <h3 class="font-lora text-xl lg:text-2xl font-semibold text-navy-800 mb-2 group-hover:text-gold-800 transition-colors duration-300 leading-tight">
-                E se eu não gostar ou não tiver resultados?
+              {% endif %}
+              <h3 class="font-lora text-xl lg:text-2xl font-semibold text-navy-800 mb-2 group-hover:text-{% if item.is_special %}gold{% else %}burgundy{% endif %}-{% if item.is_special %}800{% else %}700{% endif %} transition-colors duration-300 leading-tight">
+                {{ item.question }}
               </h3>
               <p class="font-century text-sm text-navy-500 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                Conheça nossa garantia de resultados 100% segura
+                {{ item.hint }}
               </p>
             </div>
             
-            <!-- Premium Icon with Shield -->
-            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-gold-500 to-gold-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-gold-500/40 transition-all duration-300 group-hover:scale-110">
+            <!-- Premium Icon with Elegant Animation -->
+            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-{{ item.icon_color }}-{% if item.icon_color == 'navy' %}600{% else %}500{% endif %} to-{{ item.icon_color }}-{% if item.icon_color == 'navy' %}800{% else %}{% if item.icon_color == 'gold' %}600{% else %}700{% endif %}{% endif %} rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-{{ item.icon_color }}-500/{% if item.is_special %}40{% else %}30{% endif %} transition-all duration-300 group-hover:scale-110">
               <svg 
-                id="faq-icon-3" 
+                id="{{ item.icon_id }}" 
                 class="w-6 h-6 text-white transform transition-transform duration-500 ease-spring"
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
                 stroke-width="2.5"
+                aria-hidden="true"
               >
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
               </svg>
@@ -223,15 +85,18 @@
           
           <!-- Answer Container with Premium Styling -->
           <div 
-            id="faq-answer-3" 
+            id="{{ item.answer_id }}" 
             class="overflow-hidden transition-all duration-500 ease-out max-h-0 opacity-0"
             role="region"
+            aria-labelledby="{{ item.unique_id }}-button"
           >
             <div class="px-8 pb-8">
               <!-- Elegant separator -->
-              <div class="h-px bg-gradient-to-r from-transparent via-gold-300 to-transparent mb-6"></div>
+              <div class="h-px bg-gradient-to-r from-transparent via-{% if item.is_special %}gold-300{% else %}neutral-300{% endif %} to-transparent mb-6"></div>
               
-              <div class="bg-gradient-to-br from-gold-50/70 to-peach-50/40 rounded-xl p-6 border border-gold-200/50">
+              <div class="bg-gradient-to-br {{ item.background_gradient }} rounded-xl p-6 border {{ item.border_color }}">
+                
+                {% if item.is_special and item.answer.main_text %}
                 <!-- Shield Icon and Guarantee Title -->
                 <div class="flex items-center space-x-3 mb-4">
                   <div class="w-10 h-10 bg-gradient-to-br from-gold-500 to-gold-600 rounded-lg flex items-center justify-center">
@@ -241,104 +106,66 @@
                   </div>
                   <h4 class="font-lora text-xl font-bold text-gold-800">Garantia de Resultados</h4>
                 </div>
+                {% endif %}
                 
-                <p class="font-century text-lg text-navy-800 leading-relaxed mb-6">
-                  A nossa Garantia de Resultados cobre o seu investimento: aplique o método e, se em 90 dias não houver <strong>+20% nas vendas</strong>, devolvemos o valor.
+                <p class="font-century text-lg text-navy-800 leading-relaxed mb-{% if item.answer.highlights or item.answer.features or item.answer.highlight %}4{% else %}0{% endif %}">
+                  {{ item.answer.main_text | safe }}
                 </p>
                 
-                <!-- Guarantee Features -->
-                <div class="space-y-4">
-                  <div class="flex items-start space-x-3">
-                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0 text-gold-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                    <p class="font-century text-base text-navy-700">
-                      <strong>90 dias</strong> para aplicar e ver resultados
-                    </p>
-                  </div>
-                  <div class="flex items-start space-x-3">
-                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0 text-gold-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                    <p class="font-century text-base text-navy-700">
-                      <strong>Reembolso total</strong> se não aumentar 20% nas vendas
-                    </p>
-                  </div>
-                  <div class="flex items-start space-x-3">
-                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0 text-gold-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                    <p class="font-century text-base text-navy-700">
-                      <strong>Processo simples</strong> - condições claras e justas
-                    </p>
-                  </div>
-                </div>
-                
-                <div class="mt-4 pt-4 border-t border-gold-200/50">
-                  <p class="font-century text-sm text-navy-600 italic">
-                    Condições aplicáveis — <a href="#terms" class="text-gold-700 hover:text-gold-800 underline font-medium">ver termos completos</a>
+                {% if item.answer.highlight %}
+                <div class="flex items-start space-x-3 text-burgundy-700">
+                  <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <p class="font-century text-base text-navy-700">
+                    <strong>{{ item.answer.highlight.label }}</strong> {{ item.answer.highlight.text }}
                   </p>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Premium FAQ Item 4 -->
-      <div class="group relative" data-faq-item="4">
-        <!-- Glassmorphism Card -->
-        <div class="relative bg-white/90 backdrop-blur-sm border border-white/50 rounded-2xl overflow-hidden shadow-lg shadow-navy-900/5 transition-all duration-500 hover:shadow-xl hover:shadow-navy-900/10 hover:-translate-y-1">
-          <!-- Subtle gradient overlay -->
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-burgundy-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          
-          <!-- Interactive Question Button -->
-          <button 
-            type="button"
-            class="relative w-full text-left px-8 py-7 flex items-start justify-between focus:outline-none focus:ring-2 focus:ring-burgundy-400/50 focus:ring-offset-2 focus:ring-offset-white group transition-all duration-300"
-            onclick="toggleFAQ('faq-4')"
-            aria-expanded="false"
-            aria-controls="faq-answer-4"
-            data-analytics-event="open_faq_about_jucana"
-          >
-            <div class="flex-1 pr-6">
-              <h3 class="font-lora text-xl lg:text-2xl font-semibold text-navy-800 mb-2 group-hover:text-burgundy-700 transition-colors duration-300 leading-tight">
-                Quem é a Juçanã Maximiliano?
-              </h3>
-              <p class="font-century text-sm text-navy-500 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                Conheça quem vai guiar sua transformação
-              </p>
-            </div>
-            
-            <!-- Premium Icon with Person -->
-            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-navy-600 to-navy-800 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-navy-500/30 transition-all duration-300 group-hover:scale-110">
-              <svg 
-                id="faq-icon-4" 
-                class="w-6 h-6 text-white transform transition-transform duration-500 ease-spring"
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-                stroke-width="2.5"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-              </svg>
-            </div>
-          </button>
-          
-          <!-- Answer Container with Premium Styling -->
-          <div 
-            id="faq-answer-4" 
-            class="overflow-hidden transition-all duration-500 ease-out max-h-0 opacity-0"
-            role="region"
-          >
-            <div class="px-8 pb-8">
-              <!-- Elegant separator -->
-              <div class="h-px bg-gradient-to-r from-transparent via-neutral-300 to-transparent mb-6"></div>
-              
-              <div class="bg-gradient-to-br from-navy-50/50 to-burgundy-50/30 rounded-xl p-6 border border-navy-200/30">
-                <p class="font-century text-lg text-navy-800 leading-relaxed mb-4">
-                  Especialista em scaling para empreendedoras, coach de negócios e fundadora do método prático que já transformou centenas de negócios.
-                </p>
+                {% endif %}
+                
+                {% if item.answer.highlights %}
+                <div class="space-y-3">
+                  {% for highlight in item.answer.highlights %}
+                  <div class="flex items-start space-x-3 text-burgundy-700">
+                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                      {% if highlight.icon == 'star' %}
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      {% else %}
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      {% endif %}
+                    </svg>
+                    <p class="font-century text-base text-navy-700">
+                      <strong>{{ highlight.label }}</strong> {{ highlight.text }}
+                    </p>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if item.answer.features %}
+                <div class="space-y-4 mb-4">
+                  {% for feature in item.answer.features %}
+                  <div class="flex items-start space-x-3">
+                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0 text-gold-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <p class="font-century text-base text-navy-700">
+                      <strong>{{ feature.label }}</strong> {{ feature.text }}
+                    </p>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if item.answer.legal_note %}
+                <div class="mt-4 pt-4 border-t border-gold-200/50">
+                  <p class="font-century text-sm text-navy-600 italic">
+                    {{ item.answer.legal_note | safe }}
+                  </p>
+                </div>
+                {% endif %}
+                
+                {% if item.answer.cta %}
                 <div class="flex items-center space-x-4">
                   <div class="flex-shrink-0">
                     <div class="w-12 h-12 bg-gradient-to-br from-burgundy-500 to-navy-600 rounded-lg flex items-center justify-center">
@@ -349,17 +176,20 @@
                   </div>
                   <div>
                     <p class="font-century text-base text-navy-700">
-                      <a href="#about" class="text-burgundy-700 hover:text-burgundy-800 font-semibold underline decoration-2 underline-offset-2">
-                        Ver mais sobre a metodologia →
+                      <a href="{{ item.answer.cta.url }}" class="text-burgundy-700 hover:text-burgundy-800 font-semibold underline decoration-2 underline-offset-2">
+                        {{ item.answer.cta.text }}
                       </a>
                     </p>
                   </div>
                 </div>
+                {% endif %}
+                
               </div>
             </div>
           </div>
         </div>
       </div>
+      {% endfor %}
 
     </div>
 
@@ -379,18 +209,19 @@
         <!-- Contact Options -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a 
-            href="https://wa.me/351935251983" 
+            href="{{ faq.contact.whatsapp_url }}" 
             class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-green-500/30 group"
             data-analytics-event="faq_whatsapp_contact"
+            aria-label="Contactar via WhatsApp"
           >
-            <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
             </svg>
             Falar no WhatsApp
           </a>
           
           <p class="font-century text-sm text-navy-500">
-            Resposta em até 2 horas • Mónica • +351 935 251 983
+            {{ faq.contact.response_time }} • {{ faq.contact.whatsapp_name }} • {{ faq.contact.whatsapp_phone }}
           </p>
         </div>
       </div>
@@ -398,68 +229,38 @@
       <!-- Legal Links -->
       <div class="mt-8 pt-6 border-t border-neutral-200/50">
         <div class="flex flex-wrap items-center justify-center gap-6 text-sm text-navy-500">
-          <a href="#terms" class="hover:text-navy-800 transition-colors underline underline-offset-2">
-            Termos da Garantia
+          {% for link in faq.legal_links %}
+          <a href="{{ link.url }}" class="hover:text-navy-800 transition-colors underline underline-offset-2">
+            {{ link.text }}
           </a>
-          <span class="text-neutral-400">•</span>
-          <a href="#policy" class="hover:text-navy-800 transition-colors underline underline-offset-2">
-            Política de Reembolso
-          </a>
-          <span class="text-neutral-400">•</span>
-          <a href="#privacy" class="hover:text-navy-800 transition-colors underline underline-offset-2">
-            Privacidade
-          </a>
+          {% if not loop.last %}<span class="text-neutral-400">•</span>{% endif %}
+          {% endfor %}
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Enhanced FAQPage Schema Markup for SEO -->
+<!-- Enhanced FAQPage Schema Markup for SEO (Generated from data) -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  "name": "Perguntas Frequentes - Café com Vendas",
-  "description": "Todas as dúvidas sobre o evento transformador para empreendedoras em Lisboa",
+  "name": "{{ faq.meta.title }}",
+  "description": "{{ faq.meta.description }}",
   "url": "{{ site.url }}#faq",
   "mainEntity": [
+    {% for item in faq.items %}
     {
       "@type": "Question",
-      "name": "Para que tipo de negócio é este evento?",
+      "name": "{{ item.question }}",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Para empreendedoras com produto/serviço validado que querem estruturar oferta, melhorar margens e automatizar vendas. Ideal para negócios de serviços, cursos e produtos digitais com foco em escala sustentável.",
-        "upvoteCount": 15
+        "text": "{{ item.answer.main_text | striptags }}{% if item.answer.highlight %}. {{ item.answer.highlight.label }}: {{ item.answer.highlight.text }}{% endif %}{% if item.answer.highlights %}{% for highlight in item.answer.highlights %}. {{ highlight.label }}: {{ highlight.text }}{% endfor %}{% endif %}{% if item.answer.features %}{% for feature in item.answer.features %}. {{ feature.label }}: {{ feature.text }}{% endfor %}{% endif %}",
+        "upvoteCount": {{ item.upvote_count }}
       }
-    },
-    {
-      "@type": "Question", 
-      "name": "Não tenho mesmo tempo. Como justificar um dia fora?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "O investimento de um dia traz frameworks accionáveis que devolvem horas semanais e aumentam receita. Inclui templates prontos e plano de 90 dias para implementação imediata com ROI garantido.",
-        "upvoteCount": 22
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "E se eu não gostar ou não tiver resultados?", 
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "A nossa Garantia de Resultados cobre o seu investimento: aplique o método e, se em 90 dias não houver +20% nas vendas, devolvemos o valor total. Processo simples com condições claras e justas.",
-        "upvoteCount": 31
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Quem é a Juçanã Maximiliano?",
-      "acceptedAnswer": {
-        "@type": "Answer", 
-        "text": "Especialista em scaling para empreendedoras, coach de negócios e fundadora do método prático que já transformou centenas de negócios. Referência em estratégias de crescimento sustentável.",
-        "upvoteCount": 18
-      }
-    }
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
   ],
   "author": {
     "@type": "Organization",
