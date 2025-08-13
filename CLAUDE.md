@@ -26,6 +26,7 @@ src/
 │   ├── site.js             # Site metadata
 │   ├── event.js            # Loads EVENT_META.json
 │   ├── avatar.js           # Loads AVATAR_AMANDA.json
+│   ├── testimonials.js     # Customer testimonials data
 │   └── tokens.js           # Loads design-tokens.json
 ├── index.njk               # Main page (includes components in order)
 └── assets/
@@ -39,7 +40,8 @@ info/                      # Design system & content
 ├── AVATAR_AMANDA.json    # Persona & objections
 ├── AVATAR_COPY_LIBRARY.md # Copy examples & headlines
 ├── VOICE_GUIDE.md        # Voice & tone guidelines
-├── TYPOGRAPHY_GUIDE.md   # Typography principles & implementation
+├── BRAND_CREATIVE_BRIEF.md # Brand guidelines  
+├── EVENT_BRIEF.md        # Event details & logistics
 └── *.md                  # Other guidelines
 ```
 
@@ -87,7 +89,7 @@ info/                      # Design system & content
 - Target: Lighthouse Performance >90, Accessibility >95
 
 ### Content Rules
-- Voice: Empathetic, authoritative, clear (see `info/tom_de_voz.md`)
+- Voice: Empathetic, authoritative, clear (see `info/VOICE_GUIDE.md`)
 - Copy library: `info/AVATAR_COPY_LIBRARY.md`
 - Event details: Always from `info/EVENT_META.json`
 - Never hardcode prices, dates, or guarantees
@@ -116,7 +118,7 @@ info/                      # Design system & content
 | Copy/Headlines | `info/AVATAR_COPY_LIBRARY.md`, `VOICE_GUIDE.md` |
 | Event Details | `info/EVENT_META.json`, `EVENT_BRIEF.md` |
 | Customer Pain | `info/AVATAR_AMANDA.json` |
-| Typography | `info/TYPOGRAPHY_GUIDE.md` |
+| Brand Guidelines | `info/BRAND_CREATIVE_BRIEF.md` |
 
 ## Common Tasks
 
