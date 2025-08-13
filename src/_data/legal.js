@@ -118,5 +118,79 @@ module.exports = {
         showContact: true
       }
     ]
+  },
+
+  guaranteeRefund: {
+    title: "Garantia de Resultados e Política de Reembolso",
+    lastUpdated: "Agosto de 2024",
+    sections: [
+      {
+        title: "1. Nossa Garantia de Resultados",
+        content: "No Café com Vendas, acreditamos tanto na eficácia do nosso método que oferecemos uma garantia única de resultados."
+      },
+      {
+        title: "2. Condições da Garantia",
+        content: null,
+        highlight: {
+          type: "success",
+          showGuarantee: true
+        }
+      },
+      {
+        title: "3. Como Funciona a Garantia",
+        content: "Para acionar a garantia, você deve:",
+        list: [
+          "Participar integralmente no evento presencial em {{event.date.local}}",
+          "Implementar pelo menos 70% das estratégias apresentadas durante os 90 dias",
+          "Documentar as ações tomadas e resultados obtidos",
+          "Solicitar o reembolso dentro do prazo de 90 dias após o evento",
+          "Fornecer evidências das implementações realizadas"
+        ]
+      },
+      {
+        title: "4. Política de Cancelamento e Reembolso",
+        content: "Entendemos que imprevistos podem acontecer. Por isso, oferecemos as seguintes condições:",
+        highlight: {
+          type: "warning",
+          title: "Cancelamento até 7 dias antes do evento:",
+          content: "Reembolso de 100% do valor pago"
+        },
+        list: [
+          "Cancelamento entre 3-7 dias antes: Reembolso de 50% do valor pago",
+          "Cancelamento com menos de 3 dias: Sem reembolso",
+          "Casos de força maior (doença, emergência familiar): Análise individual e possível transferência para próxima edição"
+        ]
+      },
+      {
+        title: "5. Processo de Reembolso",
+        content: "Para solicitar um reembolso:",
+        list: [
+          "Entre em contato através do WhatsApp ou email",
+          "Forneça os dados da compra (nome, data, valor)",
+          "Explique o motivo da solicitação",
+          "Aguarde análise (máximo 5 dias úteis)",
+          "O reembolso será processado na mesma forma de pagamento original"
+        ]
+      },
+      {
+        title: "6. Exceções à Garantia",
+        content: "A garantia não se aplica nos seguintes casos:",
+        list: [
+          "Não participação ou participação parcial no evento",
+          "Falta de implementação das estratégias apresentadas",
+          "Solicitação de reembolso após 90 dias do evento",
+          "Circunstâncias externas que impeçam a aplicação do método (mudanças de mercado, questões legais específicas do negócio, etc.)"
+        ]
+      },
+      {
+        title: "7. Compromisso com o Resultado",
+        content: "Nosso objetivo é o seu sucesso. Além da garantia financeira, oferecemos suporte contínuo durante os 90 dias para maximizar suas chances de alcançar os resultados desejados."
+      },
+      {
+        title: "8. Contato para Garantia e Reembolsos",
+        content: "Para questões sobre garantia ou solicitações de reembolso:",
+        showContact: true
+      }
+    ]
   }
 };

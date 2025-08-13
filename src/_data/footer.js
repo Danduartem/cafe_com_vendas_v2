@@ -39,6 +39,10 @@ module.exports = {
       {
         label: "Termos e Condições", 
         url: "/termos-condicoes"
+      },
+      {
+        label: "Garantia e Reembolso",
+        url: "/garantia-reembolso"
       }
     ]
   },

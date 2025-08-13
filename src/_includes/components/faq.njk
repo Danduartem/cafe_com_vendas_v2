@@ -39,7 +39,7 @@
           {% endif %}
           
           <!-- Subtle gradient overlay -->
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-{% if item.icon_color == 'gold' %}gold{% elif item.icon_color == 'burgundy' %}peach{% elif item.icon_color == 'navy' %}burgundy{% else %}peach{% endif %}-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-{% if item.icon_color == 'gold' %}gold{% elif item.icon_color == 'burgundy' %}peach{% elif item.icon_color == 'navy' %}burgundy{% else %}peach{% endif %}-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
           
           <!-- Interactive Question Button -->
           <button 

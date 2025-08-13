@@ -14,15 +14,15 @@
   "legal_links": [
     {
       "text": "Termos da Garantia",
-      "url": "#terms"
+      "url": "/garantia-reembolso"
     },
     {
       "text": "Política de Reembolso", 
-      "url": "#policy"
+      "url": "/garantia-reembolso"
     },
     {
       "text": "Privacidade",
-      "url": "#privacy"
+      "url": "/politica-privacidade"
     }
   ],
   "items": [
@@ -92,7 +92,7 @@
             "text": "condições claras e justas"
           }
         ],
-        "legal_note": "Condições aplicáveis — <a href=\"#terms\" class=\"text-gold-700 hover:text-gold-800 underline font-medium\">ver termos completos</a>"
+        "legal_note": "Condições aplicáveis — <a href=\"/garantia-reembolso\" class=\"text-gold-700 hover:text-gold-800 underline font-medium\">ver termos completos</a>"
       },
       "analytics_event": "open_faq_guarantee",
       "icon_color": "gold",
