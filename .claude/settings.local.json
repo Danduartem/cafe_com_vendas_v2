@@ -30,7 +30,9 @@
       "Bash(mkdir:*)",
       "mcp__context7__resolve-library-id",
       "mcp__context7__get-library-docs",
-      "Bash(npm run tokens:build:*)"
+      "Bash(npm run tokens:build:*)",
+      "mcp__playwright-mcp__browser_take_screenshot",
+      "Bash(git add:*)"
     ],
     "deny": []
   },

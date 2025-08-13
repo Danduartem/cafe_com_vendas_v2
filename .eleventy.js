@@ -1,6 +1,8 @@
 module.exports = function(eleventyConfig) {
-  // Passthrough copy for all static assets (css, js, fonts, pictures)
-  eleventyConfig.addPassthroughCopy({ 'src/assets': 'assets' });
+  // Passthrough copy for static assets (css, fonts, pictures) - excluding js since Vite handles bundling
+  eleventyConfig.addPassthroughCopy({ 'src/assets/css': 'assets/css' });
+  eleventyConfig.addPassthroughCopy({ 'src/assets/fonts': 'assets/fonts' });
+  eleventyConfig.addPassthroughCopy({ 'src/assets/pictures': 'assets/pictures' });
   // Public files to site root (favicons)
   eleventyConfig.addPassthroughCopy({ 'src/public': '/' });
 

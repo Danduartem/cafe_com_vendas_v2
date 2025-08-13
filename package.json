@@ -7,9 +7,11 @@
     "clean": "rm -rf _site",
     "tokens:build": "node scripts/build-tokens.js",
     "build:css": "TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npx postcss ./src/assets/css/main.css -o ./_site/tailwind.css",
-    "build": "npm run clean && npm run tokens:build && npm run build:css && eleventy",
-    "start": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && eleventy --serve",
-    "dev": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && eleventy --serve --watch"
+    "build:js": "NODE_ENV=production vite build",
+    "build:js:dev": "NODE_ENV=development vite build",
+    "build": "npm run clean && npm run tokens:build && npm run build:css && npm run build:js && eleventy",
+    "start": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && npm run build:js:dev && eleventy --serve",
+    "dev": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && npm run build:js:dev && eleventy --serve --watch"
   },
   "keywords": [
     "landing-page",
@@ -28,6 +30,7 @@
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "postcss-cli": "^11.0.1",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.11",
+    "vite": "^7.1.2"
   }
 }
