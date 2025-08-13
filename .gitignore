@@ -37,9 +37,13 @@ pids
 *.seed
 *.pid.lock
 
-# Backup files with version numbers
+# Backup files with version numbers (various patterns)
 *\ 2.*
 *\ 3.*
+* 2.*
+* 3.*
+*2.*
+*3.*
 
 # Coverage directory
 coverage/
@@ -61,3 +65,11 @@ yarn-error.log*
 
 # Claude settings with sensitive data
 .claude/settings.local.json
+.claude/settings.local
+
+# Temporary/duplicate files that shouldn't be tracked
+info/423155
+info/design-tokens.json
+scripts/build-tokens
+src/_data/avatar
+src/_data/tokens
