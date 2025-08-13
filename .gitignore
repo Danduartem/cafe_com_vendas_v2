@@ -73,3 +73,8 @@ info/design-tokens.json
 scripts/build-tokens
 src/_data/avatar
 src/_data/tokens
+
+# Development artifacts
+.playwright-mcp/*.png
+.playwright-mcp/*.jpg
+.playwright-mcp/*.jpeg
