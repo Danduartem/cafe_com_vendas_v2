@@ -1,0 +1,91 @@
+{# Legal Page Component - Reusable template for legal pages #}
+
+<main class="min-h-screen bg-gradient-to-b from-neutral-50 to-neutral-100" role="main">
+  <div class="container mx-auto px-8 py-16 max-w-4xl">
+    
+    <!-- Header -->
+    <header class="text-center mb-12">
+      <h1 class="text-4xl font-lora font-bold text-navy-900 mb-4">
+        {{ pageData.title }}
+      </h1>
+      <p class="text-lg text-neutral-600 font-century">
+        Última atualização: {{ pageData.lastUpdated }}
+      </p>
+    </header>
+
+    <!-- Content -->
+    <div class="prose prose-lg max-w-none">
+      <article class="bg-white rounded-2xl shadow-sm border border-neutral-200 p-8 space-y-8">
+        
+        {% for section in pageData.sections %}
+        <section>
+          <h2 class="text-2xl font-lora font-semibold text-navy-800 mb-4">
+            {{ section.title }}
+          </h2>
+          
+          {% if section.content %}
+          <p class="text-neutral-700 font-century leading-relaxed">
+            {{ section.content | replace("{{event.date.local}}", event.date.local) | 
+                               replace("{{event.location.city}}", event.location.city) | 
+                               replace("{{event.location.country}}", event.location.country) | 
+                               replace("{{event.date.durationHours}}", event.date.durationHours) | 
+                               replace("{{event.capacity.firstLot}}", event.capacity.firstLot) | safe }}
+          </p>
+          {% endif %}
+
+          {% if section.highlight %}
+            {% if section.highlight.type == "warning" %}
+            <div class="bg-gold-50 border-l-4 border-gold-400 p-4 my-6">
+              <p class="text-gold-800 font-century font-medium">
+                <strong>{{ section.highlight.title }}</strong> {{ section.highlight.content }}
+              </p>
+            </div>
+            {% elif section.highlight.type == "success" %}
+            <div class="bg-green-50 border-l-4 border-green-400 p-6 my-6">
+              {% if section.highlight.showGuarantee %}
+              <h3 class="text-lg font-lora font-semibold text-green-800 mb-2">
+                {{ event.guarantee.claim }}
+              </h3>
+              <p class="text-green-700 font-century leading-relaxed mb-4">
+                {{ event.guarantee.policy }}
+              </p>
+              <p class="text-sm text-green-600 font-century">
+                <strong>Condições aplicáveis:</strong>
+              </p>
+              <ul class="list-disc list-inside text-sm text-green-600 font-century space-y-1 ml-4">
+                {% for requirement in event.guarantee.requirements %}
+                <li>{{ requirement }}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endif %}
+          
+          {% if section.list %}
+          <ul class="list-disc list-inside text-neutral-700 font-century space-y-2 ml-4">
+            {% for item in section.list %}
+            <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+
+          {% if section.showContact %}
+          <div class="bg-neutral-50 rounded-lg p-4 mt-4">
+            <p class="text-neutral-700 font-century">
+              <strong>Email:</strong> {{ legal.contact.email }}<br>
+              <strong>WhatsApp:</strong> {{ legal.contact.whatsapp.phone }} ({{ legal.contact.whatsapp.contact }})
+            </p>
+          </div>
+          {% endif %}
+        </section>
+        {% endfor %}
+
+      </article>
+    </div>
+
+    <!-- Back Navigation -->
+    {% include "partials/back-navigation.njk" %}
+
+  </div>
+</main>
