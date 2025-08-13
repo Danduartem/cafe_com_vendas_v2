@@ -1089,15 +1089,24 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Scroll-based Gradient Animation
+  // Scroll-based Gradient Animation - Using Tailwind Classes
   function initScrollGradient() {
     const footer = document.querySelector('#footer');
     
     const scrollHandler = () => {
       const scrollPercent = Math.min(window.scrollY / (document.body.scrollHeight - window.innerHeight), 1);
-      const hue = 220 + (scrollPercent * 40); // Navy to slightly warmer
       
-      footer.style.background = `linear-gradient(135deg, hsl(${hue}, 45%, 12%) 0%, hsl(${hue + 10}, 35%, 15%) 100%)`;
+      // Use predefined gradient classes instead of dynamic styles
+      if (scrollPercent > 0.8) {
+        footer.classList.remove('bg-gradient-to-br');
+        footer.classList.add('bg-gradient-to-bl');
+      } else if (scrollPercent > 0.4) {
+        footer.classList.remove('bg-gradient-to-bl', 'bg-gradient-to-br');
+        footer.classList.add('bg-gradient-to-b');
+      } else {
+        footer.classList.remove('bg-gradient-to-b', 'bg-gradient-to-bl');
+        footer.classList.add('bg-gradient-to-br');
+      }
     };
     
     window.addEventListener('scroll', scrollHandler, { passive: true });
