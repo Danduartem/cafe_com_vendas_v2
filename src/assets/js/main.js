@@ -322,15 +322,43 @@ function initializeYouTubeEmbeds() {
 // Initialize YouTube embeds when DOM is ready
 document.addEventListener('DOMContentLoaded', initializeYouTubeEmbeds);
 
-// MBWay Toggle Function for Offer Section
+// MBWay Toggle Function for Offer Section - Enhanced with smooth animations
 function toggleMBWayInfo() {
   const mbwayInfo = document.getElementById('mbway-info');
+  const button = document.getElementById('mbway-button');
+  const chevron = button.querySelector('svg:last-child');
   const isHidden = mbwayInfo.classList.contains('hidden');
   
   if (isHidden) {
-    mbwayInfo.classList.remove('hidden');
+    // Show state - smooth transition
+    mbwayInfo.classList.remove('hidden', 'max-h-0', 'opacity-0');
+    mbwayInfo.classList.add('max-h-48', 'opacity-100');
+    
+    // Update button state
+    button.setAttribute('aria-expanded', 'true');
+    chevron.classList.add('rotate-180');
+    
+    // Focus management for accessibility
+    setTimeout(() => {
+      const firstFocusable = mbwayInfo.querySelector('p');
+      if (firstFocusable) {
+        firstFocusable.focus();
+      }
+    }, 300);
+    
   } else {
-    mbwayInfo.classList.add('hidden');
+    // Hide state - smooth transition
+    mbwayInfo.classList.remove('max-h-48', 'opacity-100');
+    mbwayInfo.classList.add('max-h-0', 'opacity-0');
+    
+    // Update button state
+    button.setAttribute('aria-expanded', 'false');
+    chevron.classList.remove('rotate-180');
+    
+    // After transition, fully hide
+    setTimeout(() => {
+      mbwayInfo.classList.add('hidden');
+    }, 300);
   }
   
   // Analytics tracking

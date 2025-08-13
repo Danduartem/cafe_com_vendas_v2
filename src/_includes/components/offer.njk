@@ -95,20 +95,8 @@
             </h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {% set deliverables = [
-                { text: '7 horas de imersão estratégica presencial', priority: true },
-                { text: 'Plano de ação claro e aplicável', priority: true },
-                { text: 'Acesso aos 5 pilares do Método Seja Livre', priority: false },
-                { text: 'Cronograma de implementação de 90 dias', priority: false },
-                { text: 'Material de apoio completo (Trello)', priority: false },
-                { text: 'Almoço + Coquetel de encerramento', priority: false },
-                { text: 'Fotos profissionais do evento', priority: false },
-                { text: 'Suporte via WhatsApp pós-evento', priority: false },
-                { text: 'Clube do livro exclusivo', priority: false },
-                { text: 'Brindes especiais edição Lisboa', priority: false }
-              ] %}
-              
-              {% for item in deliverables %}
+              {# Core deliverables from event data #}
+              {% for item in event.deliverables %}
               <div class="deliverable-item flex items-start p-4 rounded-xl bg-white/60 border border-neutral-200/30 hover:bg-white/80 hover:shadow-lg hover:translate-x-1 transition-all duration-300">
                 <div class="flex-shrink-0 mr-4">
                   <div class="w-8 h-8 bg-gradient-to-br from-burgundy-600 to-burgundy-700 rounded-lg flex items-center justify-center">
@@ -117,8 +105,40 @@
                     </svg>
                   </div>
                 </div>
-                <span class="text-navy-700 leading-relaxed {% if item.priority %}font-semibold{% endif %}">
-                  {{ item.text }}
+                <span class="text-navy-700 leading-relaxed font-semibold">
+                  {{ item }}
+                </span>
+              </div>
+              {% endfor %}
+              
+              {# Additional benefits and hospitality #}
+              {% for item in event.benefits %}
+              <div class="deliverable-item flex items-start p-4 rounded-xl bg-white/60 border border-neutral-200/30 hover:bg-white/80 hover:shadow-lg hover:translate-x-1 transition-all duration-300">
+                <div class="flex-shrink-0 mr-4">
+                  <div class="w-8 h-8 bg-gradient-to-br from-burgundy-600 to-burgundy-700 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </div>
+                </div>
+                <span class="text-navy-700 leading-relaxed">
+                  {{ item }}
+                </span>
+              </div>
+              {% endfor %}
+              
+              {# Hospitality items #}
+              {% for item in event.hospitality %}
+              <div class="deliverable-item flex items-start p-4 rounded-xl bg-white/60 border border-neutral-200/30 hover:bg-white/80 hover:shadow-lg hover:translate-x-1 transition-all duration-300">
+                <div class="flex-shrink-0 mr-4">
+                  <div class="w-8 h-8 bg-gradient-to-br from-burgundy-600 to-burgundy-700 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </div>
+                </div>
+                <span class="text-navy-700 leading-relaxed">
+                  {{ item }}
                 </span>
               </div>
               {% endfor %}
@@ -169,14 +189,18 @@
             </div>
           </div>
 
-          {# Premium Payment Buttons #}
+          {# ========================================
+             PAYMENT BUTTONS SECTION
+             Primary PayPal CTA + MBWay alternative
+             ======================================== #}
           <div class="space-y-4">
-            <!-- Primary CTA -->
+            {# Primary PayPal checkout button #}
             <div class="primary-cta-container">
               <a href="{{ event.payments.links.paypal }}" 
-                 class="primary-cta-button block w-full py-6 px-8 bg-gradient-to-r from-burgundy-600 via-burgundy-700 to-burgundy-600 hover:from-burgundy-700 hover:via-burgundy-800 hover:to-burgundy-700 text-white font-bold rounded-2xl text-center shadow-2xl hover:shadow-burgundy-500/25 transform hover:-translate-y-1 transition-all duration-300 group"
+                 class="primary-cta-button block w-full py-6 px-8 bg-gradient-to-r from-burgundy-600 via-burgundy-700 to-burgundy-600 hover:from-burgundy-700 hover:via-burgundy-800 hover:to-burgundy-700 text-white font-bold rounded-2xl text-center shadow-2xl hover:shadow-burgundy-500/25 transform hover:-translate-y-1 transition-all duration-300 group focus:outline-none focus:ring-4 focus:ring-burgundy-400 focus:ring-offset-2"
                  data-analytics-event="click_to_checkout"
-                 aria-label="Garantir vaga via PayPal">
+                 aria-label="Garantir vaga via PayPal - {{ event.pricing.tiers[0].price }}€"
+                 role="button">
                 
                 <span class="text-xl mb-2 block">Sim — quero garantir a minha vaga agora!</span>
                 <span class="text-sm opacity-90 flex items-center justify-center">
@@ -188,19 +212,29 @@
               </a>
             </div>
 
-            <!-- Alternative Payment -->
-            <button onclick="toggleMBWayInfo()" 
-                    class="w-full py-4 px-6 bg-white/90 border-2 border-neutral-300 hover:border-neutral-400 text-navy-700 font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+            {# Alternative Payment Button - Enhanced with accessibility #}
+            <button id="mbway-button"
+                    onclick="toggleMBWayInfo()" 
+                    class="w-full py-4 px-6 bg-white/90 border-2 border-neutral-300 hover:border-neutral-400 text-navy-700 font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-burgundy-500 focus:ring-offset-2"
+                    aria-expanded="false"
+                    aria-controls="mbway-info"
+                    data-analytics-event="mbway_toggle">
               <span class="flex items-center justify-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 mr-2 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                 </svg>
                 Pagar com MBWay
+                <svg class="w-4 h-4 ml-2 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
               </span>
             </button>
 
-            <!-- MBWay Info Panel -->
-            <div id="mbway-info" class="hidden">
+            {# MBWay Info Panel - Enhanced with transitions #}
+            <div id="mbway-info" 
+                 class="hidden overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0"
+                 role="region" 
+                 aria-labelledby="mbway-button">
               <div class="bg-neutral-50 rounded-xl p-6 border border-neutral-200 mt-4">
                 <div class="flex items-start">
                   <div class="flex-shrink-0 w-12 h-12 bg-navy-700 rounded-lg flex items-center justify-center mr-4">
@@ -213,8 +247,7 @@
                       MBWay: <span class="text-burgundy-700">{{ event.payments.alternative.mbway.phone }}</span>
                     </p>
                     <p class="text-navy-600 text-sm">
-                      Após o pagamento, envie mensagem para <strong>{{ event.payments.alternative.mbway.contact }}</strong> 
-                      para confirmar a sua vaga.
+                      {{ event.payments.alternative.mbway.instruction }}
                     </p>
                   </div>
                 </div>
@@ -222,23 +255,24 @@
             </div>
           </div>
 
-          {# Trust Indicators #}
-          <div class="mt-8 pt-6 border-t border-neutral-200">
+          {# Trust Indicators - Enhanced with better accessibility #}
+          <div class="mt-8 pt-6 border-t border-neutral-200" role="region" aria-labelledby="trust-indicators">
+            <h4 id="trust-indicators" class="sr-only">Indicadores de confiança</h4>
             <div class="grid grid-cols-3 gap-4 text-center text-xs text-navy-600">
-              <div class="flex flex-col items-center">
-                <svg class="w-5 h-5 text-green-500 mb-1" fill="currentColor" viewBox="0 0 20 20">
+              <div class="flex flex-col items-center hover:text-navy-800 transition-colors duration-200" role="img" aria-label="Pagamento 100% seguro">
+                <svg class="w-5 h-5 text-green-500 mb-1" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
                 </svg>
                 <span>100% Seguro</span>
               </div>
-              <div class="flex flex-col items-center">
-                <svg class="w-5 h-5 text-red-500 mb-1" fill="currentColor" viewBox="0 0 20 20">
+              <div class="flex flex-col items-center hover:text-navy-800 transition-colors duration-200" role="img" aria-label="Apenas {{ event.capacity.firstLot }} vagas disponíveis">
+                <svg class="w-5 h-5 text-red-500 mb-1" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                 </svg>
                 <span>{{ event.capacity.firstLot }} vagas</span>
               </div>
-              <div class="flex flex-col items-center">
-                <svg class="w-5 h-5 text-amber-500 mb-1" fill="currentColor" viewBox="0 0 20 20">
+              <div class="flex flex-col items-center hover:text-navy-800 transition-colors duration-200" role="img" aria-label="Garantia de 90 dias">
+                <svg class="w-5 h-5 text-amber-500 mb-1" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                 </svg>
                 <span>90 dias garantia</span>
@@ -250,9 +284,11 @@
       </div>
     </div>
 
-    {# Legal Links #}
+    {# Legal Links - Enhanced accessibility #}
     <div class="text-center mt-12">
-      <a href="#" class="text-navy-500 hover:text-burgundy-600 text-sm underline transition-colors">
+      <a href="#" 
+         class="text-navy-500 hover:text-burgundy-600 text-sm underline transition-colors focus:outline-none focus:ring-2 focus:ring-burgundy-500 focus:ring-offset-2 rounded-sm"
+         aria-label="Ver termos completos da garantia de 90 dias e política de reembolso">
         Ver todos os termos da garantia · Política de reembolso
       </a>
     </div>
@@ -260,38 +296,60 @@
   </div>
 </section>
 
-{# Schema Markup #}
+{# Enhanced Schema Markup - Combined Product + Offer #}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Offer",
-  "name": "{{ event.name }} - Primeiro Lote",
+  "@type": "Event",
+  "name": "{{ event.name }}",
   "description": "{{ event.description }}",
-  "price": "{{ event.pricing.tiers[0].price }}",
-  "priceCurrency": "EUR",
-  "availability": "https://schema.org/LimitedAvailability",
-  "validFrom": "2025-08-12",
-  "validThrough": "2025-09-20",
-  "seller": {
+  "eventStatus": "https://schema.org/EventScheduled",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "startDate": "2025-09-20T09:00:00+01:00",
+  "endDate": "2025-09-20T17:00:00+01:00",
+  "location": {
+    "@type": "Place",
+    "name": "{{ event.location.venueName }}",
+    "description": "{{ event.location.venueDescription }}",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "{{ event.location.city }}",
+      "addressCountry": "{{ event.location.country }}"
+    }
+  },
+  "organizer": {
     "@type": "Organization",
     "name": "Juçanã Maximiliano"
-  }
-}
-</script>
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Product",
-  "name": "{{ event.name }}",
-  "description": "{{ event.tagline }}",
+  },
   "offers": {
     "@type": "Offer",
+    "name": "{{ event.pricing.tiers[0].label }}",
+    "description": "{{ event.tagline }}",
     "price": "{{ event.pricing.tiers[0].price }}",
-    "priceCurrency": "EUR",
-    "availability": "https://schema.org/InStock",
-    "priceValidUntil": "2025-09-20"
-  }
+    "priceCurrency": "{{ event.pricing.currency }}",
+    "availability": "https://schema.org/LimitedAvailability",
+    "inventoryLevel": {{ event.capacity.firstLot }},
+    "validFrom": "2025-08-12T00:00:00+01:00",
+    "validThrough": "2025-09-20T00:00:00+01:00",
+    "url": "{{ event.payments.links.paypal }}",
+    "acceptedPaymentMethod": [
+      "https://schema.org/PaymentMethodCreditCard",
+      "PayPal",
+      "MBWay"
+    ],
+    "seller": {
+      "@type": "Organization",
+      "name": "Juçanã Maximiliano"
+    },
+    "warranty": {
+      "@type": "WarrantyPromise",
+      "durationOfWarranty": "P90D",
+      "warrantyScope": "{{ event.guarantee.claim }}"
+    }
+  },
+  "maximumAttendeeCapacity": {{ event.capacity.firstLot }},
+  "remainingAttendeeCapacity": {{ event.capacity.firstLot }},
+  "isAccessibleForFree": false
 }
 </script>
 
