@@ -1,3 +1,11 @@
+---
+file: CONTENT_copy_library.md
+version: 2025-08-13
+purpose: Marketing copy library with headlines, CTAs, and messaging for Amanda avatar
+dependencies: DATA_avatar.json, GUIDE_voice_tone.md
+original_name: AVATAR_COPY_LIBRARY.md
+---
+
 # Avatar Copy Library — Amanda
 
 ## Headline + Subheadline Pairs

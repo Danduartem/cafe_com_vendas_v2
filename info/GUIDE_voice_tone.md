@@ -1,12 +1,20 @@
+---
+file: GUIDE_voice_tone.md
+version: 2025-08-13
+purpose: Brand voice and tone guidelines for messaging and content creation
+dependencies: DATA_avatar.json, DATA_event.json, CONTENT_copy_library.md
+original_name: VOICE_GUIDE.md
+---
+
 # Voice & Tone Guide — Café com Vendas
 
 *Version: 2.0 • Last updated: January 2025*
 
 ## Quick Reference
-- **Target Audience**: See [`AVATAR_AMANDA.json`](./AVATAR_AMANDA.json)
-- **Creative Direction**: See [`BRAND_CREATIVE_BRIEF.md`](./BRAND_CREATIVE_BRIEF.md)
-- **Event Details**: See [`EVENT_META.json`](./EVENT_META.json)
-- **Copy Examples**: See [`AVATAR_COPY_LIBRARY.md`](./AVATAR_COPY_LIBRARY.md)
+- **Target Audience**: See [`DATA_avatar.json`](./DATA_avatar.json)
+- **Creative Direction**: See [`GUIDE_brand_visual.md`](./GUIDE_brand_visual.md)
+- **Event Details**: See [`DATA_event.json`](./DATA_event.json)
+- **Copy Examples**: See [`CONTENT_copy_library.md`](./CONTENT_copy_library.md)
 
 ## Core Voice Attributes
 
@@ -142,7 +150,7 @@
 
 ### Bottom of Funnel
 - Clear offer
-- Guarantee (see EVENT_META.json)
+- Guarantee (see DATA_event.json)
 - Logistics
 - Strong CTA
 
@@ -182,7 +190,7 @@
 ## Compliance & Guarantees
 
 ### Guarantee Framework
-- See `EVENT_META.json → guarantee` for current details
+- See `DATA_event.json → guarantee` for current details
 - Always conditional on method application
 - Include simple proof requirements
 
@@ -201,9 +209,9 @@
 - [ ] Single clear CTA per block?
 
 ### Consistency Check
-- [ ] Aligned with AVATAR_AMANDA.json?
-- [ ] Aligned with BRAND_CREATIVE_BRIEF.md?
-- [ ] Aligned with EVENT_META.json?
+- [ ] Aligned with DATA_avatar.json?
+- [ ] Aligned with GUIDE_brand_visual.md?
+- [ ] Aligned with DATA_event.json?
 - [ ] Uses approved vocabulary?
 
 ### Technical Check
@@ -214,11 +222,11 @@
 
 ## Maintenance Notes
 
-- This guide works with `design-tokens.json` for voice tokens
-- Always sync with EVENT_META.json for current CTAs
-- Update AVATAR_COPY_LIBRARY.md with new approved copy
+- This guide works with `DATA_design_tokens.json` for voice tokens
+- Always sync with DATA_event.json for current CTAs
+- Update CONTENT_copy_library.md with new approved copy
 - Test all copy with target audience when possible
 
 ---
 
-*For extended examples and specific use cases, see [`AVATAR_COPY_LIBRARY.md`](./AVATAR_COPY_LIBRARY.md)*
+*For extended examples and specific use cases, see [`CONTENT_copy_library.md`](./CONTENT_copy_library.md)*

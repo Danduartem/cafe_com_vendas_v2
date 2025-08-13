@@ -1,3 +1,11 @@
+---
+file: GUIDE_brand_visual.md
+version: 2025-08-13
+purpose: Visual brand guidelines focusing on color-driven art direction
+dependencies: DATA_design_tokens.json
+original_name: BRAND_CREATIVE_BRIEF.md
+---
+
 # Creative Brief — Beauty First (Color-Driven Art Direction)
 
 This brief guides the creation of elegant, high-converting pages grounded in your brand palette. Typography and audience details live in separate docs; use them together with this brief.

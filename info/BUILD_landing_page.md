@@ -1,3 +1,11 @@
+---
+file: BUILD_landing_page.md
+version: 2025-08-13
+purpose: Phase 4 development blueprint for building the complete landing page
+dependencies: DATA_event.json, DATA_avatar.json, DATA_design_tokens.json, GUIDE_voice_tone.md
+original_name: 423155
+---
+
 Phase 4 Input - Final Development & Implementation
 Objective
 To take the final copy and high-fidelity design brief and translate them into a single, production-ready, fully responsive HTML file.
@@ -169,7 +177,7 @@ Core Inputs: The Complete Creative & Strategic Package
 -   **Conteúdo do Copywriter:**
    -   **Gancho/Ângulo:** Veja o que empreendedoras como você estão a dizer.
    -   **Draft Headline:** "**Elas vieram pela estratégia, ficaram pela transformação.**"
-   -   **Draft Sub-headline/Body Copy:** Selecionar 2-3 testemunhos poderosos do `AVATAR_COPY_LIBRARY.md` que abordem diretamente as objeções. Exemplo: "Eu achava que não tinha tempo para mais nada. O Café com Vendas não me deu mais trabalho, deu-me um sistema que me devolveu 10 horas por semana." - Nome, Empresa.
+   -   **Draft Sub-headline/Body Copy:** Selecionar 2-3 testemunhos poderosos do `CONTENT_copy_library.md` que abordem diretamente as objeções. Exemplo: "Eu achava que não tinha tempo para mais nada. O Café com Vendas não me deu mais trabalho, deu-me um sistema que me devolveu 10 horas por semana." - Nome, Empresa.
    -   **CTA:** N/A.
    -   **Gestão de Objeções:** Aborda diretamente a **Confiança**, o **Ceticismo** e a **Falta de Tempo** através de histórias reais.
 
@@ -214,7 +222,7 @@ Core Inputs: The Complete Creative & Strategic Package
    -   **Gancho/Ângulo:** O seu investimento na sua liberdade, 100% seguro.
    -   **Draft Headline:** "**O seu lugar na mesa está à sua espera.**"
    -   **Draft Sub-headline/Body Copy:** "Isto é mais do que um evento. É um ponto de viragem. Inclui: Um dia inteiro de imersão estratégica, material de apoio completo, almoço de networking e acesso ao plano de ação de 90 dias. Tudo isto num ambiente exclusivo para apenas [número] empreendedoras."
-   -   **Preço:** "Investimento: [Preço do `EVENT_META.json`]"
+   -   **Preço:** "Investimento: [Preço do `DATA_event.json`]"
    -   **Garantia (Inversão de Risco):** **A nossa Garantia de Resultados:** "Participe no evento, aplique o método e, se em 90 dias não aumentar as suas vendas em pelo menos 20%, devolvemos o seu investimento na totalidade. O risco é todo nosso."
    -   **CTA:** "Sim, quero garantir a minha vaga agora!"
    -   **Gestão de Objeções:** Aborda diretamente o **Preço** (ancorando em valor e garantia) e o **Ceticismo** (com a garantia de resultados).
@@ -807,7 +815,7 @@ Isto é mais do que um evento: é um ponto de viragem. Inclui: um dia inteiro de
 
 
 Preço
-Investimento: [INSERIR PREÇO DO EVENT_META.json] · Opções: Pagamento único ou 3x via PayPal.
+Investimento: [INSERIR PREÇO DO DATA_event.json] · Opções: Pagamento único ou 3x via PayPal.
 
 
 Garantia (Inversão de Risco)

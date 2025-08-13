@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const root = process.cwd();
-const tokensPath = path.join(root, 'info', 'design-tokens.json');
+const tokensPath = path.join(root, 'info', 'DATA_design_tokens.json');
 const outDir = path.join(root, 'src', 'assets', 'css');
 const outFile = path.join(outDir, '_tokens.generated.css');
 
@@ -18,7 +18,7 @@ function main() {
   // Load unified design tokens
   const tokens = JSON.parse(fs.readFileSync(tokensPath, 'utf8'));
   
-  const themeHeader = `/* Generated from design-tokens.json. Do not edit directly. */\n/* Generated: ${new Date().toISOString()} */\n\n`;
+  const themeHeader = `/* Generated from DATA_design_tokens.json. Do not edit directly. */\n/* Generated: ${new Date().toISOString()} */\n\n`;
   const themeBlocks = [];
 
   // Extract CSS variables from the unified tokens

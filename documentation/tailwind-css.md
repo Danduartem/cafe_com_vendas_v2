@@ -311,7 +311,7 @@ Use container queries for component-based responsive design:
 
 In this project, Tailwind CSS is used with:
 - PostCSS for processing
-- Custom design tokens from `design-tokens.json`
+- Custom design tokens from `DATA_design_tokens.json`
 - Responsive design following mobile-first approach
 - Custom brand colors (Navy, Burgundy, Neutral)
 - Typography system using Lora and Century Gothic fonts

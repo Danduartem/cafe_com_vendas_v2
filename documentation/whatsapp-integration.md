@@ -35,7 +35,7 @@ A floating WhatsApp button is implemented to provide easy access to customer sup
 WhatsApp contact details are stored in the event metadata:
 
 ```json
-// info/EVENT_META.json
+// info/DATA_event.json
 {
   "payments": {
     "alternative": {

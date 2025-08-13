@@ -12,7 +12,7 @@ PayPal is used as the primary payment processor for event registrations. The int
 The PayPal payment link is stored in the event metadata and used throughout the application:
 
 ```json
-// info/EVENT_META.json
+// info/DATA_event.json
 {
   "payments": {
     "links": {
@@ -49,7 +49,7 @@ The PayPal payment link is accessed via the Eleventy data cascade:
 An alternative payment method (MBWay) is also available:
 
 ```json
-// info/EVENT_META.json
+// info/DATA_event.json
 {
   "payments": {
     "alternative": {
@@ -197,7 +197,7 @@ paypal.Buttons({
 ### Common Issues and Solutions
 
 1. **Link Not Working**
-   - Verify PayPal link in EVENT_META.json
+   - Verify PayPal link in DATA_event.json
    - Check for expired payment links
    - Ensure proper URL encoding
 

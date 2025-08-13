@@ -47,7 +47,7 @@ npm run clean
 │   │   └── components/*.njk     # Section components
 │   ├── _data/                   # Eleventy data layer
 │   │   ├── site.js             # Site metadata
-│   │   ├── event.js            # Event data (from EVENT_META.json)
+│   │   ├── event.js            # Event data (from DATA_event.json)
 │   │   ├── avatar.js           # Target persona data
 │   │   ├── testimonials.js     # Customer testimonials
 │   │   └── tokens.js           # Design tokens
@@ -59,13 +59,14 @@ npm run clean
 │       ├── js/main.js          # All JavaScript
 │       └── fonts/              # Local fonts
 ├── info/                       # Design system & content
-│   ├── design-tokens.json      # Unified design system
-│   ├── EVENT_META.json         # Event details & pricing
-│   ├── AVATAR_AMANDA.json      # Target persona & objections
-│   ├── AVATAR_COPY_LIBRARY.md  # Copy examples & headlines
-│   ├── VOICE_GUIDE.md          # Voice & tone guidelines
-│   ├── BRAND_CREATIVE_BRIEF.md # Brand guidelines
-│   └── EVENT_BRIEF.md          # Event details
+│   ├── DATA_design_tokens.json      # Unified design system
+│   ├── DATA_event.json               # Event details & pricing
+│   ├── DATA_avatar.json              # Target persona & objections
+│   ├── CONTENT_copy_library.md       # Copy examples & headlines
+│   ├── GUIDE_voice_tone.md           # Voice & tone guidelines
+│   ├── GUIDE_brand_visual.md         # Brand guidelines
+│   ├── GUIDE_claude_instructions.md  # Claude context & instructions
+│   └── BUILD_landing_page.md         # Development blueprint
 ├── documentation/              # API integration docs
 │   ├── eleventy-11ty.md        # Eleventy reference
 │   ├── tailwind-css.md         # Tailwind reference
@@ -78,7 +79,7 @@ npm run clean
 
 ## 🎨 Design System
 
-The design system is centralized in `info/design-tokens.json` and automatically converted to CSS custom properties:
+The design system is centralized in `info/DATA_design_tokens.json` and automatically converted to CSS custom properties:
 
 - **Colors**: Navy `#191F3A`, Burgundy `#81171F`, Neutral `#ECECEC`
 - **Typography**: Lora (headings), Century Gothic (body)
@@ -104,7 +105,7 @@ The design system is centralized in `info/design-tokens.json` and automatically 
 - **Performance**: WebP images, lazy loading, LCP optimization
 
 ### Build Process
-1. `design-tokens.json` → CSS custom properties
+1. `DATA_design_tokens.json` → CSS custom properties
 2. Tailwind processes CSS with design tokens
 3. Eleventy generates static HTML
 4. PostCSS optimizes final CSS

@@ -4,7 +4,7 @@ Guidance for Claude Code when working with the Café com Vendas landing page.
 
 ## Project Context
 **What**: Premium landing page for female entrepreneur event (Sept 20, Lisbon, 8 spots)  
-**Audience**: See `info/AVATAR_AMANDA.json` - overworked female entrepreneurs seeking transformation  
+**Audience**: See `info/DATA_avatar.json` - overworked female entrepreneurs seeking transformation  
 **Language**: Portuguese (pt-PT)  
 **Goal**: High-converting page with elegant design and proven conversion principles
 
@@ -24,10 +24,10 @@ src/
 │   └── components/*.njk    # Section components
 ├── _data/                   # Eleventy data layer
 │   ├── site.js             # Site metadata
-│   ├── event.js            # Loads EVENT_META.json
-│   ├── avatar.js           # Loads AVATAR_AMANDA.json
+│   ├── event.js            # Loads DATA_event.json
+│   ├── avatar.js           # Loads DATA_avatar.json
 │   ├── testimonials.js     # Customer testimonials data
-│   └── tokens.js           # Loads design-tokens.json
+│   └── tokens.js           # Loads DATA_design_tokens.json
 ├── index.njk               # Main page (includes components in order)
 └── assets/
     ├── css/main.css       # Tailwind + tokens
@@ -35,14 +35,15 @@ src/
     └── fonts/             # Local Lora & Century Gothic
 
 info/                      # Design system & content
-├── design-tokens.json     # Unified design system (colors, typography, spacing)
-├── EVENT_META.json       # Event data (prices, dates)
-├── AVATAR_AMANDA.json    # Persona & objections
-├── AVATAR_COPY_LIBRARY.md # Copy examples & headlines
-├── VOICE_GUIDE.md        # Voice & tone guidelines
-├── BRAND_CREATIVE_BRIEF.md # Brand guidelines  
-├── EVENT_BRIEF.md        # Event details & logistics
-└── *.md                  # Other guidelines
+├── DATA_design_tokens.json     # Unified design system (colors, typography, spacing)
+├── DATA_event.json             # Event data (prices, dates)
+├── DATA_avatar.json            # Persona & objections
+├── CONTENT_copy_library.md     # Copy examples & headlines
+├── GUIDE_voice_tone.md         # Voice & tone guidelines
+├── GUIDE_brand_visual.md       # Brand guidelines  
+├── GUIDE_claude_instructions.md # Claude context & instructions
+├── BUILD_landing_page.md       # Development blueprint
+└── *.md                        # Other guidelines
 ```
 
 ## Critical Rules
@@ -79,7 +80,7 @@ info/                      # Design system & content
 ### Design Tokens
 - Colors: Navy `#191F3A`, Burgundy `#81171F`, Neutral `#ECECEC`
 - Typography: `font-lora` (display), `font-century` (body)
-- All tokens in `info/design-tokens.json` (unified file)
+- All tokens in `info/DATA_design_tokens.json` (unified file)
 - Run `npm run tokens:build` after changes to generate CSS
 
 ### Performance
@@ -89,9 +90,9 @@ info/                      # Design system & content
 - Target: Lighthouse Performance >90, Accessibility >95
 
 ### Content Rules
-- Voice: Empathetic, authoritative, clear (see `info/VOICE_GUIDE.md`)
-- Copy library: `info/AVATAR_COPY_LIBRARY.md`
-- Event details: Always from `info/EVENT_META.json`
+- Voice: Empathetic, authoritative, clear (see `info/GUIDE_voice_tone.md`)
+- Copy library: `info/CONTENT_copy_library.md`
+- Event details: Always from `info/DATA_event.json`
 - Never hardcode prices, dates, or guarantees
 
 ## Section Order
@@ -114,22 +115,22 @@ info/                      # Design system & content
 
 | Need | File |
 |------|------|
-| Design System | `info/design-tokens.json` (unified colors, typography, spacing) |
-| Copy/Headlines | `info/AVATAR_COPY_LIBRARY.md`, `VOICE_GUIDE.md` |
-| Event Details | `info/EVENT_META.json`, `EVENT_BRIEF.md` |
-| Customer Pain | `info/AVATAR_AMANDA.json` |
-| Brand Guidelines | `info/BRAND_CREATIVE_BRIEF.md` |
+| Design System | `info/DATA_design_tokens.json` (unified colors, typography, spacing) |
+| Copy/Headlines | `info/CONTENT_copy_library.md`, `GUIDE_voice_tone.md` |
+| Event Details | `info/DATA_event.json` |
+| Customer Pain | `info/DATA_avatar.json` |
+| Brand Guidelines | `info/GUIDE_brand_visual.md` |
 
 ## Common Tasks
 
 **Add Section**: Create in `components/`, include in `index.njk`, add id + aria-label
 
-**Update Tokens**: Edit `design-tokens.json` → `npm run tokens:build` → available as CSS vars
+**Update Tokens**: Edit `DATA_design_tokens.json` → `npm run tokens:build` → available as CSS vars
 
-**Change Copy**: Check AVATAR_COPY_LIBRARY → match VOICE_GUIDE → pull data from EVENT_META
+**Change Copy**: Check CONTENT_copy_library → match GUIDE_voice_tone → pull data from DATA_event
 
 **Build Process**: 
-1. Edit `design-tokens.json` → `npm run tokens:build` 
+1. Edit `DATA_design_tokens.json` → `npm run tokens:build` 
 2. Tokens become CSS vars in `_tokens.generated.css`
 3. Tailwind uses vars via `@theme` directive
 4. `npm run build:css` processes final CSS
@@ -148,7 +149,7 @@ info/                      # Design system & content
 
 ## Conversion Elements
 - Social proof with numbers
-- 90-day guarantee (see EVENT_META)
+- 90-day guarantee (see DATA_event)
 - Limited spots (8 first batch)
 - PayPal integration
 - WhatsApp button
