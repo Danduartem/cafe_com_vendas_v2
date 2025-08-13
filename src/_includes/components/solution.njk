@@ -1,6 +1,7 @@
+{% from "partials/icons.njk" import pillarIcon %}
 {# Solution & Benefits Section - Método Seja Livre #}
 
-<section id="solucao" aria-label="Método Seja Livre - 5 pilares para vender mais trabalhando menos" 
+<section id="solucao" aria-label="{{ pillars.title }} - 5 pilares para vender mais trabalhando menos" 
   data-analytics-section="solution"
   class="relative overflow-hidden py-32 scroll-mt-[var(--top-banner-h,56px)]">
   
@@ -22,14 +23,14 @@
       {# Small accent label #}
       <div class="inline-flex items-center gap-2 mb-8">
         <span class="w-12 h-[1px] bg-gradient-to-r from-transparent to-gold-500"></span>
-        <span class="font-century text-gold-500 text-sm font-medium tracking-[0.2em] uppercase">O Sistema Comprovado</span>
+        <span class="font-century text-gold-500 text-sm font-medium tracking-[0.2em] uppercase">{{ pillars.subtitle }}</span>
         <span class="w-12 h-[1px] bg-gradient-to-l from-transparent to-gold-500"></span>
       </div>
       
       <h2 class="font-lora font-bold mb-8 text-navy-800 text-[clamp(2.5rem,5vw,3.5rem)] leading-[1.1]">
         <span class="block">Apresentamos o</span>
         <span class="relative inline-block mt-2">
-          <span class="relative z-10 bg-gradient-to-r from-burgundy-700 via-gold-500 to-burgundy-700 bg-clip-text text-transparent">Método Seja Livre</span>
+          <span class="relative z-10 bg-gradient-to-r from-burgundy-700 via-gold-500 to-burgundy-700 bg-clip-text text-transparent">{{ pillars.title }}</span>
           {# Decorative underline #}
           <svg class="absolute -bottom-2 left-0 w-full h-3 text-gold-500/20" preserveAspectRatio="none" viewBox="0 0 300 12">
             <path d="M0,6 Q75,0 150,6 T300,6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
@@ -38,45 +39,45 @@
       </h2>
       
       <p class="font-century text-navy-800/80 text-lg leading-[1.8] max-w-[75ch] mx-auto">
-        No Café com Vendas não damos "dicas". Implementamos um <span class="font-semibold text-navy-800">sistema completo</span> que transforma o seu funcionamento operacional e a forma como vende. Cada pilar resolve uma dor crítica — da mentalidade ao lucro — para que o seu negócio trabalhe para si.
+        {{ pillars.description | safe }}
       </p>
     </div>
 
     {# 5 Pillars Grid System with Golden Ratio and Premium Design #}
+    {% set pillarClasses = "group relative" %}
+    {% set cardClasses = "relative h-full bg-white rounded-2xl p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl overflow-hidden" %}
+    {% set iconContainerClasses = "relative flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-neutral-50 to-white shadow-md group-hover:shadow-xl transition-all duration-300" %}
+    
     <div class="relative" data-reveal>
       
       {# First Row - 3 Pillars with staggered animation #}
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
-        
-        {# Pillar 1: Clareza Estratégica #}
-        <div class="group relative [animation-delay:0.1s]" data-analytics-event="hover_pillar_clareza">
-          <div class="relative h-full bg-white rounded-2xl p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl overflow-hidden">
+        {% for pillar in pillars.pillars %}
+        {% if loop.index <= 3 %}
+        <div class="{{ pillarClasses }} [animation-delay:{{ pillar.animationDelay }}]" data-analytics-event="{{ pillar.analyticsEvent }}">
+          <div class="{{ cardClasses }}">
             {# Gradient border effect #}
             <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold-500/10 via-transparent to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             
             {# Number indicator with golden ratio sizing #}
-            <div class="absolute top-6 right-6 font-lora text-6xl font-bold text-peach-100 select-none">01</div>
+            <div class="absolute top-6 right-6 font-lora text-6xl font-bold text-peach-100 select-none">{{ pillar.number }}</div>
             
             <div class="relative flex flex-col items-center text-center">
               {# Enhanced icon container with gradient background #}
               <div class="relative mb-6">
                 <div class="absolute inset-0 bg-gradient-to-br from-gold-500/20 to-burgundy-700/20 rounded-full blur-xl transform scale-150 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                <div class="relative flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-neutral-50 to-white shadow-md group-hover:shadow-xl transition-all duration-300">
+                <div class="{{ iconContainerClasses }}">
                   <div class="absolute inset-0 rounded-full bg-gradient-to-br from-gold-500/10 to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <svg class="relative z-10 w-10 h-10 text-navy-800 group-hover:text-burgundy-700 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M12 6v6l4 2"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
+                  {{ pillarIcon(pillar.icon) }}
                 </div>
               </div>
               
               <h3 class="font-lora font-bold text-[1.25rem] text-navy-800 mb-4 transition-colors duration-300 group-hover:text-burgundy-700">
-                Clareza Estratégica
+                {{ pillar.title }}
               </h3>
               
               <p class="font-century text-navy-800/70 text-base leading-[1.618] max-w-[30ch]">
-                Simplifique a oferta: menos serviços, mais margem. Resultado: decisões mais rápidas e maior foco.
+                {{ pillar.description }}
               </p>
               
               {# Hidden detail that appears on hover #}
@@ -84,112 +85,38 @@
             </div>
           </div>
         </div>
-
-        {# Pillar 2: Oferta Lucrativa #}
-        <div class="group relative [animation-delay:0.2s]" data-analytics-event="hover_pillar_oferta">
-          <div class="relative h-full bg-white rounded-2xl p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl overflow-hidden">
-            {# Gradient border effect #}
-            <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold-500/10 via-transparent to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            
-            {# Number indicator with golden ratio sizing #}
-            <div class="absolute top-6 right-6 font-lora text-6xl font-bold text-peach-100 select-none">02</div>
-            
-            <div class="relative flex flex-col items-center text-center">
-              {# Enhanced icon container with gradient background #}
-              <div class="relative mb-6">
-                <div class="absolute inset-0 bg-gradient-to-br from-gold-500/20 to-burgundy-700/20 rounded-full blur-xl transform scale-150 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                <div class="relative flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-neutral-50 to-white shadow-md group-hover:shadow-xl transition-all duration-300">
-                  <div class="absolute inset-0 rounded-full bg-gradient-to-br from-gold-500/10 to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <svg class="relative z-10 w-10 h-10 text-navy-800 group-hover:text-burgundy-700 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                    <circle cx="12" cy="12" r="2"></circle>
-                  </svg>
-                </div>
-              </div>
-              
-              <h3 class="font-lora font-bold text-[1.25rem] text-navy-800 mb-4 transition-colors duration-300 group-hover:text-burgundy-700">
-                Oferta Lucrativa
-              </h3>
-              
-              <p class="font-century text-navy-800/70 text-base leading-[1.618] max-w-[30ch]">
-                Reestruture preços e pacotes para vender mais por cliente, não para trabalhar mais horas.
-              </p>
-              
-              {# Hidden detail that appears on hover #}
-              <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-            </div>
-          </div>
-        </div>
-
-        {# Pillar 3: Fluxo de Vendas Simples #}
-        <div class="group relative [animation-delay:0.3s]" data-analytics-event="hover_pillar_fluxo">
-          <div class="relative h-full bg-white rounded-2xl p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl overflow-hidden">
-            {# Gradient border effect #}
-            <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold-500/10 via-transparent to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            
-            {# Number indicator with golden ratio sizing #}
-            <div class="absolute top-6 right-6 font-lora text-6xl font-bold text-peach-100 select-none">03</div>
-            
-            <div class="relative flex flex-col items-center text-center">
-              {# Enhanced icon container with gradient background #}
-              <div class="relative mb-6">
-                <div class="absolute inset-0 bg-gradient-to-br from-gold-500/20 to-burgundy-700/20 rounded-full blur-xl transform scale-150 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                <div class="relative flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-neutral-50 to-white shadow-md group-hover:shadow-xl transition-all duration-300">
-                  <div class="absolute inset-0 rounded-full bg-gradient-to-br from-gold-500/10 to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <svg class="relative z-10 w-10 h-10 text-navy-800 group-hover:text-burgundy-700 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M3 3h18l-9 18-9-18z"></path>
-                    <path d="M12 8v13"></path>
-                    <path d="M8 12h8"></path>
-                  </svg>
-                </div>
-              </div>
-              
-              <h3 class="font-lora font-bold text-[1.25rem] text-navy-800 mb-4 transition-colors duration-300 group-hover:text-burgundy-700">
-                Fluxo de Vendas Simples
-              </h3>
-              
-              <p class="font-century text-navy-800/70 text-base leading-[1.618] max-w-[30ch]">
-                Um funil prático e repetível que converte sem promessas milagrosas.
-              </p>
-              
-              {# Hidden detail that appears on hover #}
-              <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-            </div>
-          </div>
-        </div>
+        {% endif %}
+        {% endfor %}
       </div>
 
       {# Second Row - 2 Pillars centered with golden ratio spacing #}
       <div class="grid md:grid-cols-2 gap-8 max-w-[800px] mx-auto">
-        
-        {# Pillar 4: Operação Automatizada #}
-        <div class="group relative [animation-delay:0.4s]" data-analytics-event="hover_pillar_operacao">
-          <div class="relative h-full bg-white rounded-2xl p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl overflow-hidden">
+        {% for pillar in pillars.pillars %}
+        {% if loop.index > 3 %}
+        <div class="{{ pillarClasses }} [animation-delay:{{ pillar.animationDelay }}]" data-analytics-event="{{ pillar.analyticsEvent }}">
+          <div class="{{ cardClasses }}">
             {# Gradient border effect #}
             <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold-500/10 via-transparent to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             
             {# Number indicator with golden ratio sizing #}
-            <div class="absolute top-6 right-6 font-lora text-6xl font-bold text-peach-100 select-none">04</div>
+            <div class="absolute top-6 right-6 font-lora text-6xl font-bold text-peach-100 select-none">{{ pillar.number }}</div>
             
             <div class="relative flex flex-col items-center text-center">
               {# Enhanced icon container with gradient background #}
               <div class="relative mb-6">
                 <div class="absolute inset-0 bg-gradient-to-br from-gold-500/20 to-burgundy-700/20 rounded-full blur-xl transform scale-150 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                <div class="relative flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-neutral-50 to-white shadow-md group-hover:shadow-xl transition-all duration-300">
+                <div class="{{ iconContainerClasses }}">
                   <div class="absolute inset-0 rounded-full bg-gradient-to-br from-gold-500/10 to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <svg class="relative z-10 w-10 h-10 text-navy-800 group-hover:text-burgundy-700 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                  </svg>
+                  {{ pillarIcon(pillar.icon) }}
                 </div>
               </div>
               
               <h3 class="font-lora font-bold text-[1.25rem] text-navy-800 mb-4 transition-colors duration-300 group-hover:text-burgundy-700">
-                Operação Automatizada
+                {{ pillar.title }}
               </h3>
               
               <p class="font-century text-navy-800/70 text-base leading-[1.618] max-w-[30ch]">
-                Ferramentas e rotinas que tiram o trabalho mecânico do seu dia.
+                {{ pillar.description }}
               </p>
               
               {# Hidden detail that appears on hover #}
@@ -197,50 +124,8 @@
             </div>
           </div>
         </div>
-
-        {# Pillar 5: Plano de 90 Dias #}
-        <div class="group relative [animation-delay:0.5s]" data-analytics-event="hover_pillar_plano">
-          <div class="relative h-full bg-white rounded-2xl p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl overflow-hidden">
-            {# Gradient border effect #}
-            <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold-500/10 via-transparent to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            
-            {# Number indicator with golden ratio sizing #}
-            <div class="absolute top-6 right-6 font-lora text-6xl font-bold text-peach-100 select-none">05</div>
-            
-            <div class="relative flex flex-col items-center text-center">
-              {# Enhanced icon container with gradient background #}
-              <div class="relative mb-6">
-                <div class="absolute inset-0 bg-gradient-to-br from-gold-500/20 to-burgundy-700/20 rounded-full blur-xl transform scale-150 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                <div class="relative flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-neutral-50 to-white shadow-md group-hover:shadow-xl transition-all duration-300">
-                  <div class="absolute inset-0 rounded-full bg-gradient-to-br from-gold-500/10 to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <svg class="relative z-10 w-10 h-10 text-navy-800 group-hover:text-burgundy-700 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                    <path d="M8 14h.01"></path>
-                    <path d="M12 14h.01"></path>
-                    <path d="M16 14h.01"></path>
-                    <path d="M8 18h.01"></path>
-                    <path d="M12 18h.01"></path>
-                    <path d="M16 18h.01"></path>
-                  </svg>
-                </div>
-              </div>
-              
-              <h3 class="font-lora font-bold text-[1.25rem] text-navy-800 mb-4 transition-colors duration-300 group-hover:text-burgundy-700">
-                Plano de 90 Dias
-              </h3>
-              
-              <p class="font-century text-navy-800/70 text-base leading-[1.618] max-w-[30ch]">
-                A aplicação concreta: o que fazer exatamente nas próximas 12 semanas para ver resultados.
-              </p>
-              
-              {# Hidden detail that appears on hover #}
-              <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-            </div>
-          </div>
-        </div>
+        {% endif %}
+        {% endfor %}
       </div>
     </div>
 
@@ -301,7 +186,7 @@
   {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    "name": "Método Seja Livre",
+    "name": "{{ pillars.title }}",
     "description": "Sistema de 5 pilares para vender mais trabalhando menos, desenvolvido para empreendedoras",
     "image": "https://cafecomvendas.com/assets/pictures/cafe.jpg",
     "totalTime": "P90D",
@@ -320,41 +205,15 @@
       }
     ],
     "step": [
+      {%- for pillar in pillars.pillars %}
       {
         "@type": "HowToStep",
-        "position": 1,
-        "name": "Clareza Estratégica",
-        "text": "Simplifique a oferta: menos serviços, mais margem. Resultado: decisões mais rápidas e maior foco.",
+        "position": {{ loop.index }},
+        "name": "{{ pillar.title }}",
+        "text": "{{ pillar.description | replace('"', '\\"') }}",
         "url": "https://cafecomvendas.com/#solucao"
-      },
-      {
-        "@type": "HowToStep",
-        "position": 2,
-        "name": "Oferta Lucrativa",
-        "text": "Reestruture preços e pacotes para vender mais por cliente, não para trabalhar mais horas.",
-        "url": "https://cafecomvendas.com/#solucao"
-      },
-      {
-        "@type": "HowToStep",
-        "position": 3,
-        "name": "Fluxo de Vendas Simples",
-        "text": "Um funil prático e repetível que converte sem promessas milagrosas.",
-        "url": "https://cafecomvendas.com/#solucao"
-      },
-      {
-        "@type": "HowToStep",
-        "position": 4,
-        "name": "Operação Automatizada",
-        "text": "Ferramentas e rotinas que tiram o trabalho mecânico do seu dia.",
-        "url": "https://cafecomvendas.com/#solucao"
-      },
-      {
-        "@type": "HowToStep",
-        "position": 5,
-        "name": "Plano de 90 Dias",
-        "text": "A aplicação concreta: o que fazer exatamente nas próximas 12 semanas para ver resultados.",
-        "url": "https://cafecomvendas.com/#solucao"
-      }
+      }{% if not loop.last %},{% endif %}
+      {%- endfor %}
     ]
   }
   </script>
