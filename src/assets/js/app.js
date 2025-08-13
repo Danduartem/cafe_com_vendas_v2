@@ -14,7 +14,8 @@ import {
     FAQ, 
     FinalCTA, 
     Footer, 
-    Testimonials 
+    Testimonials,
+    ThankYou
 } from './components/index.js';
 
 export const CafeComVendas = {
@@ -57,7 +58,8 @@ export const CafeComVendas = {
             { name: 'FAQ', component: FAQ },
             { name: 'FinalCTA', component: FinalCTA },
             { name: 'Footer', component: Footer },
-            { name: 'Testimonials', component: Testimonials }
+            { name: 'Testimonials', component: Testimonials },
+            { name: 'ThankYou', component: ThankYou }
         ];
         
         components.forEach(({ name, component }) => {

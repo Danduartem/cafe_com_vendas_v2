@@ -12,3 +12,4 @@ export { FinalCTA } from './final-cta.js';
 export { Footer } from './footer.js';
 export { Testimonials } from './testimonials.js';
 export { Navigation } from './navigation.js';
+export { ThankYou } from './thank-you.js';
