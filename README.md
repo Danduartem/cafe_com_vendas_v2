@@ -14,7 +14,7 @@ Premium landing page for an intimate business transformation event in Lisbon, de
 
 - **Framework**: [Eleventy](https://www.11ty.dev/) (Static Site Generator)
 - **Templating**: Nunjucks (.njk files)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) + PostCSS
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) + PostCSS (pure CSS-based configuration)
 - **Design System**: JSON tokens → CSS custom properties
 - **Fonts**: Local Lora (display) + Century Gothic (body)
 - **JavaScript**: Vanilla JS (performance optimized)
@@ -106,9 +106,11 @@ The design system is centralized in `info/DATA_design_tokens.json` and automatic
 
 ### Build Process
 1. `DATA_design_tokens.json` → CSS custom properties
-2. Tailwind processes CSS with design tokens
+2. Tailwind v4 processes CSS via `@theme` block configuration
 3. Eleventy generates static HTML
 4. PostCSS optimizes final CSS
+
+**Note**: Uses Tailwind v4's pure CSS-based configuration - no `tailwind.config.js` file needed.
 
 ### Critical Rules
 - ❌ No `element.style.*` assignments

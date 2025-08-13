@@ -73,13 +73,13 @@ info/                      # Design system & content
 ### Tech Stack & Architecture
 - **Static Site Generator**: Eleventy (.eleventy.js config)
 - **Templates**: Nunjucks (.njk files) 
-- **CSS Framework**: Tailwind v4 with PostCSS (postcss.config.js)
+- **CSS Framework**: Tailwind v4 with PostCSS (pure CSS-based configuration via @theme)
 - **Data Layer**: Eleventy data files (src/_data/*.js) load from info/*.json
 - **Design System**: JSON tokens → CSS custom properties via build-tokens.js
 - **Fonts**: Local only (Lora display, Century Gothic body)
 - **JavaScript**: Vanilla JS in main.js only
 
-**Data Flow**: `info/DATA_design_tokens.json` → `scripts/build-tokens.js` → `src/assets/css/_tokens.generated.css` → Tailwind config uses CSS vars
+**Data Flow**: `info/DATA_design_tokens.json` → `scripts/build-tokens.js` → `src/assets/css/_tokens.generated.css` → `@theme` block in main.css
 
 ### Components
 - Structure: `<section id="name" aria-label="Description">`
@@ -142,9 +142,11 @@ info/                      # Design system & content
 **Build Process**: 
 1. Edit `DATA_design_tokens.json` → `npm run tokens:build` 
 2. `scripts/build-tokens.js` generates `_tokens.generated.css` with CSS custom properties
-3. Tailwind config references these CSS vars in theme.extend.colors
+3. `@theme` block in main.css defines Tailwind configuration using CSS custom properties
 4. `npm run build:css` processes with PostCSS (Tailwind + Autoprefixer)
 5. Eleventy builds static HTML using data from src/_data layer
+
+**Note**: This project uses Tailwind v4's pure CSS-based configuration. No `tailwind.config.js` file is needed.
 
 **MANDATORY Code Review Checklist for ALL Components:**
 - 🚨 **SCAN FOR VIOLATIONS**: Search entire component for `style.`, `<style>`, `style=""`
