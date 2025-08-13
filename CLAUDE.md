@@ -158,6 +158,12 @@ info/                      # Design system & content
 
 **Access Data in Templates**: Use Eleventy data (`{{ site }}`, `{{ event }}`, `{{ avatar }}`, `{{ tokens }}`)
 
+## Git Commit Guidelines
+- Write clear, descriptive commit messages
+- Use conventional commit format when appropriate
+- **Do NOT include Claude Code attribution or co-author lines in commits**
+- Keep commit messages focused on the actual changes made
+
 ## Conversion Elements
 - Social proof with numbers
 - 90-day guarantee (see DATA_event)
