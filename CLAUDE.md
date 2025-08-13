@@ -78,8 +78,18 @@ info/                       # Design system & content
 ├── BUILD_landing_page.md        # Development blueprint
 └── *.md                         # Other guidelines
 
-docs/
-└── VITE.md                 # Vite configuration guide
+docs/                           # Comprehensive documentation directory
+├── README.md                    # Documentation overview and quick reference
+├── ELEVENTY.md                  # Eleventy static site generator documentation
+├── TAILWIND-CSS.md              # Tailwind CSS framework documentation
+├── VITE.md                      # Vite build tool configuration guide
+├── STRIPE.md                    # Stripe payment integration documentation
+├── MAILERLITE.md                # MailerLite email marketing integration
+├── FILLOUT.md                   # Fillout forms platform documentation
+├── GOOGLE-ANALYTICS.md          # Google Analytics 4 implementation
+├── YOUTUBE-API.md               # YouTube video embedding for testimonials
+├── WHATSAPP-INTEGRATION.md      # WhatsApp customer communication
+└── NETLIFY.md                   # Netlify hosting and deployment
 
 vite.config.js              # Vite bundler configuration
 ```

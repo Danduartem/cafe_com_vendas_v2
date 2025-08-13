@@ -1,40 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "mcp__playwright__browser_navigate",
-      "mcp__playwright__browser_console_messages",
-      "mcp__playwright__browser_evaluate",
+      "Bash(diff:*)",
       "Bash(rm:*)",
-      "Bash(touch:*)",
-      "Bash(npm run build:css:*)",
-      "Bash(npm install:*)",
-      "Bash(npm run build:*)",
-      "Bash(python3:*)",
-      "mcp__playwright__browser_snapshot",
-      "mcp__playwright__browser_take_screenshot",
-      "Bash(npm run dev:*)",
-      "mcp__playwright__browser_click",
-      "mcp__playwright__browser_resize",
-      "Bash(claude mcp get:*)",
-      "Bash(gtimeout:*)",
       "Bash(claude mcp:*)",
-      "Bash(UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL} UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN} gtimeout 10 npx @upstash/context7-mcp)",
-      "Bash(UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL} UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN} npx @upstash/context7-mcp)",
-      "Bash(UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL} UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN} npx context7-mcp-server --help)",
-      "Bash(FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY} npx -y firecrawl-mcp --help)",
-      "Bash(claude --version)",
-      "Bash(claude --debug)",
-      "Bash(claude --debug --print \"test\")",
-      "WebFetch(domain:github.com)",
-      "Bash(git init:*)",
-      "Bash(mkdir:*)",
-      "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs",
-      "Bash(npm run tokens:build:*)",
-      "mcp__playwright-mcp__browser_take_screenshot",
-      "Bash(git add:*)"
+      "mcp__playwright-mcp__browser_click",
+      "mcp__playwright-mcp__browser_evaluate",
+      "mcp__playwright-mcp__browser_snapshot",
+      "mcp__playwright-mcp__browser_navigate",
+      "mcp__context7__get-library-docs"
     ],
-    "deny": []
-  },
-  "enableAllProjectMcpServers": false
+    "deny": [],
+    "ask": []
+  }
 }
