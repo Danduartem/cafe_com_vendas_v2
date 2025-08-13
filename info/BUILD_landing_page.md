@@ -84,7 +84,7 @@ original_name: 423155
 - **Subheadline**: "Um encontro presencial e intimista em Portugal para reestruturar o seu negócio, recuperar o seu tempo e multiplicar as vendas — sem burnout, com método. Um dia de imersão estratégica, ferramentas accionáveis e um plano de 90 dias para implementar mudanças reais."
 - **Primary CTA**: "Garantir a minha vaga com tranquilidade"
 - **Secondary CTA**: "Ver os 5 pilares"
-- **Microcopy**: "Vagas limitadas — sessão com capacidade reduzida para garantir transformação. · Pagamento seguro via PayPal."
+- **Microcopy**: "Vagas limitadas — sessão com capacidade reduzida para garantir transformação. · Pagamento seguro via Stripe."
 
 #### Design Specifications
 - **Mood**: Sophisticated, aspirational, serene
@@ -174,7 +174,7 @@ original_name: 423155
 #### Content
 - **H2**: "O seu lugar na mesa está à sua espera."
 - **Body**: "Isto é mais do que um evento: é um ponto de viragem. Inclui: um dia inteiro de imersão estratégica, material de apoio prático, almoço de networking e acesso a um plano de ação de 90 dias. Ambiente exclusivo para apenas [número] empreendedoras — atenção ao limite de vagas."
-- **Price**: "Investimento: [FROM DATA_event.json] · Opções: Pagamento único ou 3x via PayPal."
+- **Price**: "Investimento: [FROM DATA_event.json] · Opções: Pagamento único ou 3x via Stripe."
 - **Guarantee**: "Garantia de Resultados: Participe, aplique o método e, se em 90 dias não aumentar as suas vendas em pelo menos 20%, devolvemos o seu investimento na totalidade. O risco é nosso."
 - **CTA**: "Sim — quero garantir a minha vaga agora!"
 
@@ -394,7 +394,7 @@ Add `data-analytics-event` attributes:
 
 **Before Launch**:
 - [ ] All sections render correctly on mobile/tablet/desktop
-- [ ] All CTAs link to correct PayPal checkout
+- [ ] All CTAs link to correct Stripe checkout
 - [ ] Analytics tracking fires on all events
 - [ ] Lighthouse scores: Performance ≥90, Accessibility ≥95
 - [ ] All forms and interactions work without JavaScript errors

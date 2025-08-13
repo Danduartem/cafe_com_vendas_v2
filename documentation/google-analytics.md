@@ -105,7 +105,7 @@ gtag('event', 'scroll_indicator_click', {
 // Track checkout button clicks
 gtag('event', 'click_to_checkout', {
     'event_category': 'Conversion',
-    'event_label': 'PayPal Checkout',
+    'event_label': 'Stripe Checkout',
     'value': event.pricing.tiers[0].price
 });
 
@@ -221,7 +221,7 @@ gtag('event', 'event_interest', {
 ## Goal and Conversion Setup
 
 ### Primary Goals
-1. **PayPal Checkout Clicks** - Main conversion goal
+1. **Stripe Checkout Clicks** - Main conversion goal
 2. **WhatsApp Contact** - Support/inquiry goal  
 3. **Scroll to Offer Section** - Engagement goal
 4. **Video Testimonial Views** - Content engagement goal

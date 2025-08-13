@@ -39,7 +39,7 @@
   },
   "payments": {
     "links": {
-      "paypal": "https://www.paypal.com/ncp/payment/ZH553KMCW5XQJ"
+      "stripe": "https://buy.stripe.com/cafe-com-vendas-lisboa"
     },
     "alternative": {
       "mbway": {

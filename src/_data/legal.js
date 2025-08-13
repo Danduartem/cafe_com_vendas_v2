@@ -24,7 +24,7 @@ module.exports = {
         content: "No evento Café com Vendas, coletamos apenas as informações necessárias para proporcionar a melhor experiência possível:",
         list: [
           "Nome e dados de contato para inscrição no evento",
-          "Informações de pagamento (processadas seguramente via PayPal)",
+          "Informações de pagamento (processadas seguramente via Stripe)",
           "Preferências alimentares e necessidades especiais",
           "Comunicações via WhatsApp para suporte"
         ]
@@ -72,7 +72,7 @@ module.exports = {
       {
         title: "2. Inscrição e Pagamento",
         list: [
-          "O pagamento pode ser realizado via PayPal ou MBWay",
+          "O pagamento pode ser realizado via Stripe ou MBWay",
           "A confirmação da vaga está sujeita à aprovação do pagamento",
           "As vagas são limitadas e preenchidas por ordem de pagamento",
           "O valor inclui todos os materiais, almoço e coquetel de encerramento"

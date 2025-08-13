@@ -230,7 +230,7 @@ vite.config.js              # Vite bundler configuration
 - Social proof with numbers
 - 90-day guarantee (see DATA_event)
 - Limited spots (8 first batch)
-- PayPal integration
+- Stripe integration
 - WhatsApp button
 
 ## Don'ts

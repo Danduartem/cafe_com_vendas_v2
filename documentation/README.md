@@ -13,7 +13,7 @@ This project integrates with several third-party services and APIs to provide fu
 - **[tailwind-css.md](./tailwind-css.md)** - Tailwind CSS utility framework documentation
 
 ### Payment & Analytics
-- **[paypal-integration.md](./paypal-integration.md)** - PayPal payment processing integration
+- **[stripe-integration.md](./stripe-integration.md)** - Stripe payment processing integration
 - **[google-analytics.md](./google-analytics.md)** - Google Analytics tracking implementation
 
 ### Media & Communication
@@ -26,7 +26,7 @@ This project integrates with several third-party services and APIs to provide fu
 |---------|---------|---------------|---------|
 | Eleventy | Static site generation | Build process, templates | ✅ Active |
 | Tailwind CSS | CSS utilities | Styling framework | ✅ Active |
-| PayPal | Payment processing | Redirect to checkout | ✅ Active |
+| Stripe | Payment processing | Redirect to checkout | ✅ Active |
 | Google Analytics | User tracking | Event-based analytics | ✅ Active |
 | YouTube | Video testimonials | Click-to-load embeds | ✅ Active |
 | WhatsApp | Customer support | Direct messaging links | ✅ Active |
@@ -40,7 +40,7 @@ This project integrates with several third-party services and APIs to provide fu
 - **PostCSS** - CSS processing
 
 ### External Services
-- **PayPal** - Payment processing (no API key required)
+- **Stripe** - Payment processing (no API key required for Payment Links)
 - **YouTube** - Video hosting (no API key required)
 - **WhatsApp** - Messaging service (no API key required)
 - **Google Analytics** - Web analytics (tracking ID required)
@@ -49,7 +49,7 @@ This project integrates with several third-party services and APIs to provide fu
 Most integrations use public endpoints or simple URL schemes:
 - YouTube uses public embed URLs
 - WhatsApp uses public `wa.me` URL scheme  
-- PayPal uses pre-configured checkout links
+- Stripe uses pre-configured Payment Links
 
 ## Environment Configuration
 
@@ -64,8 +64,8 @@ NODE_ENV=production
 
 ### Optional Configuration
 ```bash
-# PayPal Environment (for different environments)
-PAYPAL_ENVIRONMENT=production
+# Stripe Environment (for different environments)
+STRIPE_ENVIRONMENT=production
 
 # Analytics Debug Mode
 GA_DEBUG_MODE=false
@@ -85,7 +85,7 @@ GA_DEBUG_MODE=false
   default-src 'self';
   script-src 'self' 'unsafe-inline' https://www.googletagmanager.com;
   img-src 'self' https://img.youtube.com;
-  frame-src 'self' https://www.youtube-nocookie.com https://www.paypal.com;
+  frame-src 'self' https://www.youtube-nocookie.com https://checkout.stripe.com;
   connect-src 'self' https://www.google-analytics.com;
 ">
 ```
@@ -132,7 +132,7 @@ GA_DEBUG_MODE=false
 - Security patches for build tools
 
 ### Service Monitoring
-- PayPal checkout link validity
+- Stripe Payment Link validity
 - Google Analytics data flow
 - YouTube video availability
 - WhatsApp contact number status
@@ -147,7 +147,7 @@ npm run tokens:build # Test design token generation
 ```
 
 ### Integration Testing
-- PayPal checkout flow end-to-end
+- Stripe checkout flow end-to-end
 - Google Analytics event firing
 - YouTube video playback
 - WhatsApp link functionality
@@ -160,7 +160,7 @@ npm run tokens:build # Test design token generation
 2. **CSS not updating** - Run `npm run tokens:build`
 3. **Analytics not tracking** - Verify GA measurement ID
 4. **Videos not loading** - Check YouTube video privacy settings
-5. **PayPal issues** - Verify checkout link validity
+5. **Stripe issues** - Verify Payment Link validity
 
 ### Debug Tools
 - Browser developer console
@@ -184,7 +184,7 @@ npm run tokens:build # Test design token generation
 ## Future Enhancements
 
 ### Potential Improvements
-- Enhanced PayPal JavaScript SDK integration
+- Enhanced Stripe Embedded Checkout integration
 - WhatsApp Business API webhooks
 - Advanced Google Analytics 4 features
 - YouTube API for playlist management

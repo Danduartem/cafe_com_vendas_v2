@@ -70,7 +70,7 @@ npm run clean
 ├── documentation/              # API integration docs
 │   ├── eleventy-11ty.md        # Eleventy reference
 │   ├── tailwind-css.md         # Tailwind reference
-│   ├── paypal-integration.md   # Payment integration
+│   ├── stripe-integration.md   # Payment integration
 │   ├── google-analytics.md     # Analytics setup
 │   ├── whatsapp-integration.md # WhatsApp contact
 │   └── youtube-api.md          # Video embeds
