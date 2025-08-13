@@ -83,16 +83,6 @@ html, body {
 @font-face { font-family: 'CenturyGothic'; src: url('/assets/fonts/CenturyGothic/CenturyGothic-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
 @font-face { font-family: 'CenturyGothic'; src: url('/assets/fonts/CenturyGothic/CenturyGothic-BoldItalic.woff') format('woff'); font-weight: 700; font-style: italic; font-display: swap; }
 
-@keyframes gentle-whatsapp-pulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3), 0 8px 32px rgba(37, 211, 102, 0.15);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4), 0 12px 40px rgba(37, 211, 102, 0.25);
-  }
-}
 
 /* Font utility classes now handled by Tailwind config (font-century, font-lora) */
 @layer components {
@@ -101,9 +91,6 @@ html, body {
     background-image: url('/assets/pictures/cafe.jpg');
   }
 
-  .whatsapp-btn {
-    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-  }
 
   /* Swiper pagination bullets styling - ensuring high specificity */
   .video-testimonials-pagination {
