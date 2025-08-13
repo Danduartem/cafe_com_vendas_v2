@@ -18,15 +18,18 @@
       "Bash(claude mcp get:*)",
       "Bash(gtimeout:*)",
       "Bash(claude mcp:*)",
-      "Bash(UPSTASH_REDIS_REST_URL=https://kind-titmouse-32096.upstash.io UPSTASH_REDIS_REST_TOKEN=AX1gAAIjcDE3YzNlZmY1YzFiNGM0ZjhjOGE2NzZmYWY2NWU4OTdjZXAxMA gtimeout 10 npx @upstash/context7-mcp)",
-      "Bash(UPSTASH_REDIS_REST_URL=https://kind-titmouse-32096.upstash.io UPSTASH_REDIS_REST_TOKEN=AX1gAAIjcDE3YzNlZmY1YzFi4ZjhjOGE2NzZmYWY2NWU4OTdjZXAxMA npx @upstash/context7-mcp)",
-      "Bash(UPSTASH_REDIS_REST_URL=https://kind-titmouse-32096.upstash.io UPSTASH_REDIS_REST_TOKEN=AX1gAAIjcDE3YzNlZmY1YzFiNGM0ZjhjOGE2NzZmYWY2NWU4OTdjZXAxMA npx context7-mcp-server --help)",
-      "Bash(FIRECRAWL_API_KEY=fc-d37ec29487a849c5b17616531ff2a8cf npx -y firecrawl-mcp --help)",
+      "Bash(UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL} UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN} gtimeout 10 npx @upstash/context7-mcp)",
+      "Bash(UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL} UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN} npx @upstash/context7-mcp)",
+      "Bash(UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL} UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN} npx context7-mcp-server --help)",
+      "Bash(FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY} npx -y firecrawl-mcp --help)",
       "Bash(claude --version)",
       "Bash(claude --debug)",
       "Bash(claude --debug --print \"test\")",
       "WebFetch(domain:github.com)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(mkdir:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs"
     ],
     "deny": []
   },

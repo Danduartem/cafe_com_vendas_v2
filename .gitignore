@@ -58,3 +58,6 @@ yarn-error.log*
 
 # CSS maps
 *.css.map
+
+# Claude settings with sensitive data
+.claude/settings.local.json
