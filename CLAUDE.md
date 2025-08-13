@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 Guidance for Claude Code when working with the Café com Vendas landing page.
 
 ## Project Context
@@ -10,11 +12,15 @@ Guidance for Claude Code when working with the Café com Vendas landing page.
 
 ## Commands
 ```bash
-npm run dev          # Development with watch
+npm run dev          # Development with watch (includes tokens:build + build:css)
+npm run start        # Alternative development server 
 npm run build        # Production build  
 npm run tokens:build # Generate CSS from JSON tokens
+npm run build:css    # Build Tailwind CSS with PostCSS
 npm run clean        # Clean build directory
 ```
+
+**Note**: No test or lint commands are configured in this project. Don't assume their existence.
 
 ## Structure
 ```
@@ -64,12 +70,16 @@ info/                      # Design system & content
 - ✅ Are all animations using Tailwind utilities (`animate-*`, `transform`, `rotate-*`)?
 - ✅ Am I only manipulating classes, never direct styles?
 
-### Tech Stack
-- Eleventy + Nunjucks templates (.njk)
-- Tailwind v4 with PostCSS (no custom CSS)
-- Local fonts only (Lora, Century Gothic)
-- Vanilla JS in main.js only
-- Design tokens → CSS custom properties
+### Tech Stack & Architecture
+- **Static Site Generator**: Eleventy (.eleventy.js config)
+- **Templates**: Nunjucks (.njk files) 
+- **CSS Framework**: Tailwind v4 with PostCSS (postcss.config.js)
+- **Data Layer**: Eleventy data files (src/_data/*.js) load from info/*.json
+- **Design System**: JSON tokens → CSS custom properties via build-tokens.js
+- **Fonts**: Local only (Lora display, Century Gothic body)
+- **JavaScript**: Vanilla JS in main.js only
+
+**Data Flow**: `info/DATA_design_tokens.json` → `scripts/build-tokens.js` → `src/assets/css/_tokens.generated.css` → Tailwind config uses CSS vars
 
 ### Components
 - Structure: `<section id="name" aria-label="Description">`
@@ -131,9 +141,10 @@ info/                      # Design system & content
 
 **Build Process**: 
 1. Edit `DATA_design_tokens.json` → `npm run tokens:build` 
-2. Tokens become CSS vars in `_tokens.generated.css`
-3. Tailwind uses vars via `@theme` directive
-4. `npm run build:css` processes final CSS
+2. `scripts/build-tokens.js` generates `_tokens.generated.css` with CSS custom properties
+3. Tailwind config references these CSS vars in theme.extend.colors
+4. `npm run build:css` processes with PostCSS (Tailwind + Autoprefixer)
+5. Eleventy builds static HTML using data from src/_data layer
 
 **MANDATORY Code Review Checklist for ALL Components:**
 - 🚨 **SCAN FOR VIOLATIONS**: Search entire component for `style.`, `<style>`, `style=""`
