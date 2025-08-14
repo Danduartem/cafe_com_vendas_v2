@@ -80,12 +80,13 @@ info/                       # Design system & content
 
 docs/                           # Comprehensive documentation directory
 ├── README.md                    # Documentation overview and quick reference
+├── ENVIRONMENT-SECURITY.md      # Environment variables and security setup
 ├── ELEVENTY.md                  # Eleventy static site generator documentation
 ├── TAILWIND-CSS.md              # Tailwind CSS framework documentation
 ├── VITE.md                      # Vite build tool configuration guide
 ├── STRIPE.md                    # Stripe payment integration documentation
 ├── MAILERLITE.md                # MailerLite email marketing integration
-├── FILLOUT.md                   # Fillout forms platform documentation
+├── FORMSPREE.md                 # Formspree forms backend documentation
 ├── GOOGLE-ANALYTICS.md          # Google Analytics 4 implementation
 ├── YOUTUBE-API.md               # YouTube video embedding for testimonials
 ├── WHATSAPP-INTEGRATION.md      # WhatsApp customer communication

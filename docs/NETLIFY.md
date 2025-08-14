@@ -71,17 +71,17 @@ Netlify is a comprehensive web development platform that combines static site ho
 # Redirects for clean URLs and analytics tracking
 [[redirects]]
   from = "/inscricao"
-  to = "https://forms.fillout.com/t/YOUR_FORM_ID?source=direct"
+  to = "https://formspree.io/f/xanbnrvp?source=direct"
   status = 302
 
 [[redirects]]
   from = "/instagram"
-  to = "https://forms.fillout.com/t/YOUR_FORM_ID?source=instagram"
+  to = "https://formspree.io/f/xanbnrvp?source=instagram"
   status = 302
 
 [[redirects]]
   from = "/linkedin" 
-  to = "https://forms.fillout.com/t/YOUR_FORM_ID?source=linkedin"
+  to = "https://formspree.io/f/xanbnrvp?source=linkedin"
   status = 302
 
 # Edge Functions configuration
@@ -639,7 +639,7 @@ STRIPE_PUBLISHABLE_KEY=pk_live_...
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 MAILERLITE_API_KEY=eyJ0eXAiOiJKV1QiLCJh...
-FILLOUT_API_KEY=...
+FORMSPREE_API_KEY=...
 ANALYTICS_API_KEY=...
 SITE_URL=https://cafecomvendas.com
 ```
@@ -651,7 +651,7 @@ SITE_URL=https://cafecomvendas.com
   for = "/*"
   [headers.values]
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://server.fillout.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.stripe.com https://api.fillout.com"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.stripe.com https://formspree.io; form-action 'self' https://formspree.io"
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"

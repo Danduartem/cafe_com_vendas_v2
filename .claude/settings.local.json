@@ -8,7 +8,9 @@
       "mcp__playwright-mcp__browser_evaluate",
       "mcp__playwright-mcp__browser_snapshot",
       "mcp__playwright-mcp__browser_navigate",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "mcp__context7__resolve-library-id",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

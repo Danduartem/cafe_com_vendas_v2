@@ -13,12 +13,15 @@ This project integrates with multiple third-party services and libraries to prov
 - **[TAILWIND-CSS.md](./TAILWIND-CSS.md)** - Tailwind CSS utility framework documentation  
 - **[VITE.md](./VITE.md)** - Vite build tool configuration guide
 
+### Security & Configuration
+- **[ENVIRONMENT-SECURITY.md](./ENVIRONMENT-SECURITY.md)** - Environment variables and security setup
+
 ### Payment Processing
 - **[STRIPE.md](./STRIPE.md)** - Stripe payment integration guide
 
 ### Email Marketing & Forms
 - **[MAILERLITE.md](./MAILERLITE.md)** - MailerLite email automation integration
-- **[FILLOUT.md](./FILLOUT.md)** - Fillout forms platform documentation
+- **[FORMSPREE.md](./FORMSPREE.md)** - Formspree forms backend documentation
 
 ### Analytics & Tracking
 - **[GOOGLE-ANALYTICS.md](./GOOGLE-ANALYTICS.md)** - Google Analytics 4 implementation
@@ -39,7 +42,7 @@ This project integrates with multiple third-party services and libraries to prov
 | Vite | JavaScript bundling | ES6 modules → IIFE | ✅ Active |
 | Stripe | Payment processing | Payment Links & checkout | ✅ Active |
 | MailerLite | Email marketing | Post-purchase automation | 🔄 Planned |
-| Fillout | Form management | Registration & feedback | 🔄 Planned |
+| Formspree | Form backend | Registration & feedback | 🔄 Planned |
 | Google Analytics | User tracking | Event-based analytics | ✅ Active |
 | YouTube | Video testimonials | Click-to-load embeds | ✅ Active |
 | WhatsApp | Customer support | Direct messaging links | ✅ Active |
@@ -57,7 +60,7 @@ This project integrates with multiple third-party services and libraries to prov
 ### External Services
 - **Stripe** - Payment processing (Payment Links)
 - **MailerLite** - Email marketing automation
-- **Fillout** - Form building and workflow automation
+- **Formspree** - Form backend service and API
 - **YouTube** - Video hosting (no API key required)
 - **WhatsApp** - Messaging service (no API key required)
 - **Google Analytics** - Web analytics (tracking ID required)
@@ -82,8 +85,8 @@ NODE_ENV=production
 # MailerLite (when implemented)
 MAILERLITE_API_KEY=your_api_key
 
-# Fillout (when implemented)
-FILLOUT_API_KEY=your_api_key
+# Formspree (when implemented)
+FORMSPREE_API_KEY=your_api_key
 ```
 
 ### Optional Configuration
@@ -175,7 +178,7 @@ CONTEXT=production
 - WhatsApp contact number status
 - Netlify deployment status
 - MailerLite API connectivity (future)
-- Fillout form functionality (future)
+- Formspree form functionality (future)
 
 ## Development Workflow
 
@@ -235,7 +238,7 @@ npm run clean        # Clean build directory
 
 ### Planned Integrations
 - **MailerLite** - Email marketing automation for post-purchase sequences
-- **Fillout** - Advanced form building with conditional logic
+- **Formspree** - Enhanced form backend with API access
 - **Enhanced Stripe** - Embedded checkout for better UX
 - **WhatsApp Business API** - Automated customer support
 

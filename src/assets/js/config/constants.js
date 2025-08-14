@@ -3,6 +3,8 @@
  * Centralized configuration for animations, breakpoints, and analytics
  */
 
+import ENV from './environment.js';
+
 export const CONFIG = {
     animations: {
         duration: {
@@ -31,7 +33,13 @@ export const CONFIG = {
             FAQ_TOGGLE: 'faq_toggle',
             TESTIMONIAL_VIEW: 'view_testimonial_slide',
             WHATSAPP_CLICK: 'whatsapp_click',
-            SCROLL_INDICATOR: 'scroll_indicator_click'
+            SCROLL_INDICATOR: 'scroll_indicator_click',
+            FORM_SUBMIT: 'form_submit',
+            FORM_START: 'form_start',
+            FORM_ABANDON: 'form_abandon'
         }
     }
 };
+
+// Export environment configuration for easy access
+export { ENV };
