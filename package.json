@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rm -rf _site",
     "tokens:build": "node scripts/build-tokens.js",
-    "postcss": "npx --yes postcss-cli ./src/assets/css/main.css -o ./_site/tailwind.css",
+    "postcss": "postcss ./src/assets/css/main.css -o ./_site/tailwind.css",
     "build:css": "TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run postcss",
     "build:js": "NODE_ENV=production vite build",
     "build:js:dev": "NODE_ENV=development vite build",
