@@ -11,8 +11,8 @@
   # Functions directory
   functions = "netlify/functions"
   
-  # Node.js version
-  environment = { NODE_VERSION = "18" }
+  # Node.js version and secrets configuration
+  environment = { NODE_VERSION = "18", SECRETS_SCAN_OMIT_KEYS = "VITE_FORMSPREE_FORM_ID,VITE_STRIPE_PUBLISHABLE_KEY" }
 
 # Build processing
 [build.processing]

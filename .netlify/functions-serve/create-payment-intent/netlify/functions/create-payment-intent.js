@@ -8378,7 +8378,7 @@ var require_stripe_cjs_node = __commonJS({
   }
 });
 
-// netlify/functions/create-payment-intent.js
+// netlify/functions/create-payment-intent.cjs
 var Stripe = require_stripe_cjs_node();
 var stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 exports.handler = async (event, context) => {

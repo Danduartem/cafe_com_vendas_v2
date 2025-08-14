@@ -8378,7 +8378,7 @@ var require_stripe_cjs_node = __commonJS({
   }
 });
 
-// netlify/functions/stripe-webhook.js
+// netlify/functions/stripe-webhook.cjs
 var Stripe = require_stripe_cjs_node();
 var stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 var MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
