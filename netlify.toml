@@ -1,0 +1,151 @@
+# Netlify Configuration for Café com Vendas
+# This file configures the build and deployment settings for the site
+
+[build]
+  # Build command - generates tokens, builds CSS/JS, and runs Eleventy
+  command = "npm run build"
+  
+  # Output directory for the built site
+  publish = "_site"
+  
+  # Functions directory
+  functions = "netlify/functions"
+  
+  # Node.js version
+  environment = { NODE_VERSION = "18" }
+
+# Build processing
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = false  # Vite handles bundling
+  minify = false  # Vite handles minification
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
+
+# Development settings
+[dev]
+  command = "npm run dev"
+  framework = "eleventy"
+  targetPort = 8080
+  port = 8888
+  publish = "_site"
+  functions = "netlify/functions"
+
+# Function-specific settings
+[functions]
+  node_bundler = "esbuild"
+
+# URL redirects and rewrites
+[[redirects]]
+  # Redirect to thank-you page after successful payment
+  from = "/payment-success"
+  to = "/obrigado"
+  status = 302
+
+[[redirects]]
+  # Redirect old URLs if needed
+  from = "/thank-you"
+  to = "/obrigado"
+  status = 301
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # Performance headers
+    X-DNS-Prefetch-Control = "on"
+    
+    # Content Security Policy
+    Content-Security-Policy = '''
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io;
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: https: blob:;
+      font-src 'self' data:;
+      connect-src 'self' https://api.stripe.com https://formspree.io https://connect.mailerlite.com https://www.google-analytics.com https://plausible.io;
+      frame-src https://js.stripe.com https://hooks.stripe.com;
+      form-action 'self' https://formspree.io;
+      base-uri 'self';
+      object-src 'none';
+    '''
+
+# Headers for static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Headers for fonts
+[[headers]]
+  for = "*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Headers for API endpoints
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, Stripe-Signature"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+
+# Environment-specific settings
+[context.production]
+  command = "npm run build"
+  
+  [context.production.environment]
+    NODE_ENV = "production"
+    ELEVENTY_ENV = "production"
+
+[context.deploy-preview]
+  command = "npm run build"
+  
+  [context.deploy-preview.environment]
+    NODE_ENV = "development"
+    ELEVENTY_ENV = "development"
+
+[context.branch-deploy]
+  command = "npm run build"
+  
+  [context.branch-deploy.environment]
+    NODE_ENV = "development"
+    ELEVENTY_ENV = "development"
+
+# Edge functions (if needed in the future)
+# [[edge_functions]]
+#   function = "checkout-analytics"
+#   path = "/checkout/*"
+
+# Plugin configuration
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+  
+  [plugins.inputs]
+    output_path = "reports/lighthouse.html"
+    
+    [plugins.inputs.audits]
+      performance = 90
+      accessibility = 95
+      best-practices = 90
+      seo = 95
+
+# Form processing (for Formspree backup)
+[forms]
+  spam_action = "block"
+  honeypot_field = "_gotcha"

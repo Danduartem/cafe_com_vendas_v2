@@ -78,13 +78,14 @@
           {# Glow effect #}
           <div class="absolute -inset-1 bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 rounded-3xl blur-lg opacity-60 group-hover:opacity-100 transition duration-500 group-hover:duration-200" aria-hidden="true"></div>
           
-          <a 
-            href="#inscricao" 
+          <button 
+            type="button"
+            data-checkout-trigger
+            data-source="final-cta"
             class="final-cta-button relative inline-flex flex-col items-center justify-center px-10 md:px-14 py-6 md:py-8 min-w-[320px] bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/15 hover:border-white/30 text-white font-lora font-semibold text-lg md:text-xl rounded-3xl shadow-2xl hover:shadow-gold-500/30 transform hover:scale-105 hover:-translate-y-2 transition-all duration-500 group focus:outline-none focus:ring-4 focus:ring-gold-400/30"
             data-analytics-event="click_final_cta"
             aria-label="Garantir vaga no Café com Vendas"
             aria-describedby="final-cta-description"
-            role="button"
           >
             {# Button content #}
             <div class="text-center space-y-2">
@@ -106,7 +107,7 @@
             
             {# Inner glow effect #}
             <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/5 via-transparent to-gold-500/5 pointer-events-none"></div>
-          </a>
+          </button>
         </div>
 
         {# Trust Indicators #}

@@ -36,7 +36,14 @@ export const CONFIG = {
             SCROLL_INDICATOR: 'scroll_indicator_click',
             FORM_SUBMIT: 'form_submit',
             FORM_START: 'form_start',
-            FORM_ABANDON: 'form_abandon'
+            FORM_ABANDON: 'form_abandon',
+            // Checkout events
+            CHECKOUT_OPENED: 'checkout_opened',
+            CHECKOUT_CLOSED: 'checkout_closed',
+            LEAD_CAPTURED: 'lead_captured',
+            PAYMENT_STARTED: 'payment_started',
+            PAYMENT_COMPLETED: 'payment_completed',
+            PAYMENT_FAILED: 'payment_failed'
         }
     }
 };

@@ -11,7 +11,8 @@
     "build:js:dev": "NODE_ENV=development vite build",
     "build": "npm run clean && npm run tokens:build && npm run build:css && npm run build:js && eleventy",
     "start": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && npm run build:js:dev && eleventy --serve",
-    "dev": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && npm run build:js:dev && eleventy --serve --watch"
+    "dev": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && npm run build:js:dev && eleventy --serve --watch",
+    "dev:netlify": "netlify dev"
   },
   "keywords": [
     "landing-page",
@@ -23,6 +24,9 @@
   ],
   "author": "Café com Vendas",
   "license": "ISC",
+  "dependencies": {
+    "stripe": "^16.12.0"
+  },
   "devDependencies": {
     "@11ty/eleventy": "^2.0.1",
     "@fontsource/lora": "^5.2.6",
