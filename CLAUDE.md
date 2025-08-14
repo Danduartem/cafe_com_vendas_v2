@@ -14,9 +14,9 @@ Guidance for Claude Code when working with the Café com Vendas landing page.
 - **Stripe**: 18.4.0 (latest Node.js SDK) - https://docs.stripe.com/api
 - **PostCSS**: 8.5.6 + autoprefixer 10.4.21
 
-**📋 Quick Reference**: Run `npm run versions` to generate current version manifest in `VERSIONS.txt`  
+**📋 Quick Reference**: Run `npm run versions` to see current installed versions  
 **📋 Check Updates**: Run `npm run outdated` to check for new versions  
-**📋 Full Tech Documentation**: See `TECH-STACK.md` for comprehensive version info and links
+**📋 Current Versions**: Check `package.json` for exact dependency versions
 
 ### Modern ESM Architecture
 - **All `.js` files use ESM syntax**: `import`/`export default`
@@ -100,21 +100,11 @@ info/                       # Design system & content
 ├── BUILD_landing_page.md        # Development blueprint
 └── *.md                         # Other guidelines
 
-docs/                           # Comprehensive documentation directory
-├── README.md                    # Documentation overview and quick reference
-├── ENVIRONMENT-SECURITY.md      # Environment variables and security setup
-├── ELEVENTY.md                  # Eleventy static site generator documentation
-├── TAILWIND-CSS.md              # Tailwind CSS framework documentation
-├── VITE.md                      # Vite build tool configuration guide
-├── STRIPE.md                    # Stripe payment integration documentation
-├── MAILERLITE.md                # MailerLite email marketing integration
-├── FORMSPREE.md                 # Formspree forms backend documentation
-├── GOOGLE-ANALYTICS.md          # Google Analytics 4 implementation
-├── YOUTUBE-API.md               # YouTube video embedding for testimonials
-├── WHATSAPP-INTEGRATION.md      # WhatsApp customer communication
-└── NETLIFY.md                   # Netlify hosting and deployment
-
 vite.config.js              # Vite bundler configuration
+.claude/                    # Custom Claude Code commands
+├── commands/
+│   ├── update-libs.md      # Dependency update command
+│   └── update-refactor.md  # Code refactoring command
 ```
 
 ## Critical Rules
@@ -241,17 +231,32 @@ vite.config.js              # Vite bundler configuration
 
 **Note**: This project uses Tailwind v4's pure CSS-based configuration with Vite as the unified build tool.
 
-**MANDATORY Code Review Checklist for ALL Components:**
-- 🚨 **SCAN FOR VIOLATIONS**: Search entire component for `style.`, `<style>`, `style=""`
-- ✅ No `<style>` blocks or `style=""` attributes  
-- ✅ No `element.style.*` assignments in JavaScript
-- ✅ All JavaScript in modular ES6 files (not inline)
-- ✅ Only design token colors (no hex codes like `#f59e0b`)
-- ✅ Standard Tailwind animations (no custom animation classes)
-- ✅ Tailwind utilities only (no custom CSS classes)
-- ✅ All interactions use class manipulation: `classList.add/remove/toggle()`
+**MANDATORY Component Checklist:**
+- 🚨 **No inline styles**: No `style.`, `<style>`, or `style=""` anywhere
+- ✅ **Pure Tailwind**: Only utility classes, no custom CSS
+- ✅ **ES6 modules**: All JavaScript in separate `.js` files  
+- ✅ **Design tokens**: Only token colors (no hex codes)
+- ✅ **Class manipulation**: Use `classList.add/remove/toggle()` only
 
 **Access Data in Templates**: Use Eleventy data (`{{ site }}`, `{{ event }}`, `{{ avatar }}`, `{{ tokens }}`)
+
+## 🤖 Custom Slash Commands
+
+### `/update-libs`
+Update all project dependencies to latest stable versions:
+- Check outdated packages with `npm outdated`
+- Update dependencies safely
+- Test build compatibility
+- Update documentation with new versions
+
+### `/update-refactor`  
+Refactor codebase to leverage latest framework features:
+- Analyze code for modernization opportunities
+- Apply current framework best practices
+- Optimize performance and build configuration
+- Ensure modern patterns throughout codebase
+
+**Usage**: Type `/` in Claude Code to see available commands
 
 ## Git Commit Guidelines
 - Write clear, descriptive commit messages
@@ -275,3 +280,66 @@ vite.config.js              # Vite bundler configuration
 - No custom animation classes (use Tailwind: `animate-pulse`, `animate-bounce`, etc.)
 - No hardcoded colors like `#f59e0b` (use design token classes: `burgundy-*`, `navy-*`)
 - No complex glassmorphism with custom shadows (use Tailwind: `backdrop-blur-md`, `bg-white/90`)
+
+## Component Development Pattern
+
+### Essential Component Structure
+```javascript
+// src/assets/js/components/my-component.js
+import { safeQuery } from '../utils/index.js';
+
+export const MyComponent = {
+    init() {
+        this.bindEvents();
+        // Make toggle function available globally for onclick handlers
+        window.toggleMyComponent = this.toggleComponent.bind(this);
+    },
+    
+    bindEvents() {
+        const container = safeQuery('#my-component');
+        if (!container) return;
+        container.addEventListener('click', this.handleClick.bind(this));
+    },
+    
+    toggleComponent(elementId) {
+        const element = safeQuery(`#${elementId}`);
+        if (!element) return;
+        
+        // Use Tailwind classes only - NEVER element.style.*
+        element.classList.toggle('hidden');
+        element.classList.toggle('max-h-0');
+        element.classList.toggle('max-h-96');
+    }
+};
+```
+
+### HTML Template Pattern
+```njk
+<section id="component-name" aria-label="Description">
+  <button onclick="toggleMyComponent('target-id')" 
+          class="transition-all duration-300 hover:scale-105">
+    Toggle
+  </button>
+  <div id="target-id" 
+       class="hidden overflow-hidden transition-all duration-300 max-h-0">
+    Content
+  </div>
+</section>
+```
+
+### Registration in app.js
+```javascript
+import { MyComponent } from './components/my-component.js';
+// Add to components array in initializeComponents()
+```
+
+## 📚 Documentation Access
+
+For latest framework/library docs, use Context7 MCP:
+- **Vite 7**: Use Context7 for build configuration and latest features
+- **Eleventy 3**: Use Context7 for ESM patterns and new APIs  
+- **Tailwind CSS v4**: Use Context7 for CSS-first configuration
+- **Stripe API**: Use Context7 for payment integration examples
+- **Netlify Functions**: Use Context7 for ESM serverless functions
+
+**Example**: Type `/context7 vite` to get fresh Vite documentation

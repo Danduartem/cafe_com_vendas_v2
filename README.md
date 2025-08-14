@@ -15,9 +15,10 @@ Premium landing page for an intimate business transformation event in Lisbon, de
 - **Framework**: [Eleventy](https://www.11ty.dev/) (Static Site Generator)
 - **Templating**: Nunjucks (.njk files)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) + PostCSS (pure CSS-based configuration)
+- **Build Tool**: [Vite](https://vite.dev/) (ES6 modules → optimized bundle)
 - **Design System**: JSON tokens → CSS custom properties
 - **Fonts**: Local Lora (display) + Century Gothic (body)
-- **JavaScript**: Vanilla JS (performance optimized)
+- **JavaScript**: Modular ES6 architecture (performance optimized)
 
 ## 🚀 Quick Start
 
@@ -67,13 +68,10 @@ npm run clean
 │   ├── GUIDE_brand_visual.md         # Brand guidelines
 │   ├── GUIDE_claude_instructions.md  # Claude context & instructions
 │   └── BUILD_landing_page.md         # Development blueprint
-├── documentation/              # API integration docs
-│   ├── eleventy-11ty.md        # Eleventy reference
-│   ├── tailwind-css.md         # Tailwind reference
-│   ├── stripe-integration.md   # Payment integration
-│   ├── google-analytics.md     # Analytics setup
-│   ├── whatsapp-integration.md # WhatsApp contact
-│   └── youtube-api.md          # Video embeds
+├── .claude/                    # Custom Claude Code commands
+│   └── commands/
+│       ├── update-libs.md      # Dependency update command
+│       └── update-refactor.md  # Code refactoring command
 └── CLAUDE.md                   # AI development guidelines
 ```
 
@@ -100,17 +98,18 @@ The design system is centralized in `info/DATA_design_tokens.json` and automatic
 
 ### Code Standards
 - **CSS**: Pure Tailwind utilities only (NO custom CSS)
-- **JavaScript**: Vanilla JS in `main.js` only (NO inline scripts)
+- **JavaScript**: Modular ES6 components (NO inline scripts)
 - **Templates**: Semantic HTML with proper ARIA labels
 - **Performance**: WebP images, lazy loading, LCP optimization
 
 ### Build Process
 1. `DATA_design_tokens.json` → CSS custom properties
 2. Tailwind v4 processes CSS via `@theme` block configuration
-3. Eleventy generates static HTML
-4. PostCSS optimizes final CSS
+3. Vite bundles modular ES6 JavaScript into optimized output
+4. Eleventy generates static HTML
+5. PostCSS optimizes final CSS
 
-**Note**: Uses Tailwind v4's pure CSS-based configuration - no `tailwind.config.js` file needed.
+**Note**: Modern ESM architecture with Vite bundling. Uses Tailwind v4's pure CSS-based configuration.
 
 ### Critical Rules
 - ❌ No `element.style.*` assignments
@@ -123,19 +122,19 @@ The design system is centralized in `info/DATA_design_tokens.json` and automatic
 ## 📊 Analytics & Conversion
 
 - **Google Analytics 4** with custom events
-- **PayPal** payment integration
+- **Stripe** payment integration  
 - **WhatsApp** direct contact button
 - **Performance tracking** (LCP, scroll depth, CTAs)
 
 ## 🚀 Deployment
 
-Built static files are generated in `_site/` directory and can be deployed to any static hosting provider (Netlify, Vercel, AWS S3, etc.).
+Built static files are generated in `_site/` directory and deployed to Netlify with automated builds from GitHub.
 
-## 📖 Documentation
+## 📖 Documentation & AI Assistance
 
-- `/documentation/` - API integration references
-- `CLAUDE.md` - Development guidelines for AI assistance
-- Component templates and development patterns included
+- `CLAUDE.md` - Complete development guidelines for Claude Code
+- Custom slash commands: `/update-libs` and `/update-refactor`
+- Fresh documentation via Context7 MCP integration
 
 ## 🎯 Business Goals
 

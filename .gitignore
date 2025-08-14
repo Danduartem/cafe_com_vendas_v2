@@ -52,6 +52,9 @@ coverage/
 tmp/
 temp/
 
+# Netlify development files
+.netlify/
+
 # Optional npm cache
 .npm
 

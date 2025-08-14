@@ -2,21 +2,29 @@
   "name": "cafe-com-vendas-landing",
   "version": "1.0.0",
   "description": "Landing page for Café com Vendas event - an intimate business event for female entrepreneurs in Portugal",
-  "main": "index.js",
   "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20.19.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
-    "clean": "rm -rf _site",
-    "tokens:build": "node scripts/build-tokens.js",
-    "postcss": "postcss ./src/assets/css/main.css -o ./_site/tailwind.css",
-    "build:css": "TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run postcss",
-    "build:js": "NODE_ENV=production vite build",
-    "build:js:dev": "NODE_ENV=development vite build",
-    "build": "npm run clean && npm run tokens:build && npm run build:css && npm run build:js && eleventy",
-    "start": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && npm run build:js:dev && eleventy --serve",
-    "dev": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && npm run build:js:dev && eleventy --serve --watch",
+    "clean": "rimraf _site",
+    "tokens": "node scripts/build-tokens.js",
+    "css": "postcss ./src/assets/css/main.css -o ./_site/tailwind.css",
+    "css:build": "cross-env TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run css",
+    "js:dev": "cross-env NODE_ENV=development vite build",
+    "js:prod": "cross-env NODE_ENV=production vite build",
+    "11ty": "eleventy",
+    "11ty:serve": "eleventy --serve --watch",
+    "dev": "npm run tokens && npm run css:build && npm run js:dev && npm run 11ty:serve",
+    "build": "npm run clean && npm run tokens && npm run css:build && npm run js:prod && npm run 11ty",
+    "start": "npm run dev",
+    "preview": "npm run build && npx serve _site",
     "dev:netlify": "netlify dev",
-    "versions": "npm list --depth=0 > VERSIONS.txt && echo \"Generated on: $(date)\" >> VERSIONS.txt && echo \"Node.js: $(node --version)\" >> VERSIONS.txt",
-    "outdated": "npm outdated || echo 'All packages are up to date!'"
+    "versions": "npm list --depth=0",
+    "outdated": "npm outdated",
+    "update": "npm update"
   },
   "keywords": [
     "landing-page",
@@ -29,16 +37,18 @@
   "author": "Café com Vendas",
   "license": "ISC",
   "dependencies": {
+    "@fontsource/lora": "^5.2.6",
+    "stripe": "^18.4.0"
+  },
+  "devDependencies": {
     "@11ty/eleventy": "^3.0.0",
     "@tailwindcss/postcss": "^4.1.11",
     "autoprefixer": "^10.4.21",
+    "cross-env": "^10.0.0",
     "postcss": "^8.5.6",
     "postcss-cli": "^11.0.1",
-    "stripe": "^18.4.0",
+    "rimraf": "^6.0.1",
     "tailwindcss": "^4.1.11",
     "vite": "^7.1.2"
-  },
-  "devDependencies": {
-    "@fontsource/lora": "^5.2.6"
   }
 }
