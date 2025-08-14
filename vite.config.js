@@ -17,17 +17,49 @@ export default defineConfig({
         entryFileNames: '[name].js',
         chunkFileNames: '[name].js',
         assetFileNames: '[name].[ext]'
+      },
+      // Vite 7.x optimizations
+      treeshake: {
+        preset: 'recommended',
+        moduleSideEffects: false
       }
     },
     // Enable source maps for development
     sourcemap: process.env.NODE_ENV === 'development',
-    // Minify in production
-    minify: process.env.NODE_ENV === 'production'
+    // Minify in production with latest terser options
+    minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
+    terserOptions: {
+      compress: {
+        drop_console: process.env.NODE_ENV === 'production',
+        drop_debugger: true,
+        pure_funcs: ['console.log']
+      },
+      format: {
+        comments: false
+      }
+    },
+    // Optimize chunk size splitting
+    chunkSizeWarningLimit: 1000,
+    // Target modern browsers for better optimization
+    target: ['es2020', 'chrome80', 'firefox80', 'safari14']
   },
-  // Development server settings (if needed)
+  // Development server settings optimized for Vite 7.x
   server: {
     watch: {
       include: ['src/assets/js/**']
+    },
+    // Enable hot reload for better dev experience
+    hmr: {
+      overlay: true
     }
+  },
+  // Optimize dependencies pre-bundling
+  optimizeDeps: {
+    include: [],
+    exclude: []
+  },
+  // Enable advanced CSS code splitting
+  css: {
+    devSourcemap: process.env.NODE_ENV === 'development'
   }
 });

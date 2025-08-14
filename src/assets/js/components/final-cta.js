@@ -96,11 +96,8 @@ export const FinalCTA = {
         const x = e.clientX - rect.left - size / 2;
         const y = e.clientY - rect.top - size / 2;
         
-        ripple.className = 'absolute rounded-full bg-white/20 pointer-events-none animate-ping';
-        ripple.style.setProperty('--ripple-size', size + 'px');
-        ripple.style.setProperty('--ripple-x', x + 'px');
-        ripple.style.setProperty('--ripple-y', y + 'px');
-        ripple.classList.add('ripple-effect');
+        // Apply pure Tailwind classes including size and position
+        ripple.className = `absolute rounded-full bg-white/20 pointer-events-none animate-ping w-[${size}px] h-[${size}px] left-[${x}px] top-[${y}px]`;
         
         e.currentTarget.appendChild(ripple);
         

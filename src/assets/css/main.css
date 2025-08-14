@@ -7,9 +7,9 @@ html, body {
 @import "./_tokens.generated.css";
 @import "tailwindcss";
 
-/* Tailwind v4 Configuration */
+/* Tailwind v4 Configuration - Both :root and @theme needed for complete functionality */
 @theme {
-  /* Custom colors from design tokens */
+  /* Custom colors from design tokens - Required for Tailwind utility generation */
   --color-navy-50: #F3F4F5;
   --color-navy-100: #E8E9EB;
   --color-navy-200: #BABBC4;
@@ -61,11 +61,11 @@ html, body {
   --color-peach-800: #914633;
   --color-peach-900: #753b2d;
 
-  /* Font families */
+  /* Font families for Tailwind (complementing generated tokens) */
   --font-lora: 'Lora', serif;
   --font-century: 'CenturyGothic', sans-serif;
 
-  /* Animation keyframes */
+  /* Enhanced Tailwind v4 Animation Utilities */
   --animate-fade-up: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   --animate-fade-in: fade-in 0.6s ease-out forwards;
   --animate-slide-in-left: slide-in-left 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -73,6 +73,13 @@ html, body {
   --animate-scale-in: scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   --animate-bounce-gentle: bounce-gentle 7s ease-in-out infinite;
   --animate-breathe: breathe 4s ease-in-out infinite;
+  
+  /* New animation delays for better control */
+  --animate-delay-200: 200ms;
+  --animate-delay-500: 500ms;
+  --animate-delay-1000: 1000ms;
+  --animate-delay-2000: 2000ms;
+  --animate-delay-3000: 3000ms;
 }
 
 
@@ -145,33 +152,22 @@ html {
 }
 
 
-/* Carousel utilities for testimonials component */
-.carousel-transform {
-  transform: translateX(var(--carousel-translate-x, 0));
-  transition: transform 0.3s ease-in-out;
+/* Carousel utilities using predefined transform classes */
+.carousel-track {
+  transition: transform 300ms ease-in-out;
 }
 
-.carousel-slide-width {
-  min-width: var(--slide-width, auto);
-}
-
-/* Footer component utilities */
-.floating-pattern {
-  animation-delay: var(--animation-delay, 0s);
-  animation-duration: var(--animation-duration, 8s);
-}
-
-.ripple-effect {
-  width: var(--ripple-size, 0);
-  height: var(--ripple-size, 0);
-  left: var(--ripple-x, 0);
-  top: var(--ripple-y, 0);
-}
-
-.particle-effect {
-  left: var(--particle-left, 0);
-  animation-delay: var(--particle-delay, 0s);
-}
+/* Predefined carousel positions (slide width + gap = ~474px) */
+.carousel-track[data-position="0"] { transform: translateX(0px); }
+.carousel-track[data-position="1"] { transform: translateX(-474px); }
+.carousel-track[data-position="2"] { transform: translateX(-948px); }
+.carousel-track[data-position="3"] { transform: translateX(-1422px); }
+.carousel-track[data-position="4"] { transform: translateX(-1896px); }
+.carousel-track[data-position="5"] { transform: translateX(-2370px); }
+.carousel-track[data-position="6"] { transform: translateX(-2844px); }
+.carousel-track[data-position="7"] { transform: translateX(-3318px); }
+.carousel-track[data-position="8"] { transform: translateX(-3792px); }
+.carousel-track[data-position="9"] { transform: translateX(-4266px); }
 
 /* SVG gradient stops */
 .gradient-stop-navy-start {

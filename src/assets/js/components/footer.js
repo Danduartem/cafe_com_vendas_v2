@@ -24,14 +24,11 @@ export const Footer = {
     
     initFloatingPatterns() {
         const patterns = safeQueryAll('#footer .absolute.opacity-5 > div');
-        const delays = ['0s', '1s', '2s', '3s'];
-        const durations = ['8s', '10s', '12s', '15s'];
+        const delayClasses = ['delay-0', 'delay-1000', 'delay-[2000ms]', 'delay-[3000ms]'];
         
         patterns.forEach((pattern, index) => {
-            pattern.classList.add('animate-pulse');
-            pattern.style.setProperty('--animation-delay', delays[index % delays.length]);
-            pattern.style.setProperty('--animation-duration', durations[index % durations.length]);
-            pattern.classList.add('floating-pattern');
+            // Apply Tailwind animation and delay classes
+            pattern.classList.add('animate-pulse', delayClasses[index % delayClasses.length]);
             
             pattern.addEventListener('mouseenter', () => {
                 pattern.classList.add('scale-110', 'transition-transform', 'duration-500');
@@ -86,11 +83,8 @@ export const Footer = {
             const x = e.clientX - rect.left - size / 2;
             const y = e.clientY - rect.top - size / 2;
             
-            ripple.className = 'absolute rounded-full bg-green-400/30 pointer-events-none animate-ping';
-            ripple.style.setProperty('--ripple-size', size + 'px');
-            ripple.style.setProperty('--ripple-x', x + 'px');
-            ripple.style.setProperty('--ripple-y', y + 'px');
-            ripple.classList.add('ripple-effect');
+            // Apply pure Tailwind classes including size and position
+            ripple.className = `absolute rounded-full bg-green-400/30 pointer-events-none animate-ping w-[${size}px] h-[${size}px] left-[${x}px] top-[${y}px]`;
             
             this.appendChild(ripple);
             setTimeout(() => ripple.remove(), 600);
@@ -102,10 +96,11 @@ export const Footer = {
     createParticleEffect(element) {
         for (let i = 0; i < 6; i++) {
             const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.style.setProperty('--particle-left', Math.random() * 100 + '%');
-            particle.style.setProperty('--particle-delay', Math.random() * 2 + 's');
-            particle.classList.add('particle-effect');
+            const leftPos = Math.random() * 100;
+            const delayMs = Math.random() * 2000;
+            
+            // Apply pure Tailwind classes for positioning and animation
+            particle.className = `absolute w-1 h-1 bg-gold-400/60 rounded-full animate-bounce left-[${leftPos}%] delay-[${delayMs}ms]`;
             element.classList.add('relative');
             element.appendChild(particle);
             

@@ -26,7 +26,9 @@
       "Bash(npm run build:*)",
       "Bash(npm outdated)",
       "Bash(npm update)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(grep:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []

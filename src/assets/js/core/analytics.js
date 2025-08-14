@@ -1,6 +1,6 @@
 /**
  * Analytics Module for Café com Vendas
- * Handles all tracking and performance monitoring
+ * Handles all tracking and performance monitoring with modern Web APIs
  */
 
 import { CONFIG } from '../config/constants.js';
@@ -8,37 +8,117 @@ import { state, StateManager } from './state.js';
 import { throttle } from '../utils/throttle.js';
 
 export const Analytics = {
+    // Error tracking for improved reliability
+    errors: new Set(),
+    
     /**
      * Track event with Google Analytics if available
      */
     track(eventName, parameters = {}) {
-        // Console logging for debugging
-        console.log(`Analytics: ${eventName}`, parameters);
-        
-        // Google Analytics integration
-        if (typeof gtag !== 'undefined') {
-            gtag('event', eventName, parameters);
+        try {
+            // Console logging for debugging
+            console.log(`Analytics: ${eventName}`, parameters);
+            
+            // Google Analytics integration
+            if (typeof gtag !== 'undefined') {
+                gtag('event', eventName, parameters);
+            }
+            
+            // Track to performance timeline for debugging
+            if ('performance' in window && 'mark' in window.performance) {
+                performance.mark(`analytics-${eventName}`);
+            }
+        } catch (error) {
+            this.trackError('analytics_tracking_failed', error);
         }
     },
     
     /**
-     * Initialize performance tracking
+     * Track JavaScript errors for improved debugging
+     */
+    trackError(errorType, error, context = {}) {
+        const errorKey = `${errorType}-${error.message}`;
+        if (this.errors.has(errorKey)) return; // Prevent duplicate error reports
+        
+        this.errors.add(errorKey);
+        console.error(`Error [${errorType}]:`, error, context);
+        
+        this.track('javascript_error', {
+            event_category: 'Error',
+            event_label: errorType,
+            error_message: error.message,
+            error_stack: error.stack?.substring(0, 500),
+            ...context
+        });
+    },
+    
+    /**
+     * Initialize comprehensive performance tracking with modern Web APIs
      */
     initPerformanceTracking() {
         try {
-            const lcpObserver = new PerformanceObserver((list) => {
-                for (const entry of list.getEntries()) {
-                    if (entry.entryType === 'largest-contentful-paint') {
+            // Core Web Vitals tracking
+            if ('PerformanceObserver' in window) {
+                // Largest Contentful Paint (LCP)
+                const lcpObserver = new PerformanceObserver((list) => {
+                    for (const entry of list.getEntries()) {
                         this.track(CONFIG.analytics.events.HERO_LCP, {
-                            custom_parameter: entry.startTime,
-                            event_category: 'Performance'
+                            custom_parameter: Math.round(entry.startTime),
+                            event_category: 'Core Web Vitals',
+                            metric_value: Math.round(entry.startTime)
                         });
                     }
-                }
+                });
+                lcpObserver.observe({entryTypes: ['largest-contentful-paint']});
+                
+                // Cumulative Layout Shift (CLS)
+                const clsObserver = new PerformanceObserver((list) => {
+                    let clsValue = 0;
+                    for (const entry of list.getEntries()) {
+                        if (!entry.hadRecentInput) {
+                            clsValue += entry.value;
+                        }
+                    }
+                    if (clsValue > 0) {
+                        this.track('core_web_vitals_cls', {
+                            custom_parameter: Math.round(clsValue * 1000),
+                            event_category: 'Core Web Vitals',
+                            metric_value: Math.round(clsValue * 1000)
+                        });
+                    }
+                });
+                clsObserver.observe({entryTypes: ['layout-shift']});
+                
+                // First Input Delay (FID) / Interaction to Next Paint (INP)
+                const fidObserver = new PerformanceObserver((list) => {
+                    for (const entry of list.getEntries()) {
+                        this.track('core_web_vitals_fid', {
+                            custom_parameter: Math.round(entry.processingStart - entry.startTime),
+                            event_category: 'Core Web Vitals',
+                            metric_value: Math.round(entry.processingStart - entry.startTime)
+                        });
+                    }
+                });
+                fidObserver.observe({entryTypes: ['first-input']});
+            }
+            
+            // Page load performance
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    const navigation = performance.getEntriesByType('navigation')[0];
+                    if (navigation) {
+                        this.track('page_load_performance', {
+                            event_category: 'Performance',
+                            dom_content_loaded: Math.round(navigation.domContentLoadedEventEnd),
+                            load_complete: Math.round(navigation.loadEventEnd),
+                            ttfb: Math.round(navigation.responseStart)
+                        });
+                    }
+                }, 1000);
             });
-            lcpObserver.observe({entryTypes: ['largest-contentful-paint']});
+            
         } catch (error) {
-            console.warn('Performance tracking not available:', error);
+            this.trackError('performance_tracking_init_failed', error);
         }
     },
     

@@ -74,9 +74,9 @@ export const Testimonials = {
         };
         
         const updateCarousel = () => {
-            const translateX = -currentIndex * (slideWidth + 24);
-            carouselTrack.style.setProperty('--carousel-translate-x', `${translateX}px`);
-            carouselTrack.classList.add('carousel-transform');
+            // Use predefined data position for pure CSS approach
+            carouselTrack.setAttribute('data-position', currentIndex);
+            carouselTrack.classList.add('carousel-track');
             this.updatePagination();
             this.updateNavigationButtons();
         };
@@ -117,8 +117,9 @@ export const Testimonials = {
         const initCarousel = () => {
             calculateSlidesPerViewLocal();
             slides.forEach(slide => {
-                slide.style.setProperty('--slide-width', `${slideWidth}px`);
-                slide.classList.add('carousel-slide-width');
+                // Use responsive Tailwind classes instead of dynamic widths
+                slide.classList.add('flex-shrink-0');
+                // Ensure slides have the correct responsive width classes already in HTML
             });
             createPagination();
             updateCarousel();
@@ -134,10 +135,6 @@ export const Testimonials = {
         // Resize handler
         const handleResize = debounce(() => {
             calculateSlidesPerViewLocal();
-            slides.forEach(slide => {
-                slide.style.setProperty('--slide-width', `${slideWidth}px`);
-                slide.classList.add('carousel-slide-width');
-            });
             createPagination();
             
             const maxIndex = slides.length - Math.floor(slidesPerView);

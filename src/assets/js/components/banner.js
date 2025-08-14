@@ -15,16 +15,24 @@ export const Banner = {
     },
     
     setupHeightVariable() {
-        const setTopBannerHeightVar = () => {
+        const updateScrollMargins = () => {
             const banner = safeQuery('#topBanner');
             if (!banner) return;
             
             const height = banner.offsetHeight || 56;
-            document.documentElement.style.setProperty('--top-banner-h', height + 'px');
+            const sections = document.querySelectorAll('[data-scroll-offset]');
+            
+            // Apply Tailwind scroll margin classes based on banner height
+            sections.forEach(section => {
+                // Remove existing scroll margin classes
+                section.className = section.className.replace(/scroll-mt-\[[\d.]+px\]/g, '');
+                // Add new scroll margin class with current banner height
+                section.classList.add(`scroll-mt-[${height}px]`);
+            });
         };
         
-        window.addEventListener('load', setTopBannerHeightVar);
-        window.addEventListener('resize', setTopBannerHeightVar);
-        setTimeout(setTopBannerHeightVar, 500);
+        window.addEventListener('load', updateScrollMargins);
+        window.addEventListener('resize', updateScrollMargins);
+        setTimeout(updateScrollMargins, 500);
     }
 };

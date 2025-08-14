@@ -5,7 +5,7 @@ allowed-tools: Read, Write, Edit, Bash(npm run:*), Glob, Grep
 
 # Update Refactor
 
-Analyze and refactor the codebase to take full advantage of the latest framework features and modern best practices after updating dependencies.
+Analyze and refactor the codebase to take full advantage of the latest framework features and modern best practices after updating dependencies. Use the `/CLAUDE.md` file as a reference guide.
 
 ## Refactoring Strategy
 
