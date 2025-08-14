@@ -10,7 +10,14 @@
       "mcp__playwright-mcp__browser_navigate",
       "mcp__context7__get-library-docs",
       "mcp__context7__resolve-library-id",
-      "WebSearch"
+      "WebSearch",
+      "Bash(npm run dev:*)",
+      "mcp__playwright-mcp__browser_type",
+      "mcp__playwright-mcp__browser_console_messages",
+      "Bash(npm install:*)",
+      "Bash(netlify functions:serve:*)",
+      "Bash(npm run build:css:*)",
+      "mcp__firecrawl__firecrawl_scrape"
     ],
     "deny": [],
     "ask": []
