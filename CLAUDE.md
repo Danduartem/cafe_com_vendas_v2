@@ -4,6 +4,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Guidance for Claude Code when working with the Café com Vendas landing page.
 
+## 🚀 Current Tech Stack (Updated: Aug 14, 2024)
+
+### Latest Stable Versions
+- **Node.js**: v22.17.1 (required: 22.12+ for Vite 7)
+- **Vite**: 7.1.2 (latest stable) - https://vite.dev/
+- **Eleventy**: 3.1.2 (ESM support) - https://www.11ty.dev/docs/
+- **Tailwind CSS**: 4.1.12 (CSS-first config) - https://tailwindcss.com/docs/v4
+- **Stripe**: 18.4.0 (latest Node.js SDK) - https://docs.stripe.com/api
+- **PostCSS**: 8.5.6 + autoprefixer 10.4.21
+
+**📋 Quick Reference**: Run `npm run versions` to generate current version manifest in `VERSIONS.txt`  
+**📋 Check Updates**: Run `npm run outdated` to check for new versions  
+**📋 Full Tech Documentation**: See `TECH-STACK.md` for comprehensive version info and links
+
+### Modern ESM Architecture
+- **All `.js` files use ESM syntax**: `import`/`export default`
+- **No `.cjs` workarounds needed**: Eleventy 3.x has native ESM support
+- **Vite 7.x requirements**: Node.js 22.12+ for optimal performance
+- **Package.json**: `"type": "module"` enables ESM everywhere
+
 ## Project Context
 **What**: Premium landing page for female entrepreneur event (Sept 20, Lisbon, 8 spots)  
 **Audience**: See `info/DATA_avatar.json` - overworked female entrepreneurs seeking transformation  
@@ -20,6 +40,8 @@ npm run build:css    # Build Tailwind CSS with PostCSS
 npm run build:js     # Build JavaScript with Vite (production)
 npm run build:js:dev # Build JavaScript with Vite (development + source maps)
 npm run clean        # Clean build directory
+npm run versions     # Generate VERSIONS.txt with current dependency versions
+npm run outdated     # Check for package updates
 ```
 
 **Note**: No test or lint commands are configured in this project. Don't assume their existence.

@@ -1,0 +1,13 @@
+cafe-com-vendas-landing@1.0.0 /Users/danielmenezes/Coding/Cafe-com-vendas-v2
+├── @11ty/eleventy@3.1.2
+├── @fontsource/lora@5.2.6
+├── @tailwindcss/postcss@4.1.12
+├── autoprefixer@10.4.21
+├── postcss-cli@11.0.1
+├── postcss@8.5.6
+├── stripe@18.4.0
+├── tailwindcss@4.1.12
+└── vite@7.1.2
+
+Generated on: Thu Aug 14 16:05:04 WEST 2025
+Node.js: v22.17.1

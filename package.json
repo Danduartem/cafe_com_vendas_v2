@@ -14,7 +14,9 @@
     "build": "npm run clean && npm run tokens:build && npm run build:css && npm run build:js && eleventy",
     "start": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && npm run build:js:dev && eleventy --serve",
     "dev": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && npm run build:js:dev && eleventy --serve --watch",
-    "dev:netlify": "netlify dev"
+    "dev:netlify": "netlify dev",
+    "versions": "npm list --depth=0 > VERSIONS.txt && echo \"Generated on: $(date)\" >> VERSIONS.txt && echo \"Node.js: $(node --version)\" >> VERSIONS.txt",
+    "outdated": "npm outdated || echo 'All packages are up to date!'"
   },
   "keywords": [
     "landing-page",
@@ -32,7 +34,7 @@
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "postcss-cli": "^11.0.1",
-    "stripe": "^16.12.0",
+    "stripe": "^18.4.0",
     "tailwindcss": "^4.1.11",
     "vite": "^7.1.2"
   },

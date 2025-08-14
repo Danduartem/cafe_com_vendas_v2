@@ -23,7 +23,10 @@
       "Bash(do mv \"$file\" \"$file%.cjs.js\")",
       "Bash(done)",
       "Bash(do sed -i '' 's/module\\.exports =/export default/g' \"$file\")",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npm outdated)",
+      "Bash(npm update)",
+      "Bash(npm run:*)"
     ],
     "deny": [],
     "ask": []
