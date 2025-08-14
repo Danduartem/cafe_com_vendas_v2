@@ -5,20 +5,19 @@
   "type": "module",
   "private": true,
   "engines": {
-    "node": ">=20.19.0",
+    "node": ">=22.17.1",
     "npm": ">=10.0.0"
   },
   "scripts": {
     "clean": "rimraf _site",
-    "tokens": "node scripts/build-tokens.js",
-    "css": "postcss ./src/assets/css/main.css -o ./_site/tailwind.css",
-    "css:build": "cross-env TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run css",
-    "js:dev": "cross-env NODE_ENV=development vite build",
-    "js:prod": "cross-env NODE_ENV=production vite build",
-    "11ty": "eleventy",
-    "11ty:serve": "eleventy --serve --watch",
-    "dev": "npm run tokens && npm run css:build && npm run js:dev && npm run 11ty:serve",
-    "build": "npm run clean && npm run tokens && npm run css:build && npm run js:prod && npm run 11ty",
+    "tokens:build": "node scripts/build-tokens.js",
+    "build:css": "postcss ./src/assets/css/main.css -o ./_site/tailwind.css",
+    "build:js": "cross-env NODE_ENV=production vite build",
+    "build:js:dev": "cross-env NODE_ENV=development vite build",
+    "eleventy": "eleventy",
+    "eleventy:serve": "eleventy --serve --watch",
+    "dev": "npm run tokens:build && npm run build:css && npm run build:js:dev && npm run eleventy:serve",
+    "build": "npm run clean && npm run tokens:build && npm run build:css && npm run build:js && npm run eleventy",
     "start": "npm run dev",
     "preview": "npm run build && npx serve _site",
     "dev:netlify": "netlify dev",
@@ -49,6 +48,7 @@
     "postcss-cli": "^11.0.1",
     "rimraf": "^6.0.1",
     "tailwindcss": "^4.1.11",
+    "terser": "^5.43.1",
     "vite": "^7.1.2"
   }
 }
