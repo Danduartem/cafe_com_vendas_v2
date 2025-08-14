@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // Load design tokens from info directory
 const tokensData = JSON.parse(
@@ -9,4 +9,4 @@ const tokensData = JSON.parse(
   )
 );
 
-module.exports = tokensData;
+export default tokensData;

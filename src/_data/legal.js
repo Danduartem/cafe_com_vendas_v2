@@ -1,12 +1,15 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Load event data for contact information
 const event = JSON.parse(
   fs.readFileSync(path.join(__dirname, '../../info/DATA_event.json'), 'utf8')
 );
 
-module.exports = {
+export default {
   contact: {
     email: "support@cafecomvendas.com",
     whatsapp: {

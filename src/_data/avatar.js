@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // Load avatar/persona data from info directory
 const avatarData = JSON.parse(
@@ -9,4 +9,4 @@ const avatarData = JSON.parse(
   )
 );
 
-module.exports = avatarData;
+export default avatarData;

@@ -3,10 +3,13 @@
  * Loads FAQ data from JSON file and makes it available to Eleventy templates
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports = function() {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export default function() {
   try {
     const faqDataPath = path.join(__dirname, '../../info/DATA_faq.json');
     const faqData = JSON.parse(fs.readFileSync(faqDataPath, 'utf8'));

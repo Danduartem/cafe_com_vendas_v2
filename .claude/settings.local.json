@@ -17,7 +17,13 @@
       "Bash(npm install:*)",
       "Bash(netlify functions:serve:*)",
       "Bash(npm run build:css:*)",
-      "mcp__firecrawl__firecrawl_scrape"
+      "mcp__firecrawl__firecrawl_scrape",
+      "Bash(mv:*)",
+      "Bash(for:*)",
+      "Bash(do mv \"$file\" \"$file%.cjs.js\")",
+      "Bash(done)",
+      "Bash(do sed -i '' 's/module\\.exports =/export default/g' \"$file\")",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

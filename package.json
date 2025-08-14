@@ -11,9 +11,9 @@
     "build:css": "TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run postcss",
     "build:js": "NODE_ENV=production vite build",
     "build:js:dev": "NODE_ENV=development vite build",
-    "build": "npm run clean && npm run tokens:build && npm run build:css && npm run build:js && npx @11ty/eleventy --config=.eleventy.cjs",
-    "start": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && npm run build:js:dev && npx @11ty/eleventy --config=.eleventy.cjs --serve",
-    "dev": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && npm run build:js:dev && npx @11ty/eleventy --config=.eleventy.cjs --serve --watch",
+    "build": "npm run clean && npm run tokens:build && npm run build:css && npm run build:js && eleventy",
+    "start": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && npm run build:js:dev && eleventy --serve",
+    "dev": "npm run tokens:build && TAILWIND_CONTENT=\"src/**/*.{njk,html,md,js}\" npm run build:css && npm run build:js:dev && eleventy --serve --watch",
     "dev:netlify": "netlify dev"
   },
   "keywords": [
@@ -27,7 +27,7 @@
   "author": "Café com Vendas",
   "license": "ISC",
   "dependencies": {
-    "@11ty/eleventy": "^2.0.1",
+    "@11ty/eleventy": "^3.0.0",
     "@tailwindcss/postcss": "^4.1.11",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",

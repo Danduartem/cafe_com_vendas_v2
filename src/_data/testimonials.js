@@ -1,6 +1,6 @@
 // Testimonials data for social proof section
 
-module.exports = {
+export default {
   videos: [
     {
       id: 1,

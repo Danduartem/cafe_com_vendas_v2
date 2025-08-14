@@ -3,12 +3,12 @@
  * Securely creates a PaymentIntent with customer metadata for Café com Vendas
  */
 
-const Stripe = require('stripe');
+import Stripe from 'stripe';
 
 // Initialize Stripe with secret key from environment variables
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-exports.handler = async (event, context) => {
+export const handler = async (event, context) => {
   // Set CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',

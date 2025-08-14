@@ -1,7 +1,12 @@
 // Footer Data Layer - Loads footer-specific content and settings
-const eventData = require('../../info/DATA_event.json');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports = {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const eventData = JSON.parse(fs.readFileSync(path.join(__dirname, '../../info/DATA_event.json'), 'utf8'));
+
+export default {
   // Stats section - pulled from event data
   stats: [
     {

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   title: "Método Seja Livre",
   subtitle: "O Sistema Comprovado",
   description: "No Café com Vendas não damos \"dicas\". Implementamos um <span class=\"font-semibold text-navy-800\">sistema completo</span> que transforma o seu funcionamento operacional e a forma como vende. Cada pilar resolve uma dor crítica — da mentalidade ao lucro — para que o seu negócio trabalhe para si.",
