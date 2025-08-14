@@ -1,4 +1,4 @@
-module.exports = function(eleventyConfig) {
+export default function(eleventyConfig) {
   // Passthrough copy for static assets (css, fonts, pictures) - excluding js since Vite handles bundling
   eleventyConfig.addPassthroughCopy({ 'src/assets/css': 'assets/css' });
   eleventyConfig.addPassthroughCopy({ 'src/assets/fonts': 'assets/fonts' });
@@ -17,4 +17,4 @@ module.exports = function(eleventyConfig) {
     htmlTemplateEngine: 'njk',
     templateFormats: ['html', 'njk', 'md']
   };
-};
+}

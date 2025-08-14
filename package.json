@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Landing page for Café com Vendas event - an intimate business event for female entrepreneurs in Portugal",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "clean": "rm -rf _site",
     "tokens:build": "node scripts/build-tokens.js",
