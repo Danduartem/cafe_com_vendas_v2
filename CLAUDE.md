@@ -7,7 +7,7 @@ Guidance for Claude Code when working with the Café com Vendas landing page.
 ## 🚀 Current Tech Stack (Updated: Aug 14, 2024)
 
 ### Latest Stable Versions
-- **Node.js**: v22.17.1 (required: 22.12+ for Vite 7)
+- **Node.js**: v22.18.0 (LTS until April 2027, optimal for all dependencies)
 - **Vite**: 7.1.2 (latest stable) - https://vite.dev/
 - **Eleventy**: 3.1.2 (ESM support) - https://www.11ty.dev/docs/
 - **Tailwind CSS**: 4.1.12 (CSS-first config) - https://tailwindcss.com/docs/v4
@@ -21,7 +21,7 @@ Guidance for Claude Code when working with the Café com Vendas landing page.
 ### Modern ESM Architecture
 - **All `.js` files use ESM syntax**: `import`/`export default`
 - **No `.cjs` workarounds needed**: Eleventy 3.x has native ESM support
-- **Vite 7.x requirements**: Node.js 22.12+ for optimal performance
+- **Vite 7.x requirements**: Node.js 22.17.1+ (current LTS, optimal performance)
 - **Package.json**: `"type": "module"` enables ESM everywhere
 
 ## Project Context
@@ -45,6 +45,18 @@ npm run outdated     # Check for package updates
 ```
 
 **Note**: No test or lint commands are configured in this project. Don't assume their existence.
+
+## 🤖 Claude Commands
+
+Custom commands available in `.claude/commands/`:
+
+```bash
+/update-libs           # Update all dependencies to latest stable versions
+/update-refactor       # Refactor code to leverage latest framework features  
+/commit                # Smart git commits with conventional messages
+/update-documentation  # Sync all docs with current codebase state
+/design-validation     # Generate 3 UI/UX variations for A/B testing
+```
 
 ## Structure
 ```
