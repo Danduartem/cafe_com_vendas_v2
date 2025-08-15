@@ -16,6 +16,7 @@ export const Checkout = {
     clientSecret: null,
     leadId: null,
     currentStep: 1,
+    idempotencyKey: null,
 
     init() {
         try {
@@ -42,6 +43,7 @@ export const Checkout = {
         // Set initial state
         this.setStep(1);
         this.leadId = this.generateUUID();
+        this.idempotencyKey = this.generateIdempotencyKey();
         
         // Ensure spinner is hidden on initialization
         const spinner = safeQuery('#leadSubmitSpinner');
@@ -235,7 +237,21 @@ export const Checkout = {
             const paymentIntentResponse = await this.createPaymentIntent(leadData);
             
             if (!paymentIntentResponse.ok) {
-                throw new Error('Erro ao processar pagamento. Tente novamente.');
+                // Try to get detailed error message
+                let errorMessage = 'Erro ao processar pagamento. Tente novamente.';
+                try {
+                    const errorData = await paymentIntentResponse.json();
+                    if (errorData.details && Array.isArray(errorData.details)) {
+                        errorMessage = errorData.details.join(', ');
+                    } else if (errorData.error) {
+                        errorMessage = errorData.error;
+                    }
+                } catch (e) {
+                    // Keep default error message if JSON parsing fails
+                }
+                const error = new Error(errorMessage);
+                error.status = paymentIntentResponse.status;
+                throw error;
             }
 
             const { clientSecret } = await paymentIntentResponse.json();
@@ -255,7 +271,21 @@ export const Checkout = {
 
         } catch (error) {
             console.error('Lead submission error:', error);
-            this.showError('leadError', error.message || 'Erro inesperado. Tente novamente.');
+            
+            // Handle specific error types
+            if (error.status === 409) {
+                // Idempotency conflict - regenerate key and retry once
+                this.idempotencyKey = this.generateIdempotencyKey();
+                this.showError('leadError', 'Solicitação duplicada detectada. Tente novamente.');
+            } else if (error.status === 400) {
+                // Validation error - show specific message
+                this.showError('leadError', error.message || 'Dados inválidos. Verifique as informações e tente novamente.');
+            } else if (error.status === 429) {
+                // Rate limit exceeded
+                this.showError('leadError', 'Muitas tentativas. Aguarde alguns minutos e tente novamente.');
+            } else {
+                this.showError('leadError', error.message || 'Erro inesperado. Tente novamente.');
+            }
         } finally {
             this.setButtonLoading(submitButton, submitText, submitSpinner, false);
         }
@@ -300,11 +330,13 @@ export const Checkout = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-Idempotency-Key': this.idempotencyKey
             },
             body: JSON.stringify({
                 ...leadData,
                 amount: 18000, // €180.00 in cents
-                currency: 'eur'
+                currency: 'eur',
+                idempotency_key: this.idempotencyKey
             })
         });
     },
@@ -502,6 +534,7 @@ export const Checkout = {
         this.currentStep = 1;
         this.clientSecret = null;
         this.leadId = this.generateUUID();
+        this.idempotencyKey = this.generateIdempotencyKey();
         
         // Destroy Stripe elements
         if (this.paymentElement) {
@@ -521,6 +554,10 @@ export const Checkout = {
         return crypto?.randomUUID ? 
             crypto.randomUUID() : 
             `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    },
+
+    generateIdempotencyKey() {
+        return `idm_${Date.now()}_${Math.random().toString(36).substr(2, 12)}`;
     },
 
     isValidEmail(email) {
