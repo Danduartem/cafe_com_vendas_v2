@@ -49,6 +49,10 @@ npm run build:js:dev # Build JavaScript with Vite (development + source maps)
 npm run clean        # Clean build directory
 npm run lint         # Run ESLint on all source files
 npm run lint:fix     # Run ESLint and auto-fix issues
+npm run lighthouse   # Run Lighthouse audits (mobile + desktop)
+npm run lighthouse:mobile   # Mobile-only Lighthouse audit
+npm run lighthouse:desktop  # Desktop-only Lighthouse audit  
+npm run lighthouse:quick    # Quick performance-only audit
 npm run versions     # Generate VERSIONS.txt with current dependency versions
 npm run outdated     # Check for package updates
 ```
@@ -101,6 +105,7 @@ Custom commands available in `.claude/commands/`:
 /update-refactor       # Refactor code to leverage latest framework features  
 /commit                # Smart git commits with conventional messages
 /push                  # Safely push current branch with checks and PR option
+/lighthouse            # Run comprehensive Lighthouse performance audits
 /update-documentation  # Sync all docs with current codebase state
 ```
 

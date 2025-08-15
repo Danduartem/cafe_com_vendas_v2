@@ -23,6 +23,10 @@
     "dev:netlify": "netlify dev",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "lighthouse": "npx lighthouse http://localhost:8080 --output=html,json --output-path=./reports/lighthouse-mobile --form-factor=mobile --preset=perf --chrome-flags=\"--headless --no-sandbox\" && npx lighthouse http://localhost:8080 --output=html,json --output-path=./reports/lighthouse-desktop --form-factor=desktop --preset=desktop --chrome-flags=\"--headless --no-sandbox\"",
+    "lighthouse:mobile": "npx lighthouse http://localhost:8080 --output=html,json --output-path=./reports/lighthouse-mobile --form-factor=mobile --preset=perf --chrome-flags=\"--headless --no-sandbox\"",
+    "lighthouse:desktop": "npx lighthouse http://localhost:8080 --output=html,json --output-path=./reports/lighthouse-desktop --form-factor=desktop --preset=desktop --chrome-flags=\"--headless --no-sandbox\"",
+    "lighthouse:quick": "npx lighthouse http://localhost:8080 --only-categories=performance --output=json --output-path=./reports/lighthouse-quick --chrome-flags=\"--headless --no-sandbox\"",
     "versions": "npm list --depth=0",
     "outdated": "npm outdated",
     "update": "npm update"
