@@ -1,3 +1,6 @@
+// Load environment variables from .env.local for development
+import 'dotenv/config';
+
 export default function(eleventyConfig) {
   // Eleventy 3.x ESM optimizations
   // Improved development server performance

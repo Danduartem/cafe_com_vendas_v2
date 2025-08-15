@@ -43,6 +43,7 @@
   "license": "ISC",
   "dependencies": {
     "@fontsource/lora": "^5.2.6",
+    "dotenv": "^17.2.1",
     "stripe": "^18.4.0"
   },
   "devDependencies": {

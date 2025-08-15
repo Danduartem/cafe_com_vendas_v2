@@ -121,7 +121,7 @@ export const CloudinaryComponent = {
       height = 1080;
     }
 
-    const heroImageUrl = `https://res.cloudinary.com/${cloudName}/image/upload/w_${width},h_${height},c_fill,q_auto,f_auto,g_auto/cafe-hero`;
+    const heroImageUrl = `https://res.cloudinary.com/${cloudName}/image/upload/w_${width},h_${height},c_fill,q_auto,f_auto,g_auto/cafe_pnkngz`;
 
     // Create preload link
     const link = document.createElement('link');
