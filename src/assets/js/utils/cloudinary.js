@@ -31,32 +31,32 @@ export function cloudinaryUrl(publicId, options = {}) {
 
   // Build transformation string
   const transformations = [];
-  
+
   // Add dimensions
   if (width) transformations.push(`w_${width}`);
   if (height) transformations.push(`h_${height}`);
-  
+
   // Add crop mode
   if (crop) transformations.push(`c_${crop}`);
-  
+
   // Add quality and format optimizations
   if (quality) transformations.push(`q_${quality}`);
   if (format) transformations.push(`f_${format}`);
   if (fetchFormat) transformations.push(`fetch_format_${fetchFormat}`);
-  
+
   // Add gravity for smart cropping
   if (gravity) transformations.push(`g_${gravity}`);
-  
+
   // Add device pixel ratio
   if (dpr) transformations.push(`dpr_${dpr}`);
-  
+
   // Add any other custom transformations
   Object.entries(otherOptions).forEach(([key, value]) => {
     if (value) transformations.push(`${key}_${value}`);
   });
 
   const transformationString = transformations.join(',');
-  
+
   return `${CLOUDINARY_CONFIG.baseUrl}/${CLOUDINARY_CONFIG.cloudName}/image/upload/${transformationString}/${publicId}`;
 }
 
@@ -71,7 +71,7 @@ export function responsiveImageSources(publicId, breakpoints, baseOptions = {}) 
   return breakpoints.map(breakpoint => {
     const { width, height, media, ...breakpointOptions } = breakpoint;
     const options = { ...baseOptions, width, height, ...breakpointOptions };
-    
+
     return {
       srcset: cloudinaryUrl(publicId, options),
       media,
@@ -157,7 +157,7 @@ export const RESPONSIVE_BREAKPOINTS = {
   ],
   testimonials: [
     { width: 320, height: 180 }, // Mobile
-    { width: 384, height: 216 }, // Desktop
+    { width: 384, height: 216 } // Desktop
   ]
 };
 
