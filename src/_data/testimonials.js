@@ -9,7 +9,7 @@ export default {
       location: 'Lisboa',
       result: '+10h/semana e +30% ticket médio',
       videoId: 'dQw4w9WgXcQ', // Placeholder - replace with real video ID
-      thumbnail: 'https://res.cloudinary.com/your-cloud-name/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
+      thumbnail: 'https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
     },
     {
       id: 2,
@@ -18,7 +18,7 @@ export default {
       location: 'Porto',
       result: 'Funil que converte em 90 dias',
       videoId: 'dQw4w9WgXcQ',
-      thumbnail: 'https://res.cloudinary.com/your-cloud-name/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
+      thumbnail: 'https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
     },
     {
       id: 3,
@@ -27,7 +27,7 @@ export default {
       location: 'Braga',
       result: 'Resultados em 2 semanas',
       videoId: 'dQw4w9WgXcQ',
-      thumbnail: 'https://res.cloudinary.com/your-cloud-name/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
+      thumbnail: 'https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
     },
     {
       id: 4,
@@ -36,7 +36,7 @@ export default {
       location: 'Coimbra',
       result: 'Dobrei as vendas em 3 meses',
       videoId: 'dQw4w9WgXcQ',
-      thumbnail: 'https://res.cloudinary.com/your-cloud-name/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
+      thumbnail: 'https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
     },
     {
       id: 5,
@@ -45,7 +45,7 @@ export default {
       location: 'Faro',
       result: 'Finalmente tenho tempo livre',
       videoId: 'dQw4w9WgXcQ',
-      thumbnail: 'https://res.cloudinary.com/your-cloud-name/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
+      thumbnail: 'https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
     },
     {
       id: 6,
@@ -54,7 +54,7 @@ export default {
       location: 'Aveiro',
       result: 'Processo de vendas automatizado',
       videoId: 'dQw4w9WgXcQ',
-      thumbnail: 'https://res.cloudinary.com/your-cloud-name/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
+      thumbnail: 'https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
     },
     {
       id: 7,
@@ -63,7 +63,7 @@ export default {
       location: 'Viseu',
       result: 'Clareza total na estratégia',
       videoId: 'dQw4w9WgXcQ',
-      thumbnail: 'https://res.cloudinary.com/your-cloud-name/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
+      thumbnail: 'https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
     },
     {
       id: 8,
@@ -72,7 +72,7 @@ export default {
       location: 'Setúbal',
       result: 'Trabalho 4 dias por semana',
       videoId: 'dQw4w9WgXcQ',
-      thumbnail: 'https://res.cloudinary.com/your-cloud-name/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
+      thumbnail: 'https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
     },
     {
       id: 9,
@@ -81,7 +81,7 @@ export default {
       location: 'Évora',
       result: 'Método mudou tudo',
       videoId: 'dQw4w9WgXcQ',
-      thumbnail: 'https://res.cloudinary.com/your-cloud-name/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
+      thumbnail: 'https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg'
     }
   ]
 };
