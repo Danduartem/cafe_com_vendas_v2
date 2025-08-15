@@ -30,7 +30,7 @@ const config = {
 
   // Stripe Configuration (Publishable keys only - Safe to expose)
   stripe: {
-    publishableKey: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ||
+    publishableKey: import.meta.env.VITE_STRIPE_PUBLIC_KEY ||
       (isDevelopment ? 'pk_test_51QxTrfF2Zw0dHOvZoUHGr5nR068f9iuyuLrR86WW9gztjOkoRWgv1Q8cscSURSn45r1wX5qT2KKrj6sE2mD3a7CT009nkU8Wey' : '')
   },
 

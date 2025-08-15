@@ -66,7 +66,7 @@ Essential environment variables for the project:
 ```bash
 # Stripe Configuration (required for payments)
 STRIPE_SECRET_KEY=sk_...           # Stripe secret key
-STRIPE_PUBLIC_KEY=pk_...           # Stripe public key  
+VITE_STRIPE_PUBLIC_KEY=pk_...      # Stripe public key  
 STRIPE_WEBHOOK_SECRET=whsec_...    # Stripe webhook signature verification
 
 # Cloudinary Configuration (for image optimization)
