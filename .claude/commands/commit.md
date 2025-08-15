@@ -88,7 +88,7 @@ Optional:
 - **Pure formatting** (no behavior) → `style`
 - **A11y fixes** (labels, roles, tab order) → `fix`
 - **CSS that changes look/behavior** → `feat` (new capability) or `fix` (bug), not `style`
-- **Breaking** public API or contract → add `!` in header and `BREAKING CHANGE:` in body
+- **Breaking** public API or contract → add "!" in header and "BREAKING CHANGE:" in body
 - If monorepo/package detected, prefer package name as scope (e.g., `feat(web): ...`)
 
 # 8) Examples (Invocation)

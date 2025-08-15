@@ -29,7 +29,15 @@
       "Bash(npm run:*)",
       "Bash(grep:*)",
       "Bash(git rm:*)",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "Bash(git commit:*)",
+      "mcp__playwright-mcp__browser_network_requests",
+      "mcp__playwright-mcp__browser_resize",
+      "mcp__playwright-mcp__browser_take_screenshot",
+      "mcp__playwright-mcp__browser_close",
+      "WebFetch(domain:docs.stripe.com)",
+      "Bash(git restore:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
