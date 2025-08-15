@@ -1,92 +1,104 @@
 ---
-description: Refactor codebase to leverage latest framework features and best practices
-allowed-tools: Read, Write, Edit, Bash(npm run:*), Glob, Grep
+name: "refactor:smart (pro)"
+summary: "Behavior-safe clarity refactors + optional compatibility fixes after dependency updates"
+risk: "medium"
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash(npm:*), Bash(pnpm:*), Bash(yarn:*)
+max-edit-scope: 350
+review-mode: "plan-then-apply"
 ---
 
-# Update Refactor
+# 1) Intent
+Goal: Improve code clarity, consistency, and maintainability **without changing behavior** (mode=clarity). When requested, apply **minimal, targeted compatibility fixes** required by recent library updates (mode=compat).
+Non-Goals: No new features or architectural rewrites. No visual or API changes unless strictly required by compat.
 
-Analyze and refactor the codebase to take full advantage of the latest framework features and modern best practices after updating dependencies. Use the `/CLAUDE.md` file as a reference guide.
+# 2) Inputs
+Optional:
+- `mode`: "clarity" (default) | "compat" | "both"
+- `target`: file/dir/glob to focus (default: src/** plus relevant configs)
+- `preserve`: files/globs never to change
+- `style`: preferences (e.g., "early-returns, camelCase, 8px spacing")
+- `notes`: hints (e.g., "focus hero", "avoid regex changes")
 
-## Refactoring Strategy
+# 3) Auto-Discovery (light)
+Detect:
+- Package manager & workspaces (pnpm/yarn/npm; monorepo layout)
+- Tooling & configs: vite/rollup/webpack, Eleventy, Tailwind/PostCSS, ESLint/Prettier, TS (tsconfig paths)
+- Recently updated libs (from package.json + lockfile timings) for likely compat edits:
+  - ESM/CJS import shape; renamed exports/options
+  - Tailwind/Vite/Eleventy plugin option or filename changes
+- Conventions: folder structure, component patterns, hooks/utilities, tokens
 
-### 1. Build Tool Optimizations
-- Review build configuration files for new features
-- Optimize build settings for better performance
-- Leverage new APIs and capabilities if available
-- Update import patterns for better tree-shaking
-- Optimize asset handling and bundling
+# 4) Constraints & Guardrails
+- **Behavior-safe by default**; compat mode may alter imports/options only to satisfy new APIs.
+- Keep diffs ≤ `max-edit-scope`. Prefer many small fixes over broad rewrites.
+- Respect existing lint/format; don’t fight local rules.
+- A11y intact (headings, labels/roles, contrast, prefers-reduced-motion).
+- No new deps; do not remove public exports; avoid cross-cutting refactors.
+- Config edits only when a dependency update requires it—explain why.
 
-### 2. Framework Enhancements
-- Optimize usage of your project's framework features
-- Apply new patterns and best practices
-- Improve data handling and state management
-- Leverage new template engine or rendering features
-- Update configuration to use modern syntax
+# 5) Method (How to Think)
+1) **Assess**
+   - Clarity: find smells (deep nesting, long funcs, unclear names, duplication, dead code).
+   - Compat: grep for deprecated imports/options; validate configs against updated libs.
+2) **Plan**
+   - Minimal, surgical edits per file with reasons; annotate `[clarity]` or `[compat]`.
+   - Prioritize: import/option fixes → types/signatures → readability (early returns, extracts).
+3) **Apply**
+   - Small patches: rename locals, extract ≤10–15 line helpers, flatten if/else, dedupe code.
+   - Compat: 1:1 import/option updates; add short comments if behavior might differ.
+4) **Verify**
+   - Provide commands for build/lint/typecheck/tests; ensure they’re expected to pass.
 
-### 3. CSS/Styling Modernization
-- Review styling approach for new features
-- Use new utility classes or properties if available
-- Optimize custom property and variable usage
-- Clean up deprecated patterns or classes
-- Improve responsive design patterns
+# 6) Refactoring Scope (choose applicable)
+- **Build Tool Optimizations** *(compat-first)*: update Vite/Rollup/Webpack/E11ty options, modern import patterns for tree-shaking, asset handling touch-ups.
+- **Framework Enhancements**: adopt current idioms without behavior change; modern config syntax only if required by updates.
+- **CSS/Styling Modernization**: dedupe utilities, enforce spacing scale, remove deprecated classes, keep responsive patterns intact.
+- **JavaScript/TypeScript Modernization**: early returns, clearer names, safe ES6+ (no behavior changes), better error paths; fix `import type` usage in TS.
+- **Performance Touches**: trim dead code, lazy-load where already supported, split code only if existing infra supports it (no new infra).
 
-### 4. JavaScript Modernization
-- Update module patterns for better performance
-- Optimize component initialization and lifecycle
-- Improve event handling and DOM manipulation
-- Apply modern ES6+ features consistently
-- Enhance error handling and logging
+# 7) Output Contract (strict)
 
-### 5. Performance Optimizations
-- Analyze bundle sizes and optimize imports
-- Implement better code splitting strategies
-- Optimize asset loading and caching
-- Review and improve animation performance
-- Minimize runtime overhead
+## PLAN
+- Bulleted changes by file with rationale; tag `[clarity]` or `[compat]`.
+- Estimated lines changed per file and total (≤ `max-edit-scope`).
 
-## Process
+## PATCH
+- Unified diffs for changed regions only, file-by-file, compact and readable.
 
-1. **Analyze current code patterns**:
-   - Read all configuration files
-   - Review JavaScript/TypeScript modules
-   - Check CSS and styling organization
-   - Assess template and component structure
+## COMMANDS
+- Auto-detect manager; equivalents as comments:
+  - `npm|pnpm|yarn run lint`
+  - `npm|pnpm|yarn run typecheck` (if TS)
+  - `npm|pnpm|yarn run build`
+  - `npm|pnpm|yarn run test -w` (if present)
 
-2. **Identify improvement opportunities**:
-   - Compare current patterns with modern best practices
-   - Find deprecated or suboptimal code patterns
-   - Look for performance bottlenecks
-   - Identify opportunities for modernization
+## NOTES
+- Behavior risk areas & quick manual checks to validate.
+- Follow-ups outside scope (e.g., deeper decomposition, design system unification).
+- **Rollback**: list files touched; `git restore -SW <files>` to revert; re-run install/build if configs changed.
 
-3. **Apply refactoring changes**:
-   - Update configurations with new features
-   - Modernize code patterns and syntax
-   - Optimize styling and performance
-   - Improve project organization
+# 8) Decision Rules
+- **Naming**: improve locals; keep export names stable; prefer intent-revealing names.
+- **Control Flow**: prefer early returns; avoid reordering with side effects.
+- **Helpers**: extract small pure helpers colocated with usage; avoid cross-module churn.
+- **Imports**:
+  - Compat: update default/named shapes; drop unused; align to ESM if project already ESM.
+  - Clarity: sort/dedupe; prefer aliased/absolute paths if tsconfig paths exist.
+- **Types**: replace obvious `any` with minimal precise types; don’t change public types.
+- **Tailwind/HTML**: keep semantic landmarks; enforce consistent spacing and line length (60–75ch).
+- **Configs**: only when required by updated libs; keep the smallest workable change.
 
-4. **Verify improvements**:
-   - Test build process thoroughly
-   - Run development server and test functionality
-   - Check for any regressions or breaking changes
-   - Validate performance improvements
+# 9) Examples (Invocation)
+- `refactor:smart (pro)`
+- `refactor:smart (pro) mode=clarity target=src/sections/hero.*`
+- `refactor:smart (pro) mode=compat notes="vite plugin options renamed"`
+- `refactor:smart (pro) mode=both preserve=src/legacy/**`
 
-## Universal Focus Areas
-
-- **Configuration files**: Build tools, frameworks, processors
-- **Source code**: JavaScript, TypeScript, or other languages used
-- **Styling**: CSS, preprocessors, utility frameworks
-- **Templates**: Whatever templating engine the project uses
-- **Assets**: Images, fonts, and other static resources
-
-## Expected Benefits
-
-- Better build and runtime performance
-- Smaller bundle sizes and faster loading
-- Modern, maintainable code patterns
-- Improved developer experience
-- Enhanced user experience
-- Better framework feature utilization
-
-## Notes
-
-This command adapts to your project structure. Refer to CLAUDE.md for project-specific patterns, critical files, and modernization priorities. Run this after `/update-libs` to ensure you're leveraging the latest capabilities of your updated dependencies.
+# 10) Review Checklist
+- [ ] Build/lint/typecheck/tests expected to pass
+- [ ] Public APIs unchanged; compat only adjusts imports/options
+- [ ] Functions shorter/shallower; names clearer; dead code removed
+- [ ] A11y intact; spacing & hierarchy consistent
+- [ ] Diffs are surgical, commented where intent might be unclear
+- [ ] Total changes ≤ scope cap; risks called out in NOTES
+- [ ] is in compliance with the /CLAUDE.md file

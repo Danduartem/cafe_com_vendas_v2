@@ -1,133 +1,98 @@
 ---
-description: Intelligently analyze git changes and create meaningful commits with conventional commit messages
-allowed-tools: Bash(git:*), Read, Write, Edit, Grep
+name: "commit:smart (pro)"
+summary: "Turn staged changes into 1–3 Conventional Commits with clear scopes"
+risk: "low"
+allowed-tools: Read, Grep, Bash(git:*)
+max-edit-scope: 0              # this command must not edit files, only craft commits
+review-mode: "plan-then-apply"
 ---
 
-# Smart Commit
+# 1) Intent
+Goal: Convert CURRENT STAGED changes into a small set of clean, Conventional Commits (preferably 1–3) with precise types and scopes.
+Non-Goals: Do not modify files, stage new files, reformat code, bump versions, or change build config. No combining unrelated topics.
 
-Analyze the current git status, understand the changes, and create meaningful commits with conventional commit messages following best practices.
+# 2) Inputs
+Required:
+- none (operates on current staged diff)
 
-## Process
+Optional:
+- `scope-preferences`: comma list to prefer (e.g., "hero,forms,checkout,tailwind,eleventy,vite")
+- `type-allowlist`: override allowed types (default: feat, fix, docs, refactor, test, chore, build, perf, ci)
+- `issue`: number or text to reference (e.g., "#123")
+- `max-commits`: default 3
+- `notes`: hints like “split refactor vs copy changes”
 
-1. **Analyze git status**:
-   ```bash
-   git status --porcelain
-   git diff --stat
-   ```
+# 3) Project Auto-Discovery (light)
+- Detect commit conventions: commitlint config (`commitlint.config.*`), conventional-changelog config, or `semantic-release` hints.
+- Detect workspaces/monorepo: package.json workspaces or pnpm/yarn workspaces → suggest package-scoped commits.
+- Read `.editorconfig`/README style to confirm 72-char subject and wrapped body.
 
-2. **Understand change context**:
-   - Read modified files to understand the nature of changes
-   - Identify the type of changes (feat, fix, refactor, docs, etc.)
-   - Determine scope and impact of modifications
-   - Check for breaking changes or major updates
+# 4) Constraints & Guardrails
+- **Conventional Commits 1.0.0** format:
+  - `type(scope): subject` (subject ≤ 72 chars, imperative: “add”, “fix”, “refactor”)
+  - Body wrapped at ~72 chars; explain why, not just what.
+  - Footer for metadata (`Refs: #123`, `BREAKING CHANGE:`) as needed.
+- No edits to unstaged files; do not stage/unstage automatically.
+- If staged diff mixes topics beyond `max-commits`, produce a **SPLIT PLAN**.
+- Scopes should be short and meaningful (e.g., `hero`, `forms`, `checkout`, `tailwind`, `vite`, `eleventy`, `build`).
+- Type selection rules (guidance):
+  - `feat`: new user-visible capability (component/section/option).
+  - `fix`: bug or visual defect correction (including a11y).
+  - `refactor`: restructure without behavior change (rename, extract).
+  - `docs`: README/MD/docs only.
+  - `style`: whitespace/format only (no prod code changes) — rarely used.
+  - `chore/build/ci`: infra, configs, scripts; not user-facing.
+  - `test`: tests only.
+  - `perf`: measurable performance boost without behavior change.
 
-3. **Smart staging strategy**:
-   - Group related changes together
-   - Stage files by logical change type
-   - Handle untracked files appropriately
-   - Separate concerns when multiple change types exist
+# 5) Method (How to Think)
+1) **Assess**: Inspect `git diff --staged --name-only` and `git diff --staged` to identify topics (by directory, feature, or intent).
+2) **Cluster**: Group staged changes into at most `max-commits` coherent topics.
+3) **Choose** type + scope per group using the rules above; keep subjects crisp and imperative.
+4) **Compose** bodies: rationale (why), impact, notable files; wrap at ~72 chars.
+5) **Validate** against any discovered commitlint rules; adjust type/scope if necessary.
 
-4. **Generate conventional commit messages**:
-   - **feat**: New features or enhancements
-   - **fix**: Bug fixes and corrections
-   - **refactor**: Code refactoring without feature changes
-   - **docs**: Documentation updates
-   - **style**: Code style changes (formatting, missing semicolons)
-   - **chore**: Maintenance tasks (dependencies, config)
-   - **perf**: Performance improvements
-   - **test**: Adding or updating tests
+# 6) Output Contract (Strict)
 
-5. **Commit with context**:
-   - Use descriptive commit messages
-   - Include scope when relevant (e.g., `feat(checkout): add payment validation`)
-   - Add detailed body for complex changes
-   - Reference issues or PRs when applicable
+## PLAN
+- Bullet list of groups (type + scope) and which files belong to each.
+- If groups > `max-commits`, include a **SPLIT PLAN** with suggested file subsets per commit.
 
-## Conventional Commit Format
+## PREVIEW
+- Show the exact commit messages for each group:
+  - Subject line
+  - Body (wrapped)
+  - Optional footer (`Refs:`, `BREAKING CHANGE:`)
 
-```
-<type>[optional scope]: <description>
+## COMMANDS
+- Provide exact commands to execute each commit **from current stage only**, e.g.:
+  - `git commit -m "type(scope): subject" -m "Body..."`
+- If a SPLIT PLAN is needed, include **helper commands** to unstage/restage (non-destructive), e.g.:
+  - `git restore --staged <files>` then `git add <subset>` then `git commit ...`
+  - or recommend `git add -p` for interactive chunking
 
-[optional body]
+## NOTES
+- Risks, tradeoffs, or ambiguities (e.g., “these CSS changes alter layout → choose feat vs fix depending on intent”)
+- Follow-ups if commitlint will reject certain types
 
-[optional footer(s)]
-```
+# 7) Decision Rules
+- **Docs-only** changes → `docs(scope?): subject`
+- **Config-only** (eslint, prettier, vite, eleventy) → `chore` or `build` (if build output changes)
+- **Pure formatting** (no behavior) → `style`
+- **A11y fixes** (labels, roles, tab order) → `fix`
+- **CSS that changes look/behavior** → `feat` (new capability) or `fix` (bug), not `style`
+- **Breaking** public API or contract → add `!` in header and `BREAKING CHANGE:` in body
+- If monorepo/package detected, prefer package name as scope (e.g., `feat(web): ...`)
 
-## Smart Analysis Rules
+# 8) Examples (Invocation)
+- `commit:smart (pro)`
+- `commit:smart (pro) scope-preferences="hero,forms,checkout" issue="#42" max-commits=2`
+- `commit:smart (pro) notes="split refactor from copy edits"`
 
-### Change Type Detection
-- **Package files**: Usually `chore(deps)` or `chore` 
-- **Config files**: Usually `chore(config)` 
-- **Source code logic**: `feat`, `fix`, or `refactor`
-- **Documentation**: `docs`
-- **Styling/CSS**: `style` or `feat(ui)`
-- **Build/deployment**: `chore(build)` or `ci`
-
-### Multi-change Strategy
-- **Related changes**: Single commit with comprehensive message
-- **Unrelated changes**: Separate commits for different concerns
-- **Mixed scope**: Ask user for preferred grouping
-
-### Safety Checks
-- Verify all staged changes are intentional
-- Check for sensitive information (API keys, credentials)
-- Ensure commit message accurately reflects changes
-- Warn about large file additions or deletions
-
-## Advanced Features
-
-### Automatic Scope Detection
-- **Frontend**: `(ui)`, `(components)`, `(styles)`
-- **Backend**: `(api)`, `(functions)`, `(server)`
-- **Config**: `(config)`, `(build)`, `(deploy)`
-- **Data**: `(content)`, `(data)`, `(tokens)`
-
-### Message Enhancement
-- Include file count and change summary
-- Mention breaking changes in footer
-- Reference related commits when continuing work
-- Add performance impact notes when relevant
-
-### Contextual Intelligence
-- **Landing page project**: Focus on conversion, performance, UX
-- **Event-driven**: Reference event dates, deadlines, business goals
-- **Marketing focus**: Emphasize user experience and conversion optimization
-
-## Example Outputs
-
-```bash
-# Feature addition
-git commit -m "feat(checkout): add payment validation and error handling
-
-- Implement client-side form validation
-- Add Stripe payment error messaging
-- Improve checkout UX with loading states
-- Update analytics tracking for payment events"
-
-# Configuration update
-git commit -m "chore(config): update Node.js to v22.17.1 across all environments
-
-- Update .nvmrc, package.json engines, and netlify.toml
-- Ensure consistency between local and deployment environments
-- Optimize for Vite 7 performance improvements"
-
-# Content/styling update
-git commit -m "feat(ui): enhance hero section conversion elements
-
-- Improve CTA button styling and positioning
-- Update testimonial layout for better social proof
-- Optimize mobile responsive design
-- Refine typography for better readability"
-```
-
-## Git Best Practices Applied
-
-- **Atomic commits**: Each commit represents one logical change
-- **Clear messages**: Descriptive and actionable commit messages
-- **Conventional format**: Consistent message structure for automation
-- **Meaningful scope**: Context-aware scope detection
-- **Change grouping**: Related changes committed together
-
-## Notes
-
-This command adapts to your project's git state and change patterns. It prioritizes business context (conversion optimization, event marketing) while maintaining technical precision. Perfect for the Café com Vendas landing page project with its focus on performance and conversion optimization.
+# 9) Review Checklist
+- [ ] Subjects ≤ 72 chars, imperative mood
+- [ ] Types align with rules; scopes concise and relevant
+- [ ] Bodies explain **why**, wrapped at ~72 chars
+- [ ] Commits are orthogonal (no mixed concerns)
+- [ ] No file edits performed; only commit instructions produced
+- [ ] Optional: includes SPLIT PLAN if topics exceed `max-commits`

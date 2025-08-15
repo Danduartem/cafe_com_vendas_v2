@@ -1,171 +1,105 @@
 ---
-description: Intelligently sync all project documentation with current codebase state and best practices
-allowed-tools: Read, Write, Edit, Bash(npm:*), Bash(git:*), Grep, Glob
+name: "docs:update (pro)"
+summary: "Audit and update ALL repo documentation to reflect current code and workflows"
+risk: "low"
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash(git:*), Bash(npm:*), Bash(pnpm:*), Bash(yarn:*)
+max-edit-scope: 600
+review-mode: "plan-then-apply"
 ---
 
-# Update Documentation
+# 1) Intent
+Goal: Identify stale or missing information and update documentation across the repository so it matches the current code, scripts, env vars, and deployment flows.
+Non-Goals: Do not change runtime behavior, build config, or project architecture. No broad rewrites; prefer surgical edits that reduce drift and duplication.
 
-Comprehensively update all project documentation to reflect current codebase state, dependencies, and architecture while maintaining business context and brand consistency.
+# 2) Inputs
+Required:
+- none (defaults to repo root)
 
-## Documentation Audit Process
+Optional:
+- `target`: path/glob to limit scope (default: entire repo)
+- `audience`: "dev" | "user" | "ops" (default: dev)
+- `include`: comma list of doc types to focus (e.g., "README,CLAUDE,CONTRIBUTING,ENV,DEPLOY,API,CHANGELOG")
+- `exclude`: paths/globs to skip
+- `tone`: "neutral" | "friendly" | "enterprise" (default: neutral)
+- `brand`: tokens or style file for names/links
+- `notes`: extra guidance (e.g., keep CLI examples pnpm-first)
 
-### 1. **Codebase State Analysis**
-- Scan `package.json` for current dependencies and scripts
-- Check actual project structure vs documented structure
-- Identify new components, features, or architectural changes
-- Review recent git commits for undocumented changes
-- Analyze build configuration and deployment setup
+# 3) Project Auto-Discovery (light)
+Detect conventions and facts to sync:
+- Package manager & scripts: `package.json` (`scripts`, `engines`, workspaces), `pnpm-lock.yaml`, `yarn.lock`, `package-lock.json`
+- Build & frameworks: `vite.config.*`, Eleventy config, Rollup/Webpack files
+- CSS/system: `tailwind.config.*`, tokens (`tokens.json`, `*.css` variables), PostCSS
+- Lint/format/test: `eslint.*`, `prettier.*`, `*.rc`, test folders & commands
+- Deployment: Netlify/Vercel/CI configs, `Dockerfile`, `compose.*`, GitHub Actions
+- Env: `.env.example`, `.env.*`, required keys present in code
+- Docs surface: `README.*`, `docs/**`, `CLAUDE.md`, `CONTRIBUTING.*`, `SECURITY.*`, `CHANGELOG.*`
+- Integrations: Stripe, Fillout, MailerLite, analytics, Sentry—derive keys/steps from code and `scripts`
 
-### 2. **Version & Dependency Sync**
-- Update all tech stack version references across documentation
-- Sync npm script commands in all docs with actual `package.json`
-- Update Node.js version requirements across all files
-- Refresh framework and library version numbers
-- Update deployment configuration references
+Use findings ONLY to align docs—do not modify configs unless a minor fix is required to make docs truthful.
 
-### 3. **Architecture Documentation**
-- **File structure diagrams**: Sync with actual folder/file organization
-- **Component architecture**: Update based on current implementation
-- **Data flow**: Verify data file → build process → output accuracy
-- **Integration points**: Document current API integrations and services
+# 4) Constraints & Guardrails
+- Accuracy over verbosity; remove duplication; prefer single-source tables (scripts/env).
+- Structure > prose: use headings, short paragraphs, bullet lists, and tables.
+- Keep READMEs scannable; line length ~100 chars; wrap code fences properly.
+- Add sections only if missing; don’t rename files unless obviously broken.
+- Respect audience: 
+  - **dev** → setup, scripts, env, architecture, deploy
+  - **user** → install/use, configuration, troubleshooting
+  - **ops** → env, deploy, observability, rollbacks
+- Accessibility & inclusive language; avoid marketing fluff in technical docs.
+- Scope cap: ≤ 600 lines changed total; prioritize highest-drift docs first.
 
-### 4. **Documentation File Updates**
+# 5) Method (How to Think)
+1) **Assess**: Build a drift map by comparing discovered facts vs. current docs; list gaps and contradictions.
+2) **Plan**: Choose minimal edits that fix drift; define target files/sections; avoid cross-file duplication.
+3) **Apply**: Patch docs with concise tables and checklists (scripts/env/deploy). Insert “Updated on <date>” footers where helpful.
+4) **Verify**: Ensure commands run across npm/pnpm/yarn; check intra-repo links; confirm env keys match code usage.
 
-#### Primary Technical Documentation
-- **`README.md`**: Project overview, quick start, tech stack
-- **`CLAUDE.md`**: Claude-specific development guidelines and versions
-- **`info/BUILD_landing_page.md`**: Technical implementation details
+# 6) Output Contract (Strict)
 
-#### Business & Content Documentation  
-- **`info/GUIDE_claude_instructions.md`**: Claude context and project priorities
-- **`info/GUIDE_voice_tone.md`**: Brand voice and messaging
-- **`info/GUIDE_brand_visual.md`**: Visual brand guidelines
+## PLAN
+- Bullet list of each doc to touch, the drift found, and the exact sections to add/replace.
+- Estimated changed lines (keep under `max-edit-scope`).
 
-#### Version Control
-- Update all file headers with current date (format: `version: YYYY-MM-DD`)
-- Increment version numbers where applicable
-- Add "Last updated" timestamps in content sections
+## PATCH
+- Provide diffs or fully replaced blocks per file in this order:
+  1) README.* 
+  2) docs/** 
+  3) CLAUDE.md 
+  4) CONTRIBUTING.* 
+  5) .env.example (if needed) 
+  6) CHANGELOG.* (only if correcting obvious errors)
+- Keep edits surgical; use tables for `scripts` and `env`.
 
-### 5. **Content Accuracy Verification**
+## COMMANDS
+- If repo has docs build: `npm|pnpm|yarn run docs:build`
+- Suggested verification: `git diff --stat` and `markdownlint`/`prettier --check` if present.
+- Suggested commit command (do not auto-commit):
+  - `git commit -m "docs: sync README and docs with current build, env, and deploy"`
 
-#### Script Commands
-- Verify all `npm run` commands exist and work
-- Update command descriptions to match actual functionality
-- Remove deprecated or non-existent commands
-- Add any new scripts that were introduced
+## NOTES
+- Risks/tradeoffs (e.g., ambiguous env names) and follow-ups (e.g., add diagrams later).
+- List any assumptions (clearly marked) and TODOs where info was missing.
 
-#### Project Structure
-- **File tree diagrams**: Match actual directory structure
-- **Component lists**: Reflect current component organization
-- **Asset organization**: Update to current assets folder structure
-- **Build outputs**: Verify build artifact locations and names
+# 7) Decision Rules
+- If `package.json#scripts` changed vs README → regenerate **Scripts** table (name → description → command).
+- If code references `process.env.*` not listed in docs → update `.env.example` and README **Environment**.
+- If Tailwind/Vite present → include **Build & Dev** steps; note `NODE_VERSION` if `engines` defined.
+- If CI/CD config exists → add a short **Deploy** section with trigger conditions (push/tag) and env prerequisites.
+- If multiple packages/workspaces → add per-package README pointers; keep root README focused on meta + getting started.
+- If CHANGELOG uses Conventional Commits → don’t fabricate entries; only fix headings/links if objectively wrong.
 
-#### Technical Details
-- **Framework versions**: Update to current stable versions
-- **API endpoints**: Document current Netlify function endpoints
-- **Environment variables**: Update required env var documentation
-- **Browser compatibility**: Update based on current build targets
+# 8) Examples (Invocation)
+- `docs:update (pro)`
+- `docs:update (pro) audience=user include=README,ENV,DEPLOY`
+- `docs:update (pro) target=docs/** tone=friendly`
+- `docs:update (pro) exclude=docs/legacy/** notes="prefer pnpm examples"`
 
-## Smart Update Strategy
-
-### Automated Detection
-- **Outdated versions**: Compare doc versions with package.json/package-lock.json
-- **Missing scripts**: Find npm scripts not documented
-- **New files**: Detect new components/modules not in file trees
-- **Changed APIs**: Identify function signature or endpoint changes
-
-### Context-Aware Updates
-- **Business context**: Preserve marketing language and conversion focus
-- **Technical precision**: Ensure accuracy without losing business context  
-- **Consistency**: Maintain voice and terminology across all docs
-- **Completeness**: Fill gaps in documentation coverage
-
-### Multi-file Coordination
-- **Cross-references**: Update file references between docs
-- **Dependency chains**: Update when one doc references another
-- **Consistent terminology**: Use same terms for same concepts across files
-- **Version alignment**: Ensure all docs reference same dependency versions
-
-## Quality Assurance
-
-### Technical Accuracy
-- Verify all code examples still work
-- Test all npm commands mentioned in docs
-- Validate file paths and directory structures
-- Confirm API endpoint documentation matches implementation
-
-### Business Alignment
-- Preserve conversion-focused language and structure
-- Maintain brand voice consistency (reference GUIDE_voice_tone.md)
-- Keep business goals and metrics prominent
-- Ensure marketing context remains intact
-
-### Maintenance Standards
-- Add comprehensive change logs when significant updates occur
-- Include "why this changed" context for major architectural shifts
-- Reference related commits or PRs for complex changes
-- Update maintenance schedules and recommended update frequencies
-
-## Specific Focus Areas
-
-### High-Priority Sync Points
-1. **Tech stack versions** (README.md, CLAUDE.md)
-2. **npm scripts** (README.md, CLAUDE.md, BUILD_landing_page.md)
-3. **Project structure** (README.md, CLAUDE.md, BUILD_landing_page.md)
-4. **Component architecture** (CLAUDE.md, BUILD_landing_page.md)
-5. **Build process** (CLAUDE.md, BUILD_landing_page.md)
-
-### Business-Critical Elements
-1. **Event details** (dates, pricing, logistics)
-2. **Conversion metrics** and targets
-3. **Customer persona** alignment
-4. **Brand guidelines** consistency
-5. **Marketing messaging** accuracy
-
-### Development Workflow
-1. **Environment setup** instructions
-2. **Development commands** and their purposes
-3. **Deployment process** documentation
-4. **Troubleshooting guides** for common issues
-5. **Code contribution** guidelines
-
-## Advanced Features
-
-### Documentation Health Checks
-- **Link validation**: Verify all internal file references
-- **Command validation**: Test all bash commands mentioned
-- **Version consistency**: Ensure no conflicting version references
-- **Completeness audit**: Identify missing documentation sections
-
-### Auto-Generation Capabilities
-- **Dependency lists**: Extract from package.json automatically
-- **Script summaries**: Generate from package.json scripts
-- **File trees**: Generate from actual directory structure
-- **Component inventories**: List all actual components and modules
-
-### Integration Awareness
-- **Stripe integration**: Document current payment flow
-- **Analytics setup**: Document tracking implementation
-- **Email automation**: Document MailerLite integration
-- **Deployment**: Document Netlify configuration and process
-
-## Expected Outcomes
-
-After running this command, all documentation will be:
-- ✅ **Technically accurate** - reflects current codebase
-- ✅ **Version current** - all dependencies and tools up to date
-- ✅ **Structurally aligned** - file trees match reality
-- ✅ **Business focused** - maintains conversion and marketing context
-- ✅ **Developer friendly** - clear setup and development instructions
-- ✅ **Consistently formatted** - unified style and terminology
-
-## Notes
-
-This command is specifically designed for the Café com Vendas project with its dual focus on technical excellence and conversion optimization. It maintains the business-critical marketing context while ensuring all technical documentation stays current and actionable.
-
-Run this command whenever:
-- Dependencies are updated
-- Project structure changes
-- New features or components are added
-- Build process is modified
-- Before major releases or deployments
+# 9) Review Checklist
+- [ ] README has: Overview, Tech Stack, Quick Start, Scripts (table), Environment, Build & Deploy, Project Structure, Troubleshooting
+- [ ] `.env.example` matches actual keys used in code; secrets not committed
+- [ ] Scripts table reflects `package.json` accurately (npm/pnpm/yarn variants)
+- [ ] Links are repo-relative and valid; code fences use correct language
+- [ ] No duplicated guidance across README/docs; canonical locations chosen
+- [ ] Tone and audience consistent; no marketing fluff for dev/ops docs
+- [ ] Edits are minimal and within scope cap
