@@ -9,7 +9,7 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
-    "clean": "rimraf _site",
+    "clean": "node -e \"const fs=require('fs'); fs.rmSync('_site', {recursive:true, force:true})\"",
     "tokens:build": "node scripts/build-tokens.js",
     "build:css": "postcss ./src/assets/css/main.css -o ./_site/tailwind.css",
     "build:js": "cross-env NODE_ENV=production vite build",
@@ -46,7 +46,6 @@
     "cross-env": "^10.0.0",
     "postcss": "^8.5.6",
     "postcss-cli": "^11.0.1",
-    "rimraf": "^6.0.1",
     "tailwindcss": "^4.1.11",
     "terser": "^5.43.1",
     "vite": "^7.1.2"
