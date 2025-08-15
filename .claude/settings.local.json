@@ -37,7 +37,10 @@
       "mcp__playwright-mcp__browser_close",
       "WebFetch(domain:docs.stripe.com)",
       "Bash(git restore:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(curl:*)",
+      "Bash(sips:*)",
+      "Bash(/dev/null)"
     ],
     "deny": [],
     "ask": []
