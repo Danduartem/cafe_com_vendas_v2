@@ -10,6 +10,21 @@
     <meta name="keywords" content="evento empreendedoras portugal, estratégia de vendas portugal, negócio estagnado, empreendedora sobrecarregada, aumentar lucro negócio, café com vendas">
     <meta name="author" content="Juçanã Maximiliano">
     
+    <!-- Critical Resource Preloading (Lighthouse Performance Optimization) -->
+    <!-- Preload critical fonts to prevent FOUT and improve LCP -->
+    <link rel="preload" href="/assets/fonts/Lora/Lora-400.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/fonts/Lora/Lora-700.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/fonts/CenturyGothic/CenturyGothic-Regular.woff" as="font" type="font/woff" crossorigin>
+    
+    <!-- Preconnect to external domains for faster third-party loading -->
+    <link rel="preconnect" href="https://js.stripe.com">
+    <link rel="preconnect" href="https://api.stripe.com">
+    <link rel="preconnect" href="https://formspree.io">
+    
+    <!-- DNS prefetch for analytics and other external services -->
+    <link rel="dns-prefetch" href="//www.googletagmanager.com">
+    <link rel="dns-prefetch" href="//plausible.io">
+    
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -88,7 +103,11 @@
     <!-- Checkout Modal - Global -->
     {% include "components/checkout-modal.njk" %}
     
-    <!-- Analytics and Performance Scripts -->
+    <!-- Optimized Script Loading (Performance Critical) -->
+    <!-- Preload critical JavaScript to start download early -->
+    <link rel="preload" href="/assets/js/main.js" as="script">
+    
+    <!-- Main application script with defer for optimal loading -->
     <script src="/assets/js/main.js" defer></script>
 </body>
 </html>
