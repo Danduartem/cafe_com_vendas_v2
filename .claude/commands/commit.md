@@ -62,7 +62,7 @@ Optional:
 - Show the exact commit messages for each group:
   - Subject line
   - Body (wrapped)
-  - Optional footer (`Refs:`, `BREAKING CHANGE:`)
+  - Optional footer (`Refs:`, `BREAKING CHANGE:`) - NO AI attribution or co-author lines
 
 ## COMMANDS
 - Provide exact commands to execute each commit **from current stage only**, e.g.:
@@ -70,6 +70,13 @@ Optional:
 - If a SPLIT PLAN is needed, include **helper commands** to unstage/restage (non-destructive), e.g.:
   - `git restore --staged <files>` then `git add <subset>` then `git commit ...`
   - or recommend `git add -p` for interactive chunking
+
+## IMPORTANT: CLEAN COMMITS
+- **DO NOT** include any Claude Code attribution lines
+- **DO NOT** include "🤖 Generated with [Claude Code]" references
+- **DO NOT** include "Co-Authored-By: Claude" lines
+- Commits should appear as if written by the developer directly
+- Keep commit messages clean, professional, and attribution-free
 
 ## NOTES
 - Risks, tradeoffs, or ambiguities (e.g., “these CSS changes alter layout → choose feat vs fix depending on intent”)
