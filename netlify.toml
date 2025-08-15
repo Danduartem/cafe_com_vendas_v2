@@ -107,7 +107,7 @@
 
 # Environment-specific settings
 [context.production]
-  command = "npm run build"
+  command = "npm ci --include=dev && npm run build"
   
   [context.production.environment]
     NODE_ENV = "production"
