@@ -1,43 +1,37 @@
 # Netlify headers for performance optimization
 
-# Enable compression for all text files
-/*
-  # Compression settings
-  Content-Encoding: gzip
-  Vary: Accept-Encoding
-
 # Static assets cache (1 year)
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
 # CSS files cache
-*.css
+/*.css
   Cache-Control: public, max-age=31536000, immutable
 
 # JavaScript files cache  
-*.js
+/*.js
   Cache-Control: public, max-age=31536000, immutable
 
 # Font files cache
-*.woff2
+/*.woff2
   Cache-Control: public, max-age=31536000, immutable
   
-*.woff
+/*.woff
   Cache-Control: public, max-age=31536000, immutable
 
 # HTML files - short cache for updates
-*.html
+/*.html
   Cache-Control: public, max-age=0, must-revalidate
 
 # Image files cache
-*.jpg
+/*.jpg
   Cache-Control: public, max-age=31536000, immutable
 
-*.jpeg
+/*.jpeg
   Cache-Control: public, max-age=31536000, immutable
 
-*.png
+/*.png
   Cache-Control: public, max-age=31536000, immutable
 
-*.webp
+/*.webp
   Cache-Control: public, max-age=31536000, immutable
