@@ -1,25 +1,25 @@
 export default {
-  name: "Café com Vendas",
-  title: "Café com Vendas - Evento para Empreendedoras em Portugal",
+  name: 'Café com Vendas',
+  title: 'Café com Vendas - Evento para Empreendedoras em Portugal',
   description: "Chega de usar o burnout como medalha de honra. O evento presencial e intimista que lhe dará o mapa para trocar o 'trabalhar duro' pelo 'trabalhar com inteligência'. Para empreendedoras em Portugal que querem estratégia, leveza e liberdade nos seus negócios.",
-  url: process.env.URL || "https://cafecomvendas.pt",
-  lang: "pt-PT",
-  locale: "pt_PT",
-  
+  url: process.env.URL || 'https://cafecomvendas.pt',
+  lang: 'pt-PT',
+  locale: 'pt_PT',
+
   meta: {
-    author: "Café com Vendas",
-    keywords: "empreendedorismo feminino, vendas, estratégia de negócios, Portugal, Lisboa, networking, mentoria",
-    ogImage: "/assets/images/og-image.jpg",
-    twitterCard: "summary_large_image"
+    author: 'Café com Vendas',
+    keywords: 'empreendedorismo feminino, vendas, estratégia de negócios, Portugal, Lisboa, networking, mentoria',
+    ogImage: '/assets/images/og-image.jpg',
+    twitterCard: 'summary_large_image'
   },
-  
+
   contact: {
-    whatsapp: "+351935251983",
-    email: "contato@cafecomvendas.pt"
+    whatsapp: '+351935251983',
+    email: 'contato@cafecomvendas.pt'
   },
-  
+
   analytics: {
-    gtag: process.env.GTAG_ID || "",
-    fbPixel: process.env.FB_PIXEL_ID || ""
+    gtag: process.env.GTAG_ID || '',
+    fbPixel: process.env.FB_PIXEL_ID || ''
   }
 };

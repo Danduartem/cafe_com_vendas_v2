@@ -3,7 +3,7 @@ export default function(eleventyConfig) {
   // Improved development server performance
   eleventyConfig.setServerOptions({
     port: 8080,
-    showVersion: true,
+    showVersion: true
   });
 
   // Enhanced watch options for better development experience
@@ -18,7 +18,7 @@ export default function(eleventyConfig) {
 
   // Optimize build performance with Eleventy 3.x features
   eleventyConfig.setDataDeepMerge(true);
-  
+
   // Add useful transforms for production optimization
   if (process.env.NODE_ENV === 'production') {
     // Minify HTML in production

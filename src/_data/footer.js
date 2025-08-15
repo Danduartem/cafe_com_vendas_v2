@@ -11,12 +11,12 @@ export default {
   stats: [
     {
       value: eventData.capacity.firstLot,
-      label: "Vagas Limitadas",
+      label: 'Vagas Limitadas',
       counter: true
     },
     {
       value: eventData.date.durationHours,
-      label: "Horas Intensivas", 
+      label: 'Horas Intensivas',
       counter: true
     },
     {
@@ -28,26 +28,26 @@ export default {
 
   // Brand information
   brand: {
-    name: "Café com Vendas",
-    tagline: "Método prático para empreendedoras",
+    name: 'Café com Vendas',
+    tagline: 'Método prático para empreendedoras',
     description: `Transforme seu negócio em ${eventData.date.local} no evento mais exclusivo de ${eventData.location.city}. Menos esforço, mais resultado — com método comprovado.`,
-    guarantee: "Garantia 90 dias"
+    guarantee: 'Garantia 90 dias'
   },
 
   // Navigation links
   navigation: {
     legal: [
       {
-        label: "Política de Privacidade",
-        url: "/politica-privacidade"
+        label: 'Política de Privacidade',
+        url: '/politica-privacidade'
       },
       {
-        label: "Termos e Condições", 
-        url: "/termos-condicoes"
+        label: 'Termos e Condições',
+        url: '/termos-condicoes'
       },
       {
-        label: "Garantia e Reembolso",
-        url: "/garantia-reembolso"
+        label: 'Garantia e Reembolso',
+        url: '/garantia-reembolso'
       }
     ]
   },
@@ -55,41 +55,41 @@ export default {
   // Contact information
   contact: {
     whatsapp: {
-      number: "+351935251983",
-      message: "Olá! Quero saber mais sobre o Café com Vendas em Lisboa.",
-      url: "https://wa.me/351935251983?text=Olá! Quero saber mais sobre o Café com Vendas em Lisboa."
+      number: '+351935251983',
+      message: 'Olá! Quero saber mais sobre o Café com Vendas em Lisboa.',
+      url: 'https://wa.me/351935251983?text=Olá! Quero saber mais sobre o Café com Vendas em Lisboa.'
     },
     email: {
-      address: "support@cafecomvendas.com",
-      url: "mailto:support@cafecomvendas.com"
+      address: 'support@cafecomvendas.com',
+      url: 'mailto:support@cafecomvendas.com'
     },
     social: [
       {
-        platform: "Instagram",
-        username: "@jucanamaximiliano", 
-        url: "https://instagram.com/jucanamaximiliano"
+        platform: 'Instagram',
+        username: '@jucanamaximiliano',
+        url: 'https://instagram.com/jucanamaximiliano'
       }
     ]
   },
 
   // Copyright information
   copyright: {
-    year: "2024",
-    owner: "Juçanã Maximiliano",
-    text: "Todos os direitos reservados",
-    madein: "Feito com ❤️ em Portugal"
+    year: '2024',
+    owner: 'Juçanã Maximiliano',
+    text: 'Todos os direitos reservados',
+    madein: 'Feito com ❤️ em Portugal'
   },
 
   // Organization schema data
   organization: {
-    name: "Juçanã Maximiliano",
-    description: "Mentora de negócios para empreendedoras em Portugal. Método prático para aumentar vendas trabalhando com mais inteligência.",
-    url: "https://cafecomvendas.com",
-    logo: "https://cafecomvendas.com/logo.png",
-    phone: "+351935251983",
+    name: 'Juçanã Maximiliano',
+    description: 'Mentora de negócios para empreendedoras em Portugal. Método prático para aumentar vendas trabalhando com mais inteligência.',
+    url: 'https://cafecomvendas.com',
+    logo: 'https://cafecomvendas.com/logo.png',
+    phone: '+351935251983',
     city: eventData.location.city,
     country: eventData.location.country,
-    founderName: "Juçanã Maximiliano",
-    founderTitle: "Business Mentor"
+    founderName: 'Juçanã Maximiliano',
+    founderTitle: 'Business Mentor'
   }
 };

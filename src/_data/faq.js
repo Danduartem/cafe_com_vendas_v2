@@ -13,7 +13,7 @@ export default function() {
   try {
     const faqDataPath = path.join(__dirname, '../../info/DATA_faq.json');
     const faqData = JSON.parse(fs.readFileSync(faqDataPath, 'utf8'));
-    
+
     // Add computed properties for easier template usage
     faqData.items.forEach((item, index) => {
       item.number = index + 1;
@@ -21,7 +21,7 @@ export default function() {
       item.answer_id = `faq-answer-${item.number}`;
       item.icon_id = `faq-icon-${item.number}`;
     });
-    
+
     return faqData;
   } catch (error) {
     console.error('Error loading FAQ data:', error);
