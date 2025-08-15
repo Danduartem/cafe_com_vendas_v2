@@ -20,6 +20,7 @@
     <link rel="preconnect" href="https://js.stripe.com">
     <link rel="preconnect" href="https://api.stripe.com">
     <link rel="preconnect" href="https://formspree.io">
+    <link rel="preconnect" href="https://res.cloudinary.com">
     
     <!-- DNS prefetch for analytics and other external services -->
     <link rel="dns-prefetch" href="//www.googletagmanager.com">
@@ -104,6 +105,12 @@
     {% include "components/checkout-modal.njk" %}
     
     <!-- Optimized Script Loading (Performance Critical) -->
+    <!-- Global configuration for Cloudinary integration -->
+    <script>
+        // Set global Cloudinary configuration
+        window.CLOUDINARY_CLOUD_NAME = '{{ site.cloudinaryCloudName or "your-cloud-name" }}';
+    </script>
+    
     <!-- Preload critical JavaScript to start download early -->
     <link rel="preload" href="/assets/js/main.js" as="script">
     

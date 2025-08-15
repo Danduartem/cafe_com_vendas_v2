@@ -16,7 +16,8 @@ import {
   Footer,
   Testimonials,
   ThankYou,
-  Checkout
+  Checkout,
+  CloudinaryComponent
 } from './components/index.js';
 
 export const CafeComVendas = {
@@ -86,7 +87,8 @@ export const CafeComVendas = {
      */
   initializeComponents() {
     const components = [
-      { name: 'Checkout', component: Checkout }, // Initialize first for modal availability
+      { name: 'CloudinaryComponent', component: CloudinaryComponent }, // Initialize first for image optimization
+      { name: 'Checkout', component: Checkout }, // Initialize second for modal availability
       { name: 'Hero', component: Hero },
       { name: 'Banner', component: Banner },
       { name: 'YouTube', component: YouTube },

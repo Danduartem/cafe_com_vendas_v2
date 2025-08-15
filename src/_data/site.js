@@ -21,5 +21,8 @@ export default {
   analytics: {
     gtag: process.env.GTAG_ID || '',
     fbPixel: process.env.FB_PIXEL_ID || ''
-  }
+  },
+
+  // Cloudinary configuration for image optimization
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || 'your-cloud-name'
 };

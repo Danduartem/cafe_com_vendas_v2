@@ -69,6 +69,9 @@ STRIPE_SECRET_KEY=sk_...           # Stripe secret key
 STRIPE_PUBLIC_KEY=pk_...           # Stripe public key  
 STRIPE_WEBHOOK_SECRET=whsec_...    # Stripe webhook signature verification
 
+# Cloudinary Configuration (for image optimization)
+CLOUDINARY_CLOUD_NAME=your-cloud-name  # Cloudinary cloud name for image CDN
+
 # Build Configuration
 NODE_ENV=production                # Build environment (development/production)
 ```
@@ -77,6 +80,8 @@ NODE_ENV=production                # Build environment (development/production)
 - Create `.env.local` for local development (not tracked in git)
 - Configure in Netlify dashboard for production deployment
 - Webhook endpoint: `/.netlify/functions/stripe-webhook`
+- Sign up for free Cloudinary account at https://cloudinary.com
+- Upload project images to Cloudinary media library
 
 ## 💳 Payment Testing
 
