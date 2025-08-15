@@ -13,15 +13,27 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        // Ensure consistent file naming
-        entryFileNames: '[name].js',
-        chunkFileNames: '[name].js',
-        assetFileNames: '[name].[ext]'
+        // Ensure consistent file naming with chunking for better caching
+        entryFileNames: '[name].[hash].js',
+        chunkFileNames: '[name].[hash].js',
+        assetFileNames: '[name].[hash].[ext]',
+        // Manual chunk splitting for better caching (vendor vs app code)
+        manualChunks: {
+          // Split large utilities into separate chunks
+          'utils': ['src/assets/js/utils/index.js'],
+          'components': [
+            'src/assets/js/components/hero.js',
+            'src/assets/js/components/checkout.js',
+            'src/assets/js/components/testimonials.js'
+          ]
+        }
       },
-      // Vite 7.x optimizations
+      // Enhanced tree-shaking for maximum bundle reduction
       treeshake: {
         preset: 'recommended',
-        moduleSideEffects: false
+        moduleSideEffects: false,
+        propertyReadSideEffects: false,
+        unknownGlobalSideEffects: false
       }
     },
     // Enable source maps for development
