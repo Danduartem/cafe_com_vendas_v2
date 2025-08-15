@@ -192,30 +192,13 @@ html {
     radial-gradient(circle at 70% 60%, rgba(129,23,31,0.08) 0 26%, transparent 28%);
 }
 
-/* Cloudinary responsive background images */
+/* Hero background with local fallback */
 .hero-bg {
   /* Fallback to local image */
   background-image: url('/assets/pictures/cafe.jpg');
 }
 
-/* Responsive background images using Cloudinary */
-@media (max-width: 640px) {
-  .hero-bg[data-cloudinary-bg="cafe-hero"] {
-    background-image: url('https://res.cloudinary.com/your-cloud-name/image/upload/w_640,h_480,c_fill,q_auto,f_auto,g_auto/cafe-hero');
-  }
-}
-
-@media (min-width: 641px) and (max-width: 1024px) {
-  .hero-bg[data-cloudinary-bg="cafe-hero"] {
-    background-image: url('https://res.cloudinary.com/your-cloud-name/image/upload/w_1024,h_600,c_fill,q_auto,f_auto,g_auto/cafe-hero');
-  }
-}
-
-@media (min-width: 1025px) {
-  .hero-bg[data-cloudinary-bg="cafe-hero"] {
-    background-image: url('https://res.cloudinary.com/your-cloud-name/image/upload/w_1920,h_1080,c_fill,q_auto,f_auto,g_auto/cafe-hero');
-  }
-}
+/* Cloudinary responsive background images will be injected by JavaScript when configured */
 
 /* Accessibility - respect user's motion preferences */
 @media (prefers-reduced-motion: reduce) {

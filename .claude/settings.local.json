@@ -40,7 +40,8 @@
       "Bash(git add:*)",
       "Bash(curl:*)",
       "Bash(sips:*)",
-      "Bash(/dev/null)"
+      "Bash(/dev/null)",
+      "mcp__playwright-mcp__browser_navigate_back"
     ],
     "deny": [],
     "ask": []
