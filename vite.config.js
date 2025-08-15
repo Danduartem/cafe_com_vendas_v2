@@ -32,7 +32,7 @@ export default defineConfig({
       compress: {
         drop_console: process.env.NODE_ENV === 'production',
         drop_debugger: true,
-        pure_funcs: ['console.log']
+        pure_funcs: ['console.log', 'console.warn']
       },
       format: {
         comments: false
