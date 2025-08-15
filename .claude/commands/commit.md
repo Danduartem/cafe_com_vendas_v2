@@ -7,12 +7,12 @@ max-edit-scope: 0              # this command must not edit files, only craft co
 ---
 
 # 1) Intent
-Goal: Convert CURRENT STAGED changes into a small set of clean, Conventional Commits (preferably 1–3) with precise types and scopes.
-Non-Goals: Do not modify files, stage new files, reformat code, bump versions, or change build config. No combining unrelated topics.
+Goal: Stage all changes with `git add -A` then convert into a small set of clean, Conventional Commits (preferably 1–3) with precise types and scopes.
+Non-Goals: Do not modify files, reformat code, bump versions, or change build config. No combining unrelated topics.
 
 # 2) Inputs
 Required:
-- none (operates on current staged diff)
+- none (stages all changes with git add -A, then operates on staged diff)
 
 Optional:
 - `scope-preferences`: comma list to prefer (e.g., "hero,forms,checkout,tailwind,eleventy,vite")
@@ -31,7 +31,7 @@ Optional:
   - `type(scope): subject` (subject ≤ 72 chars, imperative: “add”, “fix”, “refactor”)
   - Body wrapped at ~72 chars; explain why, not just what.
   - Footer for metadata (`Refs: #123`, `BREAKING CHANGE:`) as needed.
-- No edits to unstaged files; do not stage/unstage automatically.
+- Automatically stage all changes with `git add -A` at start; no manual staging required.
 - If staged diff mixes topics beyond `max-commits`, produce a **SPLIT PLAN**.
 - Scopes should be short and meaningful (e.g., `hero`, `forms`, `checkout`, `tailwind`, `vite`, `eleventy`, `build`).
 - Type selection rules (guidance):
@@ -45,11 +45,12 @@ Optional:
   - `perf`: measurable performance boost without behavior change.
 
 # 5) Method (How to Think)
-1) **Assess**: Inspect `git diff --staged --name-only` and `git diff --staged` to identify topics (by directory, feature, or intent).
-2) **Cluster**: Group staged changes into at most `max-commits` coherent topics.
-3) **Choose** type + scope per group using the rules above; keep subjects crisp and imperative.
-4) **Compose** bodies: rationale (why), impact, notable files; wrap at ~72 chars.
-5) **Validate** against any discovered commitlint rules; adjust type/scope if necessary.
+1) **Stage**: Run `git add -A` to stage all working directory changes.
+2) **Assess**: Inspect `git diff --staged --name-only` and `git diff --staged` to identify topics (by directory, feature, or intent).
+3) **Cluster**: Group staged changes into at most `max-commits` coherent topics.
+4) **Choose** type + scope per group using the rules above; keep subjects crisp and imperative.
+5) **Compose** bodies: rationale (why), impact, notable files; wrap at ~72 chars.
+6) **Validate** against any discovered commitlint rules; adjust type/scope if necessary.
 
 # 6) Output Contract (Strict)
 
