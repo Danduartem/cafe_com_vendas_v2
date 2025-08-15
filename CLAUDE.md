@@ -254,6 +254,17 @@ vite.config.js              # Vite bundler configuration
 
 ## 🤖 Custom Slash Commands
 
+Commands in `.claude/commands/` extend and specialize the guidelines in this file.
+When a slash command is invoked, follow its specific instructions which may add
+additional requirements on top of these base guidelines.
+
+### Command Hierarchy
+1. **Slash command files** (`.claude/commands/*.md`) - specific requirements and workflows
+2. **CLAUDE.md** - base project guidelines and context
+3. **Default Claude Code behavior** - fallback when not specified
+
+Commands inherit from CLAUDE.md but can add specific workflows, constraints, and output formats.
+
 ### `/update-libs`
 Update all project dependencies to latest stable versions:
 - Check outdated packages with `npm outdated`
@@ -267,6 +278,20 @@ Refactor codebase to leverage latest framework features:
 - Apply current framework best practices
 - Optimize performance and build configuration
 - Ensure modern patterns throughout codebase
+
+### `/commit`
+Smart git commits with conventional messages:
+- Operates on staged changes only
+- Follows plan-then-apply workflow
+- Creates 1-3 clean conventional commits
+- No Claude Code attribution (inherits from Git Commit Guidelines below)
+
+### Command Execution Workflow
+When any slash command is invoked:
+1. **Read the command file** first (`.claude/commands/command-name.md`)
+2. **Follow its specific workflow** (e.g., `review-mode: plan-then-apply`)
+3. **Apply CLAUDE.md guidelines** where not overridden by the command
+4. **Never apply defaults** that conflict with either file
 
 **Usage**: Type `/` in Claude Code to see available commands
 
