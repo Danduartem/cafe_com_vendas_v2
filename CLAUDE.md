@@ -47,11 +47,13 @@ npm run build:css    # Build Tailwind CSS with PostCSS
 npm run build:js     # Build JavaScript with Vite (production)
 npm run build:js:dev # Build JavaScript with Vite (development + source maps)
 npm run clean        # Clean build directory
+npm run lint         # Run ESLint on all source files
+npm run lint:fix     # Run ESLint and auto-fix issues
 npm run versions     # Generate VERSIONS.txt with current dependency versions
 npm run outdated     # Check for package updates
 ```
 
-**Note**: No test or lint commands are configured in this project. Don't assume their existence.
+**Note**: ESLint is configured for code quality and consistency. No test commands are configured in this project.
 
 ## 🔐 Environment Variables
 
@@ -71,6 +73,24 @@ NODE_ENV=production                # Build environment (development/production)
 - Create `.env.local` for local development (not tracked in git)
 - Configure in Netlify dashboard for production deployment
 - Webhook endpoint: `/.netlify/functions/stripe-webhook`
+
+## 💳 Payment Testing
+
+Test the checkout flow with Stripe test cards:
+
+**Quick Test Cards for Portugal/Brazil:**
+- 🇵🇹 Portugal: `4000 0062 0000 0007` (Visa with 3D Secure)
+- 🇧🇷 Brazil: `4000 0007 6000 0002` (Visa Brazil)
+- 🌍 Global: `4242 4242 4242 4242` (Standard success)
+
+**Complete Documentation**: See `docs/STRIPE_TEST_CARDS.md` for full list of test scenarios, 3D Secure cards, and testing workflow.
+
+**Testing Steps**:
+1. Start dev server: `npm run dev`
+2. Click "Garantir vaga via Stripe"
+3. Use test cards with any future expiry/CVC
+4. Complete 3D Secure authentication if prompted
+5. Verify success/error handling
 
 ## 🤖 Claude Commands
 
