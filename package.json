@@ -57,6 +57,7 @@
     "postcss-cli": "^11.0.1",
     "tailwindcss": "^4.1.11",
     "terser": "^5.43.1",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "vite-plugin-compression": "^0.5.1"
   }
 }

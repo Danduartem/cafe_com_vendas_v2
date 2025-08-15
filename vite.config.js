@@ -1,7 +1,24 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import compression from 'vite-plugin-compression';
 
 export default defineConfig({
+  plugins: [
+    // Enable gzip compression for production
+    compression({
+      algorithm: 'gzip',
+      ext: '.gz',
+      threshold: 1024,
+      compressionOptions: { level: 9 }
+    }),
+    // Enable brotli compression for modern browsers
+    compression({
+      algorithm: 'brotliCompress',
+      ext: '.br',
+      threshold: 1024,
+      compressionOptions: { level: 11 }
+    })
+  ],
   build: {
     outDir: '_site/assets/js',
     emptyOutDir: true,
