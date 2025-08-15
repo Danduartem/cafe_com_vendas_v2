@@ -66,6 +66,9 @@ yarn-error.log*
 # CSS maps
 *.css.map
 
+# Generated files (build artifacts)
+src/assets/css/_tokens.generated.css
+
 # Claude settings with sensitive data
 .claude/settings.local.json
 .claude/settings.local
