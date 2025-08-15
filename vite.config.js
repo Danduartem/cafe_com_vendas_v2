@@ -15,7 +15,7 @@ export default defineConfig({
       output: {
         // Ensure consistent file naming for library mode
         entryFileNames: '[name].js',
-        chunkFileNames: '[name].js', 
+        chunkFileNames: '[name].js',
         assetFileNames: '[name].[ext]'
       },
       // Enhanced tree-shaking for maximum bundle reduction
