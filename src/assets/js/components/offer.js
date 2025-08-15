@@ -18,8 +18,11 @@ export const Offer = {
   },
 
   initMBWayToggle() {
-    // Make toggleMBWayInfo available globally for onclick handlers
-    window.toggleMBWayInfo = this.toggleMBWayInfo.bind(this);
+    // Bind click event listener to MBWay button
+    const mbwayButton = safeQuery('#mbway-button');
+    if (mbwayButton) {
+      mbwayButton.addEventListener('click', this.toggleMBWayInfo.bind(this));
+    }
   },
 
   toggleMBWayInfo() {

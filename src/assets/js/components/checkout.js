@@ -17,12 +17,14 @@ export const Checkout = {
   leadId: null,
   currentStep: 1,
   idempotencyKey: null,
+  stripeLoaded: false,
+  stripeLoadPromise: null,
 
   init() {
     try {
       this.initializeComponent();
       this.bindEvents();
-      this.loadStripe();
+      // Stripe is now loaded lazily when checkout is opened
     } catch (error) {
       console.error('Error initializing Checkout component:', error);
     }
@@ -87,43 +89,76 @@ export const Checkout = {
     payButton?.addEventListener('click', this.handlePayment.bind(this));
   },
 
-  async loadStripe() {
-    try {
-      // Wait for Stripe.js to load
-      if (typeof Stripe === 'undefined') {
-        await this.waitForStripe();
-      }
-
-      this.stripe = Stripe(ENV.stripe.publishableKey);
-
-      if (!this.stripe) {
-        throw new Error('Failed to initialize Stripe');
-      }
-    } catch (error) {
-      console.error('Error loading Stripe:', error);
-      this.showError('payError', 'Erro ao carregar sistema de pagamento. Tente novamente.');
+  async loadStripeScript() {
+    // Return existing promise if already loading
+    if (this.stripeLoadPromise) {
+      return this.stripeLoadPromise;
     }
-  },
 
-  waitForStripe() {
-    return new Promise((resolve, reject) => {
-      let attempts = 0;
-      const maxAttempts = 50; // 5 seconds max
+    // Return resolved promise if already loaded
+    if (this.stripeLoaded && this.stripe) {
+      return Promise.resolve();
+    }
 
-      const checkStripe = () => {
-        if (typeof Stripe !== 'undefined') {
+    // Create new loading promise
+    this.stripeLoadPromise = new Promise((resolve, reject) => {
+      // Check if Stripe is already available globally
+      if (typeof Stripe !== 'undefined') {
+        this.initializeStripe();
+        resolve();
+        return;
+      }
+
+      // Create script element
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/';
+      script.async = true;
+
+      // Handle successful load
+      script.onload = () => {
+        try {
+          this.initializeStripe();
           resolve();
-        } else if (attempts < maxAttempts) {
-          attempts++;
-          setTimeout(checkStripe, 100);
-        } else {
-          reject(new Error('Stripe.js failed to load'));
+        } catch (error) {
+          reject(error);
         }
       };
 
-      checkStripe();
+      // Handle error
+      script.onerror = () => {
+        reject(new Error('Failed to load Stripe.js'));
+      };
+
+      // Add to document head
+      document.head.appendChild(script);
     });
+
+    return this.stripeLoadPromise;
   },
+
+  initializeStripe() {
+    if (!ENV.stripe.publishableKey) {
+      throw new Error('Stripe publishable key not configured');
+    }
+
+    this.stripe = Stripe(ENV.stripe.publishableKey);
+    this.stripeLoaded = true;
+
+    if (!this.stripe) {
+      throw new Error('Failed to initialize Stripe');
+    }
+  },
+
+  async loadStripe() {
+    try {
+      await this.loadStripeScript();
+    } catch (error) {
+      console.error('Error loading Stripe:', error);
+      this.showError('payError', 'Erro ao carregar sistema de pagamento. Tente novamente.');
+      throw error;
+    }
+  },
+
 
   handleOpenClick(event) {
     event.preventDefault();
@@ -135,7 +170,7 @@ export const Checkout = {
     });
   },
 
-  openModal() {
+  async openModal() {
     const modal = safeQuery('#checkoutModal');
     const modalContent = safeQuery('#modalContent');
 
@@ -158,6 +193,17 @@ export const Checkout = {
     const spinner = safeQuery('#leadSubmitSpinner');
     if (spinner) {
       spinner.classList.add('hidden');
+    }
+
+    // Load Stripe.js lazily when modal opens (only first time)
+    if (!this.stripeLoaded) {
+      try {
+        await this.loadStripe();
+        console.log('🎯 Stripe.js loaded lazily on modal open');
+      } catch (error) {
+        console.error('Failed to load Stripe on modal open:', error);
+        // Don't prevent modal from opening, error will be shown if user tries to proceed to payment
+      }
     }
 
     // Focus first input
@@ -536,7 +582,7 @@ export const Checkout = {
     this.leadId = this.generateUUID();
     this.idempotencyKey = this.generateIdempotencyKey();
 
-    // Destroy Stripe elements
+    // Destroy Stripe elements (but keep Stripe.js loaded for reuse)
     if (this.paymentElement) {
       this.paymentElement.destroy();
       this.paymentElement = null;
@@ -545,6 +591,8 @@ export const Checkout = {
     if (this.elements) {
       this.elements = null;
     }
+
+    // Note: We don't reset stripeLoaded or stripeLoadPromise to keep Stripe.js cached
 
     this.clearErrors();
   },

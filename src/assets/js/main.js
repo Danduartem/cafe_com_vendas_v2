@@ -6,6 +6,10 @@
  */
 
 import { CafeComVendas } from './app.js';
+import { ENV } from './config/constants.js';
+
+// Set global Cloudinary configuration
+window.CLOUDINARY_CLOUD_NAME = ENV.cloudinary.cloudName;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

@@ -4,7 +4,6 @@ summary: "Turn staged changes into 1–3 Conventional Commits with clear scopes"
 risk: "low"
 allowed-tools: Read, Grep, Bash(git:*)
 max-edit-scope: 0              # this command must not edit files, only craft commits
-review-mode: "plan-then-apply"
 ---
 
 # 1) Intent

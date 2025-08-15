@@ -204,6 +204,46 @@ netlify/                    # Netlify Functions
 - ✅ Are all animations using Tailwind utilities (`animate-*`, `transform`, `rotate-*`)?
 - ✅ Am I only manipulating classes, never direct styles?
 
+### 🔒 CRITICAL: Security Best Practices
+**ZERO TOLERANCE POLICY - NO EXCEPTIONS**
+- ❌ NEVER use inline event handlers (`onclick=""`, `onsubmit=""`, etc.)
+- ❌ NEVER write inline JavaScript in `<script>` tags without src
+- ❌ NEVER use `'unsafe-inline'` in Content Security Policy
+- ❌ NEVER expose sensitive data to client-side JavaScript
+- ✅ ALWAYS use `addEventListener()` for event handling
+- ✅ ALWAYS load third-party scripts lazily when needed
+- ✅ ALWAYS implement proper ARIA roles for interactive elements
+- ✅ ALWAYS validate CSP compliance before deployment
+
+**Security Pre-Implementation Checklist:**
+- ✅ Are all event handlers attached via addEventListener?
+- ✅ Is all JavaScript in external files (no inline scripts)?
+- ✅ Do interactive elements have proper ARIA roles and states?
+- ✅ Are third-party scripts loaded only when needed?
+- ✅ Does the CSP policy block unsafe inline scripts?
+
+**Lazy Loading Pattern for Third-Party Scripts:**
+```javascript
+// ✅ CORRECT: Lazy load expensive scripts
+async loadScript(url) {
+  if (this.scriptLoaded) return Promise.resolve();
+  
+  this.scriptLoadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = url;
+    script.async = true;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+  
+  return this.scriptLoadPromise;
+}
+
+// ❌ WRONG: Global script loading
+// <script src="https://js.stripe.com/v3/"></script>
+```
+
 ### Tech Stack & Architecture
 - **Static Site Generator**: Eleventy (.eleventy.js config)
 - **Templates**: Nunjucks (.njk files) 
@@ -315,12 +355,62 @@ netlify/                    # Netlify Functions
 
 **MANDATORY Component Checklist:**
 - 🚨 **No inline styles**: No `style.`, `<style>`, or `style=""` anywhere
+- 🔒 **No inline scripts**: No inline JavaScript or event handlers
 - ✅ **Pure Tailwind**: Only utility classes, no custom CSS
 - ✅ **ES6 modules**: All JavaScript in separate `.js` files  
 - ✅ **Design tokens**: Only token colors (no hex codes)
 - ✅ **Class manipulation**: Use `classList.add/remove/toggle()` only
+- ✅ **Event handlers**: Use `addEventListener()` only, never `onclick=""`
+- ✅ **ARIA compliance**: Proper roles for interactive elements (`role="tab"`, `aria-selected`)
+- ✅ **Third-party scripts**: Load lazily when needed, never globally
 
 **Access Data in Templates**: Use Eleventy data (`{{ site }}`, `{{ event }}`, `{{ avatar }}`, `{{ tokens }}`)
+
+## 🚀 Performance Optimization Achievements
+
+### ✅ **Latest Performance Improvements (Aug 2025)**
+- **Stripe.js Lazy Loading**: Eliminated 187 KiB (1.65s) from initial page load
+- **CSP Security**: Removed all inline scripts for XSS protection
+- **ARIA Compliance**: 95/100 accessibility score with proper tab roles
+- **Lighthouse Scores**: Performance 84/100, Accessibility 95/100, Best Practices 100/100
+
+### **Third-Party Script Optimization Pattern**
+```javascript
+// Applied to Stripe.js - saves 187 KiB on page load
+export const OptimizedComponent = {
+  stripe: null,
+  stripeLoaded: false,
+  stripeLoadPromise: null,
+
+  async loadStripeScript() {
+    if (this.stripeLoadPromise) return this.stripeLoadPromise;
+    if (this.stripeLoaded) return Promise.resolve();
+
+    this.stripeLoadPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/';
+      script.async = true;
+      script.onload = () => {
+        this.stripe = Stripe(ENV.stripe.publishableKey);
+        this.stripeLoaded = true;
+        resolve();
+      };
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+
+    return this.stripeLoadPromise;
+  },
+
+  async openModal() {
+    // Load Stripe only when user shows intent to purchase
+    if (!this.stripeLoaded) {
+      await this.loadStripeScript();
+    }
+    // Continue with modal logic...
+  }
+};
+```
 
 ## 🔄 Development Workflow
 

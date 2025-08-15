@@ -47,7 +47,11 @@ export const Testimonials = {
       for (let i = 0; i < totalPages; i++) {
         const dot = document.createElement('button');
         dot.className = 'w-2 h-2 rounded-full bg-navy-800/20 transition-all duration-300 hover:bg-navy-800/40';
+        dot.setAttribute('role', 'tab');
         dot.setAttribute('aria-label', `Ir para página ${i + 1} dos testemunhos`);
+        dot.setAttribute('aria-selected', 'false');
+        dot.setAttribute('aria-controls', `testimonial-page-${i + 1}`);
+        dot.setAttribute('tabindex', '-1');
         dot.addEventListener('click', () => this.goToSlide(i * Math.floor(slidesPerView)));
         paginationContainer.appendChild(dot);
       }
@@ -64,9 +68,13 @@ export const Testimonials = {
         if (index === activePage) {
           dot.classList.remove('bg-navy-800/20');
           dot.classList.add('bg-navy-800', 'w-6');
+          dot.setAttribute('aria-selected', 'true');
+          dot.setAttribute('tabindex', '0');
         } else {
           dot.classList.remove('bg-navy-800', 'w-6');
           dot.classList.add('bg-navy-800/20');
+          dot.setAttribute('aria-selected', 'false');
+          dot.setAttribute('tabindex', '-1');
         }
       });
     };

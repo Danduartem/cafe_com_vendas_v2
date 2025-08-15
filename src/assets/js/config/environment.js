@@ -45,6 +45,11 @@ const config = {
     whatsapp: '+351912345678'
   },
 
+  // Cloudinary Configuration (Public)
+  cloudinary: {
+    cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'ds4dhbneq'
+  },
+
   // API Endpoints (Client-side safe endpoints only)
   api: {
     spotsRemaining: '/api/spots-remaining',
