@@ -87,19 +87,11 @@ html, body {
 /* Lora font-face (regular + bold only; italic via browser synthesis) */
 /* Prefer woff2 if available (lighter); keep woff as fallback if needed */
 @font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-400.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-400-Italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-500.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-500-Italic.woff2') format('woff2'); font-weight: 500; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-600.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-600-Italic.woff2') format('woff2'); font-weight: 600; font-style: italic; font-display: swap; }
 @font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-700.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-700-Italic.woff2') format('woff2'); font-weight: 700; font-style: italic; font-display: swap; }
 
 /* Local font-face for Century Gothic */
 @font-face { font-family: 'CenturyGothic'; src: url('/assets/fonts/CenturyGothic/CenturyGothic-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: 'CenturyGothic'; src: url('/assets/fonts/CenturyGothic/CenturyGothic-Italic.woff') format('woff'); font-weight: 400; font-style: italic; font-display: swap; }
 @font-face { font-family: 'CenturyGothic'; src: url('/assets/fonts/CenturyGothic/CenturyGothic-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
-@font-face { font-family: 'CenturyGothic'; src: url('/assets/fonts/CenturyGothic/CenturyGothic-BoldItalic.woff') format('woff'); font-weight: 700; font-style: italic; font-display: swap; }
 
 
 /* Font utility classes now handled by Tailwind config (font-century, font-lora) */

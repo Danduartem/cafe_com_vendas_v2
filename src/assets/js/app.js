@@ -86,51 +86,71 @@ export const CafeComVendas = {
      * Initialize all page components with enhanced error handling
      */
   initializeComponents() {
-    const components = [
-      { name: 'CloudinaryComponent', component: CloudinaryComponent }, // Initialize first for image optimization
-      { name: 'Checkout', component: Checkout }, // Initialize second for modal availability
+    // Split critical vs deferred to reduce long main-thread tasks
+    const critical = [
+      { name: 'CloudinaryComponent', component: CloudinaryComponent },
+      { name: 'Checkout', component: Checkout },
       { name: 'Hero', component: Hero },
       { name: 'Banner', component: Banner },
-      { name: 'YouTube', component: YouTube },
+      { name: 'FinalCTA', component: FinalCTA }
+    ];
+
+    const deferred = [
       { name: 'Offer', component: Offer },
       { name: 'FAQ', component: FAQ },
-      { name: 'FinalCTA', component: FinalCTA },
-      { name: 'Footer', component: Footer },
+      { name: 'YouTube', component: YouTube },
       { name: 'Testimonials', component: Testimonials },
+      { name: 'Footer', component: Footer },
       { name: 'ThankYou', component: ThankYou }
     ];
 
     let successCount = 0;
     let failureCount = 0;
 
-    components.forEach(({ name, component }) => {
-      try {
-        if (component && typeof component.init === 'function') {
-          component.init();
-          console.log(`✓ ${name} component initialized`);
-          successCount++;
-        } else {
-          console.warn(`⚠ ${name} component missing or invalid init method`);
+    const initList = (list) => {
+      list.forEach(({ name, component }) => {
+        try {
+          if (component && typeof component.init === 'function') {
+            component.init();
+            console.log(`✓ ${name} component initialized`);
+            successCount++;
+          } else {
+            console.warn(`⚠ ${name} component missing or invalid init method`);
+            failureCount++;
+          }
+        } catch (error) {
+          console.error(`✗ Failed to initialize ${name} component:`, error);
+          Analytics.trackError('component_initialization_failed', error, { component_name: name });
           failureCount++;
         }
-      } catch (error) {
-        console.error(`✗ Failed to initialize ${name} component:`, error);
-        Analytics.trackError('component_initialization_failed', error, {
-          component_name: name
-        });
-        failureCount++;
+      });
+    };
+
+    // Initialize critical first
+    initList(critical);
+
+    // Defer non-critical to idle to avoid long tasks
+    const scheduleDeferred = (cb) => {
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => cb(), { timeout: 1500 });
+      } else {
+        setTimeout(cb, 0);
       }
+    };
+
+    scheduleDeferred(() => initList(deferred));
+
+    // Track results (approximate; deferred counted after init)
+    scheduleDeferred(() => {
+      Analytics.track('components_initialized', {
+        event_category: 'Application',
+        success_count: successCount,
+        failure_count: failureCount,
+        total_components: critical.length + deferred.length
+      });
     });
 
-    // Track component initialization results
-    Analytics.track('components_initialized', {
-      event_category: 'Application',
-      success_count: successCount,
-      failure_count: failureCount,
-      total_components: components.length
-    });
-
-    this.components = components;
+    this.components = [...critical, ...deferred];
   },
 
   /**
