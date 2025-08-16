@@ -41,7 +41,9 @@
       "Bash(curl:*)",
       "Bash(sips:*)",
       "Bash(/dev/null)",
-      "mcp__playwright-mcp__browser_navigate_back"
+      "mcp__playwright-mcp__browser_navigate_back",
+      "mcp__playwright-mcp__browser_install",
+      "Bash(npx lighthouse:*)"
     ],
     "deny": [],
     "ask": []

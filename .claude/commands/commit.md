@@ -87,3 +87,10 @@ If `fast=false` OR multiple commits:
 - [ ] Commits are orthogonal (no mixed concerns)
 - [ ] No file edits performed; only commit instructions produced
 - [ ] Optional: includes SPLIT PLAN if topics exceed `max-commits`
+
+## IMPORTANT: CLEAN COMMITS
+- **DO NOT** include any Claude Code attribution lines
+- **DO NOT** include "🤖 Generated with [Claude Code]" references
+- **DO NOT** include "Co-Authored-By: Claude" lines
+- Commits should appear as if written by the developer directly
+- Keep commit messages clean, professional, and attribution-free
