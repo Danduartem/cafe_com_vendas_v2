@@ -147,7 +147,9 @@ html {
 
 /* Hero background with local fallback */
 .hero-bg {
-  /* Fallback to local image */
+  /* WebP fallback from Cloudinary (smaller file size) */
+  background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_webp,g_auto/cafe_pnkngz');
+  /* JPEG fallback for browsers without WebP support */
   background-image: url('/assets/pictures/cafe.jpg');
 }
 
