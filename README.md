@@ -19,6 +19,7 @@ Premium landing page for an intimate business transformation event in Lisbon, de
 - **Design System**: JSON tokens → CSS custom properties
 - **Fonts**: Local Lora (display) + Century Gothic (body)
 - **JavaScript**: Modular ES6 architecture (performance optimized)
+- **Edge**: Netlify Edge Functions (CSP header)
 
 ## 🚀 Quick Start
 
@@ -125,18 +126,25 @@ The design system is centralized in `info/DATA_design_tokens.json` and automatic
 
 ## 📊 Analytics & Conversion
 
-- **Google Analytics 4** with custom events
+- **Google Tag Manager (GTM)** loaded via module (no inline JS) with noscript iframe fallback
+- **Google Analytics 4** events dispatched via app modules (optional through GTM)
 - **Stripe** payment integration  
 - **WhatsApp** direct contact button
 - **Performance tracking** (LCP, scroll depth, CTAs)
 
+### GTM Setup
+- Set `VITE_GTM_CONTAINER_ID` in Netlify environment variables (e.g., `GTM-XXXXXXX`).
+- GTM loads from `src/assets/js/components/gtm.js` (pushes `gtm.start` to `dataLayer` then injects `gtm.js`).
+- Noscript iframe is rendered only when `site.analytics.gtmId` is present (mapped from `VITE_GTM_CONTAINER_ID`).
+
 ## 🔒 Security Features
 
 ### Content Security Policy (CSP)
-- **No inline scripts**: All JavaScript in external files
-- **Strict CSP**: Blocks XSS attacks with no 'unsafe-inline'
-- **Third-party script control**: Whitelisted domains only
-- **Event handler security**: No `onclick=""` attributes, only `addEventListener()`
+- Managed via Netlify Edge Function (`netlify/edge-functions/csp.js`)
+- No inline scripts: All JavaScript in external files
+- style-src `'unsafe-inline'` kept (Tailwind utilities)
+- Whitelisted script/frame/connect targets include Stripe, GTM, GA, YouTube
+- Event handler security: No `onclick=""` attributes, only `addEventListener()`
 
 ### Performance Security
 - **Lazy-loaded third-party scripts**: Stripe.js loads only when needed (saves 187 KiB)
@@ -160,7 +168,20 @@ The design system is centralized in `info/DATA_design_tokens.json` and automatic
 
 ## 🚀 Deployment
 
-Built static files are generated in `_site/` directory and deployed to Netlify with automated builds from GitHub.
+Built static files are generated in `_site/` and deployed to Netlify with automated builds from GitHub.
+
+### Environment Variables
+- `VITE_STRIPE_PUBLIC_KEY` (publishable)
+- `STRIPE_SECRET_KEY` (functions)
+- `VITE_FORMSPREE_FORM_ID`
+- `VITE_GTM_CONTAINER_ID`
+
+### Netlify Secrets Scanning
+`netlify.toml` is configured to omit scanning for:
+`VITE_FORMSPREE_FORM_ID`, `VITE_STRIPE_PUBLIC_KEY`, `VITE_GTM_CONTAINER_ID`.
+
+### Edge Function
+- `[[edge_functions]]` registers `csp` for all paths.
 
 ## 📖 Documentation & AI Assistance
 
