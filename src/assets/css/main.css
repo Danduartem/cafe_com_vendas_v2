@@ -145,15 +145,28 @@ html {
 
 /* Removed unused confetti-bg */
 
-/* Hero background with local fallback */
+/* Hero background - responsive Cloudinary WebP images with local fallback */
+/* Base mobile version (default) */
 .hero-bg {
-  /* WebP fallback from Cloudinary (smaller file size) */
-  background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_webp,g_auto/cafe_pnkngz');
-  /* JPEG fallback for browsers without WebP support */
-  background-image: url('/assets/pictures/cafe.jpg');
+  background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,h_480,c_fill,q_auto,f_webp,g_auto/cafe_pnkngz'),
+                    url('/assets/pictures/cafe.jpg');
 }
 
-/* Cloudinary responsive background images will be injected by JavaScript when configured */
+/* Tablet and small desktop */
+@media (min-width: 640px) {
+  .hero-bg {
+    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1024,h_600,c_fill,q_auto,f_webp,g_auto/cafe_pnkngz'),
+                      url('/assets/pictures/cafe.jpg');
+  }
+}
+
+/* Large desktop */
+@media (min-width: 1024px) {
+  .hero-bg {
+    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_webp,g_auto/cafe_pnkngz'),
+                      url('/assets/pictures/cafe.jpg');
+  }
+}
 
 /* Accessibility - respect user's motion preferences */
 @media (prefers-reduced-motion: reduce) {
