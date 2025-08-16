@@ -1,13 +1,10 @@
 export default async function handler(request, context) {
-	const response = await context.next();
-	const contentType = response.headers.get('content-type') || '';
-
-	// Generate a per-request nonce (UUID is sufficient for CSP nonces)
-	const nonce = crypto.randomUUID();
+	const res = await context.next();
+	const contentType = res.headers.get('content-type') || '';
 
 	const csp = [
 		"default-src 'self'",
-		`script-src 'self' https://js.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io 'strict-dynamic' 'nonce-${nonce}'`,
+		"script-src 'self' https://js.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io 'strict-dynamic'",
 		"style-src 'self'",
 		"img-src 'self' data: https: blob:",
 		"font-src 'self' data:",
@@ -18,26 +15,12 @@ export default async function handler(request, context) {
 		"object-src 'none'"
 	].join('; ');
 
-	const newHeaders = new Headers(response.headers);
+	const newHeaders = new Headers(res.headers);
 	newHeaders.set('Content-Security-Policy', csp);
 
-	if (!contentType.includes('text/html')) {
-		return new Response(response.body, {
-			status: response.status,
-			headers: newHeaders
-		});
-	}
-
-	// Add nonce to all script tags in HTML
-	const rewriter = new HTMLRewriter().on('script', {
-		element(el) {
-			el.setAttribute('nonce', nonce);
-		}
-	});
-
-	const transformed = rewriter.transform(response);
-	return new Response(transformed.body, {
-		status: response.status,
+	return new Response(res.body, {
+		status: res.status,
+		statusText: res.statusText,
 		headers: newHeaders
 	});
 }
