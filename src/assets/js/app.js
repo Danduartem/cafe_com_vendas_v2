@@ -18,7 +18,8 @@ import {
   ThankYou,
   Checkout,
   CloudinaryComponent,
-  GTM
+  GTM,
+  About
 } from './components/index.js';
 
 export const CafeComVendas = {
@@ -94,6 +95,7 @@ export const CafeComVendas = {
       { name: 'Banner', component: Banner },
       { name: 'GTM', component: GTM },
       { name: 'YouTube', component: YouTube },
+      { name: 'About', component: About },
       { name: 'Offer', component: Offer },
       { name: 'FAQ', component: FAQ },
       { name: 'FinalCTA', component: FinalCTA },
