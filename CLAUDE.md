@@ -222,6 +222,39 @@ netlify/                    # Netlify Functions
 - ✅ Are third-party scripts loaded only when needed?
 - ✅ Does the CSP policy block unsafe inline scripts?
 
+### ♿ CRITICAL: Accessibility Compliance (WCAG AA)
+**ZERO TOLERANCE POLICY - NO EXCEPTIONS**
+- ❌ NEVER use invalid ARIA attributes (`role="tab"` without tabpanel structure)
+- ❌ NEVER use `aria-controls` pointing to non-existent elements
+- ❌ NEVER use colors that fail WCAG AA contrast ratios (4.5:1 minimum)
+- ❌ NEVER use `aria-selected` on non-tab elements
+- ✅ ALWAYS use `aria-current` for pagination/carousel indicators
+- ✅ ALWAYS validate color contrast with design tokens
+- ✅ ALWAYS test with keyboard navigation and screen readers
+- ✅ ALWAYS use semantic HTML before adding ARIA
+
+**Accessibility Pre-Implementation Checklist:**
+- ✅ Do colors meet WCAG AA contrast ratios (4.5:1)?
+- ✅ Are all interactive elements keyboard accessible?
+- ✅ Do ARIA attributes reference existing elements?
+- ✅ Is focus management logical and visible?
+- ✅ Target Lighthouse Accessibility score: 95+
+
+**WCAG AA Color Combinations (Approved):**
+```css
+/* ✅ CORRECT: Meets 4.5:1+ contrast ratio */
+.text-navy-800/80    /* On light backgrounds */
+.text-navy-800/70    /* On medium backgrounds */
+.text-neutral-300    /* On dark backgrounds (navy-900) */
+.text-gold-200       /* On dark gradients (burgundy/navy) */
+
+/* ❌ WRONG: Fails WCAG AA */
+.text-navy-800/60    /* Contrast ratio: 3.1:1 */
+.text-navy-800/50    /* Contrast ratio: 2.4:1 */
+.text-neutral-400    /* On dark backgrounds: 3.5:1 */
+.text-gold-300       /* On burgundy: varies, often fails */
+```
+
 **Lazy Loading Pattern for Third-Party Scripts:**
 ```javascript
 // ✅ CORRECT: Lazy load expensive scripts
@@ -327,6 +360,7 @@ async loadScript(url) {
 | Event Details | `info/DATA_event.json` |
 | Customer Pain | `info/DATA_avatar.json` |
 | Brand Guidelines | `info/GUIDE_brand_visual.md` |
+| Accessibility | `docs/ACCESSIBILITY_GUIDELINES.md` (WCAG AA compliance, color contrast) |
 
 ## Common Tasks
 
@@ -356,12 +390,14 @@ async loadScript(url) {
 **MANDATORY Component Checklist:**
 - 🚨 **No inline styles**: No `style.`, `<style>`, or `style=""` anywhere
 - 🔒 **No inline scripts**: No inline JavaScript or event handlers
+- ♿ **WCAG AA compliance**: Colors meet 4.5:1 contrast, valid ARIA attributes
 - ✅ **Pure Tailwind**: Only utility classes, no custom CSS
 - ✅ **ES6 modules**: All JavaScript in separate `.js` files  
 - ✅ **Design tokens**: Only token colors (no hex codes)
 - ✅ **Class manipulation**: Use `classList.add/remove/toggle()` only
 - ✅ **Event handlers**: Use `addEventListener()` only, never `onclick=""`
-- ✅ **ARIA compliance**: Proper roles for interactive elements (`role="tab"`, `aria-selected`)
+- ✅ **ARIA compliance**: Use `aria-current` for pagination, avoid invalid roles
+- ✅ **Keyboard navigation**: All interactive elements focusable and accessible
 - ✅ **Third-party scripts**: Load lazily when needed, never globally
 
 **Access Data in Templates**: Use Eleventy data (`{{ site }}`, `{{ event }}`, `{{ avatar }}`, `{{ tokens }}`)
