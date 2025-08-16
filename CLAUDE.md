@@ -20,6 +20,7 @@ Guidance for Claude Code when working with the Café com Vendas landing page.
 - **Tailwind CSS**: 4.1.12 (CSS-first config) - https://tailwindcss.com/docs/v4
 - **Stripe**: 18.4.0 (latest Node.js SDK) - https://docs.stripe.com/api
 - **PostCSS**: 8.5.6 + autoprefixer 10.4.21
+- **Netlify Edge**: CSP header via Edge Function
 
 **📋 Quick Reference**: Run `npm run versions` to see current installed versions  
 **📋 Check Updates**: Run `npm run outdated` to check for new versions  
@@ -208,7 +209,7 @@ netlify/                    # Netlify Functions
 **ZERO TOLERANCE POLICY - NO EXCEPTIONS**
 - ❌ NEVER use inline event handlers (`onclick=""`, `onsubmit=""`, etc.)
 - ❌ NEVER write inline JavaScript in `<script>` tags without src
-- ❌ NEVER use `'unsafe-inline'` in Content Security Policy
+- ❌ NEVER use `'unsafe-inline'` in Content Security Policy for scripts (style-src may include `'unsafe-inline'` due to Tailwind)
 - ❌ NEVER expose sensitive data to client-side JavaScript
 - ✅ ALWAYS use `addEventListener()` for event handling
 - ✅ ALWAYS load third-party scripts lazily when needed
@@ -281,6 +282,7 @@ async loadScript(url) {
 - **Static Site Generator**: Eleventy (.eleventy.js config)
 - **Templates**: Nunjucks (.njk files) 
 - **Build Tool**: Vite for unified JS/CSS bundling and development server
+- **Edge**: Netlify Edge Function sets CSP response header for all paths
 - **CSS Framework**: Tailwind v4 with PostCSS (pure CSS-based configuration via @theme)
 - **Data Layer**: Eleventy data files (src/_data/*.js) load from info/*.json
 - **Design System**: JSON tokens → CSS custom properties via build-tokens.js
@@ -306,6 +308,11 @@ async loadScript(url) {
 - **Build Output**: Single optimized IIFE bundle for browser compatibility
 - **Development**: Source maps enabled for debugging
 - **Production**: Minified and tree-shaken for performance
+
+### Analytics via GTM
+- GTM module: `src/assets/js/components/gtm.js` (no inline JS)
+- ENV: `VITE_GTM_CONTAINER_ID` (set in Netlify). Exposed to templates as `site.analytics.gtmId` for noscript iframe.
+- CSP: `frame-src` allows `https://www.googletagmanager.com`.
 
 **Component Creation Pattern**:
 1. Create `.njk` template in `src/_includes/components/`
@@ -551,6 +558,7 @@ When any slash command is invoked:
 ### Environment Variables Setup
 1. **Local Development**: Create `.env.local` with Stripe test keys
 2. **Production**: Configure in Netlify → Site Settings → Environment Variables
+   - `VITE_GTM_CONTAINER_ID=GTM-XXXXXXX`
 3. **Webhook URL**: `https://yourdomain.com/.netlify/functions/stripe-webhook`
 
 ### Pre-deployment Checklist
@@ -560,6 +568,7 @@ When any slash command is invoked:
 - [ ] All payment flows tested
 - [ ] Forms submission working
 - [ ] Analytics tracking verified
+  - GTM loads (check `gtm.js` in Network) and `dataLayer` receives events
 - [ ] Performance audit passed (>90 Lighthouse score)
 
 ### Security Considerations
