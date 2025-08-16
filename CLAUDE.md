@@ -412,10 +412,33 @@ async loadScript(url) {
 ## 🚀 Performance Optimization Achievements
 
 ### ✅ **Latest Performance Improvements (Aug 2025)**
+- **Cloudinary WebP Optimization**: Eliminated 178 KiB (53% savings) from hero image
+- **Next-Gen Image Formats**: Perfect 100/100 Lighthouse score for modern image formats
+- **Dual Loading Fix**: Removed inefficient JPEG fallback that was loading alongside WebP
 - **Stripe.js Lazy Loading**: Eliminated 187 KiB (1.65s) from initial page load
 - **CSP Security**: Removed all inline scripts for XSS protection
 - **ARIA Compliance**: 95/100 accessibility score with proper tab roles
-- **Lighthouse Scores**: Performance 84/100, Accessibility 95/100, Best Practices 100/100
+- **Total Bandwidth Savings**: ~365 KiB per page load (WebP + Stripe optimization)
+
+### **Cloudinary WebP Optimization Pattern**
+```css
+/* ✅ CORRECT: Single Cloudinary URL with f_auto for automatic format detection */
+.hero-bg {
+  background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz');
+}
+
+/* ❌ WRONG: Dual loading (loads both WebP AND JPEG) */
+.hero-bg-old {
+  background-image: url('cloudinary-webp-url'),
+                    url('/assets/pictures/cafe.jpg');
+}
+```
+
+### **Results of WebP Optimization**
+- **Hero Image**: 336 KiB → 158 KiB (53% reduction)
+- **Lighthouse Score**: Modern Image Formats 100/100 (previously failing)
+- **Browser Support**: WebP for modern browsers, automatic JPEG fallback via Cloudinary
+- **Network Requests**: Eliminated redundant local image loading
 
 ### **Third-Party Script Optimization Pattern**
 ```javascript

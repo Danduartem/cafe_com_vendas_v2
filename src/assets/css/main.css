@@ -145,26 +145,23 @@ html {
 
 /* Removed unused confetti-bg */
 
-/* Hero background - responsive Cloudinary WebP images with local fallback */
-/* Base mobile version (default) */
+/* Hero background - optimized Cloudinary WebP/AVIF with automatic format detection */
+/* Base mobile version (default) - portrait orientation optimized */
 .hero-bg {
-  background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,h_480,c_fill,q_auto,f_webp,g_auto/cafe_pnkngz'),
-                    url('/assets/pictures/cafe.jpg');
+  background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,h_1136,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz');
 }
 
 /* Tablet and small desktop */
 @media (min-width: 640px) {
   .hero-bg {
-    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1024,h_600,c_fill,q_auto,f_webp,g_auto/cafe_pnkngz'),
-                      url('/assets/pictures/cafe.jpg');
+    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1024,h_768,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz');
   }
 }
 
 /* Large desktop */
 @media (min-width: 1024px) {
   .hero-bg {
-    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_webp,g_auto/cafe_pnkngz'),
-                      url('/assets/pictures/cafe.jpg');
+    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz');
   }
 }
 
