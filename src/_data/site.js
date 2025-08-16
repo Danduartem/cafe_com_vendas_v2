@@ -25,5 +25,5 @@ export default {
   },
 
   // Cloudinary configuration for image optimization
-  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || 'your-cloud-name'
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || 'ds4dhbneq'
 };
