@@ -14,7 +14,7 @@ export const GTM = {
       // Initialize dataLayer immediately for early events
       window.dataLayer = window.dataLayer || [];
 
-      // Delay GTM loading until user interaction or 3 seconds (whichever comes first)
+      // Delay GTM loading until user interaction or page idle (optimized for performance)
       this.setupLazyLoading(containerId);
     } catch (_err) {
       // no-op; analytics should not block UX
@@ -50,8 +50,17 @@ export const GTM = {
       document.addEventListener(event, handleUserInteraction, { passive: true });
     });
 
-    // Fallback: load after 3 seconds if no user interaction
-    setTimeout(loadGTM, 3000);
+    // Load when page becomes idle using requestIdleCallback or fallback to 5 seconds
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        if (!this.loaded) loadGTM();
+      }, { timeout: 5000 });
+    } else {
+      // Fallback: load after 5 seconds if no user interaction (increased from 3s)
+      setTimeout(() => {
+        if (!this.loaded) loadGTM();
+      }, 5000);
+    }
   }
 };
 

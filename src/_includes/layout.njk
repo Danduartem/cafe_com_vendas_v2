@@ -46,8 +46,21 @@
     <!-- External JSON-LD schema includes -->
     <script type="application/ld+json" src="/schema/faq.json"></script>
     
-    <!-- Main CSS (includes Tailwind + tokens) -->
-    <link rel="stylesheet" href="/tailwind.css">
+    <!-- Critical CSS inlined for fastest render -->
+    <style>
+      /* Critical above-the-fold styles */
+      html,body{margin:0;padding:0;overflow-x:hidden!important}
+      .antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+      .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+      .focus\:not-sr-only:focus{position:static;width:auto;height:auto;padding:inherit;margin:inherit;overflow:visible;clip:auto;white-space:normal}
+      .hero-bg{background-image:url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,h_1136,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz')}
+      @media(min-width:640px){.hero-bg{background-image:url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1024,h_768,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz')}}
+      @media(min-width:1024px){.hero-bg{background-image:url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz')}}
+    </style>
+    
+    <!-- Main CSS loaded with media trick for non-blocking -->
+    <link rel="preload" href="/tailwind.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/tailwind.css"></noscript>
     
     <!-- Fonts are served locally via @font-face in /assets/css/main.css -->
     
