@@ -41,7 +41,7 @@ const config = {
 
   // Google Tag Manager
   gtm: {
-    containerId: import.meta.env.VITE_GTM_CONTAINER_ID || 'GTM-T63QRLFT'
+    containerId: import.meta.env.VITE_GTM_CONTAINER_ID || ''
   },
 
   // Contact Information (Public)

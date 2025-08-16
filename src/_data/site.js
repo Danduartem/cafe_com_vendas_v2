@@ -20,7 +20,8 @@ export default {
 
   analytics: {
     gtag: process.env.GTAG_ID || '',
-    fbPixel: process.env.FB_PIXEL_ID || ''
+    fbPixel: process.env.FB_PIXEL_ID || '',
+    gtmId: process.env.VITE_GTM_CONTAINER_ID || ''
   },
 
   // Cloudinary configuration for image optimization
