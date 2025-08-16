@@ -266,61 +266,6 @@
   </div>
 </section>
 
-{# Enhanced Schema Markup - Combined Product + Offer #}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Event",
-  "name": "{{ event.name }}",
-  "description": "{{ event.description }}",
-  "eventStatus": "https://schema.org/EventScheduled",
-  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-  "startDate": "2025-09-20T09:00:00+01:00",
-  "endDate": "2025-09-20T17:00:00+01:00",
-  "location": {
-    "@type": "Place",
-    "name": "{{ event.location.venueName }}",
-    "description": "{{ event.location.venueDescription }}",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "{{ event.location.city }}",
-      "addressCountry": "{{ event.location.country }}"
-    }
-  },
-  "organizer": {
-    "@type": "Organization",
-    "name": "Juçanã Maximiliano"
-  },
-  "offers": {
-    "@type": "Offer",
-    "name": "{{ event.pricing.tiers[0].label }}",
-    "description": "{{ event.tagline }}",
-    "price": "{{ event.pricing.tiers[0].price }}",
-    "priceCurrency": "{{ event.pricing.currency }}",
-    "availability": "https://schema.org/LimitedAvailability",
-    "inventoryLevel": {{ event.capacity.firstLot }},
-    "validFrom": "2025-08-12T00:00:00+01:00",
-    "validThrough": "2025-09-20T00:00:00+01:00",
-    "url": "{{ event.payments.links.stripe }}",
-    "acceptedPaymentMethod": [
-      "https://schema.org/PaymentMethodCreditCard",
-      "Stripe",
-      "MBWay"
-    ],
-    "seller": {
-      "@type": "Organization",
-      "name": "Juçanã Maximiliano"
-    },
-    "warranty": {
-      "@type": "WarrantyPromise",
-      "durationOfWarranty": "P90D",
-      "warrantyScope": "{{ event.guarantee.claim }}"
-    }
-  },
-  "maximumAttendeeCapacity": {{ event.capacity.firstLot }},
-  "remainingAttendeeCapacity": {{ event.capacity.firstLot }},
-  "isAccessibleForFree": false
-}
-</script>
+{# Schema served externally #}
 
 

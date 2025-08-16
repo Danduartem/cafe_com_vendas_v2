@@ -112,6 +112,7 @@ export const Checkout = {
       // Create script element
       const script = document.createElement('script');
       script.src = 'https://js.stripe.com/v3/';
+      // Let CSP edge function inject the correct nonce; no inline code used
       script.async = true;
 
       // Handle successful load

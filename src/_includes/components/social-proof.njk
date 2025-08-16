@@ -108,34 +108,4 @@
   </div>
 </section>
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ItemList",
-  "name": "Testemunhos em Vídeo - Café com Vendas",
-  "description": "Histórias reais de empreendedoras que transformaram os seus negócios",
-  "itemListElement": [
-    {% for video in testimonials.videos -%}
-    {
-      "@type": "VideoObject",
-      "position": {{ loop.index }},
-      "name": "{{ video.name }} - Testemunho Café com Vendas",
-      "description": "{{ video.result }}",
-      "thumbnailUrl": "{{ video.thumbnail }}",
-      "contentUrl": "https://www.youtube.com/watch?v={{ video.videoId }}",
-      "embedUrl": "https://www.youtube.com/embed/{{ video.videoId }}",
-      "uploadDate": "2024-01-15",
-      "publisher": {
-        "@type": "Organization",
-        "name": "Café com Vendas"
-      },
-      "creator": {
-        "@type": "Person",
-        "name": "{{ video.name }}",
-        "jobTitle": "{{ video.profession }}"
-      }
-    }{% if not loop.last %},{% endif %}
-    {% endfor %}
-  ]
-}
-</script>
+<!-- Testimonials structured data served externally -->

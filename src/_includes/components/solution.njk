@@ -182,41 +182,6 @@
 
   </div>
 
-  {# Schema.org HowTo Markup #}
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    "name": "{{ pillars.title }}",
-    "description": "Sistema de 5 pilares para vender mais trabalhando menos, desenvolvido para empreendedoras",
-    "image": "https://cafecomvendas.com/assets/pictures/cafe.jpg",
-    "totalTime": "P90D",
-    "supply": [
-      {
-        "@type": "HowToSupply",
-        "name": "Plano de ação personalizado"
-      },
-      {
-        "@type": "HowToSupply", 
-        "name": "Templates e ferramentas"
-      },
-      {
-        "@type": "HowToSupply",
-        "name": "Cronograma de 90 dias"
-      }
-    ],
-    "step": [
-      {%- for pillar in pillars.pillars %}
-      {
-        "@type": "HowToStep",
-        "position": {{ loop.index }},
-        "name": "{{ pillar.title }}",
-        "text": "{{ pillar.description | replace('"', '\\"') }}",
-        "url": "https://cafecomvendas.com/#solucao"
-      }{% if not loop.last %},{% endif %}
-      {%- endfor %}
-    ]
-  }
-  </script>
+  {# Schema served externally #}
 
 </section>
