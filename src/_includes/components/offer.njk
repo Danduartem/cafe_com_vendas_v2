@@ -81,49 +81,39 @@
             </div>
           </div>
 
-          {# Premium Deliverables Grid (simplified DOM) #}
+          {# Premium Deliverables Grid (full list) #}
           <div class="mb-12">
             <h3 class="text-center text-2xl font-serif font-bold text-navy-800 mb-8">
               O que está incluído
             </h3>
 
-            <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {# Core deliverables from event data #}
               {% for item in event.deliverables %}
-              <li class="deliverable-item relative pl-9 py-3 rounded-xl bg-white/60 border border-neutral-200/30 transition-all duration-300 hover:bg-white/80 hover:shadow-lg">
-                <svg class="absolute left-3 top-3 w-5 h-5 text-burgundy-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                </svg>
-                <span class="text-navy-700 leading-relaxed">{{ item }}</span>
-              </li>
+              <div class="deliverable-item relative pl-14 p-4 rounded-xl bg-white/60 border border-neutral-200/30 hover:bg-white/80 hover:shadow-lg hover:translate-x-1 transition-all duration-300 before:content-[''] before:absolute before:left-4 before:top-1/2 before:-translate-y-1/2 before:w-8 before:h-8 before:rounded-lg before:bg-gradient-to-br before:from-burgundy-600 before:to-burgundy-700 after:content-['✓'] after:absolute after:left-6 after:top-1/2 after:-translate-y-1/2 after:text-white after:text-sm after:font-bold after:leading-none" aria-hidden="false">
+                <span class="text-navy-700 leading-relaxed font-semibold">{{ item }}</span>
+              </div>
               {% endfor %}
+
+              {# Additional benefits #}
               {% for item in event.benefits %}
-              <li class="deliverable-item relative pl-9 py-3 rounded-xl bg-white/60 border border-neutral-200/30 transition-all duration-300 hover:bg-white/80 hover:shadow-lg">
-                <svg class="absolute left-3 top-3 w-5 h-5 text-burgundy-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                </svg>
+              <div class="deliverable-item relative pl-14 p-4 rounded-xl bg-white/60 border border-neutral-200/30 hover:bg-white/80 hover:shadow-lg hover:translate-x-1 transition-all duration-300 before:content-[''] before:absolute before:left-4 before:top-1/2 before:-translate-y-1/2 before:w-8 before:h-8 before:rounded-lg before:bg-gradient-to-br before:from-burgundy-600 before:to-burgundy-700 after:content-['✓'] after:absolute after:left-6 after:top-1/2 after:-translate-y-1/2 after:text-white after:text-sm after:font-bold after:leading-none">
                 <span class="text-navy-700 leading-relaxed">{{ item }}</span>
-              </li>
+              </div>
               {% endfor %}
+
+              {# Hospitality items #}
               {% for item in event.hospitality %}
-              <li class="deliverable-item relative pl-9 py-3 rounded-xl bg-white/60 border border-neutral-200/30 transition-all duration-300 hover:bg-white/80 hover:shadow-lg">
-                <svg class="absolute left-3 top-3 w-5 h-5 text-burgundy-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                </svg>
+              <div class="deliverable-item relative pl-14 p-4 rounded-xl bg-white/60 border border-neutral-200/30 hover:bg-white/80 hover:shadow-lg hover:translate-x-1 transition-all duration-300 before:content-[''] before:absolute before:left-4 before:top-1/2 before:-translate-y-1/2 before:w-8 before:h-8 before:rounded-lg before:bg-gradient-to-br before:from-burgundy-600 before:to-burgundy-700 after:content-['✓'] after:absolute after:left-6 after:top-1/2 after:-translate-y-1/2 after:text-white after:text-sm after:font-bold after:leading-none">
                 <span class="text-navy-700 leading-relaxed">{{ item }}</span>
-              </li>
+              </div>
               {% endfor %}
-            </ul>
+            </div>
           </div>
 
           {# Premium Guarantee Section #}
           <div class="guarantee-section mb-12">
-            <div class="bg-gradient-to-br from-neutral-50 to-neutral-100 rounded-2xl p-8 border-2 border-neutral-200/30 relative overflow-hidden">
-              
-              <!-- Background Pattern -->
-              <div class="absolute inset-0 opacity-8">
-                <div class="absolute top-4 right-4 w-16 h-16 bg-burgundy-300/30 rounded-full"></div>
-                <div class="absolute bottom-4 left-4 w-12 h-12 bg-navy-300/20 rounded-full"></div>
-              </div>
+            <div class="bg-gradient-to-br from-neutral-50 to-neutral-100 rounded-2xl p-8 border-2 border-neutral-200/30 relative overflow-hidden before:content-[''] before:absolute before:inset-0 before:opacity-10 before:[background:radial-gradient(4rem_4rem_at_90%_10%,theme(colors.burgundy.300/.3),transparent_60%),radial-gradient(3rem_3rem_at_10%_90%,theme(colors.navy.300/.2),transparent_60%)]">
               
               <div class="relative text-center">
                 <!-- Premium Badge -->
