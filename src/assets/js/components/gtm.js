@@ -37,8 +37,55 @@ export const GTM = {
       this.loaded = true;
     };
 
-    // Load on first user interaction
-    const userEvents = ['click', 'scroll', 'keydown', 'touchstart'];
+    // Immediate loading triggers for conversion-intent actions
+    const setupConversionTriggers = () => {
+      // CTA buttons and offer interactions
+      const ctaSelectors = [
+        '[data-analytics-event*="cta"]',
+        '[data-analytics-event*="checkout"]', 
+        '[data-analytics-event*="offer"]',
+        'button[class*="checkout"]',
+        'button[class*="stripe"]',
+        'a[href*="#oferta"]'
+      ];
+      
+      ctaSelectors.forEach(selector => {
+        document.addEventListener('click', (e) => {
+          if (e.target.closest(selector)) {
+            loadGTM();
+          }
+        }, { passive: true });
+      });
+    };
+
+    // Meaningful engagement triggers
+    const setupEngagementTriggers = () => {
+      let scrollTriggered = false;
+      
+      // Load when user scrolls past hero section (25% of page)
+      const handleMeaningfulScroll = () => {
+        if (scrollTriggered) return;
+        
+        const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+        if (scrollPercent >= 25) {
+          scrollTriggered = true;
+          loadGTM();
+          window.removeEventListener('scroll', handleMeaningfulScroll);
+        }
+      };
+      
+      window.addEventListener('scroll', handleMeaningfulScroll, { passive: true });
+      
+      // Load on FAQ interaction
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('[data-faq-toggle]') || e.target.closest('.faq')) {
+          loadGTM();
+        }
+      }, { passive: true });
+    };
+
+    // Basic user interaction (keep for immediate responsiveness)
+    const userEvents = ['keydown', 'touchstart'];
     const handleUserInteraction = () => {
       loadGTM();
       userEvents.forEach(event => {
@@ -50,16 +97,20 @@ export const GTM = {
       document.addEventListener(event, handleUserInteraction, { passive: true });
     });
 
-    // Load when page becomes idle using requestIdleCallback or fallback to 5 seconds
+    // Set up progressive loading triggers
+    setupConversionTriggers();
+    setupEngagementTriggers();
+
+    // Extended fallback: load after 15 seconds for engaged users (increased from 5s)
     if ('requestIdleCallback' in window) {
       requestIdleCallback(() => {
         if (!this.loaded) loadGTM();
-      }, { timeout: 5000 });
+      }, { timeout: 15000 });
     } else {
-      // Fallback: load after 5 seconds if no user interaction (increased from 3s)
+      // Fallback: load after 15 seconds if no meaningful interaction
       setTimeout(() => {
         if (!this.loaded) loadGTM();
-      }, 5000);
+      }, 15000);
     }
   }
 };
