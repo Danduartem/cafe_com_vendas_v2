@@ -65,41 +65,8 @@ export const CloudinaryComponent = {
      * Update CSS background image URLs by injecting new styles
      */
   updateCSSBackgrounds(cloudName, imageId) {
-    // Create dynamic CSS for responsive backgrounds with proper specificity
-    const css = `
-            /* Cloudinary responsive backgrounds - injected dynamically */
-            @media (max-width: 640px) {
-                .hero-bg[data-cloudinary-bg="${imageId}"] {
-                    background-image: url('https://res.cloudinary.com/${cloudName}/image/upload/w_640,h_480,c_fill,q_auto,f_auto,g_auto/${imageId}') !important;
-                }
-            }
-            
-            @media (min-width: 641px) and (max-width: 1024px) {
-                .hero-bg[data-cloudinary-bg="${imageId}"] {
-                    background-image: url('https://res.cloudinary.com/${cloudName}/image/upload/w_1024,h_600,c_fill,q_auto,f_auto,g_auto/${imageId}') !important;
-                }
-            }
-            
-            @media (min-width: 1025px) {
-                .hero-bg[data-cloudinary-bg="${imageId}"] {
-                    background-image: url('https://res.cloudinary.com/${cloudName}/image/upload/w_1920,h_1080,c_fill,q_auto,f_auto,g_auto/${imageId}') !important;
-                }
-            }
-        `;
-
-    // Remove any existing Cloudinary styles first
-    const existingStyle = document.querySelector('style[data-cloudinary="true"]');
-    if (existingStyle) {
-      existingStyle.remove();
-    }
-
-    // Inject the new CSS into the page
-    const style = document.createElement('style');
-    style.setAttribute('data-cloudinary', 'true');
-    style.textContent = css;
-    document.head.appendChild(style);
-
-    console.log(`Cloudinary styles injected for ${imageId} using cloud: ${cloudName}`);
+    // No-op: hero background now uses Tailwind responsive bg utilities
+    // Kept for backward compatibility if needed elsewhere
   },
 
   /**
