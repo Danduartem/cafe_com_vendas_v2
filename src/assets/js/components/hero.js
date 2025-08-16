@@ -5,7 +5,7 @@
 
 import { CONFIG } from '../config/constants.js';
 import { safeQuery, Animations } from '../utils/index.js';
-import { Navigation } from './navigation.js';
+// Inline minimal smooth scroll to avoid importing removed navigation module
 
 export const Hero = {
   init() {
@@ -53,7 +53,20 @@ export const Hero = {
     const scrollIndicatorBtn = safeQuery('#scroll-indicator-btn');
     if (!scrollIndicatorBtn) return;
 
-    scrollIndicatorBtn.addEventListener('click', Navigation.scrollToNext);
+    scrollIndicatorBtn.addEventListener('click', () => {
+      const explicitNext = safeQuery('#inscricao');
+      if (explicitNext) {
+        explicitNext.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      const heroSection = safeQuery('#hero');
+      const nextSection = heroSection?.nextElementSibling;
+      if (nextSection) {
+        nextSection.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+      }
+    });
 
     // Enhanced interactions
     scrollIndicatorBtn.addEventListener('mouseenter', function() {
@@ -76,7 +89,11 @@ export const Hero = {
     scrollIndicatorBtn.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        Navigation.scrollToNext();
+        const heroSection = safeQuery('#hero');
+        const nextSection = heroSection?.nextElementSibling;
+        if (nextSection) {
+          nextSection.scrollIntoView({ behavior: 'smooth' });
+        }
         this.classList.add('scale-110');
         setTimeout(() => this.classList.remove('scale-110'), CONFIG.animations.duration.fast);
       }
