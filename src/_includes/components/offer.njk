@@ -1,14 +1,7 @@
 <section id="offer" aria-label="Oferta e Preço" class="relative py-24 md:py-32 overflow-hidden" data-reveal>
   
   {# Premium Background Layer - Optimized #}
-  <div class="absolute inset-0">
-    <!-- Gradient Background - Using brand colors -->
-    <div class="absolute inset-0 bg-gradient-to-br from-neutral-50 via-white to-neutral-100"></div>
-    
-    <!-- Simplified Floating Elements -->
-    <div class="absolute top-20 right-20 w-32 h-32 bg-burgundy-100/20 rounded-full animate-pulse"></div>
-    <div class="absolute bottom-32 left-16 w-24 h-24 bg-navy-100/15 rounded-full animate-bounce"></div>
-  </div>
+  <div class="absolute inset-0 before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-neutral-50 before:via-white before:to-neutral-100 after:content-[''] after:absolute after:inset-0 after:[background:radial-gradient(16rem_16rem_at_80%_12%,theme(colors.burgundy.100/.2),transparent_60%),radial-gradient(12rem_12rem_at_15%_85%,theme(colors.navy.100/.15),transparent_60%)]"></div>
 
   <!-- Main Content Container -->
   <div class="relative container mx-auto px-6 md:px-8 max-w-7xl">
@@ -88,61 +81,38 @@
             </div>
           </div>
 
-          {# Premium Deliverables Grid #}
+          {# Premium Deliverables Grid (simplified DOM) #}
           <div class="mb-12">
             <h3 class="text-center text-2xl font-serif font-bold text-navy-800 mb-8">
               O que está incluído
             </h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {# Core deliverables from event data #}
+
+            <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
               {% for item in event.deliverables %}
-              <div class="deliverable-item flex items-start p-4 rounded-xl bg-white/60 border border-neutral-200/30 hover:bg-white/80 hover:shadow-lg hover:translate-x-1 transition-all duration-300">
-                <div class="flex-shrink-0 mr-4">
-                  <div class="w-8 h-8 bg-gradient-to-br from-burgundy-600 to-burgundy-700 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                    </svg>
-                  </div>
-                </div>
-                <span class="text-navy-700 leading-relaxed font-semibold">
-                  {{ item }}
-                </span>
-              </div>
+              <li class="deliverable-item relative pl-9 py-3 rounded-xl bg-white/60 border border-neutral-200/30 transition-all duration-300 hover:bg-white/80 hover:shadow-lg">
+                <svg class="absolute left-3 top-3 w-5 h-5 text-burgundy-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="text-navy-700 leading-relaxed">{{ item }}</span>
+              </li>
               {% endfor %}
-              
-              {# Additional benefits and hospitality #}
               {% for item in event.benefits %}
-              <div class="deliverable-item flex items-start p-4 rounded-xl bg-white/60 border border-neutral-200/30 hover:bg-white/80 hover:shadow-lg hover:translate-x-1 transition-all duration-300">
-                <div class="flex-shrink-0 mr-4">
-                  <div class="w-8 h-8 bg-gradient-to-br from-burgundy-600 to-burgundy-700 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                    </svg>
-                  </div>
-                </div>
-                <span class="text-navy-700 leading-relaxed">
-                  {{ item }}
-                </span>
-              </div>
+              <li class="deliverable-item relative pl-9 py-3 rounded-xl bg-white/60 border border-neutral-200/30 transition-all duration-300 hover:bg-white/80 hover:shadow-lg">
+                <svg class="absolute left-3 top-3 w-5 h-5 text-burgundy-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="text-navy-700 leading-relaxed">{{ item }}</span>
+              </li>
               {% endfor %}
-              
-              {# Hospitality items #}
               {% for item in event.hospitality %}
-              <div class="deliverable-item flex items-start p-4 rounded-xl bg-white/60 border border-neutral-200/30 hover:bg-white/80 hover:shadow-lg hover:translate-x-1 transition-all duration-300">
-                <div class="flex-shrink-0 mr-4">
-                  <div class="w-8 h-8 bg-gradient-to-br from-burgundy-600 to-burgundy-700 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                    </svg>
-                  </div>
-                </div>
-                <span class="text-navy-700 leading-relaxed">
-                  {{ item }}
-                </span>
-              </div>
+              <li class="deliverable-item relative pl-9 py-3 rounded-xl bg-white/60 border border-neutral-200/30 transition-all duration-300 hover:bg-white/80 hover:shadow-lg">
+                <svg class="absolute left-3 top-3 w-5 h-5 text-burgundy-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="text-navy-700 leading-relaxed">{{ item }}</span>
+              </li>
               {% endfor %}
-            </div>
+            </ul>
           </div>
 
           {# Premium Guarantee Section #}

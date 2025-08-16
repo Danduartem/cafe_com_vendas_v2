@@ -5,10 +5,9 @@
   aria-label="Testemunhos em vídeo do Café com Vendas"
   data-reveal
 >
-  <!-- Simplified decorative background -->
-  <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
-    <div class="absolute top-10 right-10 w-32 h-32 rounded-full blur-3xl bg-gradient-to-r from-peach-200/20 to-gold-200/20"></div>
-  </div>
+  <!-- Decorative background consolidated via ::before -->
+  <div class="absolute inset-0 overflow-hidden" aria-hidden="true"></div>
+  <div class="pointer-events-none absolute inset-0 before:content-[''] before:absolute before:top-10 before:right-10 before:w-32 before:h-32 before:rounded-full before:blur-3xl before:bg-gradient-to-r before:from-peach-200/20 before:to-gold-200/20" aria-hidden="true"></div>
 
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <header class="text-center mb-12 sm:mb-16 lg:mb-20">

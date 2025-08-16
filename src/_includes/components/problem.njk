@@ -5,18 +5,10 @@
 #}
 
 <section id="problema" aria-label="Problema e agitação" data-analytics-section="problem"
-  class="relative isolate w-full overflow-hidden bg-gradient-to-b from-neutral-50 via-peach-100 to-neutral-50 py-20 sm:py-24 lg:py-28 scroll-mt-14" 
+  class="relative isolate w-full overflow-hidden bg-gradient-to-b from-neutral-50 via-peach-100 to-neutral-50 py-20 sm:py-24 lg:py-28 scroll-mt-14 before:content-[''] before:absolute before:inset-0 before:pointer-events-none before:[background:radial-gradient(620px_620px_at_0%_0%,rgba(212,165,116,.40),transparent_60%),radial-gradient(380px_380px_at_100%_100%,rgba(139,21,56,.30),transparent_60%),radial-gradient(236px_236px_at_80%_50%,rgba(212,165,116,.30),transparent_60%)] before:blur-[80px] before:opacity-40" 
   data-scroll-offset>
 
-  {# Decorative gradient orbs for premium aesthetic - positioned for balanced visual flow #}
-  {# Large gold orb - top left #}
-  <div aria-hidden="true" class="pointer-events-none absolute -left-48 -top-48 w-[620px] h-[620px] rounded-full blur-[80px] opacity-40 bg-[radial-gradient(circle,rgba(212,165,116,0.40),transparent)]"></div>
-  
-  {# Medium burgundy orb - bottom right #}
-  <div aria-hidden="true" class="pointer-events-none absolute -right-24 -bottom-24 w-[380px] h-[380px] rounded-full blur-[80px] opacity-40 bg-[radial-gradient(circle,rgba(139,21,56,0.30),transparent)]"></div>
-  
-  {# Small gold orb - right center for depth #}
-  <div aria-hidden="true" class="pointer-events-none absolute right-[10%] top-1/2 w-[236px] h-[236px] rounded-full blur-[80px] opacity-40 bg-[radial-gradient(circle,rgba(212,165,116,0.30),transparent)]"></div>
+  {# Decorative background consolidated into ::before via Tailwind arbitrary values #}
 
 
   {# Main content container with golden ratio layout #}
