@@ -1,13 +1,14 @@
 ---
-name: "commit:smart (pro)"
-summary: "Turn staged changes into 1–3 Conventional Commits with clear scopes"
+name: "commit:smart (fast)"
+summary: "Ultra-fast Conventional Commit(s) with optional preview/plan"
 risk: "low"
 allowed-tools: Read, Grep, Bash(git:*)
 max-edit-scope: 0              # this command must not edit files, only craft commits
 ---
 
 # 1) Intent
-Goal: Stage all changes with `git add -A` then convert into a small set of clean, Conventional Commits (preferably 1–3) with precise types and scopes.
+Goal: Stage all changes with `git add -A` then convert into a small set of clean,
+Conventional Commits (default: 1) with precise types and scopes.
 Non-Goals: Do not modify files, reformat code, bump versions, or change build config. No combining unrelated topics.
 
 # 2) Inputs
@@ -20,6 +21,10 @@ Optional:
 - `issue`: number or text to reference (e.g., "#123")
 - `max-commits`: default 3
 - `notes`: hints like “split refactor vs copy changes”
+- `fast`: true|false (default: true) → when true, do a single, best-effort commit without PLAN/PREVIEW
+- `subject`: override auto-generated subject (≤72 chars)
+- `type`: force a type (e.g., `fix`, `feat`) if obvious
+- `scope`: force a scope (short, e.g., `hero`, `build`)
 
 # 3) Project Auto-Discovery (light)
 - Detect commit conventions: commitlint config (`commitlint.config.*`), conventional-changelog config, or `semantic-release` hints.
@@ -34,70 +39,49 @@ Optional:
 - Automatically stage all changes with `git add -A` at start; no manual staging required.
 - If staged diff mixes topics beyond `max-commits`, produce a **SPLIT PLAN**.
 - Scopes should be short and meaningful (e.g., `hero`, `forms`, `checkout`, `tailwind`, `vite`, `eleventy`, `build`).
-- Type selection rules (guidance):
-  - `feat`: new user-visible capability (component/section/option).
-  - `fix`: bug or visual defect correction (including a11y).
-  - `refactor`: restructure without behavior change (rename, extract).
-  - `docs`: README/MD/docs only.
-  - `style`: whitespace/format only (no prod code changes) — rarely used.
-  - `chore/build/ci`: infra, configs, scripts; not user-facing.
-  - `test`: tests only.
-  - `perf`: measurable performance boost without behavior change.
 
 # 5) Method (How to Think)
-1) **Stage**: Run `git add -A` to stage all working directory changes.
-2) **Assess**: Inspect `git diff --staged --name-only` and `git diff --staged` to identify topics (by directory, feature, or intent).
-3) **Cluster**: Group staged changes into at most `max-commits` coherent topics.
-4) **Choose** type + scope per group using the rules above; keep subjects crisp and imperative.
-5) **Compose** bodies: rationale (why), impact, notable files; wrap at ~72 chars.
-6) **Validate** against any discovered commitlint rules; adjust type/scope if necessary.
+Fast path (default):
+1) Run `git add -A`.
+2) Create ONE Conventional Commit from staged diff:
+   - Type: infer from changes (fix if a11y/security/build fixes; perf; docs; chore; feat last).
+   - Scope: infer from dominant folder (e.g., `hero`, `offer`, `build`, `tailwind`).
+   - Subject: concise imperative summary (≤72 chars); use `subject` input if provided.
+   - Body: short rationale (“why”), notable files.
+
+Full path (when `fast=false` or `max-commits>1`):
+1) Stage with `git add -A`.
+2) Inspect staged diff; cluster into 1–3 logical groups.
+3) Compose Conventional Commit for each; keep subjects crisp; add brief rationale.
+4) Validate against any discovered commitlint rules; adjust type/scope if necessary.
 
 # 6) Output Contract (Strict)
+If `fast=true` AND `max-commits=1`:
+- Provide only COMMANDS (single `git commit` with subject/body), no PLAN/PREVIEW.
 
-## PLAN
-- Bullet list of groups (type + scope) and which files belong to each.
-- If groups > `max-commits`, include a **SPLIT PLAN** with suggested file subsets per commit.
-
-## PREVIEW
-- Show the exact commit messages for each group:
-  - Subject line
-  - Body (wrapped)
-  - Optional footer (`Refs:`, `BREAKING CHANGE:`) - NO AI attribution or co-author lines
-
-## COMMANDS
-- Provide exact commands to execute each commit **from current stage only**, e.g.:
-  - `git commit -m "type(scope): subject" -m "Body..."`
-- If a SPLIT PLAN is needed, include **helper commands** to unstage/restage (non-destructive), e.g.:
-  - `git restore --staged <files>` then `git add <subset>` then `git commit ...`
-  - or recommend `git add -p` for interactive chunking
-
-## IMPORTANT: CLEAN COMMITS
-- **DO NOT** include any Claude Code attribution lines
-- **DO NOT** include "🤖 Generated with [Claude Code]" references
-- **DO NOT** include "Co-Authored-By: Claude" lines
-- Commits should appear as if written by the developer directly
-- Keep commit messages clean, professional, and attribution-free
-
-## NOTES
-- Risks, tradeoffs, or ambiguities (e.g., “these CSS changes alter layout → choose feat vs fix depending on intent”)
-- Follow-ups if commitlint will reject certain types
+If `fast=false` OR multiple commits:
+- PLAN: bullet list of groups (type + scope) and files per group.
+- PREVIEW: exact messages for each group (subject + body, wrapped).
+- COMMANDS: exact `git commit` lines for each group.
+  - If split needed: add helper commands to stage subsets (non-destructive).
 
 # 7) Decision Rules
-- **Docs-only** changes → `docs(scope?): subject`
-- **Config-only** (eslint, prettier, vite, eleventy) → `chore` or `build` (if build output changes)
-- **Pure formatting** (no behavior) → `style`
-- **A11y fixes** (labels, roles, tab order) → `fix`
-- **CSS that changes look/behavior** → `feat` (new capability) or `fix` (bug), not `style`
-- **Breaking** public API or contract → add "!" in header and "BREAKING CHANGE:" in body
-- If monorepo/package detected, prefer package name as scope (e.g., `feat(web): ...`)
+- **Docs-only** → `docs(scope?): subject`
+- **Config-only** → `chore` or `build`
+- **Formatting only** → `style`
+- **A11y/Security** → `fix`
+- **CSS behavior change** → `feat` or `fix`
+- **Breaking** → add `!` and footer
+- Prefer short scopes (e.g., `hero`, `offer`, `build`, `tailwind`)
 
 # 8) Examples (Invocation)
-- `commit:smart (pro)`
-- `commit:smart (pro) scope-preferences="hero,forms,checkout" issue="#42" max-commits=2`
-- `commit:smart (pro) notes="split refactor from copy edits"`
+- `commit:smart (fast)`
+- `commit:smart (fast) fast=false max-commits=2`
+- `commit:smart (fast) scope-preferences="hero,forms,checkout" issue="#42" max-commits=2`
+- `commit:smart (fast) notes="split refactor from copy edits"`
 
 # 9) Review Checklist
-- [ ] Subjects ≤ 72 chars, imperative mood
+- [ ] Subject ≤ 72 chars, imperative mood
 - [ ] Types align with rules; scopes concise and relevant
 - [ ] Bodies explain **why**, wrapped at ~72 chars
 - [ ] Commits are orthogonal (no mixed concerns)
