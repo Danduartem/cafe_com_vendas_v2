@@ -58,8 +58,8 @@
       @media(min-width:1024px){.hero-bg{background-image:url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz')}}
     </style>
     
-    <!-- Main CSS loaded with media trick for non-blocking -->
-    <link rel="preload" href="/tailwind.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- Main CSS loaded with external script for CSP compliance -->
+    <link rel="preload" href="/tailwind.css" as="style" id="critical-css">
     <noscript><link rel="stylesheet" href="/tailwind.css"></noscript>
     
     <!-- Fonts are served locally via @font-face in /assets/css/main.css -->

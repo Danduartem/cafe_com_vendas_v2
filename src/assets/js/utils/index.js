@@ -6,4 +6,5 @@
 export { throttle, debounce } from './throttle.js';
 export { safeQuery, safeQueryAll, calculateSlidesPerView, generateId } from './dom.js';
 export { Animations } from './animations.js';
+export { CSSLoader } from './css-loader.js';
 // Cloudinary helpers are currently unused; export can be restored if needed
