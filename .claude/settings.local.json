@@ -43,7 +43,8 @@
       "Bash(/dev/null)",
       "mcp__playwright-mcp__browser_navigate_back",
       "mcp__playwright-mcp__browser_install",
-      "Bash(npx lighthouse:*)"
+      "Bash(npx lighthouse:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
