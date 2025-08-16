@@ -6,7 +6,6 @@
 import { CONFIG } from './config/constants.js';
 import { state, StateManager } from './core/state.js';
 import { Analytics } from './core/analytics.js';
-import { CSSLoader } from './utils/index.js';
 import {
   Hero,
   Banner,
@@ -39,8 +38,7 @@ export const CafeComVendas = {
       // Set up global error handling
       this.setupGlobalErrorHandling();
 
-      // Initialize critical CSS loading (CSP-compliant)
-      CSSLoader.init();
+      // CSS now loaded directly in HTML for reliability
 
       // Initialize analytics first
       Analytics.initPerformanceTracking();
