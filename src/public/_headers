@@ -19,9 +19,17 @@
 /*.woff
   Cache-Control: public, max-age=31536000, immutable
 
-# HTML files - short cache for updates
+# Homepage optimization - instant CDN serving with background revalidation
+/
+  Cache-Control: public, max-age=0, s-maxage=31536000, stale-while-revalidate=86400
+
+# Directory indexes optimization (like /obrigado/)
+/*/
+  Cache-Control: public, max-age=0, s-maxage=31536000, stale-while-revalidate=86400
+
+# Other HTML files - shorter CDN cache but still use stale-while-revalidate
 /*.html
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: public, max-age=0, s-maxage=3600, stale-while-revalidate=86400
 
 # Image files cache
 /*.jpg
