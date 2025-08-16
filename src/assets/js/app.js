@@ -17,7 +17,8 @@ import {
   Testimonials,
   ThankYou,
   Checkout,
-  CloudinaryComponent
+  CloudinaryComponent,
+  GTM
 } from './components/index.js';
 
 export const CafeComVendas = {
@@ -87,10 +88,11 @@ export const CafeComVendas = {
      */
   initializeComponents() {
     const components = [
-      { name: 'CloudinaryComponent', component: CloudinaryComponent }, // Initialize first for image optimization
-      { name: 'Checkout', component: Checkout }, // Initialize second for modal availability
+      { name: 'CloudinaryComponent', component: CloudinaryComponent },
+      { name: 'Checkout', component: Checkout },
       { name: 'Hero', component: Hero },
       { name: 'Banner', component: Banner },
+      { name: 'GTM', component: GTM },
       { name: 'YouTube', component: YouTube },
       { name: 'Offer', component: Offer },
       { name: 'FAQ', component: FAQ },
@@ -122,7 +124,6 @@ export const CafeComVendas = {
       }
     });
 
-    // Track component initialization results
     Analytics.track('components_initialized', {
       event_category: 'Application',
       success_count: successCount,

@@ -14,3 +14,4 @@ export { Testimonials } from './testimonials.js';
 export { ThankYou } from './thank-you.js';
 export { Checkout } from './checkout.js';
 export { CloudinaryComponent } from './cloudinary.js';
+export { GTM } from './gtm.js';

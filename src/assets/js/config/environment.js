@@ -39,6 +39,11 @@ const config = {
     measurementId: 'G-XXXXXXXXXX' // Replace with actual GA4 measurement ID
   },
 
+  // Google Tag Manager
+  gtm: {
+    containerId: import.meta.env.VITE_GTM_CONTAINER_ID || 'GTM-T63QRLFT'
+  },
+
   // Contact Information (Public)
   contact: {
     email: 'team@cafecomvendas.com',

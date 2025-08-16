@@ -9,7 +9,7 @@ export default async function handler(request, context) {
 		"img-src 'self' data: https: blob:",
 		"font-src 'self' data:",
 		"connect-src 'self' https://api.stripe.com https://formspree.io https://connect.mailerlite.com https://www.google-analytics.com https://plausible.io",
-		"frame-src https://js.stripe.com https://hooks.stripe.com https://www.youtube-nocookie.com https://www.youtube.com",
+		"frame-src https://js.stripe.com https://hooks.stripe.com https://www.youtube-nocookie.com https://www.youtube.com https://www.googletagmanager.com",
 		"form-action 'self' https://formspree.io",
 		"base-uri 'self'",
 		"object-src 'none'"
