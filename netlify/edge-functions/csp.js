@@ -4,8 +4,8 @@ export default async function handler(request, context) {
 
 	const csp = [
 		"default-src 'self'",
-		"script-src 'self' https://js.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io 'strict-dynamic'",
-		"style-src 'self'",
+		"script-src 'self' https://js.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io",
+		"style-src 'self' 'unsafe-inline'",
 		"img-src 'self' data: https: blob:",
 		"font-src 'self' data:",
 		"connect-src 'self' https://api.stripe.com https://formspree.io https://connect.mailerlite.com https://www.google-analytics.com https://plausible.io",
