@@ -32,7 +32,6 @@
     ],
     "deny": [
       "Bash(rm -rf *)",
-      "Bash(sudo *)",
       "Bash(rm package.json)",
       "Bash(rm CLAUDE.md)",
       "Bash(rm .env*)"

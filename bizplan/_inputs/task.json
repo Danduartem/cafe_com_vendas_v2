@@ -1,0 +1,68 @@
+{
+  "company": {
+    "name": "Café com Vendas Academy",
+    "model": "Info-product",
+    "geo": ["PT", "BR"],
+    "stage": "growth",
+    "website": "https://cafecomvendas.pt"
+  },
+  "offer": {
+    "name": "Mentoria Seja Livre - Transformação em Vendas",
+    "price_point": 2497,
+    "gross_margin_pct": 85,
+    "upsells": [
+      "Implementação VIP (€5000)",
+      "Grupo Mastermind Anual (€997/mês)",
+      "Sessões 1:1 Mensais (€497)"
+    ],
+    "value_ladder": [
+      "Workshop Café com Vendas (€180)",
+      "Programa 90 Dias Seja Livre (€2497)",
+      "Mentoria VIP 6 Meses (€9997)"
+    ]
+  },
+  "goals": {
+    "north_star": "Monthly Gross Profit",
+    "target_revenue_month_6": 150000,
+    "payback_days": 30,
+    "growth_rate_monthly": 25
+  },
+  "audience": {
+    "primary_icp": "Empreendedoras de serviços premium em Portugal e Brasil, 29-45 anos, que trabalham 12+ horas/dia mas não conseguem escalar receita",
+    "segments": [
+      "Coaches e Consultoras",
+      "Profissionais de Estética e Bem-estar",
+      "Designers e Criativas"
+    ],
+    "regions": ["PT", "BR"],
+    "size": 250000
+  },
+  "constraints": {
+    "budget_monthly": 15000,
+    "timeline_weeks": 12,
+    "team_size": 8,
+    "brand_voice": ["Empática", "Confiante", "Premium", "Transformadora"],
+    "compliance": ["GDPR", "LGPD", "Consumer Protection"]
+  },
+  "assets": {
+    "site": "yes",
+    "email_list_size": 8500,
+    "social": {
+      "instagram": 24000,
+      "youtube": 6800,
+      "linkedin": 4200,
+      "whatsapp_list": 3200
+    },
+    "content_inventory": [
+      "45 blog posts sobre vendas e mindset",
+      "12 lead magnets (checklists e templates)",
+      "25 vídeos de casos de sucesso",
+      "3 webinars gravados",
+      "100+ depoimentos de alunas"
+    ]
+  },
+  "output": {
+    "base_path": "./bizplan/2025-08-17-cafe-vendas",
+    "lang": "pt-PT"
+  }
+}
