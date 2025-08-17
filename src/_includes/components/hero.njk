@@ -3,15 +3,20 @@
 <!-- Hero Section Start -->
 <section
   id="hero"
-  class="hero-bg relative flex items-center justify-center bg-cover bg-center overflow-hidden w-full h-screen pt-14 before:absolute before:inset-0 before:bg-gradient-to-br before:from-navy-900/85 before:to-navy-900/70"
+  class="hero-bg relative flex flex-col
+         bg-cover bg-center bg-no-repeat
+         overflow-hidden w-full h-screen pt-14
+         before:absolute before:inset-0
+         before:bg-gradient-to-b before:from-navy-900/85 before:via-navy-900/78 before:to-navy-900/66"
   role="banner"
   aria-label="Seção principal do evento Café com Vendas"
   data-reveal
 >
-  <!-- Decorative SVG Pattern (low contrast) -->
+  <!-- Decorative SVG Pattern (right side, feathered edge to avoid vertical seam) -->
   <svg 
     aria-hidden="true" 
     class="absolute right-0 top-0 h-full pointer-events-none z-10 w-[55vw]" 
+    style="mask-image: linear-gradient(to right, transparent 0, black 6vw, black 100%); -webkit-mask-image: linear-gradient(to right, transparent 0, black 6vw, black 100%);" 
     viewBox="0 0 800 1200" 
     preserveAspectRatio="xMaxYMin slice"
   >
@@ -24,8 +29,8 @@
     <rect x="0" y="0" width="800" height="1200" fill="url(#hero-gradient)"></rect>
   </svg>
 
-  <!-- Content Container -->
-  <div class="relative z-20 mx-auto text-center w-full px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center max-w-3xl py-8 sm:py-12">
+  <!-- Content Container (centered vertically, safe from scroll-indicator overlap) -->
+  <div class="relative z-20 flex-1 flex flex-col items-center justify-center text-center w-full px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto py-8 sm:py-12">
     
     <!-- Accent Line -->
     <div class="hero-accent mb-4 sm:mb-6 w-full" data-reveal>
@@ -81,7 +86,7 @@
         type="button"
         data-checkout-trigger
         data-source="hero"
-        class="hero-cta-primary inline-flex items-center justify-center px-6 py-3 min-h-[48px] rounded-[14px] bg-gradient-to-r from-burgundy-700 to-navy-800 text-white font-bold shadow-[0_10px_30px_rgba(2,6,23,0.5)] transform-gpu transition-all duration-300 hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-navy-900"
+        class="hero-cta-primary inline-flex items-center justify-center px-6 py-3 min-h-[48px] rounded-[14px] bg-gradient-to-r from-burgundy-700 to-navy-800 text-white font-bold shadow-[0_10px_30px_rgba(2,6,23,0.5)] transform-gpu transition-all duration-300 hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-white/40 focus:ring-offset-2 cursor-pointer focus:ring-offset-navy-900"
         aria-label="Garantir a minha vaga no evento"
         data-analytics-event="click_hero_cta"
       >
@@ -92,7 +97,7 @@
       </button>
 
       <a 
-        href="#solucao" 
+        href="#problema" 
         class="text-white/90 underline underline-offset-4 text-sm sm:text-base transition-colors duration-200 hover:text-white" 
         data-analytics-event="click_hero_secondary"
       >
@@ -111,22 +116,30 @@
     </div>
   </div>
 
-  <!-- Scroll Indicator Button -->
-  <button 
-    class="hero-scroll-indicator absolute bottom-6 left-1/2 -translate-x-1/2 z-30 text-white/90 sm:block hidden bg-transparent border-none cursor-pointer transition-all duration-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-navy-900" 
-    id="scroll-indicator-btn" 
-    aria-label="Role para baixo para ver mais conteúdo" 
-    type="button"
-    data-reveal
-  >
-    <div class="flex flex-col items-center space-y-1 w-full">
-      <span class="font-lora text-xs">Role para baixo</span>
-      <svg class="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-      </svg>
-    </div>
-  </button>
+  <!-- Scroll Indicator Zone (auto-hides on short viewports) -->
+  <div class="relative z-20 flex justify-center pb-6">
+    <button 
+      class="hero-scroll-indicator text-white/90 bg-transparent border-none cursor-pointer transition-all duration-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-navy-900 hidden sm:flex"
+      id="scroll-indicator-btn" 
+      aria-label="Role para baixo para ver mais conteúdo" 
+      type="button"
+      data-reveal
+    >
+      <div class="flex flex-col items-center space-y-1 w-full">
+        <span class="font-lora text-xs">Role para baixo</span>
+        <svg class="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+      </div>
+    </button>
+  </div>
+
+  <!-- Component-scoped helper styles -->
+  <style>
+    /* Hide scroll indicator on very short viewports */
+    @media (max-height: 600px) {
+      .hero-scroll-indicator { display: none !important; }
+    }
+  </style>
 </section>
 <!-- Hero Section End -->
-
-
