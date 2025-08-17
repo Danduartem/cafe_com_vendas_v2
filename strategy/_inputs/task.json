@@ -1,0 +1,70 @@
+{
+  "project": {
+    "company": "Café com Vendas",
+    "offer_name": "Café com Vendas — Edição Portugal",
+    "one_line": "7 horas para libertar suas vendas (e você) do burnout empreendedor",
+    "core_problem": "Empreendedoras trabalham 12+ horas por dia mas não conseguem escalar receita nem ter tempo para família",
+    "uvp": "Método prático dos 5 pilares para dobrar vendas trabalhando metade do tempo, com prova social de 100+ empresárias",
+    "brand_voice": ["Empática", "Confiante", "Elegante", "Premium"],
+    "core_emotion": "Transformação com leveza"
+  },
+  "audience": {
+    "persona": {
+      "role": "Empreendedora de serviços premium",
+      "industry": "Coaching, Consultoria, Estética, Moda, Nutrição, Arquitetura",
+      "demographics": "29–45 anos, Portugal e Brasil, classe média-alta"
+    },
+    "pains": [
+      "Alto esforço com baixo retorno financeiro",
+      "Sobrecarregada e sem tempo para família",
+      "Dificuldade em precificar e vender sem culpa",
+      "Falta de método escalável e processos",
+      "Trabalha sozinha sem rede de apoio similar"
+    ],
+    "desired_outcome": "Trabalhar 4 horas por dia, faturar 2-10x mais, ter tempo para família e viagens, ser reconhecida como referência",
+    "objections": [
+      "Já fiz cursos e nada mudou",
+      "Não tenho tempo para implementar",
+      "Se aumentar preço vou perder clientes",
+      "É muito caro para investir agora",
+      "Não confio em promessas milagrosas"
+    ]
+  },
+  "market": {
+    "competitors": [
+      "Cursos online genéricos de vendas",
+      "Mentorias individuais caras (€3000+)",
+      "Workshops grandes sem intimidade"
+    ],
+    "key_differentiator": "Evento presencial intimista (8 vagas) com método comprovado, networking de alto nível, implementação guiada e garantia de resultados"
+  },
+  "conversion": {
+    "traffic_sources": ["Instagram Ads", "WhatsApp orgânico", "Email marketing", "Indicação de alunas"],
+    "temperature": "warm",
+    "primary_goal": "Garantir vaga via Stripe (€180)",
+    "secondary_goal": "Entrar na lista de espera para próxima edição"
+  },
+  "tech": {
+    "integrations": ["Stripe", "GTM", "Netlify", "WhatsApp", "Cloudinary"],
+    "seo": {
+      "primary_kw": "café com vendas lisboa",
+      "secondary_kw": [
+        "evento empreendedoras portugal",
+        "workshop vendas lisboa",
+        "mentoria vendas presencial",
+        "aumentar vendas negócio"
+      ]
+    },
+    "mandates": [
+      "Usar paleta navy-burgundy-gold oficial",
+      "Manter tom premium e elegante",
+      "Evitar stock photos genéricas",
+      "Fotos reais do espaço Mesa Corrida",
+      "Depoimentos em vídeo de alunas portuguesas"
+    ]
+  },
+  "output": {
+    "base_path": "./strategy/2025-08-17-landing",
+    "lang": "pt-PT"
+  }
+}
