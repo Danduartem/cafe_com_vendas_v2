@@ -101,17 +101,20 @@ export const GTM = {
     setupConversionTriggers();
     setupEngagementTriggers();
 
-    // Extended fallback: load after 15 seconds for engaged users (increased from 5s)
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => {
-        if (!this.loaded) loadGTM();
-      }, { timeout: 15000 });
-    } else {
-      // Fallback: load after 15 seconds if no meaningful interaction
-      setTimeout(() => {
-        if (!this.loaded) loadGTM();
-      }, 15000);
-    }
+    // Progressive fallback: minimum 10s delay, then idle check, max 15s
+    setTimeout(() => {
+      if (this.loaded) return;
+      
+      // After 10 seconds, check if browser is idle for deferred loading
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          if (!this.loaded) loadGTM();
+        }, { timeout: 5000 }); // Max 5s additional wait (total: 15s)
+      } else {
+        // Immediate load after 10s minimum wait
+        loadGTM();
+      }
+    }, 10000); // Minimum 10-second delay before any automatic loading
   }
 };
 
