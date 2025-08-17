@@ -3,7 +3,7 @@
 
 <section id="solucao" aria-label="{{ pillars.title }} - 5 pilares para vender mais trabalhando menos" 
   data-analytics-section="solution"
-  class="relative overflow-hidden py-32 scroll-mt-14" 
+  class="relative overflow-hidden py-12 scroll-mt-14" 
   data-scroll-offset>
   
   {# Premium gradient background with subtle animation #}
@@ -131,7 +131,7 @@
     </div>
 
     {# CTA Section with Premium Design #}
-    <div class="relative mt-24" data-reveal>
+    <div class="relative mt-12" data-reveal>
       
       {# Decorative divider with golden ratio proportions #}
       <div class="flex items-center justify-center mb-16">
@@ -142,15 +142,17 @@
       
       <div class="text-center">
         {# CTA button using the same style as hero section #}
-        <a href="#oferta" 
-           class="inline-flex items-center justify-center px-6 py-3 min-h-[48px] rounded-[14px] bg-gradient-to-r from-burgundy-700 to-navy-800 text-white font-bold shadow-[0_10px_30px_rgba(2,6,23,0.5)] transform-gpu transition-all duration-250 hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-neutral-200/20"
-           data-analytics-event="click_solution_cta"
-           aria-label="Conhecer os 5 pilares em detalhe - ir para oferta">
+        <button type="button"
+                data-checkout-trigger
+                data-source="solution"
+                class="inline-flex items-center justify-center px-6 py-3 min-h-[48px] rounded-[14px] bg-gradient-to-r from-burgundy-700 to-navy-800 text-white font-bold shadow-[0_10px_30px_rgba(2,6,23,0.5)] transform-gpu transition-all duration-250 hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-neutral-200/20"
+                data-analytics-event="click_solution_cta"
+                aria-label="Conhecer os 5 pilares em detalhe - abrir modal de inscrição">
           Quero conhecer os 5 pilares em detalhe
           <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
           </svg>
-        </a>
+        </button>
         
         {# Supporting text with refined styling #}
         <div class="mt-8 relative">
