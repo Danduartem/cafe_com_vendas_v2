@@ -53,6 +53,18 @@ export const Hero = {
     const scrollIndicatorBtn = safeQuery('#scroll-indicator-btn');
     if (!scrollIndicatorBtn) return;
 
+    // Hide scroll indicator on very short viewports (replaces CSS media query)
+    const checkViewportHeight = () => {
+      if (window.innerHeight <= 600) {
+        scrollIndicatorBtn.classList.add('!hidden');
+      } else {
+        scrollIndicatorBtn.classList.remove('!hidden');
+      }
+    };
+
+    checkViewportHeight();
+    window.addEventListener('resize', checkViewportHeight);
+
     scrollIndicatorBtn.addEventListener('click', () => {
       const explicitNext = safeQuery('#inscricao');
       if (explicitNext) {

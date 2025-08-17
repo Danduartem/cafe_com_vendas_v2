@@ -221,6 +221,7 @@
     "glass": "0 6px 30px rgba(2,6,23,0.35)"
   },
   
+  
   "animation": {
     "duration": {
       "fast": "150ms",
