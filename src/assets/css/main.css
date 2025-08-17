@@ -109,23 +109,15 @@ html {
   scroll-behavior: smooth;
 }
 
-
-/* Carousel utilities using predefined transform classes */
-.carousel-track {
-  transition: transform 300ms ease-in-out;
+/* Hide scrollbar for carousel */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
 }
 
-/* Predefined carousel positions (slide width + gap = ~474px) */
-.carousel-track[data-position="0"] { transform: translateX(0px); }
-.carousel-track[data-position="1"] { transform: translateX(-474px); }
-.carousel-track[data-position="2"] { transform: translateX(-948px); }
-.carousel-track[data-position="3"] { transform: translateX(-1422px); }
-.carousel-track[data-position="4"] { transform: translateX(-1896px); }
-.carousel-track[data-position="5"] { transform: translateX(-2370px); }
-.carousel-track[data-position="6"] { transform: translateX(-2844px); }
-.carousel-track[data-position="7"] { transform: translateX(-3318px); }
-.carousel-track[data-position="8"] { transform: translateX(-3792px); }
-.carousel-track[data-position="9"] { transform: translateX(-4266px); }
 
 /* SVG gradient stops */
 .gradient-stop-navy-start {

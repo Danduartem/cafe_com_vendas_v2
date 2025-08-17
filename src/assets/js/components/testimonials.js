@@ -5,7 +5,10 @@
 
 import { CONFIG } from '../config/constants.js';
 import { Analytics } from '../core/analytics.js';
-import { safeQuery, safeQueryAll, calculateSlidesPerView, Animations, debounce } from '../utils/index.js';
+import { safeQuery, safeQueryAll, Animations, debounce } from '../utils/index.js';
+
+// Constants for carousel layout
+const CAROUSEL_GAP_DEFAULT = 24; // Default gap between slides in pixels
 
 export const Testimonials = {
   init() {
@@ -18,39 +21,31 @@ export const Testimonials = {
   },
 
   initTestimonialsCarousel() {
-    const carouselContainer = safeQuery('.testimonials-carousel-container');
-    const carouselTrack = safeQuery('[data-carousel-track]');
+    const carousel = safeQuery('.testimonials-carousel');
     const slides = safeQueryAll('.carousel-slide');
     const prevButton = safeQuery('[data-carousel-prev]');
     const nextButton = safeQuery('[data-carousel-next]');
     const paginationContainer = safeQuery('[data-carousel-pagination]');
 
-    if (!carouselContainer || !carouselTrack || !slides.length) {
+    if (!carousel || !slides.length) {
       console.warn('Testimonials carousel elements not found');
       return;
     }
 
     let currentIndex = 0;
-    let slidesPerView = 1;
-
-    const calculateSlidesPerViewLocal = () => {
-      const containerWidth = carouselContainer.offsetWidth;
-      slidesPerView = calculateSlidesPerView(containerWidth);
-    };
 
     const createPagination = () => {
       if (!paginationContainer) return;
 
       paginationContainer.innerHTML = '';
-      const totalPages = Math.ceil(slides.length / Math.floor(slidesPerView));
 
-      for (let i = 0; i < totalPages; i++) {
+      for (let i = 0; i < slides.length; i++) {
         const dot = document.createElement('button');
         dot.className = 'w-2 h-2 rounded-full bg-navy-800/20 transition-all duration-300 hover:bg-navy-800/40';
         dot.setAttribute('type', 'button');
-        dot.setAttribute('aria-label', `Ir para página ${i + 1} dos testemunhos`);
+        dot.setAttribute('aria-label', `Ir para testemunho ${i + 1}`);
         dot.setAttribute('aria-current', 'false');
-        dot.addEventListener('click', () => this.goToSlide(i * Math.floor(slidesPerView)));
+        dot.addEventListener('click', () => this.goToSlide(i));
         paginationContainer.appendChild(dot);
       }
       this.updatePagination();
@@ -60,10 +55,9 @@ export const Testimonials = {
       if (!paginationContainer) return;
 
       const dots = paginationContainer.querySelectorAll('button');
-      const activePage = Math.floor(currentIndex / Math.floor(slidesPerView));
 
       dots.forEach((dot, index) => {
-        if (index === activePage) {
+        if (index === currentIndex) {
           dot.classList.remove('bg-navy-800/20');
           dot.classList.add('bg-navy-800', 'w-6');
           dot.setAttribute('aria-current', 'true');
@@ -75,18 +69,19 @@ export const Testimonials = {
       });
     };
 
-    const updateCarousel = () => {
-      // Use predefined data position for pure CSS approach
-      carouselTrack.setAttribute('data-position', currentIndex);
-      carouselTrack.classList.add('carousel-track');
-      this.updatePagination();
-      this.updateNavigationButtons();
+    const scrollToSlide = (index) => {
+      if (slides[index]) {
+        // Use native scroll for smooth behavior
+        slides[index].scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'start'
+        });
+      }
     };
 
     this.updateNavigationButtons = () => {
       if (!prevButton || !nextButton) return;
-
-      const maxIndex = slides.length - Math.floor(slidesPerView);
 
       if (currentIndex <= 0) {
         prevButton.classList.add('opacity-50', 'cursor-not-allowed');
@@ -96,7 +91,7 @@ export const Testimonials = {
         prevButton.disabled = false;
       }
 
-      if (currentIndex >= maxIndex) {
+      if (currentIndex >= slides.length - 1) {
         nextButton.classList.add('opacity-50', 'cursor-not-allowed');
         nextButton.disabled = true;
       } else {
@@ -106,9 +101,10 @@ export const Testimonials = {
     };
 
     this.goToSlide = (index) => {
-      const maxIndex = slides.length - Math.floor(slidesPerView);
-      currentIndex = Math.max(0, Math.min(index, maxIndex));
-      updateCarousel();
+      currentIndex = Math.max(0, Math.min(index, slides.length - 1));
+      scrollToSlide(currentIndex);
+      this.updatePagination();
+      this.updateNavigationButtons();
 
       Analytics.track(CONFIG.analytics.events.TESTIMONIAL_VIEW, {
         slide_index: currentIndex + 1,
@@ -117,37 +113,40 @@ export const Testimonials = {
     };
 
     const initCarousel = () => {
-      calculateSlidesPerViewLocal();
+      // Add scroll-snap classes to carousel
+      carousel.classList.add('snap-x', 'snap-mandatory', 'scroll-smooth');
+
+      // Add snap classes to slides
       slides.forEach(slide => {
-        // Use responsive Tailwind classes instead of dynamic widths
-        slide.classList.add('flex-shrink-0');
-        // Ensure slides have the correct responsive width classes already in HTML
+        slide.classList.add('snap-start', 'flex-shrink-0');
       });
+
       createPagination();
-      updateCarousel();
+      this.updateNavigationButtons();
     };
+
+    // Handle scroll events to update current index
+    const handleScroll = debounce(() => {
+      const scrollLeft = carousel.scrollLeft;
+      const slideWidth = slides[0].offsetWidth;
+      const gap = parseInt(window.getComputedStyle(carousel.firstElementChild).gap) || CAROUSEL_GAP_DEFAULT;
+
+      // Calculate which slide is most visible
+      const newIndex = Math.round(scrollLeft / (slideWidth + gap));
+      if (newIndex !== currentIndex) {
+        currentIndex = newIndex;
+        this.updatePagination();
+        this.updateNavigationButtons();
+      }
+    }, 100);
+
+    carousel.addEventListener('scroll', handleScroll, { passive: true });
 
     // Event listeners
     prevButton?.addEventListener('click', () => this.goToSlide(currentIndex - 1));
     nextButton?.addEventListener('click', () => this.goToSlide(currentIndex + 1));
 
-    // Touch support
-    this.initTouchSupport(carouselTrack, currentIndex);
-
-    // Resize handler
-    const handleResize = debounce(() => {
-      calculateSlidesPerViewLocal();
-      createPagination();
-
-      const maxIndex = slides.length - Math.floor(slidesPerView);
-      if (currentIndex > maxIndex) {
-        currentIndex = maxIndex;
-      }
-
-      updateCarousel();
-    }, 250);
-
-    window.addEventListener('resize', handleResize, { passive: true });
+    // Touch support is handled by native scroll
 
     initCarousel();
     this.trackSectionView();
