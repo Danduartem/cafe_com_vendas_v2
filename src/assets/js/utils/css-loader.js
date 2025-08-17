@@ -25,10 +25,10 @@ export const CSSLoader = {
       styleLink.rel = 'stylesheet';
       styleLink.href = preloadLink.href;
       styleLink.id = 'tailwind-css';
-      
+
       // Insert the stylesheet link
       document.head.appendChild(styleLink);
-      
+
       // Remove the preload link to prevent duplication
       preloadLink.remove();
     };

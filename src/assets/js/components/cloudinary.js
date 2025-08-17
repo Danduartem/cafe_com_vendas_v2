@@ -64,7 +64,7 @@ export const CloudinaryComponent = {
   /**
      * Update CSS background image URLs by injecting new styles
      */
-  updateCSSBackgrounds(cloudName, imageId) {
+  updateCSSBackgrounds(_cloudName, _imageId) {
     // No-op: hero background now uses Tailwind responsive bg utilities
     // Kept for backward compatibility if needed elsewhere
   },

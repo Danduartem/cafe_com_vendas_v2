@@ -16,7 +16,7 @@ export const GTM = {
 
       // Delay GTM loading until user interaction or page idle (optimized for performance)
       this.setupLazyLoading(containerId);
-    } catch (_err) {
+    } catch {
       // no-op; analytics should not block UX
     }
   },
@@ -42,13 +42,13 @@ export const GTM = {
       // CTA buttons and offer interactions
       const ctaSelectors = [
         '[data-analytics-event*="cta"]',
-        '[data-analytics-event*="checkout"]', 
+        '[data-analytics-event*="checkout"]',
         '[data-analytics-event*="offer"]',
         'button[class*="checkout"]',
         'button[class*="stripe"]',
         'a[href*="#oferta"]'
       ];
-      
+
       ctaSelectors.forEach(selector => {
         document.addEventListener('click', (e) => {
           if (e.target.closest(selector)) {
@@ -61,11 +61,11 @@ export const GTM = {
     // Meaningful engagement triggers
     const setupEngagementTriggers = () => {
       let scrollTriggered = false;
-      
+
       // Load when user scrolls past hero section (25% of page)
       const handleMeaningfulScroll = () => {
         if (scrollTriggered) return;
-        
+
         const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
         if (scrollPercent >= 25) {
           scrollTriggered = true;
@@ -73,9 +73,9 @@ export const GTM = {
           window.removeEventListener('scroll', handleMeaningfulScroll);
         }
       };
-      
+
       window.addEventListener('scroll', handleMeaningfulScroll, { passive: true });
-      
+
       // Load on FAQ interaction
       document.addEventListener('click', (e) => {
         if (e.target.closest('[data-faq-toggle]') || e.target.closest('.faq')) {
@@ -104,7 +104,7 @@ export const GTM = {
     // Progressive fallback: minimum 10s delay, then idle check, max 15s
     setTimeout(() => {
       if (this.loaded) return;
-      
+
       // After 10 seconds, check if browser is idle for deferred loading
       if ('requestIdleCallback' in window) {
         requestIdleCallback(() => {
