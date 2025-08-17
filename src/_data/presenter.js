@@ -11,7 +11,7 @@ export default {
 
   microStory: 'Eu também acreditava que \'trabalhar duro\' era o único caminho. Até perceber que o meu negócio precisava de sistemas — não de mais horas. O Método nasceu dessa viragem.',
 
-  ctaText: 'Quero aprender com a Juçanã no evento',
+  ctaText: 'Quero aprender no evento',
 
   photoUrl: 'https://res.cloudinary.com/ds4dhbneq/image/upload/w_600,h_800,c_fill,q_auto,f_auto,g_auto/jucana-maximiliano',
   photoAlt: 'Juçanã Maximiliano — especialista em escalar negócios de empreendedoras',

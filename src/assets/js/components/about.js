@@ -20,10 +20,10 @@ export const About = {
     if (!container) return;
 
     // Track CTA clicks
-    const cta = container.querySelector('[data-analytics-event="click_about_cta"]');
+    const cta = container.querySelector('[data-analytics-event="click_about_checkout_cta"]');
     if (cta) {
       cta.addEventListener('click', () => {
-        Analytics.track('click_about_cta', {
+        Analytics.track('click_about_checkout_cta', {
           event_category: 'engagement',
           event_label: 'about_section',
           value: 1
@@ -43,20 +43,6 @@ export const About = {
       });
     }
 
-    // Smooth scroll for CTA
-    const ctaLink = container.querySelector('a[href="#oferta"]');
-    if (ctaLink) {
-      ctaLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        const target = safeQuery('#oferta');
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      });
-    }
   },
 
   setupIntersectionObserver() {
