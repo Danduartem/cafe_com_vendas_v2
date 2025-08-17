@@ -44,9 +44,25 @@
       "mcp__playwright-mcp__browser_navigate_back",
       "mcp__playwright-mcp__browser_install",
       "Bash(npx lighthouse:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(chmod:*)",
+      "Bash(npx:*)",
+      "Bash(cp:*)"
     ],
     "deny": [],
     "ask": []
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/auto-build.sh"
+          }
+        ]
+      }
+    ]
   }
 }

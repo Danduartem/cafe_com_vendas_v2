@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "model": "opusplan",
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "defaultMode": "default",
+    "allow": [
+      "npm run dev",
+      "npm run build",
+      "npm run start",
+      "npm run clean",
+      "npm run tokens:build",
+      "npm run build:css",
+      "npm run build:js*",
+      "npm run eleventy*",
+      "npm run lint*",
+      "npm run lighthouse*",
+      "npm run versions",
+      "npm run outdated",
+      "npm install*",
+      "npm update",
+      "git status",
+      "git diff*",
+      "git add*",
+      "git commit*",
+      "git push*",
+      "git log*",
+      "git branch*",
+      "git checkout*",
+      "node scripts/*",
+      "netlify *",
+      "stripe *"
+    ],
+    "ask": [
+      "rm src/*",
+      "rm info/*",
+      "git reset --hard",
+      "git rebase*",
+      "npm uninstall*"
+    ],
+    "deny": [
+      "rm -rf *",
+      "sudo *",
+      "rm package.json",
+      "rm CLAUDE.md",
+      "rm .env*"
+    ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/project-context.sh",
+            "timeout": 1
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "NODE_ENV": "development",
+    "PROJECT_TYPE": "landing-page",
+    "PROJECT_LANGUAGE": "pt-PT",
+    "TARGET_AUDIENCE": "female-entrepreneurs",
+    "FRAMEWORK_PRIMARY": "eleventy",
+    "CSS_FRAMEWORK": "tailwind-v4",
+    "BUILD_TOOL": "vite",
+    "PAYMENT_PROVIDER": "stripe"
+  }
+}
