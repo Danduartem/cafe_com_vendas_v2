@@ -1,8 +1,8 @@
 # 1) Intent
-Run comprehensive Lighthouse performance audits on the local development server and generate actionable reports with performance metrics analysis.
+Run comprehensive Lighthouse performance audits on the Café com Vendas landing page and generate actionable reports with conversion-focused performance metrics analysis.
 
-Goal: Provide instant performance insights to track optimization progress and identify bottlenecks.
-Non-Goals: Do not make code changes or modify files. This is a read-only analysis tool.
+Goal: Provide instant performance insights to optimize conversion rates and track optimization progress for the Portuguese female entrepreneur event.
+Non-Goals: Do not make code changes or modify files. This is a read-only analysis tool focused on landing page performance.
 
 # 2) Inputs
 Optional:
@@ -115,8 +115,24 @@ try {
   });
   
   console.log('🎯 TARGETS (from CLAUDE.md):');
-  console.log('  Performance: >90');
-  console.log('  Accessibility: >95');
+  console.log('  Performance: >90 (Critical for conversion)');
+  console.log('  Accessibility: >95 (WCAG AA compliance)');
+  console.log('  SEO: >90 (Portuguese market visibility)');
+  console.log('');
+  
+  console.log('💰 CONVERSION IMPACT ANALYSIS:');
+  reports.forEach(({type, data}) => {
+    const lcp = parseFloat(data.audits['largest-contentful-paint'].numericValue / 1000);
+    const fcp = parseFloat(data.audits['first-contentful-paint'].numericValue / 1000);
+    const cls = parseFloat(data.audits['cumulative-layout-shift'].numericValue);
+    
+    console.log(\`📱 \${type} Conversion Metrics:\`);
+    console.log(\`  Time to CTA visible: \${fcp.toFixed(2)}s \${fcp <= 1.8 ? '✅' : '❌'}\`);
+    console.log(\`  Time to hero loaded: \${lcp.toFixed(2)}s \${lcp <= 2.5 ? '✅' : '❌'}\`);
+    console.log(\`  Layout stability: \${cls.toFixed(3)} \${cls <= 0.1 ? '✅' : '❌'}\`);
+    console.log(\`  Est. conversion impact: \${fcp <= 1.8 && lcp <= 2.5 && cls <= 0.1 ? 'Optimal' : 'Needs improvement'}\`);
+    console.log('');
+  });
   console.log('');
   
   console.log('📊 GENERATED REPORTS:');
@@ -186,8 +202,11 @@ lighthouse quick=true
 # Custom URL 
 lighthouse url="http://localhost:3000"
 
-# Production URL audit
+# Production URL audit for Portuguese market
 lighthouse url="https://cafecomvendas.com" device="mobile"
+
+# Test Stripe checkout performance  
+lighthouse url="http://localhost:8080" device="mobile" format="json"
 ```
 
 # 8) Troubleshooting
@@ -234,13 +253,32 @@ lighthouse device="both" format="both"
 **CI/CD Integration:**
 Can be integrated with GitHub Actions using the lighthouse-ci action for automated performance monitoring.
 
-# 10) Performance Insights
+# 10) Performance Insights for Café com Vendas
 
-The command analyzes key metrics that directly impact user experience:
-- **LCP (Largest Contentful Paint)**: When main content loads
-- **FCP (First Contentful Paint)**: When anything first appears  
-- **TBT (Total Blocking Time)**: JavaScript blocking main thread
-- **CLS (Cumulative Layout Shift)**: Visual stability
-- **Speed Index**: How quickly content is visually complete
+The command analyzes key metrics that directly impact conversion rates for your Portuguese event landing page:
+- **LCP (Largest Contentful Paint)**: When hero section loads (critical for first impression)
+- **FCP (First Contentful Paint)**: When CTA buttons first appear (conversion opportunity)  
+- **TBT (Total Blocking Time)**: JavaScript blocking form interactions
+- **CLS (Cumulative Layout Shift)**: Visual stability during Stripe checkout flow
+- **Speed Index**: How quickly testimonials and trust signals load
 
-Use these insights to prioritize optimizations for maximum user experience impact.
+## Landing Page Specific Considerations
+
+**Portuguese Market Mobile Performance:**
+- Test on 3G connections (common in Portugal)
+- Prioritize mobile-first optimization (high mobile usage)
+- Monitor Cloudinary image delivery performance
+
+**Conversion Critical Elements:**
+- Hero section loading speed (LCP target: <2.5s)
+- CTA button interactivity (FID target: <100ms)
+- Form field responsiveness 
+- Stripe payment modal performance
+
+**Event-Specific Optimizations:**
+- Testimonials carousel loading
+- FAQ accordion performance
+- Countdown timer script efficiency
+- Social proof elements visibility timing
+
+Use these insights to prioritize optimizations for maximum conversion impact on your premium event registration.

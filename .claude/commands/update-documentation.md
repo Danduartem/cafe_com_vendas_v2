@@ -33,7 +33,8 @@ Detect conventions and facts to sync:
 - Deployment: Netlify/Vercel/CI configs, `Dockerfile`, `compose.*`, GitHub Actions
 - Env: `.env.example`, `.env.*`, required keys present in code
 - Docs surface: `README.*`, `docs/**`, `CLAUDE.md`, `CONTRIBUTING.*`, `SECURITY.*`, `CHANGELOG.*`
-- Integrations: Stripe, Fillout, MailerLite, analytics, Sentry—derive keys/steps from code and `scripts`
+- Integrations: Stripe payment, GTM analytics, Netlify Functions, Cloudinary images—derive keys/steps from code and `scripts`
+- Café com Vendas specifics: event data, design tokens, Portuguese content, testimonials
 
 Use findings ONLY to align docs—do not modify configs unless a minor fix is required to make docs truthful.
 
@@ -84,22 +85,28 @@ Use findings ONLY to align docs—do not modify configs unless a minor fix is re
 # 7) Decision Rules
 - If `package.json#scripts` changed vs README → regenerate **Scripts** table (name → description → command).
 - If code references `process.env.*` not listed in docs → update `.env.example` and README **Environment**.
-- If Tailwind/Vite present → include **Build & Dev** steps; note `NODE_VERSION` if `engines` defined.
-- If CI/CD config exists → add a short **Deploy** section with trigger conditions (push/tag) and env prerequisites.
-- If multiple packages/workspaces → add per-package README pointers; keep root README focused on meta + getting started.
-- If CHANGELOG uses Conventional Commits → don’t fabricate entries; only fix headings/links if objectively wrong.
+- If Eleventy/Vite/Tailwind present → include **Build & Dev** steps; note Node 22.17.1+ requirement.
+- If Netlify Functions exist → document webhook endpoints and environment setup.
+- If Stripe integration found → add payment testing section with test cards.
+- If `info/DATA_*.json` files exist → sync event details, pricing, and Portuguese content in docs.
+- If design tokens in `info/DATA_design_tokens.json` → document token build process.
+- If landing page structure → add conversion optimization and accessibility sections.
+- If CHANGELOG uses Conventional Commits → don't fabricate entries; only fix headings/links if objectively wrong.
 
 # 8) Examples (Invocation)
-- `docs:update (pro)`
-- `docs:update (pro) audience=user include=README,ENV,DEPLOY`
-- `docs:update (pro) target=docs/** tone=friendly`
-- `docs:update (pro) exclude=docs/legacy/** notes="prefer pnpm examples"`
+- `docs:update (pro)` - full documentation audit for Café com Vendas
+- `docs:update (pro) include=README,CLAUDE,ENV` - focus on core project docs
+- `docs:update (pro) audience=dev notes="npm only, Node 22+"` - developer-focused
+- `docs:update (pro) target=info/** notes="sync event data and design tokens"`
 
-# 9) Review Checklist
-- [ ] README has: Overview, Tech Stack, Quick Start, Scripts (table), Environment, Build & Deploy, Project Structure, Troubleshooting
-- [ ] `.env.example` matches actual keys used in code; secrets not committed
-- [ ] Scripts table reflects `package.json` accurately (npm/pnpm/yarn variants)
-- [ ] Links are repo-relative and valid; code fences use correct language
-- [ ] No duplicated guidance across README/docs; canonical locations chosen
-- [ ] Tone and audience consistent; no marketing fluff for dev/ops docs
-- [ ] Edits are minimal and within scope cap
+# 9) Review Checklist for Café com Vendas
+- [ ] README includes: Landing page overview, Eleventy+Vite+Tailwind stack, npm scripts, Stripe testing
+- [ ] `.env.example` has: VITE_STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY, VITE_GTM_CONTAINER_ID, CLOUDINARY_CLOUD_NAME
+- [ ] Scripts table reflects actual npm commands (no pnpm/yarn references)
+- [ ] CLAUDE.md synced with: current dependency versions, performance targets, design token process
+- [ ] Event documentation matches: info/DATA_event.json (dates, pricing, location)
+- [ ] Design token process documented: build-tokens.js script and CSS generation
+- [ ] Netlify deployment covered: Functions setup, environment variables, preview URLs
+- [ ] Portuguese content guidelines preserved and documented
+- [ ] Accessibility targets documented: WCAG AA compliance, Lighthouse scores >95
+- [ ] No marketing content in technical docs; focus on development workflow

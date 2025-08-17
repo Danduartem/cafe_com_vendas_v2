@@ -8,33 +8,36 @@ review-mode: "plan-then-apply"
 ---
 
 # 1) Intent
-Goal: Improve code clarity, consistency, and maintainability **without changing behavior** (mode=clarity). When requested, apply **minimal, targeted compatibility fixes** required by recent library updates (mode=compat).
-Non-Goals: No new features or architectural rewrites. No visual or API changes unless strictly required by compat.
+Goal: Improve Café com Vendas landing page code clarity, conversion optimization, and WCAG AA compliance **without changing core functionality**. Focus on landing page best practices and Portuguese market optimization.
+Non-Goals: No major design changes or conversion flow modifications. Maintain premium event branding and messaging integrity.
 
 # 2) Inputs
 Optional:
-- `mode`: "clarity" (default) | "compat" | "both"
-- `target`: file/dir/glob to focus (default: src/** plus relevant configs)
-- `preserve`: files/globs never to change
-- `style`: preferences (e.g., "early-returns, camelCase, 8px spacing")
-- `notes`: hints (e.g., "focus hero", "avoid regex changes")
+- `mode`: "clarity" (default) | "compat" | "conversion" | "a11y"
+- `target`: file/dir/glob to focus (default: src/assets/js/components/*)
+- `preserve`: files/globs never to change (e.g., "info/DATA_*")
+- `focus`: "hero" | "testimonials" | "pricing" | "forms" | "checkout" | "all"
+- `notes`: hints (e.g., "improve mobile CTA", "optimize payment flow")
 
 # 3) Auto-Discovery (light)
 Detect:
-- Package manager & workspaces (pnpm/yarn/npm; monorepo layout)
-- Tooling & configs: vite/rollup/webpack, Eleventy, Tailwind/PostCSS, ESLint/Prettier, TS (tsconfig paths)
-- Recently updated libs (from package.json + lockfile timings) for likely compat edits:
-  - ESM/CJS import shape; renamed exports/options
-  - Tailwind/Vite/Eleventy plugin option or filename changes
-- Conventions: folder structure, component patterns, hooks/utilities, tokens
+- Landing page architecture: Eleventy templates, Vite JS bundling, Tailwind CSS v4
+- Component structure: hero, testimonials, pricing, FAQ, CTA sections
+- Conversion elements: form handling, Stripe integration, analytics tracking
+- Design system: JSON tokens, CSS custom properties, component patterns
+- Accessibility patterns: ARIA roles, keyboard navigation, color contrast
+- Portuguese content: DATA_event.json, copy library, i18n considerations
+- Mobile optimization: responsive patterns, touch interactions, performance
 
 # 4) Constraints & Guardrails
-- **Behavior-safe by default**; compat mode may alter imports/options only to satisfy new APIs.
-- Keep diffs ≤ `max-edit-scope`. Prefer many small fixes over broad rewrites.
-- Respect existing lint/format; don’t fight local rules.
-- A11y intact (headings, labels/roles, contrast, prefers-reduced-motion).
-- No new deps; do not remove public exports; avoid cross-cutting refactors.
-- Config edits only when a dependency update requires it—explain why.
+- **Conversion-safe refactoring**: Never break payment flow or CTA functionality
+- **Pure Tailwind CSS enforcement**: No inline styles, use utility classes only
+- **WCAG AA compliance**: Maintain 4.5:1 contrast ratios and keyboard accessibility
+- **Portuguese content preservation**: Never modify event details or pricing
+- **Mobile-first approach**: Ensure all changes work on mobile devices
+- **Performance maintenance**: No changes that degrade Lighthouse scores
+- **Design token compliance**: Use only approved colors from JSON tokens
+- Keep diffs ≤ `max-edit-scope`. Prefer conversion-focused improvements.
 
 # 5) Method (How to Think)
 1) **Assess**
@@ -49,12 +52,16 @@ Detect:
 4) **Verify**
    - Provide commands for build/lint/typecheck/tests; ensure they’re expected to pass.
 
-# 6) Refactoring Scope (choose applicable)
-- **Build Tool Optimizations** *(compat-first)*: update Vite/Rollup/Webpack/E11ty options, modern import patterns for tree-shaking, asset handling touch-ups.
-- **Framework Enhancements**: adopt current idioms without behavior change; modern config syntax only if required by updates.
-- **CSS/Styling Modernization**: dedupe utilities, enforce spacing scale, remove deprecated classes, keep responsive patterns intact.
-- **JavaScript/TypeScript Modernization**: early returns, clearer names, safe ES6+ (no behavior changes), better error paths; fix `import type` usage in TS.
-- **Performance Touches**: trim dead code, lazy-load where already supported, split code only if existing infra supports it (no new infra).
+# 6) Landing Page Refactoring Scope
+
+- **Conversion Optimization**: improve CTA clarity, form UX, trust signal placement, checkout flow
+- **Accessibility Enhancement**: ARIA roles, keyboard navigation, color contrast, screen reader support
+- **Mobile Experience**: touch targets, responsive behavior, performance on mobile devices
+- **Component Modularity**: extract reusable hero patterns, testimonial components, form handlers
+- **Performance Optimization**: lazy loading, image optimization, script efficiency, CSS cleanup
+- **Design System Compliance**: enforce token usage, consistent spacing, proper typography scale
+- **Portuguese UX Patterns**: cultural considerations, number formatting, payment preferences
+- **Analytics Integration**: clean event tracking, conversion funnel optimization, GTM compliance
 
 # 7) Output Contract (strict)
 
@@ -66,11 +73,11 @@ Detect:
 - Unified diffs for changed regions only, file-by-file, compact and readable.
 
 ## COMMANDS
-- Auto-detect manager; equivalents as comments:
-  - `npm|pnpm|yarn run lint`
-  - `npm|pnpm|yarn run typecheck` (if TS)
-  - `npm|pnpm|yarn run build`
-  - `npm|pnpm|yarn run test -w` (if present)
+- Landing page validation:
+  - `npm run lint` to check code quality
+  - `npm run build` to verify static site generation
+  - `npm run tokens:build` to ensure design token generation
+  - `npm run lighthouse` to validate performance impact (if available)
 
 ## NOTES
 - Behavior risk areas & quick manual checks to validate.
@@ -89,10 +96,10 @@ Detect:
 - **Configs**: only when required by updated libs; keep the smallest workable change.
 
 # 9) Examples (Invocation)
-- `refactor:smart (pro)`
-- `refactor:smart (pro) mode=clarity target=src/sections/hero.*`
-- `refactor:smart (pro) mode=compat notes="vite plugin options renamed"`
-- `refactor:smart (pro) mode=both preserve=src/legacy/**`
+- `refactor:smart (pro)` - general landing page improvements
+- `refactor:smart (pro) focus="hero" mode="conversion"` - optimize hero section for conversion
+- `refactor:smart (pro) mode="a11y" target="src/assets/js/components/*"` - accessibility improvements
+- `refactor:smart (pro) focus="checkout" notes="improve Stripe payment flow"`
 
 # 10) Review Checklist
 - [ ] Build/lint/typecheck/tests expected to pass

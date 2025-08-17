@@ -8,40 +8,49 @@ review-mode: "plan-then-apply"
 ---
 
 # 1) Intent
-Goal: Bring dependencies to the latest **minor/patch** by default with minimal risk, then preview majors. Keep behavior/build output unchanged.
-Non-Goals: No broad refactors or framework migrations. Do not silently apply major upgrades unless explicitly allowed.
+Goal: Update Café com Vendas landing page dependencies safely to latest **minor/patch** versions. Prioritize Eleventy, Vite, Tailwind CSS, and Stripe SDK compatibility.
+Non-Goals: No broad refactors or framework migrations. Maintain landing page functionality and Portuguese event integration.
 
 # 2) Inputs
 Optional:
 - `mode`: "safe" (default, minors/patches) | "majors-preview" | "majors-allow"
-- `include`: comma list to prioritize (e.g., "vite,eslint,@types/*")
-- `exclude`: comma list to skip (e.g., "tailwindcss,eleventy")
-- `workspace`: "auto" | "root" | "all" (monorepos)
-- `manager`: "auto" | "npm" | "pnpm" | "yarn"
-- `notes`: constraints (e.g., "keep Node 18", "don’t touch Tailwind config")
+- `include`: comma list to prioritize (e.g., "stripe,vite,@11ty/eleventy")
+- `exclude`: comma list to skip (e.g., "tailwindcss" - requires careful migration)
+- `pre-audit`: true|false (default: true) - run Lighthouse before updates
+- `post-audit`: true|false (default: true) - verify performance after updates
+- `test-stripe`: true|false (default: false) - test payment integration after updates
+- `notes`: constraints (e.g., "keep Node 22+", "maintain Eleventy ESM compatibility")
 
 # 3) Auto-Discovery (light)
 Detect:
-- Manager/lockfile: `pnpm-lock.yaml` | `yarn.lock` | `package-lock.json`
-- Workspaces: `package.json#workspaces`, `pnpm-workspace.yaml`, `packages/*`
-- Tooling: Vite/Rollup/Webpack, Eleventy, Tailwind, ESLint/Prettier, TypeScript
-- Scripts: `build`, `dev`, `lint`, `typecheck`, `test`
-- Engines: `package.json#engines`, `.nvmrc`, `.node-version`
+- Package manager: npm (package-lock.json, npm scripts)
+- Landing page stack: Eleventy 3.x (ESM), Vite 7.x, Tailwind CSS v4, PostCSS
+- Payment integration: Stripe SDK, Netlify Functions
+- Build tools: cross-env, design tokens generation script
+- Development: ESLint, Lighthouse auditing, live reload
+- Scripts: `dev`, `build`, `tokens:build`, `lighthouse`, `lint`
+- Node requirements: package.json#engines (Node 22.17.1+)
 
 # 4) Constraints & Guardrails
-- Default **minor/patch only**; list majors separately unless `mode="majors-allow"`.
-- Only change `package.json` version ranges (+ lockfiles via install). Preserve existing range style (`^`, `~`, exact).
-- Keep diffs ≤ `max-edit-scope` (lockfile churn excluded).
-- Respect engines (do not bump Node).
-- Peer-dep bundles move together: TypeScript + @types, ESLint core + official plugins, Vite + official plugins.
-- No config rewrites unless a minor requires a 1-line change—explain why.
+- Default **minor/patch only** to maintain landing page stability
+- Preserve landing page functionality and Stripe payment integration
+- Keep diffs ≤ `max-edit-scope` (lockfile churn excluded)
+- Respect Node 22.17.1+ requirement for optimal Vite performance
+- Bundle updates: Eleventy + plugins, Vite + CSS plugins, Stripe SDK compatibility
+- No Tailwind CSS v4 config changes without explicit approval
+- Maintain Eleventy 3.x ESM compatibility throughout updates
+- Preserve design token build process and CSS generation
 
 # 5) Method
-1) **Assess**: read current versions, compute latest safe targets; enumerate majors available.
-2) **Plan**: group updates by risk (types → lint/format → bundler → UI libs → runtime).
-3) **Patch**: update version ranges in the relevant `package.json`(s); do not pin if project uses ranges.
-4) **Verify**: provide install/dedupe + `build`/`lint`/`typecheck`/`test` commands if present.
-5) **Report**: show from→to table and majors deferred with brief notes.
+1) **Pre-audit**: run `npm run lighthouse` to capture baseline performance if enabled
+2) **Assess**: read current versions, compute latest safe targets; enumerate majors available
+3) **Plan**: group updates by risk (build tools → CSS → payment → dev tools)
+4) **Patch**: update version ranges in package.json preserving existing range style
+5) **Install**: run `npm install` and `npm dedupe` to update lockfile
+6) **Verify**: run `npm run build`, `npm run lint`, `npm run tokens:build`
+7) **Post-audit**: run Lighthouse again to verify no performance regression
+8) **Test**: validate Stripe integration if `test-stripe=true`
+9) **Report**: show from→to table, performance comparison, majors deferred
 
 # 6) Output Contract (strict)
 
@@ -55,35 +64,41 @@ Detect:
 - Minimal diffs of only the changed dependency lines in each affected `package.json`.
 
 ## COMMANDS
-- Install & dedupe (choose 1 set based on detection; alternatives as comments):
-  - npm: `npm install` ; `npm dedupe`
-  - pnpm: `pnpm install` ; `pnpm dedupe`
-  - yarn: `yarn install`
-- Sanity checks if scripts exist:
-  - `npm|pnpm|yarn run build`
-  - `npm|pnpm|yarn run lint`
-  - `npm|pnpm|yarn run typecheck`
-  - `npm|pnpm|yarn run test -w`
-- Optional (monorepo): workspace-wide dedupe/update hints.
+- Pre-audit (if enabled):
+  - `npm run lighthouse` to capture baseline performance
+- Install & update:
+  - `npm install` to apply package.json changes
+  - `npm dedupe` to optimize dependency tree
+- Landing page verification:
+  - `npm run build` to ensure static site generation works
+  - `npm run tokens:build` to verify design token generation
+  - `npm run lint` to check code quality
+  - `npm run lighthouse` to compare performance (if post-audit enabled)
+- Stripe integration test (if enabled):
+  - Test payment intent creation and webhook handling
 
 ## NOTES
-- Peer-dep hotspots to watch (ESLint plugins, @types, Vite plugins).
-- Skipped updates & why (engines/peers).
-- Follow-ups: migration guides to consult for majors (names only).
-- **Docs follow-through**: if versions are documented, add a line for `docs:update (pro)` to sync CLAUDE.md/version manifest.
-- **Rollback**: `git restore -SW :/ && git clean -fd` to discard `package.json` changes and remove lockfile/node_modules; then reinstall.
+- **Landing page impact**: Performance regression analysis (before/after Lighthouse scores)
+- **Dependency hotspots**: Eleventy ESM compatibility, Vite plugins, PostCSS processors
+- **Skipped updates**: Tailwind CSS v4 (manual migration required), major Eleventy changes
+- **Payment integration**: Stripe SDK compatibility maintained, webhook signature validation
+- **Follow-ups**: Major version migration guides (Eleventy 4.x, Vite 8.x, Tailwind CSS v5)
+- **Docs update**: Run `/update-documentation` to sync CLAUDE.md with new versions
+- **Rollback**: `git restore package.json package-lock.json && npm install` to revert changes
 
 # 7) Decision Rules
-- Manager: `pnpm-lock.yaml` → pnpm; else `yarn.lock` → yarn; else npm.
-- Workspace: if detected and `workspace!="root"`, operate across packages; else root only.
-- Range style: keep existing style; if exact pins, bump exact safely.
-- Order of application: types → lint/format → bundler → UI libs → runtime.
-- If scope would exceed cap, apply top-impact groups and stop with a note.
+- Package manager: npm (confirmed by package-lock.json presence)
+- Range style: preserve existing caret (^) ranges for flexibility
+- Priority order: Vite/build tools → CSS/design → Stripe/payment → dev tools → utilities
+- Performance threshold: reject updates causing >5% Lighthouse score regression
+- Compatibility: maintain Node 22.17.1+ and Eleventy 3.x ESM requirements
+- If scope exceeds cap, prioritize build tools and payment integration first
 
 # 8) Examples
-- `deps:update (pro)`
-- `deps:update (pro) mode=majors-preview include="vite,eslint,@types/*"`
-- `deps:update (pro) workspace=all notes="keep Node 18"`
+- `deps:update (pro)` - safe minor/patch updates with performance auditing
+- `deps:update (pro) include="stripe,vite" test-stripe=true` - prioritize payment and build tools
+- `deps:update (pro) mode=majors-preview` - preview major version upgrades
+- `deps:update (pro) exclude="tailwindcss" notes="maintain v4 config"` - skip Tailwind updates
 
 # 9) Review Checklist
 - [ ] Only minor/patch unless `mode=majors-allow`
