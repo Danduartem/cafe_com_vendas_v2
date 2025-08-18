@@ -1,0 +1,152 @@
+{
+  "metadata": {
+    "version": "2.0.0",
+    "lastUpdated": "2025-08-18",
+    "totalAgents": 34,
+    "optimized": true,
+    "baseTemplate": "01-base-template.md",
+    "project": "cafe-com-vendas-v2"
+  },
+  "categories": {
+    "orchestrators": {
+      "description": "Coordinate multi-agent workflows for complex tasks",
+      "color": "🎭",
+      "agents": [
+        "orchestrator",
+        "landing-page-orchestrator",
+        "email-generator-orchestrator",
+        "online-bizplan-orchestrator",
+        "copy-pick-orchestrator",
+        "design-pick-orchestrator"
+      ]
+    },
+    "copywriting": {
+      "description": "Portuguese copy creation and optimization",
+      "color": "✍️",
+      "agents": [
+        "portuguese-copywriter",
+        "copy-variant-writer",
+        "copy-quality-specialist",
+        "angle-generator"
+      ]
+    },
+    "design": {
+      "description": "Visual design and user experience",
+      "color": "🎨",
+      "agents": [
+        "ui-designer",
+        "ux-designer",
+        "beauty-art-director",
+        "beauty-critic",
+        "design-compliance-specialist"
+      ]
+    },
+    "technical": {
+      "description": "Implementation and performance",
+      "color": "⚙️",
+      "agents": [
+        "eleventy-njk-specialist",
+        "gtm-analytics-tracker",
+        "stripe-event-specialist",
+        "performance-auditor",
+        "frontend-prototyper"
+      ]
+    },
+    "email": {
+      "description": "Email campaigns and automation",
+      "color": "📧",
+      "agents": [
+        "email-automation-specialist",
+        "email-generator-orchestrator"
+      ]
+    },
+    "strategy": {
+      "description": "Business strategy and analysis",
+      "color": "📊",
+      "agents": [
+        "conversion-optimizer",
+        "customer-insights",
+        "market-researcher",
+        "business-analyst",
+        "value-optimization-specialist",
+        "brief-intake-analyst",
+        "proof-curator",
+        "education-strategist",
+        "message-map-strategist",
+        "segmentation-architect",
+        "utility-librarian",
+        "cognitive-load-reviewer"
+      ]
+    }
+  },
+  "proactiveAgents": [
+    "orchestrator",
+    "conversion-optimizer",
+    "design-compliance-specialist",
+    "portuguese-copywriter",
+    "gtm-analytics-tracker",
+    "stripe-event-specialist",
+    "performance-auditor",
+    "eleventy-njk-specialist",
+    "email-automation-specialist"
+  ],
+  "quickAccess": {
+    "copy": "portuguese-copywriter",
+    "design": "design-compliance-specialist",
+    "performance": "performance-auditor",
+    "analytics": "gtm-analytics-tracker",
+    "payments": "stripe-event-specialist",
+    "email": "email-automation-specialist",
+    "coordinate": "orchestrator",
+    "landing": "landing-page-orchestrator",
+    "convert": "conversion-optimizer",
+    "research": "customer-insights"
+  },
+  "dependencies": {
+    "conversion-optimizer": ["portuguese-copywriter", "design-compliance-specialist"],
+    "design-compliance-specialist": ["performance-auditor"],
+    "portuguese-copywriter": ["copy-clarity-reviewer"],
+    "gtm-analytics-tracker": ["conversion-optimizer"],
+    "stripe-event-specialist": ["email-automation-specialist"],
+    "landing-page-orchestrator": ["portuguese-copywriter", "conversion-optimizer", "gtm-analytics-tracker", "design-compliance-specialist", "eleventy-njk-specialist", "performance-auditor"],
+    "email-generator-orchestrator": ["email-automation-specialist", "portuguese-copywriter"]
+  },
+  "workflows": {
+    "landingPageOptimization": {
+      "name": "Landing Page Optimization",
+      "sequence": [
+        {"agent": "conversion-optimizer", "task": "Funnel analysis"},
+        {"agent": "portuguese-copywriter", "task": "Copy improvements"},
+        {"agent": "design-compliance-specialist", "task": "Visual review"},
+        {"agent": "performance-auditor", "task": "Speed optimization"}
+      ]
+    },
+    "emailCampaign": {
+      "name": "Email Campaign Launch",
+      "sequence": [
+        {"agent": "email-automation-specialist", "task": "Campaign strategy"},
+        {"agent": "portuguese-copywriter", "task": "Email content"},
+        {"agent": "stripe-event-specialist", "task": "Payment triggers"},
+        {"agent": "gtm-analytics-tracker", "task": "Tracking setup"}
+      ]
+    },
+    "performanceAudit": {
+      "name": "Performance Optimization",
+      "sequence": [
+        {"agent": "performance-auditor", "task": "Baseline audit"},
+        {"agent": "eleventy-njk-specialist", "task": "Build optimization"},
+        {"agent": "design-compliance-specialist", "task": "CSS efficiency"},
+        {"agent": "performance-auditor", "task": "Validation"}
+      ]
+    },
+    "conversionOptimization": {
+      "name": "Conversion Rate Optimization",
+      "sequence": [
+        {"agent": "conversion-optimizer", "task": "Identify bottlenecks"},
+        {"agent": "portuguese-copywriter", "task": "Message refinement"},
+        {"agent": "design-compliance-specialist", "task": "CTA enhancement"},
+        {"agent": "gtm-analytics-tracker", "task": "Results measurement"}
+      ]
+    }
+  }
+}
