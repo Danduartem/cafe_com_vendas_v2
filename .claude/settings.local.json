@@ -47,10 +47,11 @@
       "Bash(node:*)",
       "Bash(chmod:*)",
       "Bash(npx:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(netlify dev:*)",
+      "Bash(stripe listen:*)"
     ],
     "deny": [],
     "ask": []
   }
-
 }

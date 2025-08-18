@@ -47,6 +47,10 @@ const CIRCUIT_BREAKER_CONFIG = {
   monitoringPeriod: 300000 // 5 minutes
 };
 
+// Fulfillment tracking to prevent duplicates
+const fulfillmentStore = new Map();
+const FULFILLMENT_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
 // Circuit breaker state management
 const circuitBreakers = new Map();
 
@@ -129,6 +133,46 @@ function getCircuitBreaker(serviceName) {
     circuitBreakers.set(serviceName, new CircuitBreaker(serviceName));
   }
   return circuitBreakers.get(serviceName);
+}
+
+/**
+ * Fulfillment tracking utilities for idempotency
+ */
+class FulfillmentTracker {
+  static cleanExpiredEntries() {
+    const now = Date.now();
+    for (const [key, entry] of fulfillmentStore.entries()) {
+      if (now - entry.timestamp > FULFILLMENT_CACHE_TTL) {
+        fulfillmentStore.delete(key);
+      }
+    }
+  }
+  
+  static isAlreadyFulfilled(key) {
+    this.cleanExpiredEntries();
+    return fulfillmentStore.has(key);
+  }
+  
+  static markAsFulfilled(key, metadata = {}) {
+    this.cleanExpiredEntries();
+    fulfillmentStore.set(key, {
+      timestamp: Date.now(),
+      fulfilled: true,
+      ...metadata
+    });
+  }
+  
+  static getFulfillmentInfo(key) {
+    this.cleanExpiredEntries();
+    return fulfillmentStore.get(key);
+  }
+  
+  static getStats() {
+    return {
+      size: fulfillmentStore.size,
+      maxAge: FULFILLMENT_CACHE_TTL
+    };
+  }
 }
 
 // Logging with correlation IDs
@@ -253,6 +297,14 @@ export const handler = async (event, context) => {
         await handleInvoicePaymentSucceeded(stripeEvent.data.object, correlationId);
         break;
 
+      case 'checkout.session.async_payment_succeeded':
+        await handleCheckoutSessionAsyncPaymentSucceeded(stripeEvent.data.object, correlationId);
+        break;
+
+      case 'checkout.session.async_payment_failed':
+        await handleCheckoutSessionAsyncPaymentFailed(stripeEvent.data.object, correlationId);
+        break;
+
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted':
@@ -274,6 +326,14 @@ export const handler = async (event, context) => {
     if (circuitBreakerStatuses.length > 0) {
       logWithCorrelation('info', 'Circuit breaker statuses', {
         circuitBreakers: circuitBreakerStatuses
+      }, correlationId);
+    }
+    
+    // Log fulfillment tracker stats for monitoring
+    const fulfillmentStats = FulfillmentTracker.getStats();
+    if (fulfillmentStats.size > 0) {
+      logWithCorrelation('info', 'Fulfillment tracker stats', {
+        fulfillmentTracker: fulfillmentStats
       }, correlationId);
     }
 
@@ -334,6 +394,19 @@ async function handlePaymentSuccess(paymentIntent, correlationId) {
   }, correlationId);
   
   try {
+    // Check if this payment has already been fulfilled
+    const fulfillmentKey = `payment_intent_${paymentIntent.id}`;
+    
+    if (FulfillmentTracker.isAlreadyFulfilled(fulfillmentKey)) {
+      const existingFulfillment = FulfillmentTracker.getFulfillmentInfo(fulfillmentKey);
+      logWithCorrelation('info', `Payment ${paymentIntent.id} already fulfilled`, {
+        paymentIntentId: paymentIntent.id,
+        existingFulfillment,
+        fulfillmentKey
+      }, correlationId);
+      return; // Skip duplicate fulfillment
+    }
+    
     // Extract customer information from metadata
     const metadata = paymentIntent.metadata;
     const customerEmail = metadata.customer_email;
@@ -385,9 +458,18 @@ async function handlePaymentSuccess(paymentIntent, correlationId) {
       event_date: metadata.event_date || '20/09/2024'
     });
 
+    // Mark as fulfilled to prevent duplicates
+    FulfillmentTracker.markAsFulfilled(fulfillmentKey, {
+      customerEmail,
+      paymentIntentId: paymentIntent.id,
+      fulfillmentType: 'payment_intent_succeeded',
+      fulfilledAt: new Date().toISOString()
+    });
+
     logWithCorrelation('info', `Successfully processed payment for ${customerEmail}`, {
       paymentIntentId: paymentIntent.id,
-      customerEmail
+      customerEmail,
+      fulfillmentKey
     }, correlationId);
 
   } catch (error) {
@@ -605,6 +687,193 @@ async function handleSubscriptionChange(subscription, eventType, correlationId) 
     status: subscription.status,
     eventType
   }, correlationId);
+}
+
+/**
+ * Handle successful async payments (delayed payment methods like Multibanco)
+ */
+async function handleCheckoutSessionAsyncPaymentSucceeded(session, correlationId) {
+  logWithCorrelation('info', `Async payment succeeded: ${session.id}`, {
+    sessionId: session.id,
+    paymentIntent: session.payment_intent,
+    amount: session.amount_total,
+    currency: session.currency,
+    paymentStatus: session.payment_status
+  }, correlationId);
+  
+  try {
+    // Retrieve full session with expanded data
+    const fullSession = await retryWithBackoff(() =>
+      stripe.checkout.sessions.retrieve(session.id, {
+        expand: ['line_items', 'payment_intent']
+      })
+    );
+
+    // Extract customer information from session
+    const customerEmail = fullSession.customer_details?.email || fullSession.metadata?.customer_email;
+    const customerName = fullSession.customer_details?.name || fullSession.metadata?.customer_name;
+    const customerPhone = fullSession.metadata?.customer_phone;
+    const leadId = fullSession.metadata?.lead_id;
+
+    if (!customerEmail || !customerName) {
+      throw new Error('Missing customer information in checkout session');
+    }
+
+    // Check if this session has already been fulfilled to prevent duplicates
+    const fulfillmentKey = `checkout_session_${fullSession.id}`;
+    const paymentIntentKey = fullSession.payment_intent?.id ? `payment_intent_${fullSession.payment_intent.id}` : null;
+    
+    // Check both session and payment intent fulfillment to handle edge cases
+    if (FulfillmentTracker.isAlreadyFulfilled(fulfillmentKey) || 
+        (paymentIntentKey && FulfillmentTracker.isAlreadyFulfilled(paymentIntentKey))) {
+      const existingFulfillment = FulfillmentTracker.getFulfillmentInfo(fulfillmentKey) || 
+                                 FulfillmentTracker.getFulfillmentInfo(paymentIntentKey);
+      logWithCorrelation('info', `Session ${fullSession.id} already fulfilled`, {
+        sessionId: fullSession.id,
+        existingFulfillment,
+        fulfillmentKey,
+        paymentIntentKey
+      }, correlationId);
+      return; // Skip duplicate fulfillment
+    }
+    
+    logWithCorrelation('info', `Processing delayed payment fulfillment for session ${fullSession.id}`, {
+      sessionId: fullSession.id,
+      customerEmail,
+      paymentIntent: fullSession.payment_intent?.id || fullSession.payment_intent,
+      fulfillmentKey
+    }, correlationId);
+
+    // Add customer to MailerLite with retry logic and circuit breaker
+    try {
+      await retryWithBackoff(() => addToMailerLite({
+        email: customerEmail,
+        name: customerName,
+        phone: customerPhone,
+        fields: {
+          lead_id: leadId,
+          payment_status: 'paid',
+          payment_intent_id: fullSession.payment_intent?.id || fullSession.payment_intent,
+          session_id: fullSession.id,
+          amount_paid: fullSession.amount_total / 100, // Convert from cents
+          currency: fullSession.currency?.toUpperCase() || 'EUR',
+          event_name: fullSession.metadata?.event_name || 'Café com Vendas',
+          event_date: fullSession.metadata?.event_date || '2024-09-20',
+          spot_type: fullSession.metadata?.spot_type || 'first_lot_early_bird',
+          source: 'checkout_async_payment',
+          payment_date: new Date().toISOString(),
+          payment_method: 'delayed_notification', // Indicates Multibanco/delayed method
+          utm_source: fullSession.metadata?.utm_source || null,
+          utm_medium: fullSession.metadata?.utm_medium || null,
+          utm_campaign: fullSession.metadata?.utm_campaign || null,
+          fulfillment_trigger: 'async_payment_succeeded'
+        }
+      }));
+    } catch (error) {
+      // Log error but don't fail the webhook processing
+      logWithCorrelation('error', 'Failed to add customer to MailerLite after retries (async payment)', {
+        error: error.message,
+        customerEmail,
+        sessionId: fullSession.id
+      }, correlationId);
+    }
+
+    // Send confirmation email (via MailerLite automation)
+    await triggerConfirmationEmail(customerEmail, {
+      name: customerName,
+      amount: fullSession.amount_total / 100,
+      currency: fullSession.currency?.toUpperCase() || 'EUR',
+      event_name: fullSession.metadata?.event_name || 'Café com Vendas',
+      event_date: fullSession.metadata?.event_date || '20/09/2024',
+      payment_method: 'Multibanco'
+    });
+
+    // Mark both session and payment intent as fulfilled to prevent duplicates
+    FulfillmentTracker.markAsFulfilled(fulfillmentKey, {
+      customerEmail,
+      sessionId: fullSession.id,
+      paymentIntentId: fullSession.payment_intent?.id || fullSession.payment_intent,
+      fulfillmentType: 'checkout_session_async_payment_succeeded',
+      fulfilledAt: new Date().toISOString()
+    });
+    
+    // Also mark payment intent to prevent duplicate processing from payment_intent.succeeded
+    if (paymentIntentKey) {
+      FulfillmentTracker.markAsFulfilled(paymentIntentKey, {
+        customerEmail,
+        sessionId: fullSession.id,
+        paymentIntentId: fullSession.payment_intent.id,
+        fulfillmentType: 'async_payment_cross_reference',
+        fulfilledAt: new Date().toISOString()
+      });
+    }
+
+    logWithCorrelation('info', `Successfully processed async payment for ${customerEmail}`, {
+      sessionId: fullSession.id,
+      customerEmail,
+      paymentIntent: fullSession.payment_intent?.id || fullSession.payment_intent,
+      fulfillmentKey,
+      paymentIntentKey
+    }, correlationId);
+
+  } catch (error) {
+    logWithCorrelation('error', 'Error processing async payment success', {
+      error: error.message,
+      sessionId: session.id,
+      stack: error.stack
+    }, correlationId);
+    // Don't throw - we don't want to retry webhook
+  }
+}
+
+/**
+ * Handle failed async payments (delayed payment methods like Multibanco)
+ */
+async function handleCheckoutSessionAsyncPaymentFailed(session, correlationId) {
+  logWithCorrelation('warn', `Async payment failed: ${session.id}`, {
+    sessionId: session.id,
+    paymentIntent: session.payment_intent,
+    amount: session.amount_total,
+    currency: session.currency
+  }, correlationId);
+  
+  try {
+    // Retrieve full session with expanded data
+    const fullSession = await retryWithBackoff(() =>
+      stripe.checkout.sessions.retrieve(session.id, {
+        expand: ['line_items', 'payment_intent']
+      })
+    );
+
+    const customerEmail = fullSession.customer_details?.email || fullSession.metadata?.customer_email;
+    const customerName = fullSession.customer_details?.name || fullSession.metadata?.customer_name;
+    
+    if (customerEmail) {
+      // Update MailerLite with failed status using retry logic
+      await retryWithBackoff(() => updateMailerLiteSubscriber(customerEmail, {
+        payment_status: 'failed_async',
+        session_id: fullSession.id,
+        failure_date: new Date().toISOString(),
+        failure_reason: 'Async payment method failed (e.g., Multibanco timeout)',
+        payment_method: 'delayed_notification'
+      }));
+
+      // Trigger abandoned cart email sequence for failed async payment
+      await retryWithBackoff(() => triggerAbandonedCartEmail(customerEmail, {
+        name: customerName,
+        amount: fullSession.amount_total / 100,
+        currency: fullSession.currency?.toUpperCase() || 'EUR',
+        failure_reason: 'Payment expired or failed to complete',
+        payment_method: 'Multibanco'
+      }));
+    }
+    
+  } catch (error) {
+    logWithCorrelation('error', 'Error processing async payment failure', {
+      error: error.message,
+      sessionId: session.id
+    }, correlationId);
+  }
 }
 
 /**
