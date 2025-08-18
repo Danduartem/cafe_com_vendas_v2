@@ -12,10 +12,12 @@ Premium landing page for an intimate business transformation event in Lisbon, de
 
 ## 🛠 Tech Stack
 
-- **Framework**: [Eleventy](https://www.11ty.dev/) (Static Site Generator)
+- **Framework**: [Eleventy](https://www.11ty.dev/) 3.1.2 (Static Site Generator)
 - **Templating**: Nunjucks (.njk files)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) + PostCSS (pure CSS-based configuration)
-- **Build Tool**: [Vite](https://vite.dev/) (ES6 modules → optimized bundle)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) 4.1.12 + PostCSS 8.5.6 (pure CSS-based configuration)
+- **Build Tool**: [Vite](https://vite.dev/) 7.1.2 (ES6 modules → optimized bundle)
+- **Runtime**: Node.js 22.18.0 (LTS) + npm 10.9.3
+- **Payments**: Stripe 18.4.0 (Node.js SDK)
 - **Design System**: JSON tokens → CSS custom properties
 - **Fonts**: Local Lora (display) + Century Gothic (body)
 - **JavaScript**: Modular ES6 architecture (performance optimized)
@@ -67,12 +69,31 @@ npm run clean
 │   ├── CONTENT_copy_library.md       # Copy examples & headlines
 │   ├── GUIDE_voice_tone.md           # Voice & tone guidelines
 │   ├── GUIDE_brand_visual.md         # Brand guidelines
-│   ├── GUIDE_claude_instructions.md  # Claude context & instructions
 │   └── BUILD_landing_page.md         # Development blueprint
-├── .claude/                    # Custom Claude Code commands
-│   └── commands/
-│       ├── update-libs.md      # Dependency update command
-│       └── update-refactor.md  # Code refactoring command
+├── docs/                       # Technical documentation
+│   ├── GTM_SETUP_GUIDE.md      # Google Tag Manager configuration
+│   ├── DEVELOPMENT_GUIDELINES.md    # Security & code patterns
+│   ├── ACCESSIBILITY_GUIDELINES.md  # WCAG AA compliance guide
+│   └── STRIPE_TEST_CARDS.md     # Payment testing procedures
+├── .claude/                    # Custom Claude Code commands (14 total)
+│   ├── commands/
+│   │   ├── update-libs.md      # Dependency updates
+│   │   ├── update-refactor.md  # Code refactoring
+│   │   ├── commit.md           # Smart git commits
+│   │   ├── push.md             # Safe deployment
+│   │   ├── lighthouse.md       # Performance audits
+│   │   ├── stripe-test.md      # Payment testing
+│   │   ├── copy-pick.md        # Copy optimization
+│   │   ├── design-pick.md      # Design prototyping
+│   │   ├── conversion-optimize.md   # CRO techniques
+│   │   ├── landing-page-strategy.md # Strategic optimization
+│   │   ├── email-generator.md  # Email campaigns
+│   │   ├── online-bizplan.md   # Business planning
+│   │   └── rollback-deploy.md  # Emergency procedures
+│   └── agents/                 # Specialized AI agents (9 total)
+├── bizplan/                    # Business strategy artifacts
+├── copy-pick/                  # Copy optimization experiments
+├── strategy/                   # Strategic planning materials
 └── CLAUDE.md                   # AI development guidelines
 ```
 
@@ -126,16 +147,28 @@ The design system is centralized in `info/DATA_design_tokens.json` and automatic
 
 ## 📊 Analytics & Conversion
 
-- **Google Tag Manager (GTM)** loaded via module (no inline JS) with noscript iframe fallback
-- **Google Analytics 4** events dispatched via app modules (optional through GTM)
-- **Stripe** payment integration  
-- **WhatsApp** direct contact button
-- **Performance tracking** (LCP, scroll depth, CTAs)
+- **Google Tag Manager (GTM)** with advanced lazy loading (Container: GTM-T63QRLFT)
+- **Google Analytics 4** events via GTM dataLayer (no direct gtag calls)
+- **Performance Tracking** - Core Web Vitals (LCP, CLS, FID), scroll depth, engagement
+- **Conversion Tracking** - Complete funnel from checkout to payment completion
+- **Error Monitoring** - JavaScript error tracking for improved UX
+- **Stripe** payment integration with conversion events
+- **WhatsApp** contact tracking
 
-### GTM Setup
-- Set `VITE_GTM_CONTAINER_ID` in Netlify environment variables (e.g., `GTM-XXXXXXX`).
-- GTM loads from `src/assets/js/components/gtm.js` (pushes `gtm.start` to `dataLayer` then injects `gtm.js`).
-- Noscript iframe is rendered only when `site.analytics.gtmId` is present (mapped from `VITE_GTM_CONTAINER_ID`).
+### GTM Advanced Features
+- **3-Tier Lazy Loading**: Conversion intent → Engagement → Fallback (10-15s)
+- **22+ Tracked Events**: Performance, user behavior, conversions, errors
+- **Performance Optimized**: GTM loads only when user shows purchase intent
+- **DataLayer Architecture**: All events flow through `window.dataLayer` → GTM → GA4
+
+### GTM Environment Setup
+```bash
+VITE_GTM_CONTAINER_ID=GTM-T63QRLFT
+```
+- Production: Configure in Netlify environment variables
+- Local: Add to `.env.local` for development testing
+- Implementation: `src/assets/js/components/gtm.js` with CSP-compliant loading
+- Complete guide: `docs/GTM_SETUP_GUIDE.md`
 
 ## 🔒 Security Features
 
@@ -154,17 +187,25 @@ The design system is centralized in `info/DATA_design_tokens.json` and automatic
 ## 📈 Performance Metrics
 
 ### Latest Lighthouse Scores (Aug 2025)
-- **Performance**: 84/100 (Mobile), 90+ (Desktop)
-- **Accessibility**: 95/100
-- **Best Practices**: 100/100
-- **SEO**: 95/100
+- **Performance**: 82/100 (Mobile), 99/100 (Desktop) 
+- **Accessibility**: 96/100 (Desktop) - WCAG AA compliance
+- **Best Practices**: 100/100 (Desktop) - Perfect security & performance
+- **SEO**: 100/100 (Desktop) - Full search optimization
 
-### Optimizations Implemented
+### Core Web Vitals (Desktop Results)
+- **LCP (Largest Contentful Paint)**: 0.9s (96/100 score) - Excellent
+- **FCP (First Contentful Paint)**: 0.7s (97/100 score) - Excellent  
+- **CLS (Cumulative Layout Shift)**: 0.00005 (100/100 score) - Perfect
+- **TBT (Total Blocking Time)**: 0ms (100/100 score) - Perfect
+
+### Performance Optimizations Implemented
+- **GTM Lazy Loading**: 3-tier loading strategy reduces initial payload
 - **Stripe.js Lazy Loading**: -187 KiB (-1.65s) from initial load
-- **Image Optimization**: WebP format with lazy loading
+- **Image Optimization**: WebP format with Cloudinary CDN
 - **Font Optimization**: Local fonts with proper preloading
-- **JavaScript**: Tree-shaken ES6 modules (41 KiB gzipped)
+- **JavaScript**: Tree-shaken ES6 modules, minimal bundle size
 - **CSS**: Pure Tailwind utilities with PostCSS optimization
+- **Error Tracking**: JavaScript error monitoring for UX quality
 
 ## 🚀 Deployment
 
@@ -173,8 +214,8 @@ Built static files are generated in `_site/` and deployed to Netlify with automa
 ### Environment Variables
 - `VITE_STRIPE_PUBLIC_KEY` (publishable)
 - `STRIPE_SECRET_KEY` (functions)
-- `VITE_FORMSPREE_FORM_ID`
-- `VITE_GTM_CONTAINER_ID`
+- `VITE_GTM_CONTAINER_ID=GTM-T63QRLFT` (analytics)
+- `VITE_FORMSPREE_FORM_ID` (optional contact forms)
 
 ### Netlify Secrets Scanning
 `netlify.toml` is configured to omit scanning for:

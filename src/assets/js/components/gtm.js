@@ -6,19 +6,58 @@ import { ENV } from '../config/constants.js';
 
 export const GTM = {
   loaded: false,
+
   init() {
     try {
       const containerId = ENV.gtm?.containerId || '';
       if (!containerId) return;
 
       // Initialize dataLayer immediately for early events
-      window.dataLayer = window.dataLayer || [];
+      this.initializeDataLayer();
 
       // Delay GTM loading until user interaction or page idle (optimized for performance)
       this.setupLazyLoading(containerId);
     } catch {
       // no-op; analytics should not block UX
     }
+  },
+
+  /**
+   * Initialize dataLayer with proper structure for GTM
+   */
+  initializeDataLayer() {
+    window.dataLayer = window.dataLayer || [];
+
+    // Push initial page data for GTM
+    window.dataLayer.push({
+      event: 'gtm_init',
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname
+    });
+  },
+
+  /**
+   * Helper function for consistent dataLayer event structure
+   */
+  pushEvent(eventName, parameters = {}) {
+    if (!window.dataLayer) {
+      this.initializeDataLayer();
+    }
+
+    window.dataLayer.push({
+      event: eventName,
+      ...parameters
+    });
+  },
+
+  /**
+   * Helper for enhanced ecommerce events
+   */
+  pushEcommerceEvent(eventName, ecommerceData) {
+    this.pushEvent(eventName, {
+      ecommerce: ecommerceData
+    });
   },
 
   setupLazyLoading(containerId) {

@@ -12,16 +12,26 @@ export const Analytics = {
   errors: new Set(),
 
   /**
-     * Track event with Google Analytics if available
+     * Track event via GTM dataLayer (GTM → GA4 flow)
      */
   track(eventName, parameters = {}) {
     try {
       // Console logging for debugging
       console.log(`Analytics: ${eventName}`, parameters);
 
-      // Google Analytics integration
-      if (typeof gtag !== 'undefined') {
-        gtag('event', eventName, parameters);
+      // Send to GTM dataLayer instead of direct gtag
+      if (window.dataLayer) {
+        window.dataLayer.push({
+          event: eventName,
+          ...parameters
+        });
+      } else {
+        // Fallback: queue event if dataLayer not yet available
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: eventName,
+          ...parameters
+        });
       }
 
       // Track to performance timeline for debugging

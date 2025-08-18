@@ -70,6 +70,9 @@ STRIPE_SECRET_KEY=sk_...           # Stripe secret key
 VITE_STRIPE_PUBLIC_KEY=pk_...      # Stripe public key  
 STRIPE_WEBHOOK_SECRET=whsec_...    # Stripe webhook signature verification
 
+# Analytics Configuration (required for tracking)
+VITE_GTM_CONTAINER_ID=GTM-T63QRLFT # Google Tag Manager container ID
+
 # Cloudinary Configuration (for image optimization)
 CLOUDINARY_CLOUD_NAME=your-cloud-name  # Cloudinary cloud name for image CDN
 
@@ -106,14 +109,37 @@ Test the checkout flow with Stripe test cards:
 
 Custom commands available in `.claude/commands/`:
 
+### **Development & Code Quality**
 ```bash
 /update-libs           # Update all dependencies to latest stable versions
 /update-refactor       # Refactor code to leverage latest framework features  
 /commit                # Smart git commits with conventional messages
 /push                  # Safely push current branch with checks and PR option
-/lighthouse            # Run comprehensive Lighthouse performance audits
 /update-documentation  # Sync all docs with current codebase state
+/rollback-deploy       # Emergency rollback procedures for production issues
 ```
+
+### **Performance & Testing**
+```bash
+/lighthouse            # Run comprehensive Lighthouse performance audits
+/stripe-test           # Complete Stripe payment testing with Portuguese cards
+```
+
+### **Content & Strategy**
+```bash
+/copy-pick             # Generate and compare multiple copy variations
+/design-pick           # Create and evaluate different design prototypes
+/landing-page-strategy # Strategic landing page optimization framework
+/conversion-optimize   # Advanced conversion rate optimization techniques
+```
+
+### **Business Intelligence**
+```bash
+/email-generator       # Generate email campaigns for Portuguese female entrepreneurs
+/online-bizplan        # Comprehensive online business planning and growth strategies
+```
+
+**Total**: 14 specialized commands for complete project lifecycle management
 
 ## Structure
 ```
@@ -166,25 +192,60 @@ info/                       # Design system & content
 ├── DATA_design_tokens.json      # Unified design system
 ├── DATA_event.json              # Event data (prices, dates)
 ├── DATA_avatar.json             # Persona & objections
+├── DATA_faq.json                # FAQ data structure
 ├── CONTENT_copy_library.md      # Copy examples & headlines
 ├── GUIDE_voice_tone.md          # Voice & tone guidelines
 ├── GUIDE_brand_visual.md        # Brand guidelines
-├── GUIDE_claude_instructions.md # Claude context & instructions
 ├── BUILD_landing_page.md        # Development blueprint
-└── *.md                         # Other guidelines
+└── angles-library.json          # Marketing angles library
 
-vite.config.js              # Vite bundler configuration
+docs/                       # Technical documentation
+├── GTM_SETUP_GUIDE.md      # Google Tag Manager setup (22+ events)
+├── DEVELOPMENT_GUIDELINES.md    # Security & performance patterns
+├── ACCESSIBILITY_GUIDELINES.md  # WCAG AA compliance guide
+├── PERFORMANCE_MONITORING.md    # Core Web Vitals tracking
+├── STRIPE_TEST_CARDS.md     # Payment testing procedures
+├── CLOUDINARY_SETUP.md      # Image optimization setup
+└── SECURITY_BEST_PRACTICES.md  # Security implementation guide
+
+bizplan/                    # Business strategy artifacts
+copy-pick/                  # Copy optimization experiments
+strategy/                   # Strategic planning materials
+
+vite.config.js              # Vite 7.1.2 bundler configuration
 netlify/                    # Netlify Functions
+├── edge-functions/
+│   └── csp.js             # Content Security Policy edge function
 ├── functions/
 │   ├── create-payment-intent.js # Stripe payment processing
 │   └── stripe-webhook.js   # Stripe webhook handler
-.claude/                    # Custom Claude Code commands
+
+.claude/                    # Custom Claude Code commands (14 total)
 ├── commands/
 │   ├── commit.md           # Smart git commits
 │   ├── push.md             # Safe git push with checks
 │   ├── update-libs.md      # Dependency update command
 │   ├── update-refactor.md  # Code refactoring command
-│   └── update-documentation.md # Documentation sync
+│   ├── update-documentation.md # Documentation sync
+│   ├── lighthouse.md       # Performance audits
+│   ├── stripe-test.md      # Payment testing workflows
+│   ├── rollback-deploy.md  # Emergency rollback procedures
+│   ├── copy-pick.md        # Copy optimization experiments
+│   ├── design-pick.md      # Design prototype generation
+│   ├── conversion-optimize.md   # CRO techniques
+│   ├── landing-page-strategy.md # Strategic optimization
+│   ├── email-generator.md  # Email campaign generation
+│   └── online-bizplan.md   # Business planning workflows
+└── agents/                 # Specialized AI agents (9 total)
+    ├── brief-intake-analyst.md      # Campaign validation
+    ├── business-analyst.md          # KPI & metrics analysis
+    ├── cognitive-load-reviewer.md   # UX content optimization
+    ├── customer-insights.md         # Persona & journey mapping
+    ├── education-strategist.md      # Content education frameworks
+    ├── market-researcher.md         # TAM/SAM analysis
+    ├── proof-curator.md             # Social proof selection
+    ├── utility-librarian.md         # Value block management
+    └── value-architect.md           # Micro-wins definition
 ```
 
 ## Critical Rules
@@ -309,10 +370,14 @@ async loadScript(url) {
 - **Development**: Source maps enabled for debugging
 - **Production**: Minified and tree-shaken for performance
 
-### Analytics via GTM
-- GTM module: `src/assets/js/components/gtm.js` (no inline JS)
-- ENV: `VITE_GTM_CONTAINER_ID` (set in Netlify). Exposed to templates as `site.analytics.gtmId` for noscript iframe.
-- CSP: `frame-src` allows `https://www.googletagmanager.com`.
+### Analytics via GTM (Container: GTM-T63QRLFT)
+- **GTM module**: `src/assets/js/components/gtm.js` with advanced lazy loading (no inline JS)
+- **Environment**: `VITE_GTM_CONTAINER_ID=GTM-T63QRLFT` (set in Netlify). Exposed as `site.analytics.gtmId`
+- **DataLayer**: All events flow through `window.dataLayer` → GTM → GA4 (no direct gtag calls)
+- **Loading Strategy**: 3-tier lazy loading (conversion intent → engagement → fallback)
+- **CSP**: `frame-src` allows `https://www.googletagmanager.com`
+- **Performance**: GTM loads only when user shows purchase intent or meaningful engagement
+- **Complete Guide**: See `docs/GTM_SETUP_GUIDE.md` for 22+ tracked events and setup
 
 **Component Creation Pattern**:
 1. Create `.njk` template in `src/_includes/components/`
@@ -581,7 +646,7 @@ When any slash command is invoked:
 ### Environment Variables Setup
 1. **Local Development**: Create `.env.local` with Stripe test keys
 2. **Production**: Configure in Netlify → Site Settings → Environment Variables
-   - `VITE_GTM_CONTAINER_ID=GTM-XXXXXXX`
+   - `VITE_GTM_CONTAINER_ID=GTM-T63QRLFT`
 3. **Webhook URL**: `https://yourdomain.com/.netlify/functions/stripe-webhook`
 
 ### Pre-deployment Checklist
@@ -591,7 +656,9 @@ When any slash command is invoked:
 - [ ] All payment flows tested
 - [ ] Forms submission working
 - [ ] Analytics tracking verified
-  - GTM loads (check `gtm.js` in Network) and `dataLayer` receives events
+  - GTM loads lazily on user interaction (check Network tab for `gtm.js`)
+  - DataLayer receives events (check `window.dataLayer` in console)
+  - 22+ events tracked including Core Web Vitals, conversions, and engagement
 - [ ] Performance audit passed (>90 Lighthouse score)
 
 ### Security Considerations

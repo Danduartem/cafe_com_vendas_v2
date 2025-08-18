@@ -8,6 +8,108 @@ import { ENV } from '../config/constants.js';
 import { Analytics } from '../core/analytics.js';
 import { safeQuery } from '../utils/index.js';
 
+// Pricing tier detection for dynamic analytics
+const PricingManager = {
+  // Event data cache (would be loaded from API in production)
+  eventData: {
+    pricing: {
+      currency: 'EUR',
+      tiers: [
+        {
+          id: 'first_lot_early_bird',
+          label: 'Primeiro lote (8 vagas)',
+          price: 180,
+          vat: true,
+          discountPercent: 25,
+          capacity: 8,
+          notes: 'Mais de 25% de desconto + brindes exclusivos'
+        },
+        {
+          id: 'second_lot',
+          label: 'Segundo lote',
+          price: 240,
+          vat: true,
+          discountPercent: 0,
+          capacity: 12,
+          notes: 'Preço regular'
+        }
+      ]
+    }
+  },
+
+  // Simulate current tier detection
+  // In production, this would check sales count via API or local storage
+  getCurrentPricingTier() {
+    // Logic to determine current active tier
+    // For now, you can manually switch between tiers for testing
+    const currentSalesCount = this.getCurrentSalesCount();
+
+    // Determine which tier is currently active
+    let activeTier = this.eventData.pricing.tiers[0]; // Default to first tier
+    let totalCapacityUsed = 0;
+
+    for (const tier of this.eventData.pricing.tiers) {
+      if (currentSalesCount < (totalCapacityUsed + tier.capacity)) {
+        activeTier = tier;
+        break;
+      }
+      totalCapacityUsed += tier.capacity;
+    }
+
+    return {
+      tier_id: activeTier.id,
+      price: activeTier.price,
+      currency: this.eventData.pricing.currency,
+      label: activeTier.label,
+      discount_percent: activeTier.discountPercent,
+      sales_count: currentSalesCount,
+      capacity_remaining: (totalCapacityUsed + activeTier.capacity) - currentSalesCount
+    };
+  },
+
+  // Simulate sales count - in production this would come from your backend
+  getCurrentSalesCount() {
+    // You can modify this number to test different tiers
+    // 0-7: first tier active (€180)
+    // 8+: second tier active (€240)
+    return parseInt(localStorage.getItem('cafecomvendas_sales_count') || '0', 10);
+  },
+
+  // Utility to manually set sales count for testing
+  setSalesCountForTesting(count) {
+    localStorage.setItem('cafecomvendas_sales_count', count.toString());
+    console.log(`🧪 Testing: Sales count set to ${count}`);
+
+    const tier = this.getCurrentPricingTier();
+    console.log(`🎯 Active tier: ${tier.label} (€${tier.price})`);
+  },
+
+  // Convert Stripe amount (cents) to euros
+  stripeAmountToEuros(amountInCents) {
+    return Math.round(amountInCents / 100);
+  },
+
+  // Get pricing display info for UI
+  getPricingDisplayInfo() {
+    const tier = this.getCurrentPricingTier();
+    return {
+      price: tier.price,
+      currency: 'EUR',
+      formatted: `€${tier.price}`,
+      tier_label: tier.label,
+      discount: tier.discount_percent > 0 ? `${tier.discount_percent}% desconto` : null,
+      urgency: tier.capacity_remaining <= 3 ? `Apenas ${tier.capacity_remaining} vagas restantes` : null
+    };
+  }
+};
+
+// Make PricingManager available globally for testing
+if (ENV.isDevelopment) {
+  window.PricingManager = PricingManager;
+  console.log('🧪 PricingManager available globally for testing');
+  console.log('🧪 Try: PricingManager.setSalesCountForTesting(5) or PricingManager.setSalesCountForTesting(10)');
+}
+
 export const Checkout = {
   // Component state
   stripe: null,
@@ -165,9 +267,15 @@ export const Checkout = {
     event.preventDefault();
     this.openModal();
 
-    // Track analytics
+    // Get current pricing tier for analytics
+    const currentTier = PricingManager.getCurrentPricingTier();
+
+    // Track analytics with dynamic pricing data
     Analytics.track('checkout_opened', {
-      source: event.target.closest('[data-checkout-trigger]')?.getAttribute('data-source') || 'unknown'
+      source: event.target.closest('[data-checkout-trigger]')?.getAttribute('data-source') || 'unknown',
+      amount: currentTier.price,
+      currency: currentTier.currency,
+      pricing_tier: currentTier.tier_id
     });
   },
 
@@ -477,11 +585,17 @@ export const Checkout = {
         // Payment successful
         this.setStep('success');
 
-        // Track successful payment
+        // Get pricing tier for analytics
+        const currentTier = PricingManager.getCurrentPricingTier();
+
+        // Track successful payment with dynamic pricing data
         Analytics.track('payment_completed', {
+          transaction_id: paymentIntent.id,
           lead_id: this.leadId,
-          payment_intent_id: paymentIntent.id,
-          amount: paymentIntent.amount
+          amount: PricingManager.stripeAmountToEuros(paymentIntent.amount),
+          currency: currentTier.currency,
+          pricing_tier: currentTier.tier_id,
+          payment_intent_id: paymentIntent.id
         });
 
         // Redirect to thank you page after delay

@@ -9,10 +9,40 @@ Este guia fornece instruções passo a passo para configurar o Google Tag Manage
 
 ### ✅ Status Atual
 - **Container ID**: GTM-T63QRLFT
-- **Implementação**: ✅ Completa e funcional
+- **Implementação**: ✅ Completa e funcional  
 - **DataLayer**: ✅ Configurado e ativo
-- **Lazy Loading**: ✅ Otimizado para performance
+- **Lazy Loading**: ✅ Otimizado para performance (estratégia avançada)
 - **CSP Compliance**: ✅ Seguro (sem scripts inline)
+- **Performance Optimized**: ✅ Carregamento sob demanda para conversão
+
+### 🚀 Estratégia de Lazy Loading Implementada
+
+O GTM é carregado dinamicamente usando uma estratégia otimizada de três níveis:
+
+#### **Nível 1: Triggers de Conversão Imediata**
+GTM carrega instantaneamente quando o usuário demonstra intenção de compra:
+- Clique em botões CTA (`[data-analytics-event*="cta"]`)
+- Interação com checkout (`[data-analytics-event*="checkout"]`)
+- Clique em botões de oferta (`[data-analytics-event*="offer"]`)
+- Links para seção de oferta (`a[href*="#oferta"]`)
+
+#### **Nível 2: Triggers de Engajamento Significativo**
+GTM carrega quando o usuário mostra engajamento profundo:
+- **Scroll 25%**: Usuário passou da seção hero
+- **Interação FAQ**: Clique em perguntas frequentes
+- **Engajamento prolongado**: Mais de 25% da página visualizada
+
+#### **Nível 3: Fallback Progressivo**
+Sistema de backup para garantir o carregamento:
+- **10 segundos**: Tempo mínimo antes de qualquer carregamento automático
+- **Idle Detection**: Usa `requestIdleCallback()` quando browser está inativo
+- **15 segundos máximo**: Carregamento garantido após esse tempo
+
+### 📊 Benefícios da Estratégia
+- **Performance**: Reduz tempo de carregamento inicial
+- **Conversão**: Carrega imediatamente quando usuário mostra intenção
+- **Engajamento**: Detecta interesse real antes de carregar scripts
+- **Compatibilidade**: Funciona em todos os browsers com fallbacks
 
 ---
 
@@ -37,6 +67,7 @@ Configure estas variáveis no GTM para capturar os dados enviados pela sua aplic
 
 ### Variáveis Built-in Necessárias
 Ative em **Variables > Built-In Variables > Configure**:
+- ✅ **Event** (captura automaticamente o nome do evento do dataLayer)
 - ✅ Page URL
 - ✅ Page Title
 - ✅ Page Path
@@ -51,6 +82,17 @@ Ative em **Variables > Built-In Variables > Configure**:
 - ✅ Scroll Direction
 
 ### Variáveis Personalizadas
+
+#### Event Settings Variable (Opcional)
+**Nome**: GA4 Event Settings - Global
+**Tipo**: Google Analytics: GA4 Event Settings
+**Parâmetros** (exemplo para configuração avançada):
+- `page_location`: {{Page URL}}
+- `page_title`: {{Page Title}}  
+- `user_engagement`: true
+- `cafe_com_vendas_version`: v2025
+
+**⚠️ Nota**: Para o seu projeto, parâmetros diretos nas tags são mais simples e eficientes.
 
 #### 1. Event Category
 - **Tipo**: Data Layer Variable
@@ -77,102 +119,236 @@ Ative em **Variables > Built-In Variables > Configure**:
 - **Nome da Variável**: metric_value
 - **Nome**: DL - Metric Value
 
+#### 6. Transaction ID
+- **Tipo**: Data Layer Variable
+- **Nome da Variável**: transaction_id
+- **Nome**: DL - Transaction ID
+
+#### 7. Error Message
+- **Tipo**: Data Layer Variable
+- **Nome da Variável**: error_message
+- **Nome**: DL - Error Message
+
+#### 8. Error Stack
+- **Tipo**: Data Layer Variable
+- **Nome da Variável**: error_stack
+- **Nome**: DL - Error Stack
+
+#### 9. FAQ Label
+- **Tipo**: Data Layer Variable
+- **Nome da Variável**: label
+- **Nome**: DL - FAQ Label
+
+#### 10. Is Open State
+- **Tipo**: Data Layer Variable
+- **Nome da Variável**: is_open
+- **Nome**: DL - Is Open State
+
+#### 11. Email Address
+- **Tipo**: Data Layer Variable
+- **Nome da Variável**: email
+- **Nome**: DL - Email Address
+
+#### 12. Purchase Value (Dynamic Pricing)
+- **Tipo**: Data Layer Variable
+- **Nome da Variável**: amount
+- **Nome**: DL - Purchase Value
+- **Descrição**: Valor dinâmico da compra em euros (€180 primeiro lote, valores superiores depois)
+
+#### 13. Currency Code
+- **Tipo**: Data Layer Variable
+- **Nome da Variável**: currency
+- **Nome**: DL - Currency Code
+
+#### 14. Pricing Tier
+- **Tipo**: Data Layer Variable
+- **Nome da Variável**: pricing_tier
+- **Nome**: DL - Pricing Tier
+- **Descrição**: Identifica o lote de pricing (first_lot_early_bird, second_lot, etc.)
+
 ---
 
 ## 🎯 3. Triggers (Gatilhos)
 
 Configure os seguintes triggers para capturar eventos específicos:
 
-### 1. Page View Trigger
+### 1. Page View - All Pages
 - **Nome**: Page View - All Pages
 - **Tipo**: Page View
-- **Condição**: All Pages (sem filtros de URL)
+- **This trigger fires on**: All Pages
+- **Condições de Ativação**: (nenhuma - dispara em todas as páginas)
 
 ### 2. Checkout Opened
 - **Nome**: Checkout Opened
 - **Tipo**: Custom Event
 - **Event Name**: checkout_opened
-- **Condições de Ativação**: 
-  - Event equals `checkout_opened`
+- **This trigger fires on**: Some Custom Events
+- **Condições de Ativação**:
+  - Variable: `{{Event}}` | Operator: equals | Value: `checkout_opened`
 
 ### 3. Core Web Vitals
 - **Nome**: Core Web Vitals
 - **Tipo**: Custom Event
 - **Event Name**: core_web_vitals_fid
+- **This trigger fires on**: Some Custom Events
 - **Condições de Ativação**:
-  - Event equals `core_web_vitals_fid`
+  - Variable: `{{Event}}` | Operator: equals | Value: `core_web_vitals_fid`
 
 ### 4. Hero LCP Timing
 - **Nome**: Hero LCP Timing
 - **Tipo**: Custom Event
 - **Event Name**: hero_lcp_timing
+- **This trigger fires on**: Some Custom Events
 - **Condições de Ativação**:
-  - Event equals `hero_lcp_timing`
+  - Variable: `{{Event}}` | Operator: equals | Value: `hero_lcp_timing`
 
 ### 5. Page Load Performance
 - **Nome**: Page Load Performance
 - **Tipo**: Custom Event
 - **Event Name**: page_load_performance
+- **This trigger fires on**: Some Custom Events
 - **Condições de Ativação**:
-  - Event equals `page_load_performance`
+  - Variable: `{{Event}}` | Operator: equals | Value: `page_load_performance`
 
 ### 6. App Initialized
 - **Nome**: App Initialized
 - **Tipo**: Custom Event
 - **Event Name**: app_initialized
+- **This trigger fires on**: Some Custom Events
 - **Condições de Ativação**:
-  - Event equals `app_initialized`
+  - Variable: `{{Event}}` | Operator: equals | Value: `app_initialized`
 
 ### 7. Components Initialized
 - **Nome**: Components Initialized
 - **Tipo**: Custom Event
 - **Event Name**: components_initialized
+- **This trigger fires on**: Some Custom Events
 - **Condições de Ativação**:
-  - Event equals `components_initialized`
+  - Variable: `{{Event}}` | Operator: equals | Value: `components_initialized`
 
-### 8. Scroll Depth Trigger
-- **Nome**: Scroll Depth 10%, 25%, 50%, 75%, 90%
-- **Tipo**: Scroll Depth
-- **Percentages**: 10,25,50,75,90
-- **Condições de Ativação**: All Pages
+### 8. Scroll Depth Event
+- **Nome**: Scroll Depth Event
+- **Tipo**: Custom Event
+- **Event Name**: scroll_depth
+- **This trigger fires on**: Some Custom Events
+- **Condições de Ativação**:
+  - Variable: `{{Event}}` | Operator: equals | Value: `scroll_depth`
 
 ### 9. CTA Button Clicks
 - **Nome**: CTA Button Clicks
 - **Tipo**: Click - All Elements
+- **This trigger fires on**: Some Clicks
 - **Condições de Ativação**:
-  - Click Text contains `Garantir a minha vaga`
-  - OR Click Text contains `Garantir vaga`
-  - OR Click Element matches CSS selector `[data-analytics-event*="checkout"]`
+  - Variable: `{{Click Text}}` | Operator: contains | Value: `Garantir a minha vaga`
+  - **OR** Variable: `{{Click Text}}` | Operator: contains | Value: `Garantir vaga`
+  - **OR** Variable: `{{Click Element}}` | Operator: matches CSS selector | Value: `[data-analytics-event*="checkout"]`
 
 ### 10. WhatsApp Button Clicks
 - **Nome**: WhatsApp Clicks
 - **Tipo**: Click - All Elements
+- **This trigger fires on**: Some Clicks
 - **Condições de Ativação**:
-  - Click URL contains `wa.me`
-  - OR Click Text contains `WhatsApp`
+  - Variable: `{{Click URL}}` | Operator: contains | Value: `wa.me`
+  - **OR** Variable: `{{Click Text}}` | Operator: contains | Value: `WhatsApp`
 
 ### 11. Social Media Clicks
 - **Nome**: Social Media Clicks
 - **Tipo**: Click - All Elements
+- **This trigger fires on**: Some Clicks
 - **Condições de Ativação**:
-  - Click URL contains `instagram.com`
-  - OR Click Text contains `@jucanamaximiliano`
+  - Variable: `{{Click URL}}` | Operator: contains | Value: `instagram.com`
+  - **OR** Variable: `{{Click Text}}` | Operator: contains | Value: `@jucanamaximiliano`
 
-### 12. Form Interactions
-- **Nome**: Form Start
-- **Tipo**: Form Submission
-- **Condições de Ativação**:
-  - Form Classes contains `checkout-form`
-
-### 13. Modal Events
+### 12. Checkout Modal Opened
 - **Nome**: Checkout Modal Opened
 - **Tipo**: Element Visibility
 - **Selection Method**: ID
 - **Element ID**: checkoutModal
+- **When to fire this trigger**: Once per page
+- **Minimum Percent Visible**: 1%
+- **On Screen Duration**: 500ms
+- **This trigger fires on**: All Pages
+- **Condições de Ativação**: (nenhuma - dispara quando elemento fica visível)
+
+### 13. Purchase Completed
+- **Nome**: Purchase Completed
+- **Tipo**: Custom Event
+- **Event Name**: payment_completed
+- **This trigger fires on**: Some Custom Events
 - **Condições de Ativação**:
-  - When to fire this trigger: Once per page
-  - Minimum Percent Visible: 1%
-  - On Screen Duration: 500ms
+  - Variable: `{{Event}}` | Operator: equals | Value: `payment_completed`
+
+### 14. Payment Failed
+- **Nome**: Payment Failed
+- **Tipo**: Custom Event
+- **Event Name**: payment_failed
+- **This trigger fires on**: Some Custom Events
+- **Condições de Ativação**:
+  - Variable: `{{Event}}` | Operator: equals | Value: `payment_failed`
+
+### 15. Core Web Vitals CLS
+- **Nome**: Core Web Vitals CLS
+- **Tipo**: Custom Event
+- **Event Name**: core_web_vitals_cls
+- **This trigger fires on**: Some Custom Events
+- **Condições de Ativação**:
+  - Variable: `{{Event}}` | Operator: equals | Value: `core_web_vitals_cls`
+
+### 16. JavaScript Error Tracking
+- **Nome**: JavaScript Error Tracking
+- **Tipo**: Custom Event
+- **Event Name**: javascript_error
+- **This trigger fires on**: Some Custom Events
+- **Condições de Ativação**:
+  - Variable: `{{Event}}` | Operator: equals | Value: `javascript_error`
+
+### 17. Checkout Modal Closed
+- **Nome**: Checkout Modal Closed
+- **Tipo**: Custom Event
+- **Event Name**: checkout_closed
+- **This trigger fires on**: Some Custom Events
+- **Condições de Ativação**:
+  - Variable: `{{Event}}` | Operator: equals | Value: `checkout_closed`
+
+### 18. Lead Captured
+- **Nome**: Lead Captured
+- **Tipo**: Custom Event
+- **Event Name**: lead_captured
+- **This trigger fires on**: Some Custom Events
+- **Condições de Ativação**:
+  - Variable: `{{Event}}` | Operator: equals | Value: `lead_captured`
+
+### 19. FAQ Toggle Interaction
+- **Nome**: FAQ Toggle Interaction
+- **Tipo**: Custom Event
+- **Event Name**: faq_toggle
+- **This trigger fires on**: Some Custom Events
+- **Condições de Ativação**:
+  - Variable: `{{Event}}` | Operator: equals | Value: `faq_toggle`
+
+### 20. FAQ Meaningful Engagement
+- **Nome**: FAQ Meaningful Engagement
+- **Tipo**: Custom Event
+- **Event Name**: faq_meaningful_engagement
+- **This trigger fires on**: Some Custom Events
+- **Condições de Ativação**:
+  - Variable: `{{Event}}` | Operator: equals | Value: `faq_meaningful_engagement`
+
+### 21. Testimonial Slide View
+- **Nome**: Testimonial Slide View
+- **Tipo**: Custom Event
+- **Event Name**: view_testimonial_slide
+- **This trigger fires on**: Some Custom Events
+- **Condições de Ativação**:
+  - Variable: `{{Event}}` | Operator: equals | Value: `view_testimonial_slide`
+
+### 22. Testimonials Section View
+- **Nome**: Testimonials Section View
+- **Tipo**: Custom Event
+- **Event Name**: view_testimonials_section
+- **This trigger fires on**: Some Custom Events
+- **Condições de Ativação**:
+  - Variable: `{{Event}}` | Operator: equals | Value: `view_testimonials_section`
 
 ---
 
@@ -185,7 +361,11 @@ Configure os seguintes triggers para capturar eventos específicos:
 2. **Event Name**: `checkout_opened` (exato)
 3. **This trigger fires on**: Some Custom Events
 4. **Fire this trigger when an Event occurs and all of these conditions are true**:
-   - `Event` equals `checkout_opened`
+   - **Variable**: `{{Event}}` | **Operator**: equals | **Value**: `checkout_opened`
+
+**💡 Explicação das Variáveis:**
+- `{{Event}}` é a variável built-in que captura o nome do evento do dataLayer
+- Esta é a variável que você seleciona no dropdown "Variable" do GTM console
 
 #### 2. Para Click Triggers (ex: CTA Buttons):
 1. **Trigger Type**: Click - All Elements
@@ -247,7 +427,14 @@ Configure os seguintes triggers para capturar eventos específicos:
 - **Nome**: GA4 Config - Café com Vendas
 - **Tipo**: Google Analytics: GA4 Configuration
 - **Measurement ID**: G-XXXXXXXXXX (substitua pelo seu GA4 ID)
-- **Trigger**: All Pages
+- **Trigger**: Page View - All Pages
+
+**🔧 Como configurar o Measurement ID:**
+1. Acesse [Google Analytics](https://analytics.google.com)
+2. Crie uma nova propriedade GA4 ou use uma existente
+3. Vá em **Admin** → **Data Streams** → **Web**
+4. Copie o **Measurement ID** (formato: G-XXXXXXXXXX)
+5. Cole no campo **Measurement ID** desta tag
 
 #### 2. GA4 Event - Checkout Opened
 - **Nome**: GA4 Event - Checkout Opened
@@ -263,14 +450,28 @@ Configure os seguintes triggers para capturar eventos específicos:
 - **Nome**: GA4 Event - Performance
 - **Tipo**: Google Analytics: GA4 Event
 - **Configuration Tag**: GA4 Config - Café com Vendas
-- **Event Name**: {{Event}}
-- **Parâmetros**:
+- **Event Name**: {{Event}} (variável built-in do GTM que captura o nome do evento automaticamente)
+- **Event Parameters**:
   - `metric_value`: {{DL - Metric Value}}
   - `custom_parameter`: {{DL - Custom Parameter}}
+  - `event_category`: {{DL - Event Category}}
+- **Event Settings Variable**: Não necessário (parâmetros diretos são suficientes)
 - **Triggers**: 
   - Core Web Vitals
   - Hero LCP Timing
   - Page Load Performance
+
+**📋 Explicação do {{Event}}:**
+Esta variável built-in do GTM automaticamente usa o nome exato do evento do dataLayer:
+- Quando trigger "Core Web Vitals" dispara → Event Name = `core_web_vitals_fid`
+- Quando trigger "Hero LCP Timing" dispara → Event Name = `hero_lcp_timing`  
+- Quando trigger "Page Load Performance" dispara → Event Name = `page_load_performance`
+
+**💡 Quando usar Event Settings Variable:**
+- **Para parâmetros globais**: Aplicar mesmos custom dimensions a todos os eventos
+- **Para user properties**: Definir propriedades de usuário consistentes
+- **Para configurações avançadas**: session_timeout, engagement_time_msec, etc.
+- **Para o seu caso**: Os parâmetros diretos são mais simples e eficientes
 
 #### 4. GA4 Event - App Events
 - **Nome**: GA4 Event - App Events
@@ -283,6 +484,49 @@ Configure os seguintes triggers para capturar eventos específicos:
 - **Triggers**:
   - App Initialized
   - Components Initialized
+
+#### 5. GA4 Event - Error Tracking
+- **Nome**: GA4 Event - Error Tracking
+- **Tipo**: Google Analytics: GA4 Event
+- **Configuration Tag**: GA4 Config - Café com Vendas
+- **Event Name**: javascript_error
+- **Event Parameters**:
+  - `error_message`: {{DL - Error Message}}
+  - `error_stack`: {{DL - Error Stack}}
+  - `event_category`: {{DL - Event Category}}
+- **Triggers**: JavaScript Error Tracking
+
+#### 6. GA4 Event - User Engagement
+- **Nome**: GA4 Event - User Engagement
+- **Tipo**: Google Analytics: GA4 Event
+- **Configuration Tag**: GA4 Config - Café com Vendas
+- **Event Name**: {{Event}}
+- **Event Parameters**:
+  - `label`: {{DL - FAQ Label}}
+  - `is_open`: {{DL - Is Open State}}
+  - `email`: {{DL - Email Address}}
+  - `source`: {{DL - Source}}
+  - `event_category`: {{DL - Event Category}}
+- **Triggers**:
+  - FAQ Toggle Interaction
+  - FAQ Meaningful Engagement
+  - Lead Captured
+  - Checkout Modal Closed
+  - Testimonial Slide View
+  - Testimonials Section View
+
+#### 7. GA4 Event - Core Web Vitals Extended
+- **Nome**: GA4 Event - Core Web Vitals Extended
+- **Tipo**: Google Analytics: GA4 Event
+- **Configuration Tag**: GA4 Config - Café com Vendas
+- **Event Name**: {{Event}}
+- **Event Parameters**:
+  - `metric_value`: {{DL - Metric Value}}
+  - `custom_parameter`: {{DL - Custom Parameter}}
+  - `event_category`: {{DL - Event Category}}
+- **Triggers**:
+  - Core Web Vitals CLS
+  - Scroll Depth Event
 
 ### Universal Analytics (Legado)
 
@@ -311,25 +555,35 @@ Configure os seguintes triggers para capturar eventos específicos:
 
 Para tracking avançado de conversões do evento €180:
 
-### Purchase Event
+### Purchase Event (Dynamic Pricing)
 - **Nome**: GA4 Ecommerce - Purchase
 - **Tipo**: Google Analytics: GA4 Event
 - **Event Name**: purchase
 - **Parâmetros**:
-  - `transaction_id`: {{Transaction ID}}
-  - `value`: 180
-  - `currency`: EUR
-  - `items`: Array com detalhes do evento
+  - `transaction_id`: {{DL - Transaction ID}}
+  - `value`: {{DL - Purchase Value}} (dinâmico: €180 primeiro lote → preços superiores)
+  - `currency`: {{DL - Currency Code}} (EUR)
+  - `pricing_tier`: {{DL - Pricing Tier}} (para segmentação de negócio)
+  - `items`: [{"item_name": "Café com Vendas Event", "price": {{DL - Purchase Value}}, "quantity": 1, "item_category": {{DL - Pricing Tier}}}]
+- **Trigger**: Purchase Completed
 
-### Begin Checkout Event
+**💡 Nota sobre Dynamic Pricing**: O evento automaticamente detecta o preço atual baseado no lote ativo:
+- **Primeiro lote**: €180 (primeiras 8 vendas)
+- **Lotes seguintes**: Preços dinâmicos conforme disponibilidade
+- **Business Intelligence**: Permite análise de performance por tier de pricing
+
+### Begin Checkout Event (Dynamic Pricing)
 - **Nome**: GA4 Ecommerce - Begin Checkout
 - **Tipo**: Google Analytics: GA4 Event
 - **Event Name**: begin_checkout
 - **Parâmetros**:
-  - `currency`: EUR
-  - `value`: 180
-  - `items`: Array com detalhes do evento
+  - `currency`: {{DL - Currency Code}} (EUR)
+  - `value`: {{DL - Purchase Value}} (preço dinâmico baseado no lote atual)
+  - `pricing_tier`: {{DL - Pricing Tier}} (segmentação por lote)
+  - `items`: [{"item_name": "Café com Vendas Event", "price": {{DL - Purchase Value}}, "quantity": 1, "item_category": {{DL - Pricing Tier}}}]
 - **Trigger**: Checkout Opened
+
+**🔧 Implementação**: O valor é capturado dinamicamente quando o usuário abre o checkout, refletindo o preço atual baseado na disponibilidade de vagas.
 
 ---
 
@@ -373,6 +627,39 @@ window._linkedin_data_partner_ids.push(_linkedin_partner_id);
    - Clique em CTAs
    - Scroll na página
    - Abertura do modal de checkout
+
+### 🧪 Dynamic Pricing Testing
+
+Para testar os diferentes tiers de pricing em desenvolvimento:
+
+#### **Teste do Primeiro Lote (€180)**
+```javascript
+// No console do browser
+PricingManager.setSalesCountForTesting(3);
+// Testa o checkout - valor deve ser €180
+```
+
+#### **Teste do Segundo Lote (€240)**
+```javascript
+// No console do browser
+PricingManager.setSalesCountForTesting(10);
+// Testa o checkout - valor deve ser €240
+```
+
+#### **Verificação no GTM Preview**
+1. **DataLayer Variables**: Verifique se aparecem:
+   - `amount`: 180 (primeiro lote) ou 240 (segundo lote)
+   - `currency`: EUR
+   - `pricing_tier`: first_lot_early_bird ou second_lot
+
+2. **Eventos para Testar**:
+   - `checkout_opened`: Valor dinâmico baseado no tier ativo
+   - `payment_completed`: Valor real da transação Stripe
+
+#### **Business Intelligence Testing**
+- **Segmentação por Tier**: Verifique se GA4 recebe `pricing_tier` parameter
+- **Análise de Revenue**: Compare valores entre primeiro e segundo lote
+- **Conversão por Preço**: Analise performance de cada tier
 
 ### Verificações Essenciais
 - [ ] DataLayer popula corretamente
