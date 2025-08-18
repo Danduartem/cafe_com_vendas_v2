@@ -20,7 +20,6 @@ Guidance for Claude Code when working with the Café com Vendas landing page.
 - **Tailwind CSS**: 4.1.12 (CSS-first config) - https://tailwindcss.com/docs/v4
 - **Stripe**: 18.4.0 (latest Node.js SDK) - https://docs.stripe.com/api
 - **PostCSS**: 8.5.6 + autoprefixer 10.4.21
-- **Netlify Edge**: CSP header via Edge Function
 
 **📋 Quick Reference**: Run `npm run versions` to see current installed versions  
 **📋 Check Updates**: Run `npm run outdated` to check for new versions  
@@ -48,17 +47,11 @@ npm run build:css    # Build Tailwind CSS with PostCSS
 npm run build:js     # Build JavaScript with Vite (production)
 npm run build:js:dev # Build JavaScript with Vite (development + source maps)
 npm run clean        # Clean build directory
-npm run lint         # Run ESLint on all source files
-npm run lint:fix     # Run ESLint and auto-fix issues
-npm run lighthouse   # Run Lighthouse audits (mobile + desktop)
-npm run lighthouse:mobile   # Mobile-only Lighthouse audit
-npm run lighthouse:desktop  # Desktop-only Lighthouse audit  
-npm run lighthouse:quick    # Quick performance-only audit
 npm run versions     # Generate VERSIONS.txt with current dependency versions
 npm run outdated     # Check for package updates
 ```
 
-**Note**: ESLint is configured for code quality and consistency. No test commands are configured in this project.
+**Note**: No test or lint commands are configured in this project. Don't assume their existence.
 
 ## 🔐 Environment Variables
 
@@ -67,14 +60,8 @@ Essential environment variables for the project:
 ```bash
 # Stripe Configuration (required for payments)
 STRIPE_SECRET_KEY=sk_...           # Stripe secret key
-VITE_STRIPE_PUBLIC_KEY=pk_...      # Stripe public key  
+STRIPE_PUBLIC_KEY=pk_...           # Stripe public key  
 STRIPE_WEBHOOK_SECRET=whsec_...    # Stripe webhook signature verification
-
-# Analytics Configuration (required for tracking)
-VITE_GTM_CONTAINER_ID=GTM-T63QRLFT # Google Tag Manager container ID
-
-# Cloudinary Configuration (for image optimization)
-CLOUDINARY_CLOUD_NAME=your-cloud-name  # Cloudinary cloud name for image CDN
 
 # Build Configuration
 NODE_ENV=production                # Build environment (development/production)
@@ -84,62 +71,18 @@ NODE_ENV=production                # Build environment (development/production)
 - Create `.env.local` for local development (not tracked in git)
 - Configure in Netlify dashboard for production deployment
 - Webhook endpoint: `/.netlify/functions/stripe-webhook`
-- Sign up for free Cloudinary account at https://cloudinary.com
-- Upload project images to Cloudinary media library
-
-## 💳 Payment Testing
-
-Test the checkout flow with Stripe test cards:
-
-**Quick Test Cards for Portugal/Brazil:**
-- 🇵🇹 Portugal: `4000 0062 0000 0007` (Visa with 3D Secure)
-- 🇧🇷 Brazil: `4000 0007 6000 0002` (Visa Brazil)
-- 🌍 Global: `4242 4242 4242 4242` (Standard success)
-
-**Complete Documentation**: See `docs/STRIPE_TEST_CARDS.md` for full list of test scenarios, 3D Secure cards, and testing workflow.
-
-**Testing Steps**:
-1. Start dev server: `npm run dev`
-2. Click "Garantir vaga via Stripe"
-3. Use test cards with any future expiry/CVC
-4. Complete 3D Secure authentication if prompted
-5. Verify success/error handling
 
 ## 🤖 Claude Commands
 
 Custom commands available in `.claude/commands/`:
 
-### **Development & Code Quality**
 ```bash
 /update-libs           # Update all dependencies to latest stable versions
 /update-refactor       # Refactor code to leverage latest framework features  
 /commit                # Smart git commits with conventional messages
 /push                  # Safely push current branch with checks and PR option
 /update-documentation  # Sync all docs with current codebase state
-/rollback-deploy       # Emergency rollback procedures for production issues
 ```
-
-### **Performance & Testing**
-```bash
-/lighthouse            # Run comprehensive Lighthouse performance audits
-/stripe-test           # Complete Stripe payment testing with Portuguese cards
-```
-
-### **Content & Strategy**
-```bash
-/copy-pick             # Generate and compare multiple copy variations
-/design-pick           # Create and evaluate different design prototypes
-/landing-page-strategy # Strategic landing page optimization framework
-/conversion-optimize   # Advanced conversion rate optimization techniques
-```
-
-### **Business Intelligence**
-```bash
-/email-generator       # Generate email campaigns for Portuguese female entrepreneurs
-/online-bizplan        # Comprehensive online business planning and growth strategies
-```
-
-**Total**: 14 specialized commands for complete project lifecycle management
 
 ## Structure
 ```
@@ -192,60 +135,25 @@ info/                       # Design system & content
 ├── DATA_design_tokens.json      # Unified design system
 ├── DATA_event.json              # Event data (prices, dates)
 ├── DATA_avatar.json             # Persona & objections
-├── DATA_faq.json                # FAQ data structure
 ├── CONTENT_copy_library.md      # Copy examples & headlines
 ├── GUIDE_voice_tone.md          # Voice & tone guidelines
 ├── GUIDE_brand_visual.md        # Brand guidelines
+├── GUIDE_claude_instructions.md # Claude context & instructions
 ├── BUILD_landing_page.md        # Development blueprint
-└── angles-library.json          # Marketing angles library
+└── *.md                         # Other guidelines
 
-docs/                       # Technical documentation
-├── GTM_SETUP_GUIDE.md      # Google Tag Manager setup (22+ events)
-├── DEVELOPMENT_GUIDELINES.md    # Security & performance patterns
-├── ACCESSIBILITY_GUIDELINES.md  # WCAG AA compliance guide
-├── PERFORMANCE_MONITORING.md    # Core Web Vitals tracking
-├── STRIPE_TEST_CARDS.md     # Payment testing procedures
-├── CLOUDINARY_SETUP.md      # Image optimization setup
-└── SECURITY_BEST_PRACTICES.md  # Security implementation guide
-
-bizplan/                    # Business strategy artifacts
-copy-pick/                  # Copy optimization experiments
-strategy/                   # Strategic planning materials
-
-vite.config.js              # Vite 7.1.2 bundler configuration
+vite.config.js              # Vite bundler configuration
 netlify/                    # Netlify Functions
-├── edge-functions/
-│   └── csp.js             # Content Security Policy edge function
 ├── functions/
 │   ├── create-payment-intent.js # Stripe payment processing
 │   └── stripe-webhook.js   # Stripe webhook handler
-
-.claude/                    # Custom Claude Code commands (14 total)
+.claude/                    # Custom Claude Code commands
 ├── commands/
 │   ├── commit.md           # Smart git commits
 │   ├── push.md             # Safe git push with checks
 │   ├── update-libs.md      # Dependency update command
 │   ├── update-refactor.md  # Code refactoring command
-│   ├── update-documentation.md # Documentation sync
-│   ├── lighthouse.md       # Performance audits
-│   ├── stripe-test.md      # Payment testing workflows
-│   ├── rollback-deploy.md  # Emergency rollback procedures
-│   ├── copy-pick.md        # Copy optimization experiments
-│   ├── design-pick.md      # Design prototype generation
-│   ├── conversion-optimize.md   # CRO techniques
-│   ├── landing-page-strategy.md # Strategic optimization
-│   ├── email-generator.md  # Email campaign generation
-│   └── online-bizplan.md   # Business planning workflows
-└── agents/                 # Specialized AI agents (9 total)
-    ├── brief-intake-analyst.md      # Campaign validation
-    ├── business-analyst.md          # KPI & metrics analysis
-    ├── cognitive-load-reviewer.md   # UX content optimization
-    ├── customer-insights.md         # Persona & journey mapping
-    ├── education-strategist.md      # Content education frameworks
-    ├── market-researcher.md         # TAM/SAM analysis
-    ├── proof-curator.md             # Social proof selection
-    ├── utility-librarian.md         # Value block management
-    └── value-architect.md           # Micro-wins definition
+│   └── update-documentation.md # Documentation sync
 ```
 
 ## Critical Rules
@@ -266,84 +174,10 @@ netlify/                    # Netlify Functions
 - ✅ Are all animations using Tailwind utilities (`animate-*`, `transform`, `rotate-*`)?
 - ✅ Am I only manipulating classes, never direct styles?
 
-### 🔒 CRITICAL: Security Best Practices
-**ZERO TOLERANCE POLICY - NO EXCEPTIONS**
-- ❌ NEVER use inline event handlers (`onclick=""`, `onsubmit=""`, etc.)
-- ❌ NEVER write inline JavaScript in `<script>` tags without src
-- ❌ NEVER use `'unsafe-inline'` in Content Security Policy for scripts (style-src may include `'unsafe-inline'` due to Tailwind)
-- ❌ NEVER expose sensitive data to client-side JavaScript
-- ✅ ALWAYS use `addEventListener()` for event handling
-- ✅ ALWAYS load third-party scripts lazily when needed
-- ✅ ALWAYS implement proper ARIA roles for interactive elements
-- ✅ ALWAYS validate CSP compliance before deployment
-
-**Security Pre-Implementation Checklist:**
-- ✅ Are all event handlers attached via addEventListener?
-- ✅ Is all JavaScript in external files (no inline scripts)?
-- ✅ Do interactive elements have proper ARIA roles and states?
-- ✅ Are third-party scripts loaded only when needed?
-- ✅ Does the CSP policy block unsafe inline scripts?
-
-### ♿ CRITICAL: Accessibility Compliance (WCAG AA)
-**ZERO TOLERANCE POLICY - NO EXCEPTIONS**
-- ❌ NEVER use invalid ARIA attributes (`role="tab"` without tabpanel structure)
-- ❌ NEVER use `aria-controls` pointing to non-existent elements
-- ❌ NEVER use colors that fail WCAG AA contrast ratios (4.5:1 minimum)
-- ❌ NEVER use `aria-selected` on non-tab elements
-- ✅ ALWAYS use `aria-current` for pagination/carousel indicators
-- ✅ ALWAYS validate color contrast with design tokens
-- ✅ ALWAYS test with keyboard navigation and screen readers
-- ✅ ALWAYS use semantic HTML before adding ARIA
-
-**Accessibility Pre-Implementation Checklist:**
-- ✅ Do colors meet WCAG AA contrast ratios (4.5:1)?
-- ✅ Are all interactive elements keyboard accessible?
-- ✅ Do ARIA attributes reference existing elements?
-- ✅ Is focus management logical and visible?
-- ✅ Target Lighthouse Accessibility score: 95+
-
-**WCAG AA Color Combinations (Approved):**
-```css
-/* ✅ CORRECT: Meets 4.5:1+ contrast ratio */
-.text-navy-800/80    /* On light backgrounds */
-.text-navy-800/70    /* On medium backgrounds */
-.text-neutral-300    /* On dark backgrounds (navy-900) */
-.text-gold-200       /* On dark gradients (burgundy/navy) */
-
-/* ❌ WRONG: Fails WCAG AA */
-.text-navy-800/60    /* Contrast ratio: 3.1:1 */
-.text-navy-800/50    /* Contrast ratio: 2.4:1 */
-.text-neutral-400    /* On dark backgrounds: 3.5:1 */
-.text-gold-300       /* On burgundy: varies, often fails */
-```
-
-**Lazy Loading Pattern for Third-Party Scripts:**
-```javascript
-// ✅ CORRECT: Lazy load expensive scripts
-async loadScript(url) {
-  if (this.scriptLoaded) return Promise.resolve();
-  
-  this.scriptLoadPromise = new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = url;
-    script.async = true;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-  
-  return this.scriptLoadPromise;
-}
-
-// ❌ WRONG: Global script loading
-// <script src="https://js.stripe.com/v3/"></script>
-```
-
 ### Tech Stack & Architecture
 - **Static Site Generator**: Eleventy (.eleventy.js config)
 - **Templates**: Nunjucks (.njk files) 
 - **Build Tool**: Vite for unified JS/CSS bundling and development server
-- **Edge**: Netlify Edge Function sets CSP response header for all paths
 - **CSS Framework**: Tailwind v4 with PostCSS (pure CSS-based configuration via @theme)
 - **Data Layer**: Eleventy data files (src/_data/*.js) load from info/*.json
 - **Design System**: JSON tokens → CSS custom properties via build-tokens.js
@@ -369,15 +203,6 @@ async loadScript(url) {
 - **Build Output**: Single optimized IIFE bundle for browser compatibility
 - **Development**: Source maps enabled for debugging
 - **Production**: Minified and tree-shaken for performance
-
-### Analytics via GTM (Container: GTM-T63QRLFT)
-- **GTM module**: `src/assets/js/components/gtm.js` with advanced lazy loading (no inline JS)
-- **Environment**: `VITE_GTM_CONTAINER_ID=GTM-T63QRLFT` (set in Netlify). Exposed as `site.analytics.gtmId`
-- **DataLayer**: All events flow through `window.dataLayer` → GTM → GA4 (no direct gtag calls)
-- **Loading Strategy**: 3-tier lazy loading (conversion intent → engagement → fallback)
-- **CSP**: `frame-src` allows `https://www.googletagmanager.com`
-- **Performance**: GTM loads only when user shows purchase intent or meaningful engagement
-- **Complete Guide**: See `docs/GTM_SETUP_GUIDE.md` for 22+ tracked events and setup
 
 **Component Creation Pattern**:
 1. Create `.njk` template in `src/_includes/components/`
@@ -432,7 +257,6 @@ async loadScript(url) {
 | Event Details | `info/DATA_event.json` |
 | Customer Pain | `info/DATA_avatar.json` |
 | Brand Guidelines | `info/GUIDE_brand_visual.md` |
-| Accessibility | `docs/ACCESSIBILITY_GUIDELINES.md` (WCAG AA compliance, color contrast) |
 
 ## Common Tasks
 
@@ -461,87 +285,12 @@ async loadScript(url) {
 
 **MANDATORY Component Checklist:**
 - 🚨 **No inline styles**: No `style.`, `<style>`, or `style=""` anywhere
-- 🔒 **No inline scripts**: No inline JavaScript or event handlers
-- ♿ **WCAG AA compliance**: Colors meet 4.5:1 contrast, valid ARIA attributes
 - ✅ **Pure Tailwind**: Only utility classes, no custom CSS
 - ✅ **ES6 modules**: All JavaScript in separate `.js` files  
 - ✅ **Design tokens**: Only token colors (no hex codes)
 - ✅ **Class manipulation**: Use `classList.add/remove/toggle()` only
-- ✅ **Event handlers**: Use `addEventListener()` only, never `onclick=""`
-- ✅ **ARIA compliance**: Use `aria-current` for pagination, avoid invalid roles
-- ✅ **Keyboard navigation**: All interactive elements focusable and accessible
-- ✅ **Third-party scripts**: Load lazily when needed, never globally
 
 **Access Data in Templates**: Use Eleventy data (`{{ site }}`, `{{ event }}`, `{{ avatar }}`, `{{ tokens }}`)
-
-## 🚀 Performance Optimization Achievements
-
-### ✅ **Latest Performance Improvements (Aug 2025)**
-- **Cloudinary WebP Optimization**: Eliminated 178 KiB (53% savings) from hero image
-- **Next-Gen Image Formats**: Perfect 100/100 Lighthouse score for modern image formats
-- **Dual Loading Fix**: Removed inefficient JPEG fallback that was loading alongside WebP
-- **Stripe.js Lazy Loading**: Eliminated 187 KiB (1.65s) from initial page load
-- **CSP Security**: Removed all inline scripts for XSS protection
-- **ARIA Compliance**: 95/100 accessibility score with proper tab roles
-- **Total Bandwidth Savings**: ~365 KiB per page load (WebP + Stripe optimization)
-
-### **Cloudinary WebP Optimization Pattern**
-```css
-/* ✅ CORRECT: Single Cloudinary URL with f_auto for automatic format detection */
-.hero-bg {
-  background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz');
-}
-
-/* ❌ WRONG: Dual loading (loads both WebP AND JPEG) */
-.hero-bg-old {
-  background-image: url('cloudinary-webp-url'),
-                    url('/assets/pictures/cafe.jpg');
-}
-```
-
-### **Results of WebP Optimization**
-- **Hero Image**: 336 KiB → 158 KiB (53% reduction)
-- **Lighthouse Score**: Modern Image Formats 100/100 (previously failing)
-- **Browser Support**: WebP for modern browsers, automatic JPEG fallback via Cloudinary
-- **Network Requests**: Eliminated redundant local image loading
-
-### **Third-Party Script Optimization Pattern**
-```javascript
-// Applied to Stripe.js - saves 187 KiB on page load
-export const OptimizedComponent = {
-  stripe: null,
-  stripeLoaded: false,
-  stripeLoadPromise: null,
-
-  async loadStripeScript() {
-    if (this.stripeLoadPromise) return this.stripeLoadPromise;
-    if (this.stripeLoaded) return Promise.resolve();
-
-    this.stripeLoadPromise = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://js.stripe.com/v3/';
-      script.async = true;
-      script.onload = () => {
-        this.stripe = Stripe(ENV.stripe.publishableKey);
-        this.stripeLoaded = true;
-        resolve();
-      };
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-
-    return this.stripeLoadPromise;
-  },
-
-  async openModal() {
-    // Load Stripe only when user shows intent to purchase
-    if (!this.stripeLoaded) {
-      await this.loadStripeScript();
-    }
-    // Continue with modal logic...
-  }
-};
-```
 
 ## 🔄 Development Workflow
 
@@ -646,7 +395,6 @@ When any slash command is invoked:
 ### Environment Variables Setup
 1. **Local Development**: Create `.env.local` with Stripe test keys
 2. **Production**: Configure in Netlify → Site Settings → Environment Variables
-   - `VITE_GTM_CONTAINER_ID=GTM-T63QRLFT`
 3. **Webhook URL**: `https://yourdomain.com/.netlify/functions/stripe-webhook`
 
 ### Pre-deployment Checklist
@@ -656,9 +404,6 @@ When any slash command is invoked:
 - [ ] All payment flows tested
 - [ ] Forms submission working
 - [ ] Analytics tracking verified
-  - GTM loads lazily on user interaction (check Network tab for `gtm.js`)
-  - DataLayer receives events (check `window.dataLayer` in console)
-  - 22+ events tracked including Core Web Vitals, conversions, and engagement
 - [ ] Performance audit passed (>90 Lighthouse score)
 
 ### Security Considerations
