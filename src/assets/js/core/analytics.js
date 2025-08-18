@@ -1,6 +1,6 @@
 /**
  * Analytics Module for Café com Vendas
- * Handles all tracking and performance monitoring with modern Web APIs
+ * Centralized tracking through Google Tag Manager dataLayer
  */
 
 import { CONFIG } from '../config/constants.js';
@@ -12,26 +12,27 @@ export const Analytics = {
   errors: new Set(),
 
   /**
-     * Track event via GTM dataLayer (GTM → GA4 flow)
-     */
+   * Track event via GTM dataLayer
+   * All events flow through GTM for centralized tag management
+   */
   track(eventName, parameters = {}) {
     try {
-      // Console logging for debugging
-      console.log(`Analytics: ${eventName}`, parameters);
-
-      // Send to GTM dataLayer instead of direct gtag
-      if (window.dataLayer) {
-        window.dataLayer.push({
-          event: eventName,
-          ...parameters
-        });
-      } else {
-        // Fallback: queue event if dataLayer not yet available
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: eventName,
-          ...parameters
-        });
+      // Initialize dataLayer if needed
+      window.dataLayer = window.dataLayer || [];
+      
+      // Standardized event structure for GTM
+      const eventData = {
+        event: eventName,
+        timestamp: new Date().toISOString(),
+        ...parameters
+      };
+      
+      // Push to dataLayer
+      window.dataLayer.push(eventData);
+      
+      // Debug logging in development
+      if (CONFIG.isDevelopment) {
+        console.log(`[GTM Event] ${eventName}:`, parameters);
       }
 
       // Track to performance timeline for debugging
@@ -72,10 +73,10 @@ export const Analytics = {
         // Largest Contentful Paint (LCP)
         const lcpObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            this.track(CONFIG.analytics.events.HERO_LCP, {
-              custom_parameter: Math.round(entry.startTime),
+            this.track('performance_lcp', {
               event_category: 'Core Web Vitals',
-              metric_value: Math.round(entry.startTime)
+              event_label: 'LCP',
+              value: Math.round(entry.startTime)
             });
           }
         });
@@ -90,10 +91,10 @@ export const Analytics = {
             }
           }
           if (clsValue > 0) {
-            this.track('core_web_vitals_cls', {
-              custom_parameter: Math.round(clsValue * 1000),
+            this.track('performance_cls', {
               event_category: 'Core Web Vitals',
-              metric_value: Math.round(clsValue * 1000)
+              event_label: 'CLS',
+              value: Math.round(clsValue * 1000)
             });
           }
         });
@@ -102,10 +103,10 @@ export const Analytics = {
         // First Input Delay (FID) / Interaction to Next Paint (INP)
         const fidObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            this.track('core_web_vitals_fid', {
-              custom_parameter: Math.round(entry.processingStart - entry.startTime),
+            this.track('performance_fid', {
               event_category: 'Core Web Vitals',
-              metric_value: Math.round(entry.processingStart - entry.startTime)
+              event_label: 'FID',
+              value: Math.round(entry.processingStart - entry.startTime)
             });
           }
         });
@@ -144,10 +145,10 @@ export const Analytics = {
       CONFIG.scroll.thresholds.forEach(threshold => {
         if (scrollPercent >= threshold && !state.scrollDepth[threshold]) {
           state.scrollDepth[threshold] = true;
-          this.track(CONFIG.analytics.events.SCROLL_DEPTH, {
+          this.track('scroll_depth', {
             event_category: 'Engagement',
-            event_label: `${threshold}%`,
-            value: threshold
+            event_label: `${threshold}%_reached`,
+            scroll_threshold: threshold
           });
         }
       });

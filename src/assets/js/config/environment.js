@@ -34,12 +34,7 @@ const config = {
       (isDevelopment ? 'pk_test_51QxTrfF2Zw0dHOvZoUHGr5nR068f9iuyuLrR86WW9gztjOkoRWgv1Q8cscSURSn45r1wX5qT2KKrj6sE2mD3a7CT009nkU8Wey' : '')
   },
 
-  // Google Analytics
-  analytics: {
-    measurementId: 'G-XXXXXXXXXX' // Replace with actual GA4 measurement ID
-  },
-
-  // Google Tag Manager
+  // Google Tag Manager (Single source of truth for all analytics)
   gtm: {
     containerId: import.meta.env.VITE_GTM_CONTAINER_ID || ''
   },

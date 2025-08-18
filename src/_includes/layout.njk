@@ -22,9 +22,8 @@
     <link rel="preconnect" href="https://formspree.io">
     <link rel="preconnect" href="https://res.cloudinary.com">
     
-    <!-- DNS prefetch for analytics and other external services -->
+    <!-- DNS prefetch for Google Tag Manager -->
     <link rel="dns-prefetch" href="//www.googletagmanager.com">
-    <link rel="dns-prefetch" href="//plausible.io">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -62,6 +61,17 @@
     <link rel="stylesheet" href="/tailwind.css" id="tailwind-css">
     
     <!-- Fonts are served locally via @font-face in /assets/css/main.css -->
+    
+    <!-- Google Tag Manager -->
+    {% if site.analytics.gtmId %}
+    <script>
+      // Initialize dataLayer for early tracking
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({'gtm.start': Date.now(), event: 'gtm.js'});
+    </script>
+    <script async src="https://www.googletagmanager.com/gtm.js?id={{ site.analytics.gtmId }}&l=dataLayer"></script>
+    {% endif %}
+    <!-- End Google Tag Manager -->
     
 </head>
 <body class="antialiased">

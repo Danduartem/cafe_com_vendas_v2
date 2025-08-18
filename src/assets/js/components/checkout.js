@@ -329,6 +329,13 @@ export const Checkout = {
 
     // Lock background scroll completely
     this.lockScroll();
+    
+    // Track conversion event - modal opened
+    Analytics.track('lead_capture_started', {
+      event_category: 'Conversion',
+      event_label: 'Checkout Modal Opened',
+      form_location: 'modal'
+    });
   },
 
   closeModal() {
@@ -427,9 +434,18 @@ export const Checkout = {
       this.setStep(2);
 
       // Track successful lead capture
-      Analytics.track('lead_captured', {
+      Analytics.track('lead_form_submitted', {
+        event_category: 'Conversion',
+        event_label: 'Lead Information Captured',
         lead_id: this.leadId,
-        source: 'checkout_modal'
+        form_location: 'checkout_modal'
+      });
+      
+      // Track checkout initiation
+      Analytics.track('checkout_initiated', {
+        event_category: 'Conversion',
+        event_label: 'Payment Step Started',
+        value: 180 // Event price in EUR
       });
 
     } catch (error) {
@@ -596,12 +612,14 @@ export const Checkout = {
         // Get pricing tier for analytics
         const currentTier = PricingManager.getCurrentPricingTier();
 
-        // Track successful payment with dynamic pricing data
-        Analytics.track('payment_completed', {
+        // Track successful payment conversion
+        Analytics.track('purchase_completed', {
+          event_category: 'Conversion',
+          event_label: 'Event Registration Completed',
           transaction_id: paymentIntent.id,
           lead_id: this.leadId,
-          amount: PricingManager.stripeAmountToEuros(paymentIntent.amount),
-          currency: currentTier.currency,
+          value: PricingManager.stripeAmountToEuros(paymentIntent.amount),
+          currency: 'EUR',
           pricing_tier: currentTier.tier_id,
           payment_intent_id: paymentIntent.id
         });

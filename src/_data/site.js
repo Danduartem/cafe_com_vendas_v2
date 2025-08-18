@@ -19,9 +19,8 @@ export default {
   },
 
   analytics: {
-    gtag: process.env.GTAG_ID || '',
-    fbPixel: process.env.FB_PIXEL_ID || '',
-    gtmId: process.env.VITE_GTM_CONTAINER_ID || ''
+    // Google Tag Manager - Single source of truth for all tags
+    gtmId: process.env.VITE_GTM_CONTAINER_ID || 'GTM-T63QRLFT'
   },
 
   // Cloudinary configuration for image optimization
