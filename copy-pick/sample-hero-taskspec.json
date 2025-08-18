@@ -1,0 +1,48 @@
+{
+  "section_id": "hero",
+  "objective": "Capture attention and drive to CTA for premium event registration",
+  "audience": {
+    "persona": "Portuguese female entrepreneurs, 30-45, overworked but ambitious",
+    "awareness": "solution-aware", 
+    "top_pain": "Working 12+ hours daily but revenue has stagnated for 6+ months",
+    "top_objection": "Price concerns for €1797 investment - worried about ROI"
+  },
+  "offer": {
+    "name": "Café com Vendas", 
+    "price": "€1797",
+    "uvp": "Transform chaotic effort into elegant, scalable results",
+    "key_benefits": [
+      "Reduce working hours without losing revenue",
+      "Increase prices with confidence and proven scripts", 
+      "Build systems that work while you rest"
+    ],
+    "proof_assets": [
+      "8 vagas preenchidas em 14 dias (Sept 2024)",
+      "Ana Santos: de 2K para 8K/mês em 4 meses",
+      "Método testado com 47 empreendedoras portuguesas",
+      "89% aumentaram preços em 30 dias"
+    ]
+  },
+  "brand": {
+    "locale": "pt-PT",
+    "voice": ["Elegante", "Confiante", "Clara"],
+    "forbidden": [
+      "hard-sell clichés like 'última chance'",
+      "hype numbers without proof",
+      "aggressive masculine language like 'domina o mercado'",
+      "American-style pressure tactics"
+    ]
+  },
+  "cta": {
+    "label": "Quero garantir minha vaga",
+    "secondary": "Ver detalhes do programa"
+  },
+  "constraints": {
+    "length": "standard",
+    "value_first": true
+  },
+  "output": {
+    "path": "./copy-pick/2025-08-18/",
+    "filename_prefix": "hero-test"
+  }
+}

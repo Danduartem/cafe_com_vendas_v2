@@ -1,0 +1,290 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-08-18",
+  "description": "Strategic copywriting angles library for Portuguese female entrepreneur copy variants",
+  "target_market": "pt-PT",
+  "audience": "female entrepreneurs, 30-45, premium segment",
+  "angles": {
+    "clarity_outcome": {
+      "id": 1,
+      "name": "Clarity & Outcome",
+      "psychology": "Direct promise, premium positioning",
+      "structure": "Clear result → simple method → concrete outcome",
+      "best_for": ["solution-aware", "product-aware"],
+      "tone": "confident, professional, premium",
+      "example_headline": "Método claro para vender mais em menos horas",
+      "objections_addressed": ["confusion", "overwhelm", "uncertainty"],
+      "language_patterns": [
+        "Método claro para...",
+        "Em X passos...",
+        "Resultado: [specific outcome]",
+        "Sistema que...",
+        "Processo direto para..."
+      ],
+      "avoid": [
+        "vague benefits",
+        "complex explanations", 
+        "multiple promises in one headline"
+      ],
+      "proof_usage": "moderate",
+      "emotional_level": "low-medium",
+      "portuguese_adaptation": "Premium simplicity, not bare-bones efficiency"
+    },
+    "empathy_story": {
+      "id": 2,
+      "name": "Empathy & Story", 
+      "psychology": "Pain mirroring → turning point → transformation",
+      "structure": "\"Sentes isto?\" → \"Eu também senti\" → \"Aqui está a saída\"",
+      "best_for": ["problem-aware", "solution-aware"],
+      "tone": "understanding, warm, relatable",
+      "example_headline": "O teu negócio não precisa de mais horas",
+      "objections_addressed": ["isolation", "doubt", "feeling misunderstood"],
+      "language_patterns": [
+        "Sei como te sentes...",
+        "Também já passei por isto...",
+        "A verdade é que...",
+        "Imagina acordar e...",
+        "Se te sentes assim..."
+      ],
+      "avoid": [
+        "dwelling on pain too long",
+        "overly emotional language",
+        "victim mentality reinforcement"
+      ],
+      "proof_usage": "light",
+      "emotional_level": "high",
+      "portuguese_adaptation": "Family/work balance themes resonate strongly"
+    },
+    "authority_proof": {
+      "id": 3,
+      "name": "Authority & Proof",
+      "psychology": "Credibility through specificity and results",
+      "structure": "Specific results → proven process → evidence",
+      "best_for": ["all awareness levels", "skeptical audiences"],
+      "tone": "credible, factual, trustworthy",
+      "example_headline": "Método testado para vender sem esgotar",
+      "objections_addressed": ["skepticism", "trust issues", "does it really work"],
+      "language_patterns": [
+        "X resultados em Y tempo",
+        "Método testado por...",
+        "Comprovado: [specific metric]",
+        "Sistema que já [proof point]",
+        "Processo validado em..."
+      ],
+      "avoid": [
+        "unsupported claims",
+        "vague social proof",
+        "American-style hype"
+      ],
+      "proof_usage": "heavy",
+      "emotional_level": "low",
+      "portuguese_adaptation": "Subtle confidence, not aggressive dominance"
+    },
+    "obstacle_removal": {
+      "id": 4,
+      "name": "Obstacle Removal",
+      "psychology": "Address #1 objection head-on with solution",
+      "structure": "\"O que te impede\" → \"Como remover\" → \"Resultado possível\"",
+      "best_for": ["cold", "problem-aware", "high objection levels"],
+      "tone": "solution-oriented, reassuring, practical",
+      "example_headline": "Medo de aumentar preços? Template testado para comunicar valor",
+      "objections_addressed": ["specific fears", "practical barriers", "implementation concerns"],
+      "language_patterns": [
+        "O que te impede de...",
+        "Se achas que...",
+        "Mesmo que...",
+        "Template para [overcome obstacle]",
+        "Solução para quem..."
+      ],
+      "avoid": [
+        "focusing too much on the problem",
+        "creating new fears",
+        "overwhelming with solutions"
+      ],
+      "proof_usage": "moderate",
+      "emotional_level": "medium",
+      "portuguese_adaptation": "Gentle problem-solving, not confrontational"
+    },
+    "time_simplicity": {
+      "id": 5,
+      "name": "Time & Simplicity",
+      "psychology": "Efficiency promise for busy entrepreneurs",
+      "structure": "Time saved → effort reduced → quick implementation",
+      "best_for": ["problem-aware", "solution-aware", "time-stressed"],
+      "tone": "efficient, practical, respectful of time",
+      "example_headline": "3 passos, 5 horas/semana, resultados em 30 dias",
+      "objections_addressed": ["I don't have time", "too complex", "implementation difficulty"],
+      "language_patterns": [
+        "Em apenas X horas/dias",
+        "3 passos simples",
+        "Poupa X horas por semana",
+        "Implementação rápida",
+        "Sistema simples para..."
+      ],
+      "avoid": [
+        "oversimplifying complex issues",
+        "unrealistic time promises", 
+        "productivity obsession messaging"
+      ],
+      "proof_usage": "moderate",
+      "emotional_level": "low",
+      "portuguese_adaptation": "Work-life integration, not productivity obsession"
+    },
+    "identity_values": {
+      "id": 6,
+      "name": "Identity & Values",
+      "psychology": "Community, standards, who this is for",
+      "structure": "Identity marker → values alignment → exclusive belonging",
+      "best_for": ["most-aware", "community-focused audiences"],
+      "tone": "aspirational, exclusive, community-focused",
+      "example_headline": "Para empreendedoras que recusam burnout como medalha",
+      "objections_addressed": ["fit concerns", "value alignment", "worthiness"],
+      "language_patterns": [
+        "Para empreendedoras que...",
+        "Se és do tipo que...",
+        "Junta-te a mulheres que...",
+        "Padrão diferente para...",
+        "Comunidade de mulheres que..."
+      ],
+      "avoid": [
+        "exclusivity that alienates",
+        "superiority complex",
+        "judgment of other approaches"
+      ],
+      "proof_usage": "light",
+      "emotional_level": "medium-high",
+      "portuguese_adaptation": "Community over individual achievement"
+    }
+  },
+  "selection_matrix": {
+    "by_awareness": {
+      "cold": {
+        "primary": "empathy_story",
+        "secondary": "obstacle_removal", 
+        "tertiary": "time_simplicity",
+        "rationale": "Need emotional connection first"
+      },
+      "problem_aware": {
+        "primary": "empathy_story",
+        "secondary": "obstacle_removal",
+        "tertiary": "clarity_outcome", 
+        "rationale": "Validate pain, show solution"
+      },
+      "solution_aware": {
+        "primary": "clarity_outcome",
+        "secondary": "authority_proof",
+        "tertiary": "empathy_story",
+        "rationale": "Ready for specific solutions"
+      },
+      "product_aware": {
+        "primary": "authority_proof", 
+        "secondary": "clarity_outcome",
+        "tertiary": "identity_values",
+        "rationale": "Need proof and differentiation"
+      },
+      "most_aware": {
+        "primary": "identity_values",
+        "secondary": "authority_proof", 
+        "tertiary": "time_simplicity",
+        "rationale": "Community and optimization focus"
+      }
+    },
+    "by_objection": {
+      "price_investment": {
+        "angles": ["authority_proof", "clarity_outcome", "obstacle_removal"],
+        "rationale": "Need credibility and clear value proposition"
+      },
+      "time_constraints": {
+        "angles": ["time_simplicity", "empathy_story", "clarity_outcome"],
+        "rationale": "Address time concerns directly"
+      },
+      "skepticism": {
+        "angles": ["authority_proof", "empathy_story", "obstacle_removal"],
+        "rationale": "Build trust through proof and understanding"
+      },
+      "not_for_me": {
+        "angles": ["identity_values", "empathy_story", "obstacle_removal"],
+        "rationale": "Address fit and belonging concerns"
+      },
+      "too_complex": {
+        "angles": ["time_simplicity", "clarity_outcome", "authority_proof"],
+        "rationale": "Emphasize simplicity and clear process"
+      },
+      "past_failures": {
+        "angles": ["empathy_story", "authority_proof", "obstacle_removal"],
+        "rationale": "Acknowledge struggle and show differentiation"
+      }
+    }
+  },
+  "diversity_requirements": {
+    "tone_variety": {
+      "description": "Angles must span emotional range",
+      "examples": ["confident", "warm", "credible", "practical", "aspirational"]
+    },
+    "structure_variety": {
+      "description": "Different information presentation",
+      "examples": ["outcome-first", "pain-first", "proof-first", "process-first"]
+    },
+    "psychology_variety": {
+      "description": "Different psychological triggers",
+      "examples": ["desire", "emotion", "logic", "belonging", "efficiency"]
+    },
+    "proof_intensity": {
+      "description": "Varying levels of social proof usage",
+      "levels": ["light", "moderate", "heavy"]
+    }
+  },
+  "cultural_adaptations": {
+    "portuguese_market": {
+      "authority": "Subtle confidence, not aggressive dominance",
+      "empathy": "Family/work balance themes resonate strongly",
+      "clarity": "Premium simplicity, not bare-bones efficiency", 
+      "identity": "Community over individual achievement",
+      "time": "Work-life integration, not productivity obsession",
+      "obstacle": "Gentle problem-solving, not confrontational"
+    },
+    "language_preferences": {
+      "tu_form": "Creates intimacy and connection",
+      "metaphors": "Transformation, journey, growth (not war/battle)",
+      "proof_style": "Concrete but understated, not American hype",
+      "emotional_range": "Warm professionalism, not cold efficiency"
+    }
+  },
+  "section_recommendations": {
+    "hero": {
+      "preferred_angles": ["empathy_story", "clarity_outcome", "authority_proof"],
+      "rationale": "Attention-grabbing angles that establish value quickly"
+    },
+    "problem": {
+      "preferred_angles": ["empathy_story", "obstacle_removal", "time_simplicity"],
+      "rationale": "Pain-focused angles that build understanding"
+    },
+    "solution": {
+      "preferred_angles": ["clarity_outcome", "time_simplicity", "authority_proof"],
+      "rationale": "Method-focused angles that show clear path"
+    },
+    "pricing": {
+      "preferred_angles": ["authority_proof", "obstacle_removal", "identity_values"],
+      "rationale": "Trust-building angles that justify investment"
+    },
+    "final_cta": {
+      "preferred_angles": ["time_simplicity", "identity_values", "obstacle_removal"],
+      "rationale": "Urgency and belonging angles for final push"
+    }
+  },
+  "usage_notes": {
+    "default_selection": "Use angles 1, 2, 3 (clarity_outcome, empathy_story, authority_proof) unless awareness/objection suggests otherwise",
+    "customization_triggers": [
+      "Low awareness: Add obstacle_removal or time_simplicity",
+      "High skepticism: Heavy authority_proof focus",
+      "Community brand: Include identity_values",
+      "Time-stressed audience: Emphasize time_simplicity"
+    ],
+    "quality_validation": [
+      "Ensure 3 angles differ in at least 2 dimensions",
+      "Check cultural appropriateness for Portuguese market",
+      "Validate premium positioning maintenance",
+      "Confirm objection addressing effectiveness"
+    ]
+  }
+}
