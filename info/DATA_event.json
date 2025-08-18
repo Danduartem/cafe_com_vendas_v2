@@ -34,6 +34,14 @@
         "vat": true,
         "discountPercent": 25,
         "notes": "Mais de 25% de desconto + brindes exclusivos"
+      },
+      {
+        "id": "second_lot",
+        "label": "Segundo lote",
+        "price": 240,
+        "vat": true,
+        "discountPercent": 0,
+        "notes": "Preço regular sem desconto"
       }
     ]
   },
