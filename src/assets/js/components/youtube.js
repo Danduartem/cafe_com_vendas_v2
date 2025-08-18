@@ -42,6 +42,10 @@ export const YouTube = {
     embed.innerHTML = '';
     embed.appendChild(iframe);
 
-    Analytics.track(`youtube_video_play_${videoId}`);
+    Analytics.track('video_play', {
+      event_category: 'Video',
+      event_label: videoId,
+      video_provider: 'youtube'
+    });
   }
 };
