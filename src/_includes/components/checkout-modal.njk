@@ -17,10 +17,10 @@
   <!-- Backdrop with blur effect -->
   <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300" aria-hidden="true"></div>
 
-  <!-- Modal Container - Centered with proper spacing -->
-  <div class="flex min-h-screen items-center justify-center p-4">
+  <!-- Modal Container - Responsive scrollable layout -->
+  <div class="flex min-h-screen py-4 px-4 sm:py-6 sm:px-6 lg:py-8 lg:px-8">
     <!-- Modal Dialog -->
-    <div class="relative w-full max-w-lg rounded-3xl bg-white shadow-2xl transform transition-all duration-300 scale-95 opacity-0" 
+    <div class="relative w-full max-w-lg max-h-[90vh] rounded-3xl bg-white shadow-2xl transform transition-all duration-300 scale-95 opacity-0 flex flex-col mx-auto my-auto" 
          id="modalContent" 
          role="dialog" 
          aria-modal="true" 
@@ -54,8 +54,8 @@
         </div>
       </div>
 
-      <!-- Modal Body -->
-      <div class="px-6 py-6">
+      <!-- Modal Body - Scrollable container for payment forms -->
+      <div class="flex-1 overflow-y-auto px-6 py-6">
 
 
         <!-- Step 1: Lead Form -->
@@ -124,11 +124,13 @@
           <button id="leadSubmit" 
                   type="submit" 
                   class="w-full rounded-2xl px-6 py-3 text-white font-semibold shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-gradient-to-r from-burgundy-700 to-burgundy-600 focus:ring-burgundy-700">
-            <span id="leadSubmitText">Garantir minha vaga</span>
-            <svg id="leadSubmitSpinner" class="hidden animate-spin -mr-1 ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+            <div class="inline-flex items-center justify-center gap-2 min-h-[1.5rem]">
+              <span id="leadSubmitText" class="transition-opacity duration-200">Garantir minha vaga</span>
+              <svg id="leadSubmitSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
           </button>
 
           <!-- Error Message for Step 1 -->
@@ -153,7 +155,7 @@
           </div>
 
           <!-- Event Summary -->
-          <div class="mb-4 p-4 rounded-xl bg-peach-50 border border-peach-200">
+          <div class="mb-4 p-4 rounded-xl bg-green-50 border border-green-200">
             <h4 class="font-medium text-base mb-2 text-navy-800">
               {{ event.pricing.tiers[0].label }}
             </h4>
@@ -165,7 +167,7 @@
                 €{{ event.pricing.tiers[0].price }}
               </span>
             </div>
-            <p class="text-xs mt-1 text-peach-700">
+            <p class="text-xs mt-1 text-green-700">
               {{ event.pricing.tiers[0].notes }}
             </p>
           </div>
@@ -180,11 +182,13 @@
                   type="button"
                   disabled
                   class="w-full rounded-2xl px-6 py-3 text-white font-semibold shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none bg-navy-800 focus:ring-navy-700">
-            <span id="payBtnText">Confirmar pagamento • €{{ event.pricing.tiers[0].price }}</span>
-            <svg id="payBtnSpinner" class="hidden animate-spin -mr-1 ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+            <div class="inline-flex items-center justify-center gap-2 min-h-[1.5rem]">
+              <span id="payBtnText" class="transition-opacity duration-200">Confirmar pagamento • €{{ event.pricing.tiers[0].price }}</span>
+              <svg id="payBtnSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
           </button>
 
           <!-- Error Message for Step 2 -->

@@ -121,6 +121,9 @@ export const Checkout = {
   idempotencyKey: null,
   stripeLoaded: false,
   stripeLoadPromise: null,
+  // Scroll lock state
+  scrollPosition: 0,
+  isScrollLocked: false,
 
   init() {
     try {
@@ -180,6 +183,11 @@ export const Checkout = {
       if (e.key === 'Escape' && !safeQuery('#checkoutModal').classList.contains('hidden')) {
         this.closeModal();
       }
+    });
+
+    // Safety unlock scroll on page unload
+    window.addEventListener('beforeunload', () => {
+      this.unlockScroll();
     });
 
     // Lead form submission
@@ -319,8 +327,8 @@ export const Checkout = {
     const firstInput = safeQuery('#fullName');
     setTimeout(() => firstInput?.focus(), 300);
 
-    // Prevent body scroll
-    document.body.classList.add('overflow-hidden');
+    // Lock background scroll completely
+    this.lockScroll();
   },
 
   closeModal() {
@@ -336,7 +344,7 @@ export const Checkout = {
     // Hide modal after animation
     setTimeout(() => {
       modal.classList.add('hidden');
-      document.body.classList.remove('overflow-hidden');
+      this.unlockScroll();
       this.resetForm();
     }, 300);
 
@@ -600,6 +608,8 @@ export const Checkout = {
 
         // Redirect to thank you page after delay
         setTimeout(() => {
+          // Unlock scroll before redirect to ensure clean state
+          this.unlockScroll();
           window.location.href = ENV.urls.thankYou;
         }, 2000);
       }
@@ -752,5 +762,39 @@ export const Checkout = {
     };
 
     return translations[message] || message;
+  },
+
+  // Scroll lock methods - prevent background page scroll when modal is open
+  lockScroll() {
+    if (this.isScrollLocked) return;
+
+    // Store current scroll position
+    this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    
+    // Apply scroll lock using pure Tailwind classes
+    document.body.classList.add('fixed', 'inset-x-0', 'overflow-hidden');
+    
+    // Set the top offset to maintain visual position - use negative margin
+    // Note: Using style for precise positioning as Tailwind doesn't have arbitrary negative top values
+    const topOffset = -this.scrollPosition;
+    document.body.style.top = `${topOffset}px`;
+    
+    this.isScrollLocked = true;
+  },
+
+  unlockScroll() {
+    if (!this.isScrollLocked) return;
+
+    // Remove scroll lock classes
+    document.body.classList.remove('fixed', 'inset-x-0', 'overflow-hidden');
+    
+    // Clear the top offset style
+    document.body.style.top = '';
+    
+    // Restore scroll position
+    window.scrollTo(0, this.scrollPosition);
+    
+    this.isScrollLocked = false;
+    this.scrollPosition = 0;
   }
 };
