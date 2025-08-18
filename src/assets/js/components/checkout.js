@@ -329,7 +329,7 @@ export const Checkout = {
 
     // Lock background scroll completely
     this.lockScroll();
-    
+
     // Track conversion event - modal opened
     Analytics.track('lead_capture_started', {
       event_category: 'Conversion',
@@ -365,108 +365,140 @@ export const Checkout = {
   async handleLeadSubmit(event) {
     event.preventDefault();
 
-    const submitButton = safeQuery('#leadSubmit');
-    const submitText = safeQuery('#leadSubmitText');
-    const submitSpinner = safeQuery('#leadSubmitSpinner');
+    const elements = this.getLeadFormElements();
+    const formData = this.extractLeadFormData();
 
-    // Get form data
+    // Validate required fields
+    if (!this.validateLeadForm(formData.fullName, formData.email, formData.phone)) return;
+
+    // Show loading state
+    this.setButtonLoading(elements.submitButton, elements.submitText, elements.submitSpinner, true);
+    this.clearErrors();
+
+    try {
+      await this.processLeadSubmission(formData);
+    } catch (error) {
+      this.handleLeadSubmissionError(error);
+    } finally {
+      this.setButtonLoading(elements.submitButton, elements.submitText, elements.submitSpinner, false);
+    }
+  },
+
+  getLeadFormElements() {
+    return {
+      submitButton: safeQuery('#leadSubmit'),
+      submitText: safeQuery('#leadSubmitText'),
+      submitSpinner: safeQuery('#leadSubmitSpinner')
+    };
+  },
+
+  extractLeadFormData() {
     const fullName = safeQuery('#fullName').value.trim();
     const email = safeQuery('#email').value.trim();
     const countryCode = safeQuery('#countryCode').value;
     const phone = safeQuery('#phone').value.trim();
     const fullPhone = `${countryCode} ${phone}`.trim();
 
-    // Validate required fields
-    if (!this.validateLeadForm(fullName, email, phone)) return;
+    return { fullName, email, phone, fullPhone };
+  },
 
-    // Show loading state
-    this.setButtonLoading(submitButton, submitText, submitSpinner, true);
-    this.clearErrors();
+  async processLeadSubmission(formData) {
+    // Prepare lead data
+    const leadData = {
+      lead_id: this.leadId,
+      status: 'started_checkout',
+      full_name: formData.fullName,
+      email: formData.email,
+      phone: formData.fullPhone,
+      page: window.location.pathname,
+      timestamp: new Date().toISOString(),
+      ...this.getUTMParams()
+    };
 
+    // Submit to Formspree immediately
+    await this.submitToFormspreeWithValidation(leadData);
+
+    // Create payment intent
+    const clientSecret = await this.createPaymentIntentWithValidation(leadData);
+    this.clientSecret = clientSecret;
+
+    // Initialize Stripe Elements and move to payment step
+    await this.initializeStripeElements();
+    this.setStep(2);
+
+    // Track successful conversion events
+    this.trackLeadConversion();
+  },
+
+  async submitToFormspreeWithValidation(leadData) {
+    const formspreeResponse = await this.submitToFormspree(leadData);
+    if (!formspreeResponse.ok) {
+      throw new Error('Erro ao salvar dados. Tente novamente.');
+    }
+  },
+
+  async createPaymentIntentWithValidation(leadData) {
+    const paymentIntentResponse = await this.createPaymentIntent(leadData);
+
+    if (!paymentIntentResponse.ok) {
+      const errorMessage = await this.extractPaymentErrorMessage(paymentIntentResponse);
+      const error = new Error(errorMessage);
+      error.status = paymentIntentResponse.status;
+      throw error;
+    }
+
+    const { clientSecret } = await paymentIntentResponse.json();
+    return clientSecret;
+  },
+
+  async extractPaymentErrorMessage(response) {
+    let errorMessage = 'Erro ao processar pagamento. Tente novamente.';
     try {
-      // Prepare lead data
-      const leadData = {
-        lead_id: this.leadId,
-        status: 'started_checkout',
-        full_name: fullName,
-        email,
-        phone: fullPhone,
-        page: window.location.pathname,
-        timestamp: new Date().toISOString(),
-        ...this.getUTMParams()
-      };
-
-      // Submit to Formspree immediately
-      const formspreeResponse = await this.submitToFormspree(leadData);
-
-      if (!formspreeResponse.ok) {
-        throw new Error('Erro ao salvar dados. Tente novamente.');
+      const errorData = await response.json();
+      if (errorData.details && Array.isArray(errorData.details)) {
+        errorMessage = errorData.details.join(', ');
+      } else if (errorData.error) {
+        errorMessage = errorData.error;
       }
+    } catch {
+      // Keep default error message if JSON parsing fails
+    }
+    return errorMessage;
+  },
 
-      // Create payment intent
-      const paymentIntentResponse = await this.createPaymentIntent(leadData);
+  trackLeadConversion() {
+    // Track successful lead capture
+    Analytics.track('lead_form_submitted', {
+      event_category: 'Conversion',
+      event_label: 'Lead Information Captured',
+      lead_id: this.leadId,
+      form_location: 'checkout_modal'
+    });
 
-      if (!paymentIntentResponse.ok) {
-        // Try to get detailed error message
-        let errorMessage = 'Erro ao processar pagamento. Tente novamente.';
-        try {
-          const errorData = await paymentIntentResponse.json();
-          if (errorData.details && Array.isArray(errorData.details)) {
-            errorMessage = errorData.details.join(', ');
-          } else if (errorData.error) {
-            errorMessage = errorData.error;
-          }
-        } catch {
-          // Keep default error message if JSON parsing fails
-        }
-        const error = new Error(errorMessage);
-        error.status = paymentIntentResponse.status;
-        throw error;
-      }
+    // Track checkout initiation
+    Analytics.track('checkout_initiated', {
+      event_category: 'Conversion',
+      event_label: 'Payment Step Started',
+      value: 180 // Event price in EUR
+    });
+  },
 
-      const { clientSecret } = await paymentIntentResponse.json();
-      this.clientSecret = clientSecret;
+  handleLeadSubmissionError(error) {
+    console.error('Lead submission error:', error);
 
-      // Initialize Stripe Elements
-      await this.initializeStripeElements();
-
-      // Move to step 2
-      this.setStep(2);
-
-      // Track successful lead capture
-      Analytics.track('lead_form_submitted', {
-        event_category: 'Conversion',
-        event_label: 'Lead Information Captured',
-        lead_id: this.leadId,
-        form_location: 'checkout_modal'
-      });
-      
-      // Track checkout initiation
-      Analytics.track('checkout_initiated', {
-        event_category: 'Conversion',
-        event_label: 'Payment Step Started',
-        value: 180 // Event price in EUR
-      });
-
-    } catch (error) {
-      console.error('Lead submission error:', error);
-
-      // Handle specific error types
-      if (error.status === 409) {
-        // Idempotency conflict - regenerate key and retry once
-        this.idempotencyKey = this.generateIdempotencyKey();
-        this.showError('leadError', 'Solicitação duplicada detectada. Tente novamente.');
-      } else if (error.status === 400) {
-        // Validation error - show specific message
-        this.showError('leadError', error.message || 'Dados inválidos. Verifique as informações e tente novamente.');
-      } else if (error.status === 429) {
-        // Rate limit exceeded
-        this.showError('leadError', 'Muitas tentativas. Aguarde alguns minutos e tente novamente.');
-      } else {
-        this.showError('leadError', error.message || 'Erro inesperado. Tente novamente.');
-      }
-    } finally {
-      this.setButtonLoading(submitButton, submitText, submitSpinner, false);
+    // Handle specific error types
+    if (error.status === 409) {
+      // Idempotency conflict - regenerate key and retry once
+      this.idempotencyKey = this.generateIdempotencyKey();
+      this.showError('leadError', 'Solicitação duplicada detectada. Tente novamente.');
+    } else if (error.status === 400) {
+      // Validation error - show specific message
+      this.showError('leadError', error.message || 'Dados inválidos. Verifique as informações e tente novamente.');
+    } else if (error.status === 429) {
+      // Rate limit exceeded
+      this.showError('leadError', 'Muitas tentativas. Aguarde alguns minutos e tente novamente.');
+    } else {
+      this.showError('leadError', error.message || 'Erro inesperado. Tente novamente.');
     }
   },
 
@@ -788,15 +820,15 @@ export const Checkout = {
 
     // Store current scroll position
     this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-    
+
     // Apply scroll lock using pure Tailwind classes
     document.body.classList.add('fixed', 'inset-x-0', 'overflow-hidden');
-    
+
     // Set the top offset to maintain visual position - use negative margin
     // Note: Using style for precise positioning as Tailwind doesn't have arbitrary negative top values
     const topOffset = -this.scrollPosition;
     document.body.style.top = `${topOffset}px`;
-    
+
     this.isScrollLocked = true;
   },
 
@@ -805,13 +837,13 @@ export const Checkout = {
 
     // Remove scroll lock classes
     document.body.classList.remove('fixed', 'inset-x-0', 'overflow-hidden');
-    
+
     // Clear the top offset style
     document.body.style.top = '';
-    
+
     // Restore scroll position
     window.scrollTo(0, this.scrollPosition);
-    
+
     this.isScrollLocked = false;
     this.scrollPosition = 0;
   }

@@ -1,6 +1,24 @@
 // Cloudinary integration component
 // Handles dynamic URL updates and environment configuration
 
+// Image size constants for responsive optimization
+const IMAGE_SIZES = {
+  MOBILE: {
+    MAX_WIDTH: 640,
+    WIDTH: 640,
+    HEIGHT: 480
+  },
+  DESKTOP: {
+    MAX_WIDTH: 1024,
+    WIDTH: 1024,
+    HEIGHT: 600
+  },
+  LARGE: {
+    WIDTH: 1920,
+    HEIGHT: 1080
+  }
+};
+
 export const CloudinaryComponent = {
   init() {
     this.updateCloudinaryUrls();
@@ -77,15 +95,15 @@ export const CloudinaryComponent = {
     const viewportWidth = window.innerWidth;
     let width, height;
 
-    if (viewportWidth <= 640) {
-      width = 640;
-      height = 480;
-    } else if (viewportWidth <= 1024) {
-      width = 1024;
-      height = 600;
+    if (viewportWidth <= IMAGE_SIZES.MOBILE.MAX_WIDTH) {
+      width = IMAGE_SIZES.MOBILE.WIDTH;
+      height = IMAGE_SIZES.MOBILE.HEIGHT;
+    } else if (viewportWidth <= IMAGE_SIZES.DESKTOP.MAX_WIDTH) {
+      width = IMAGE_SIZES.DESKTOP.WIDTH;
+      height = IMAGE_SIZES.DESKTOP.HEIGHT;
     } else {
-      width = 1920;
-      height = 1080;
+      width = IMAGE_SIZES.LARGE.WIDTH;
+      height = IMAGE_SIZES.LARGE.HEIGHT;
     }
 
     const heroImageUrl = `https://res.cloudinary.com/${cloudName}/image/upload/w_${width},h_${height},c_fill,q_auto,f_auto,g_auto/cafe_pnkngz`;

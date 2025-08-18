@@ -19,17 +19,17 @@ export const Analytics = {
     try {
       // Initialize dataLayer if needed
       window.dataLayer = window.dataLayer || [];
-      
+
       // Standardized event structure for GTM
       const eventData = {
         event: eventName,
         timestamp: new Date().toISOString(),
         ...parameters
       };
-      
+
       // Push to dataLayer
       window.dataLayer.push(eventData);
-      
+
       // Debug logging in development
       if (CONFIG.isDevelopment) {
         console.log(`[GTM Event] ${eventName}:`, parameters);

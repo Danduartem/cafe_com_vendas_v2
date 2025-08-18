@@ -21,135 +21,161 @@ export const Testimonials = {
   },
 
   initTestimonialsCarousel() {
-    const carousel = safeQuery('.testimonials-carousel');
-    const slides = safeQueryAll('.carousel-slide');
-    const prevButton = safeQuery('[data-carousel-prev]');
-    const nextButton = safeQuery('[data-carousel-next]');
-    const paginationContainer = safeQuery('[data-carousel-pagination]');
+    const elements = this.getCarouselElements();
+    if (!this.validateCarouselElements(elements)) return;
 
-    if (!carousel || !slides.length) {
+    this.setupCarouselState(elements);
+    this.setupCarouselBehavior(elements);
+    this.bindCarouselEvents(elements);
+    this.trackSectionView();
+  },
+
+  getCarouselElements() {
+    return {
+      carousel: safeQuery('.testimonials-carousel'),
+      slides: safeQueryAll('.carousel-slide'),
+      prevButton: safeQuery('[data-carousel-prev]'),
+      nextButton: safeQuery('[data-carousel-next]'),
+      paginationContainer: safeQuery('[data-carousel-pagination]')
+    };
+  },
+
+  validateCarouselElements(elements) {
+    if (!elements.carousel || !elements.slides.length) {
       console.warn('Testimonials carousel elements not found');
-      return;
+      return false;
     }
+    return true;
+  },
 
-    let currentIndex = 0;
+  setupCarouselState(elements) {
+    this.currentIndex = 0;
+    this.carouselElements = elements;
 
-    const createPagination = () => {
-      if (!paginationContainer) return;
+    // Add scroll-snap classes to carousel
+    elements.carousel.classList.add('snap-x', 'snap-mandatory', 'scroll-smooth');
 
-      paginationContainer.innerHTML = '';
+    // Add snap classes to slides
+    elements.slides.forEach(slide => {
+      slide.classList.add('snap-start', 'flex-shrink-0');
+    });
+  },
 
-      for (let i = 0; i < slides.length; i++) {
-        const dot = document.createElement('button');
-        dot.className = 'w-2 h-2 rounded-full bg-navy-800/20 transition-all duration-300 hover:bg-navy-800/40';
-        dot.setAttribute('type', 'button');
-        dot.setAttribute('aria-label', `Ir para testemunho ${i + 1}`);
-        dot.setAttribute('aria-current', 'false');
-        dot.addEventListener('click', () => this.goToSlide(i));
-        paginationContainer.appendChild(dot);
-      }
-      this.updatePagination();
-    };
+  setupCarouselBehavior(elements) {
+    this.createCarouselPagination(elements);
+    this.updateNavigationButtons(elements);
+  },
 
-    this.updatePagination = () => {
-      if (!paginationContainer) return;
+  createCarouselPagination(elements) {
+    if (!elements.paginationContainer) return;
 
-      const dots = paginationContainer.querySelectorAll('button');
+    elements.paginationContainer.innerHTML = '';
 
-      dots.forEach((dot, index) => {
-        if (index === currentIndex) {
-          dot.classList.remove('bg-navy-800/20');
-          dot.classList.add('bg-navy-800', 'w-6');
-          dot.setAttribute('aria-current', 'true');
-        } else {
-          dot.classList.remove('bg-navy-800', 'w-6');
-          dot.classList.add('bg-navy-800/20');
-          dot.setAttribute('aria-current', 'false');
-        }
-      });
-    };
+    for (let i = 0; i < elements.slides.length; i++) {
+      const dot = this.createPaginationDot(i);
+      elements.paginationContainer.appendChild(dot);
+    }
+    this.updatePagination(elements);
+  },
 
-    const scrollToSlide = (index) => {
-      if (slides[index]) {
-        // Use native scroll for smooth behavior
-        slides[index].scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-          inline: 'start'
-        });
-      }
-    };
+  createPaginationDot(index) {
+    const dot = document.createElement('button');
+    dot.className = 'w-2 h-2 rounded-full bg-navy-800/20 transition-all duration-300 hover:bg-navy-800/40';
+    dot.setAttribute('type', 'button');
+    dot.setAttribute('aria-label', `Ir para testemunho ${index + 1}`);
+    dot.setAttribute('aria-current', 'false');
+    dot.addEventListener('click', () => this.goToSlide(index));
+    return dot;
+  },
 
-    this.updateNavigationButtons = () => {
-      if (!prevButton || !nextButton) return;
-
-      if (currentIndex <= 0) {
-        prevButton.classList.add('opacity-50', 'cursor-not-allowed');
-        prevButton.disabled = true;
-      } else {
-        prevButton.classList.remove('opacity-50', 'cursor-not-allowed');
-        prevButton.disabled = false;
-      }
-
-      if (currentIndex >= slides.length - 1) {
-        nextButton.classList.add('opacity-50', 'cursor-not-allowed');
-        nextButton.disabled = true;
-      } else {
-        nextButton.classList.remove('opacity-50', 'cursor-not-allowed');
-        nextButton.disabled = false;
-      }
-    };
-
-    this.goToSlide = (index) => {
-      currentIndex = Math.max(0, Math.min(index, slides.length - 1));
-      scrollToSlide(currentIndex);
-      this.updatePagination();
-      this.updateNavigationButtons();
-
-      Analytics.track(CONFIG.analytics.events.TESTIMONIAL_VIEW, {
-        slide_index: currentIndex + 1,
-        total_slides: slides.length
-      });
-    };
-
-    const initCarousel = () => {
-      // Add scroll-snap classes to carousel
-      carousel.classList.add('snap-x', 'snap-mandatory', 'scroll-smooth');
-
-      // Add snap classes to slides
-      slides.forEach(slide => {
-        slide.classList.add('snap-start', 'flex-shrink-0');
-      });
-
-      createPagination();
-      this.updateNavigationButtons();
-    };
-
+  bindCarouselEvents(elements) {
     // Handle scroll events to update current index
     const handleScroll = debounce(() => {
-      const scrollLeft = carousel.scrollLeft;
-      const slideWidth = slides[0].offsetWidth;
-      const gap = parseInt(window.getComputedStyle(carousel.firstElementChild).gap) || CAROUSEL_GAP_DEFAULT;
-
-      // Calculate which slide is most visible
-      const newIndex = Math.round(scrollLeft / (slideWidth + gap));
-      if (newIndex !== currentIndex) {
-        currentIndex = newIndex;
-        this.updatePagination();
-        this.updateNavigationButtons();
-      }
+      this.handleCarouselScroll(elements);
     }, 100);
 
-    carousel.addEventListener('scroll', handleScroll, { passive: true });
+    elements.carousel.addEventListener('scroll', handleScroll, { passive: true });
 
-    // Event listeners
-    prevButton?.addEventListener('click', () => this.goToSlide(currentIndex - 1));
-    nextButton?.addEventListener('click', () => this.goToSlide(currentIndex + 1));
+    // Navigation button events
+    elements.prevButton?.addEventListener('click', () => this.goToSlide(this.currentIndex - 1));
+    elements.nextButton?.addEventListener('click', () => this.goToSlide(this.currentIndex + 1));
+  },
 
-    // Touch support is handled by native scroll
+  handleCarouselScroll(elements) {
+    const scrollLeft = elements.carousel.scrollLeft;
+    const slideWidth = elements.slides[0].offsetWidth;
+    const gap = parseInt(window.getComputedStyle(elements.carousel.firstElementChild).gap) || CAROUSEL_GAP_DEFAULT;
 
-    initCarousel();
-    this.trackSectionView();
+    // Calculate which slide is most visible
+    const newIndex = Math.round(scrollLeft / (slideWidth + gap));
+    if (newIndex !== this.currentIndex) {
+      this.currentIndex = newIndex;
+      this.updatePagination(elements);
+      this.updateNavigationButtons(elements);
+    }
+  },
+
+  updatePagination(elements) {
+    if (!elements.paginationContainer) return;
+
+    const dots = elements.paginationContainer.querySelectorAll('button');
+
+    dots.forEach((dot, index) => {
+      if (index === this.currentIndex) {
+        dot.classList.remove('bg-navy-800/20');
+        dot.classList.add('bg-navy-800', 'w-6');
+        dot.setAttribute('aria-current', 'true');
+      } else {
+        dot.classList.remove('bg-navy-800', 'w-6');
+        dot.classList.add('bg-navy-800/20');
+        dot.setAttribute('aria-current', 'false');
+      }
+    });
+  },
+
+  updateNavigationButtons(elements) {
+    if (!elements.prevButton || !elements.nextButton) return;
+
+    // Update previous button
+    this.toggleButtonState(elements.prevButton, this.currentIndex <= 0);
+
+    // Update next button
+    this.toggleButtonState(elements.nextButton, this.currentIndex >= elements.slides.length - 1);
+  },
+
+  toggleButtonState(button, isDisabled) {
+    if (isDisabled) {
+      button.classList.add('opacity-50', 'cursor-not-allowed');
+      button.disabled = true;
+    } else {
+      button.classList.remove('opacity-50', 'cursor-not-allowed');
+      button.disabled = false;
+    }
+  },
+
+  goToSlide(index) {
+    if (!this.carouselElements) return;
+
+    this.currentIndex = Math.max(0, Math.min(index, this.carouselElements.slides.length - 1));
+    this.scrollToSlide(this.currentIndex);
+    this.updatePagination(this.carouselElements);
+    this.updateNavigationButtons(this.carouselElements);
+
+    Analytics.track(CONFIG.analytics.events.TESTIMONIAL_VIEW, {
+      slide_index: this.currentIndex + 1,
+      total_slides: this.carouselElements.slides.length
+    });
+  },
+
+  scrollToSlide(index) {
+    const slide = this.carouselElements.slides[index];
+    if (slide) {
+      slide.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'start'
+      });
+    }
   },
 
   initTouchSupport(carouselTrack, currentIndex) {

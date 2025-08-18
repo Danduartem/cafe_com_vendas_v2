@@ -95,8 +95,7 @@ export const CafeComVendas = {
       { name: 'Checkout', component: Checkout },
       { name: 'Hero', component: Hero },
       { name: 'Banner', component: Banner },
-      // GTM is loaded via HTML template to avoid duplicate initialization
-      // { name: 'GTM', component: GTM },
+      { name: 'GTM', component: GTM },
       { name: 'YouTube', component: YouTube },
       { name: 'About', component: About },
       { name: 'Offer', component: Offer },

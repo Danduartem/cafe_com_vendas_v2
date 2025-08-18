@@ -77,6 +77,15 @@ export const GTM = {
     const script = document.createElement('script');
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(containerId)}&l=dataLayer`;
+
+    // Fire gtm_init event after script loads
+    script.onload = () => {
+      this.pushEvent('gtm_init', {
+        event_category: 'Application',
+        gtm_container_id: containerId
+      });
+    };
+
     document.head.appendChild(script);
 
     this.loaded = true;
