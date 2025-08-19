@@ -4,8 +4,7 @@
  */
 
 import { CONFIG } from '../config/constants.js';
-import { state, StateManager } from './state.js';
-import { throttle } from '../utils/throttle.js';
+import { StateManager } from './state.js';
 
 export const Analytics = {
   // Error tracking for improved reliability
@@ -133,29 +132,6 @@ export const Analytics = {
     }
   },
 
-  /**
-     * Initialize scroll depth tracking
-     */
-  initScrollDepthTracking() {
-    const trackScrollDepth = throttle(() => {
-      const scrollPercent = Math.round(
-        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
-      );
-
-      CONFIG.scroll.thresholds.forEach(threshold => {
-        if (scrollPercent >= threshold && !state.scrollDepth[threshold]) {
-          state.scrollDepth[threshold] = true;
-          this.track('scroll_depth', {
-            event_category: 'Engagement',
-            event_label: `${threshold}%_reached`,
-            scroll_threshold: threshold
-          });
-        }
-      });
-    }, CONFIG.scroll.throttle);
-
-    window.addEventListener('scroll', trackScrollDepth, { passive: true });
-  },
 
   /**
      * Track FAQ engagement time

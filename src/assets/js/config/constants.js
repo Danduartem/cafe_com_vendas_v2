@@ -23,8 +23,7 @@ export const CONFIG = {
     xl: 1280
   },
   scroll: {
-    throttle: 16, // ~60fps
-    thresholds: [25, 50, 75]
+    throttle: 16 // ~60fps
   },
   analytics: {
     events: {
@@ -35,7 +34,6 @@ export const CONFIG = {
       PAGE_LOAD_PERFORMANCE: 'page_load_performance',
 
       // Engagement events
-      SCROLL_DEPTH: 'scroll_depth',
       FAQ_TOGGLE: 'faq_toggle',
       FAQ_MEANINGFUL_ENGAGEMENT: 'faq_meaningful_engagement',
       TESTIMONIAL_VIEW: 'view_testimonial_slide',

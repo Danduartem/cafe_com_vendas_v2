@@ -42,7 +42,6 @@ export const CafeComVendas = {
 
       // Initialize analytics first
       Analytics.initPerformanceTracking();
-      Analytics.initScrollDepthTracking();
 
       // Initialize all components
       this.initializeComponents();

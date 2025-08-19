@@ -4,11 +4,6 @@
  */
 
 export const state = {
-  scrollDepth: {
-    25: false,
-    50: false,
-    75: false
-  },
   faqOpenTimes: {},
   isInitialized: false
 };
@@ -17,17 +12,6 @@ export const state = {
  * State management utilities
  */
 export const StateManager = {
-  /**
-     * Reset scroll depth tracking
-     */
-  resetScrollDepth() {
-    state.scrollDepth = {
-      25: false,
-      50: false,
-      75: false
-    };
-  },
-
   /**
      * Mark FAQ as opened for engagement tracking
      */
