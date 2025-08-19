@@ -424,8 +424,24 @@ export const Checkout = {
       ...this.getUTMParams()
     };
 
-    // Submit to Formspree immediately
-    await this.submitToFormspreeWithValidation(leadData);
+    // Submit to both Formspree and MailerLite in parallel
+    // Formspree is required, MailerLite is enhancement
+    const [formspreeResult, mailerliteResult] = await Promise.allSettled([
+      this.submitToFormspreeWithValidation(leadData),
+      this.submitToMailerLiteWithValidation(leadData)
+    ]);
+
+    // Continue to payment step only if Formspree succeeds
+    if (formspreeResult.status === 'rejected') {
+      throw formspreeResult.reason;
+    }
+
+    // Log MailerLite result for monitoring (don't fail on MailerLite errors)
+    if (mailerliteResult.status === 'rejected') {
+      console.warn('MailerLite lead capture failed:', mailerliteResult.reason);
+    } else if (mailerliteResult.status === 'fulfilled') {
+      console.log('MailerLite lead capture succeeded:', mailerliteResult.value);
+    }
 
     // Create payment intent
     const clientSecret = await this.createPaymentIntentWithValidation(leadData);
@@ -546,6 +562,29 @@ export const Checkout = {
 
   async submitToFormspree(leadData) {
     return fetch(ENV.formspree.endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(leadData)
+    });
+  },
+
+  async submitToMailerLiteWithValidation(leadData) {
+    const response = await this.submitToMailerLite(leadData);
+    if (!response.ok) {
+      throw new Error('MailerLite lead capture failed');
+    }
+    return response.json();
+  },
+
+  async submitToMailerLite(leadData) {
+    // Use local functions server during development
+    const functionsUrl = window.location.hostname === 'localhost' ?
+      'http://localhost:9999/.netlify/functions/mailerlite-lead' :
+      '/.netlify/functions/mailerlite-lead';
+
+    return fetch(functionsUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
