@@ -1,7 +1,7 @@
 /**
  * GTM Debug Script with Normalizer Testing for Café com Vendas
  * Enhanced debugging with normalization validation
- * 
+ *
  * Usage:
  * 1. Open your site in a browser
  * 2. Open DevTools Console (F12)
@@ -15,8 +15,8 @@
 window.gtmNormalizer = {
   normalizeString(value, maxLength = 50, fallback = 'other') {
     if (value == null || value === '') return fallback;
-    
-    let normalized = String(value)
+
+    const normalized = String(value)
       .toLowerCase()
       .trim()
       .normalize('NFD')
@@ -25,10 +25,10 @@ window.gtmNormalizer = {
       .replace(/\s+/g, ' ')
       .slice(0, maxLength)
       .trim();
-    
+
     return normalized || fallback;
   },
-  
+
   normalizeId(id) {
     if (!id) return 'unknown_id';
     return String(id)
@@ -36,25 +36,25 @@ window.gtmNormalizer = {
       .replace(/[^a-z0-9_\-]+/g, '_')
       .slice(0, 100);
   },
-  
+
   normalizeSection(section) {
     const knownSections = [
       'hero', 'problem', 'solution', 'social_proof',
       'testimonials', 'offer', 'pricing_table', 'faq',
       'final_cta', 'footer', 'checkout_modal', 'floating_button'
     ];
-    
+
     const normalized = this.normalizeString(section, 30, 'unknown');
     const found = knownSections.find(k => k === normalized || k.includes(normalized));
     return found || normalized;
   },
-  
+
   normalizeAction(action) {
     const validActions = ['open', 'close', 'click', 'submit', 'view', 'play', 'pause', 'complete'];
     const normalized = this.normalizeString(action, 20, 'unknown');
     return validActions.includes(normalized) ? normalized : 'other';
   },
-  
+
   normalizePricingTier(tier) {
     const validTiers = ['early_bird', 'regular', 'last_minute', 'vip', 'standard'];
     const normalized = this.normalizeString(tier, 30, 'standard');
@@ -68,38 +68,38 @@ window.gtmNormalizer = {
 (function setupGTMDebugger() {
   window.dataLayer = window.dataLayer || [];
   const originalPush = window.dataLayer.push;
-  
+
   window.gtmDebug = {
     events: [],
     enabled: true,
     normalizeEnabled: true
   };
-  
+
   window.dataLayer.push = function() {
     const result = originalPush.apply(window.dataLayer, arguments);
-    
+
     if (window.gtmDebug.enabled) {
       const event = arguments[0];
       const timestamp = new Date().toISOString();
-      
+
       // Check normalization
-      const normalized = window.gtmDebug.normalizeEnabled ? 
+      const normalized = window.gtmDebug.normalizeEnabled ?
         checkNormalization(event) : event;
-      
+
       window.gtmDebug.events.push({
         timestamp,
         original: event,
         normalized,
         warnings: getNormalizationWarnings(event)
       });
-      
+
       // Enhanced logging with normalization info
       console.log(
         '%c📊 GTM Event',
         'background: #4CAF50; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold;',
         event.event || 'No event name'
       );
-      
+
       // Show original vs normalized
       if (window.gtmDebug.normalizeEnabled) {
         console.log('%c  Original:', 'color: #888', event);
@@ -107,17 +107,17 @@ window.gtmNormalizer = {
       } else {
         console.log(event);
       }
-      
+
       // Show warnings
       const warnings = getNormalizationWarnings(event);
       if (warnings.length > 0) {
         console.warn('%c⚠️ Normalization Warnings:', 'color: #ff9800', warnings);
       }
     }
-    
+
     return result;
   };
-  
+
   function checkNormalization(event) {
     const normalized = {};
     for (const [key, value] of Object.entries(event)) {
@@ -129,10 +129,10 @@ window.gtmNormalizer = {
     }
     return normalized;
   }
-  
+
   function getNormalizationWarnings(event) {
     const warnings = [];
-    
+
     for (const [key, value] of Object.entries(event)) {
       if (typeof value === 'string') {
         // Check for non-normalized values
@@ -150,10 +150,10 @@ window.gtmNormalizer = {
         }
       }
     }
-    
+
     return warnings;
   }
-  
+
   console.log('%c✅ GTM Debugger with Normalizer Activated', 'color: #4CAF50; font-size: 14px; font-weight: bold;');
 })();
 
@@ -163,16 +163,16 @@ window.gtmNormalizer = {
 window.gtmNormalizerTest = {
   runAll() {
     console.log('%c🧪 Running Normalization Tests...', 'color: #2196F3; font-size: 14px; font-weight: bold;');
-    
+
     this.testStrings();
     this.testSections();
     this.testActions();
     this.testPricingTiers();
     this.testIds();
-    
+
     console.log('%c✅ All tests complete!', 'color: #4CAF50; font-size: 14px; font-weight: bold;');
   },
-  
+
   testStrings() {
     console.log('\n📝 String Normalization:');
     const tests = [
@@ -185,7 +185,7 @@ window.gtmNormalizerTest = {
       { input: null, expected: 'other' },
       { input: 'A'.repeat(100), expected: 'a'.repeat(50) }
     ];
-    
+
     tests.forEach(test => {
       const result = window.gtmNormalizer.normalizeString(test.input);
       const pass = result === test.expected;
@@ -195,7 +195,7 @@ window.gtmNormalizerTest = {
       );
     });
   },
-  
+
   testSections() {
     console.log('\n📍 Section Normalization:');
     const tests = [
@@ -205,7 +205,7 @@ window.gtmNormalizerTest = {
       { input: 'footer', expected: 'footer' },
       { input: '', expected: 'unknown' }
     ];
-    
+
     tests.forEach(test => {
       const result = window.gtmNormalizer.normalizeSection(test.input);
       const pass = result === test.expected;
@@ -215,7 +215,7 @@ window.gtmNormalizerTest = {
       );
     });
   },
-  
+
   testActions() {
     console.log('\n🎯 Action Normalization:');
     const tests = [
@@ -225,7 +225,7 @@ window.gtmNormalizerTest = {
       { input: 'click', expected: 'click' },
       { input: '', expected: 'other' }
     ];
-    
+
     tests.forEach(test => {
       const result = window.gtmNormalizer.normalizeAction(test.input);
       const pass = result === test.expected;
@@ -235,7 +235,7 @@ window.gtmNormalizerTest = {
       );
     });
   },
-  
+
   testPricingTiers() {
     console.log('\n💰 Pricing Tier Normalization:');
     const tests = [
@@ -245,7 +245,7 @@ window.gtmNormalizerTest = {
       { input: 'VIP', expected: 'vip' },
       { input: '', expected: 'standard' }
     ];
-    
+
     tests.forEach(test => {
       const result = window.gtmNormalizer.normalizePricingTier(test.input);
       const pass = result === test.expected;
@@ -255,7 +255,7 @@ window.gtmNormalizerTest = {
       );
     });
   },
-  
+
   testIds() {
     console.log('\n🔑 ID Normalization:');
     const tests = [
@@ -265,7 +265,7 @@ window.gtmNormalizerTest = {
       { input: '', expected: 'unknown_id' },
       { input: null, expected: 'unknown_id' }
     ];
-    
+
     tests.forEach(test => {
       const result = window.gtmNormalizer.normalizeId(test.input);
       const pass = result === test.expected;
@@ -285,13 +285,13 @@ window.gtmTest = {
   leadFormRaw() {
     dataLayer.push({
       event: 'lead_form_submitted',
-      lead_id: 'TEST_LEAD_' + Date.now(), // Will be normalized to lowercase
+      lead_id: `TEST_LEAD_${  Date.now()}`, // Will be normalized to lowercase
       form_location: 'Checkout Modal!', // Will be normalized
       source_section: 'PRICING TABLE' // Will be normalized
     });
     console.log('✅ Fired: lead_form_submitted (raw values)');
   },
-  
+
   checkoutRaw() {
     dataLayer.push({
       event: 'checkout_opened',
@@ -308,7 +308,7 @@ window.gtmTest = {
     });
     console.log('✅ Fired: checkout_opened (raw values)');
   },
-  
+
   faqRaw() {
     dataLayer.push({
       event: 'faq_toggle',
@@ -317,7 +317,7 @@ window.gtmTest = {
     });
     console.log('✅ Fired: faq_toggle (raw values)');
   },
-  
+
   whatsappRaw() {
     dataLayer.push({
       event: 'whatsapp_click',
@@ -327,11 +327,11 @@ window.gtmTest = {
     });
     console.log('✅ Fired: whatsapp_click (raw values)');
   },
-  
+
   // Test cardinality prevention
   cardinalityTest() {
     console.log('%c🔥 Testing Cardinality Prevention...', 'color: #ff5722; font-weight: bold;');
-    
+
     // Fire 10 events with slightly different values
     for (let i = 0; i < 10; i++) {
       const variations = [
@@ -346,22 +346,22 @@ window.gtmTest = {
         'Café com Vendas!!!',
         'CaFé CoM VeNdAs'
       ];
-      
+
       dataLayer.push({
         event: 'cardinality_test',
         test_value: variations[i]
       });
     }
-    
+
     // Check unique values
     const uniqueValues = new Set();
     window.gtmDebug.events
       .filter(e => e.original.event === 'cardinality_test')
       .forEach(e => uniqueValues.add(e.normalized.test_value));
-    
+
     console.log(`📊 10 variations sent → ${uniqueValues.size} unique normalized values`);
     console.log('Unique values:', Array.from(uniqueValues));
-    
+
     if (uniqueValues.size === 1) {
       console.log('%c✅ Cardinality prevention working!', 'color: #4CAF50; font-weight: bold;');
     } else {
@@ -377,9 +377,9 @@ window.gtmAnalyze = {
   // Check cardinality for all events
   checkCardinality() {
     console.log('%c📊 Cardinality Analysis', 'color: #2196F3; font-size: 14px; font-weight: bold;');
-    
+
     const fields = {};
-    
+
     window.gtmDebug.events.forEach(e => {
       Object.entries(e.normalized).forEach(([key, value]) => {
         if (typeof value === 'string') {
@@ -388,7 +388,7 @@ window.gtmAnalyze = {
         }
       });
     });
-    
+
     console.table(
       Object.entries(fields).map(([field, values]) => ({
         Field: field,
@@ -397,13 +397,13 @@ window.gtmAnalyze = {
       }))
     );
   },
-  
+
   // Find non-normalized values
   findIssues() {
     console.log('%c🔍 Finding Non-Normalized Values', 'color: #ff5722; font-size: 14px; font-weight: bold;');
-    
+
     const issues = [];
-    
+
     window.gtmDebug.events.forEach((e, index) => {
       if (e.warnings && e.warnings.length > 0) {
         issues.push({
@@ -413,14 +413,14 @@ window.gtmAnalyze = {
         });
       }
     });
-    
+
     if (issues.length === 0) {
       console.log('✅ No normalization issues found!');
     } else {
       console.table(issues);
     }
   },
-  
+
   // Export normalized events
   exportNormalized() {
     const normalized = window.gtmDebug.events.map(e => e.normalized);

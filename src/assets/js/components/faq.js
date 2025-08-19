@@ -42,11 +42,11 @@ export const FAQ = {
         const itemNumber = detailsEl.getAttribute('data-faq-item');
         const questionText = detailsEl.querySelector('summary')?.textContent?.trim() || `FAQ ${itemNumber}`;
         const label = `faq-${itemNumber}`;
-        
+
         try {
           // Track engagement time
           Analytics.trackFAQEngagement(label, isOpen);
-          
+
           // Push FAQ toggle event to dataLayer for GTM
           window.dataLayer = window.dataLayer || [];
           const faqPayload = normalizeEventPayload({

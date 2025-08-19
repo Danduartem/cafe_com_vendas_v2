@@ -21,7 +21,7 @@ export const ScrollTracker = {
   init() {
     // Ensure dataLayer exists
     window.dataLayer = window.dataLayer || [];
-    
+
     // Create throttled scroll handler
     const handleScroll = throttle(() => {
       this.checkScrollDepth();
@@ -29,7 +29,7 @@ export const ScrollTracker = {
 
     // Listen for scroll events
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
+
     // Also check on resize as viewport changes affect scroll percentages
     window.addEventListener('resize', throttle(() => {
       this.checkScrollDepth();
@@ -50,12 +50,12 @@ export const ScrollTracker = {
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
       const scrollTop = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
-      
+
       // Prevent division by zero
       if (documentHeight <= windowHeight) {
         return; // Page is too short to scroll
       }
-      
+
       // Calculate percentage (0-100)
       const scrollPercent = Math.round(
         ((scrollTop + windowHeight) / documentHeight) * 100
@@ -63,7 +63,7 @@ export const ScrollTracker = {
 
       // Check each threshold
       const thresholds = [10, 25, 50, 75, 90];
-      
+
       thresholds.forEach(threshold => {
         if (scrollPercent >= threshold && !this.firedThresholds[threshold]) {
           this.fireScrollEvent(threshold);

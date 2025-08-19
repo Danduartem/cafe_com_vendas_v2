@@ -21,7 +21,7 @@ export const StateManager = {
   markFAQOpened(faqId) {
     state.faqOpenTimes[faqId] = Date.now();
     state.faqToggleCount++; // Increment toggle count
-    
+
     // Check for meaningful engagement (3+ toggles)
     if (state.faqToggleCount === 3) {
       // Push meaningful engagement event to dataLayer

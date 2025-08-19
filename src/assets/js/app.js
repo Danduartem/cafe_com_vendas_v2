@@ -43,7 +43,7 @@ export const CafeComVendas = {
 
       // Initialize analytics first
       Analytics.initPerformanceTracking();
-      
+
       // Initialize scroll depth tracking
       ScrollTracker.init();
 

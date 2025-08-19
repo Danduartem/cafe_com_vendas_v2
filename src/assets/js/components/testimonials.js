@@ -160,7 +160,7 @@ export const Testimonials = {
     this.updateNavigationButtons(this.carouselElements);
 
     // Track testimonial slide view for GTM
-    const testimonialId = this.carouselElements.slides[this.currentIndex]?.getAttribute('data-testimonial-id') || 
+    const testimonialId = this.carouselElements.slides[this.currentIndex]?.getAttribute('data-testimonial-id') ||
                          `tst_${String(this.currentIndex + 1).padStart(2, '0')}`;
     window.dataLayer = window.dataLayer || [];
     const testimonialPayload = normalizeEventPayload({

@@ -150,7 +150,7 @@ export const Hero = {
     const whatsappLink = whatsappButton.querySelector('a[href*="wa.me"]');
     if (whatsappLink && !whatsappLink.hasAttribute('data-gtm-tracked')) {
       whatsappLink.setAttribute('data-gtm-tracked', 'true'); // Prevent duplicate listeners
-      
+
       whatsappLink.addEventListener('click', function() {
         // Push WhatsApp click event to dataLayer
         window.dataLayer = window.dataLayer || [];

@@ -11,7 +11,7 @@
  * - Limits to safe characters (alphanumeric, dash, underscore, space)
  * - Limits length to prevent cardinality issues
  * - Returns 'other' for empty/invalid values
- * 
+ *
  * @param {any} value - The value to normalize
  * @param {number} maxLength - Maximum length (default: 50)
  * @param {string} fallback - Fallback value (default: 'other')
@@ -24,7 +24,7 @@ export function normalizeString(value, maxLength = 50, fallback = 'other') {
   }
 
   // Convert to string and normalize
-  let normalized = String(value)
+  const normalized = String(value)
     .toLowerCase()
     .trim()
     // Remove accents/diacritics (important for Portuguese)
@@ -49,7 +49,7 @@ export function normalizeString(value, maxLength = 50, fallback = 'other') {
  */
 export function normalizeId(id) {
   if (!id) return 'unknown_id';
-  
+
   // Keep alphanumeric, dash, underscore (common in IDs)
   return String(id)
     .toLowerCase()
@@ -80,12 +80,12 @@ export function normalizeSection(section) {
   ];
 
   const normalized = normalizeString(section, 30, 'unknown');
-  
+
   // Map to known section if close match
-  const found = knownSections.find(known => 
+  const found = knownSections.find(known =>
     known === normalized || known.includes(normalized) || normalized.includes(known)
   );
-  
+
   return found || normalized;
 }
 
@@ -96,7 +96,7 @@ export function normalizeSection(section) {
  */
 export function normalizeUrl(url) {
   if (!url) return 'no_url';
-  
+
   try {
     const urlObj = new URL(String(url));
     // Return just hostname and pathname for privacy
@@ -115,7 +115,7 @@ export function normalizeUrl(url) {
 export function normalizeAction(action) {
   const validActions = ['open', 'close', 'click', 'submit', 'view', 'play', 'pause', 'complete'];
   const normalized = normalizeString(action, 20, 'unknown');
-  
+
   // Map to valid action if match found
   return validActions.includes(normalized) ? normalized : 'other';
 }
@@ -128,7 +128,7 @@ export function normalizeAction(action) {
 export function normalizePricingTier(tier) {
   const validTiers = ['early_bird', 'regular', 'last_minute', 'vip', 'standard'];
   const normalized = normalizeString(tier, 30, 'standard');
-  
+
   return validTiers.includes(normalized) ? normalized : 'standard';
 }
 
@@ -150,13 +150,13 @@ export function normalizeQuestion(question) {
 export function normalizeFormLocation(location) {
   const validLocations = [
     'checkout_modal',
-    'footer_form', 
+    'footer_form',
     'popup_leadgen',
     'inline_form',
     'sidebar_form',
     'header_form'
   ];
-  
+
   const normalized = normalizeString(location, 30, 'unknown_form');
   return validLocations.includes(normalized) ? normalized : normalized;
 }
@@ -185,41 +185,41 @@ export function normalizeParameter(key, value) {
 
   // Apply specific normalizers based on parameter name
   switch (key) {
-    case 'lead_id':
-    case 'transaction_id':
-    case 'testimonial_id':
-    case 'payment_intent_id':
-      return normalizeId(value);
-    
-    case 'source_section':
-    case 'section':
-    case 'location':
-      return normalizeSection(value);
-    
-    case 'form_location':
-      return normalizeFormLocation(value);
-    
-    case 'link_url':
-      return normalizeUrl(value);
-    
-    case 'action':
-      return normalizeAction(value);
-    
-    case 'pricing_tier':
-      return normalizePricingTier(value);
-    
-    case 'question':
-      return normalizeQuestion(value);
-    
-    case 'video_title':
-    case 'link_text':
-    case 'event_label':
-    case 'event_category':
-      return normalizeString(value, 50);
-    
+  case 'lead_id':
+  case 'transaction_id':
+  case 'testimonial_id':
+  case 'payment_intent_id':
+    return normalizeId(value);
+
+  case 'source_section':
+  case 'section':
+  case 'location':
+    return normalizeSection(value);
+
+  case 'form_location':
+    return normalizeFormLocation(value);
+
+  case 'link_url':
+    return normalizeUrl(value);
+
+  case 'action':
+    return normalizeAction(value);
+
+  case 'pricing_tier':
+    return normalizePricingTier(value);
+
+  case 'question':
+    return normalizeQuestion(value);
+
+  case 'video_title':
+  case 'link_text':
+  case 'event_label':
+  case 'event_category':
+    return normalizeString(value, 50);
+
     // Default: general string normalization
-    default:
-      return typeof value === 'string' ? normalizeString(value) : value;
+  default:
+    return typeof value === 'string' ? normalizeString(value) : value;
   }
 }
 
@@ -230,7 +230,7 @@ export function normalizeParameter(key, value) {
  */
 export function normalizeEventPayload(payload) {
   const normalized = {};
-  
+
   for (const [key, value] of Object.entries(payload)) {
     // Skip 'event' key itself (don't normalize event names)
     if (key === 'event' || key === 'timestamp') {
@@ -239,7 +239,7 @@ export function normalizeEventPayload(payload) {
       normalized[key] = normalizeParameter(key, value);
     }
   }
-  
+
   return normalized;
 }
 
