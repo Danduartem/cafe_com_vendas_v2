@@ -1,11 +1,41 @@
 {
   "metadata": {
-    "version": "2.0.0",
-    "lastUpdated": "2025-08-18",
+    "version": "3.0.0",
+    "lastUpdated": "2025-08-19",
     "totalAgents": 34,
     "optimized": true,
-    "baseTemplate": "01-base-template.md",
-    "project": "cafe-com-vendas-v2"
+    "baseTemplate": "00-core/base-template.md",
+    "project": "cafe-com-vendas-v2",
+    "structure": "categorized-folders",
+    "features": ["templates", "workflows", "health-monitoring", "capability-matrix"]
+  },
+  "health_metrics": {
+    "last_health_check": "2025-08-19",
+    "average_success_rate": 0.92,
+    "average_completion_time": "180s",
+    "most_used_agents": ["portuguese-copywriter", "conversion-optimizer", "orchestrator"],
+    "least_used_agents": ["online-bizplan-orchestrator", "utility-librarian"],
+    "error_rate": 0.03
+  },
+  "capability_matrix": {
+    "content_creation": ["portuguese-copywriter", "copy-variant-writer", "angle-generator", "education-strategist"],
+    "optimization": ["conversion-optimizer", "performance-auditor", "value-optimization-specialist"],
+    "design": ["ui-designer", "ux-designer", "beauty-art-director", "frontend-prototyper"],
+    "analytics": ["gtm-analytics-tracker", "market-researcher", "business-analyst"],
+    "coordination": ["orchestrator", "landing-page-orchestrator", "email-generator-orchestrator"],
+    "quality_assurance": ["design-compliance-specialist", "copy-quality-specialist", "beauty-critic"]
+  },
+  "performance_benchmarks": {
+    "response_time_targets": {
+      "simple_tasks": "60s",
+      "complex_tasks": "300s",
+      "orchestrated_workflows": "600s"
+    },
+    "token_limits": {
+      "per_agent": 10000,
+      "per_workflow": 50000,
+      "daily_budget": 500000
+    }
   },
   "categories": {
     "orchestrators": {
@@ -101,6 +131,23 @@
     "landing": "landing-page-orchestrator",
     "convert": "conversion-optimizer",
     "research": "customer-insights"
+  },
+  "fallback_chains": {
+    "portuguese-copywriter": ["copy-variant-writer", "copy-quality-specialist"],
+    "conversion-optimizer": ["business-analyst", "customer-insights"],
+    "performance-auditor": ["eleventy-njk-specialist", "design-compliance-specialist"],
+    "gtm-analytics-tracker": ["conversion-optimizer"],
+    "design-compliance-specialist": ["beauty-critic", "ui-designer"]
+  },
+  "agent_aliases": {
+    "copy": ["portuguese-copywriter", "copywriter", "writer"],
+    "design": ["ui-designer", "designer", "visual"],
+    "ux": ["ux-designer", "user-experience", "usability"],
+    "performance": ["performance-auditor", "speed", "lighthouse"],
+    "analytics": ["gtm-analytics-tracker", "tracking", "gtm"],
+    "conversion": ["conversion-optimizer", "cro", "optimize"],
+    "email": ["email-automation-specialist", "automation", "nurture"],
+    "orchestrate": ["orchestrator", "coordinate", "manage"]
   },
   "dependencies": {
     "conversion-optimizer": ["portuguese-copywriter", "design-compliance-specialist"],

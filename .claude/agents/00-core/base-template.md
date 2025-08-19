@@ -1,17 +1,32 @@
 # Base Agent Template
 
-This template provides shared context and directives for all Café com Vendas agents.
+This template provides shared context, standards, and directives for all Café com Vendas agents.
 
-## 🔄 Planning Before Action Directive
+## 🎯 Agent Metadata
+- **Version**: 3.0.0
+- **Base Template**: Universal foundation for all agents
+- **Project**: Café com Vendas - Portuguese Female Entrepreneur Event
+- **Last Updated**: 2025-08-19
 
-**MANDATORY: ALWAYS plan before executing any changes**
+## 🔄 Universal Planning Process
+
+**MANDATORY: Every agent MUST follow this 5-step planning process**
 
 Before taking any action, you MUST:
-1. **Analyze** the request and identify required data sources
-2. **Outline** 3-5 specific steps with clear deliverables
-3. **Present** your plan clearly to the user
-4. **Wait** for explicit approval before proceeding
-5. **Execute** only after confirmation
+1. **Analyze** the request scope and identify all required data sources
+2. **Research** relevant files, guidelines, and existing patterns
+3. **Design** solution approach with 3-5 specific deliverables
+4. **Validate** approach against quality standards and constraints
+5. **Present** complete plan for approval before execution
+
+## 📊 Success Metrics Framework
+
+All agents must track and optimize for:
+- **Quality Score**: >90% adherence to standards
+- **Completion Time**: Within timeout limits
+- **Token Efficiency**: <10k tokens per task
+- **Error Rate**: <5% failure rate
+- **User Satisfaction**: Clear, actionable outputs
 
 ## 📋 Shared Project Context
 
@@ -47,6 +62,14 @@ Before taking any action, you MUST:
 - `info/CONTENT_copy_library.md` - Proven copy patterns and headlines
 - `info/GUIDE_voice_tone.md` - Brand voice and communication guidelines
 - `info/GUIDE_brand_visual.md` - Visual identity and brand standards
+
+### Agent System Files
+- `00-core/agent-config.json` - System configuration and metadata
+- `_templates/` - Agent and orchestrator templates
+- `_workflows/` - Predefined workflow sequences
+- `README.md` - Agent directory and quick start
+- `WORKFLOWS.md` - Detailed workflow documentation
+- `TROUBLESHOOTING.md` - Problem resolution guide
 
 ### Code Structure References
 - `src/_data/*.js` - Eleventy data layer
@@ -141,3 +164,23 @@ Agents inheriting from this base should:
 - **Focus** on their unique specialization and expertise
 - **Reference** this base for shared standards and requirements
 - **Add** only agent-specific context and methodologies
+
+## ⚠️ Error Handling Standards
+
+All agents must implement:
+- **Graceful Degradation**: Continue with reduced functionality
+- **Clear Error Messages**: Specify what went wrong and how to fix
+- **Fallback Options**: Suggest alternative approaches
+- **Recovery Procedures**: Document how to retry or recover
+
+## 🔍 Quality Assurance Checklist
+
+Before completing any task, verify:
+- [ ] All planning steps completed
+- [ ] Data sources properly referenced
+- [ ] Output follows standard format
+- [ ] Success metrics defined
+- [ ] Compliance rules followed
+- [ ] Performance standards met
+- [ ] Error scenarios handled
+- [ ] Documentation clear and actionable

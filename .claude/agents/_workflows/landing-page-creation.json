@@ -1,0 +1,263 @@
+{
+  "name": "landing-page-creation",
+  "version": "1.0.0",
+  "description": "Complete landing page creation workflow from strategy to implementation",
+  "trigger": {
+    "manual": ["Create new landing page", "Redesign existing page"]
+  },
+  "phases": [
+    {
+      "phase": 1,
+      "name": "Strategy & Research",
+      "agents": [
+        {
+          "agent": "customer-insights",
+          "task": "Define target audience and pain points",
+          "timeout": 300,
+          "output": "audience_profile.json"
+        },
+        {
+          "agent": "market-researcher",
+          "task": "Analyze market opportunity and competition",
+          "timeout": 300,
+          "parallel": true,
+          "output": "market_analysis.json"
+        },
+        {
+          "agent": "business-analyst",
+          "task": "Define business objectives and KPIs",
+          "timeout": 240,
+          "parallel": true,
+          "output": "business_requirements.json"
+        }
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Content Strategy",
+      "agents": [
+        {
+          "agent": "message-map-strategist",
+          "task": "Create messaging hierarchy and flow",
+          "timeout": 300,
+          "output": "message_map.json"
+        },
+        {
+          "agent": "education-strategist",
+          "task": "Design educational content framework",
+          "timeout": 240,
+          "parallel": true,
+          "output": "education_framework.json"
+        },
+        {
+          "agent": "proof-curator",
+          "task": "Select social proof and testimonials",
+          "timeout": 180,
+          "parallel": true,
+          "output": "social_proof.json"
+        }
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Copy Creation",
+      "agents": [
+        {
+          "agent": "angle-generator",
+          "task": "Generate strategic copy angles",
+          "timeout": 180,
+          "output": "copy_angles.json"
+        },
+        {
+          "agent": "portuguese-copywriter",
+          "task": "Write all page sections in Portuguese",
+          "timeout": 600,
+          "depends_on": ["angle-generator"],
+          "output": "page_copy.md"
+        },
+        {
+          "agent": "copy-quality-specialist",
+          "task": "Review and optimize copy quality",
+          "timeout": 300,
+          "depends_on": ["portuguese-copywriter"],
+          "output": "final_copy.md"
+        }
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "Design & UX",
+      "agents": [
+        {
+          "agent": "ux-designer",
+          "task": "Create user flow and wireframes",
+          "timeout": 420,
+          "output": "ux_specifications.json"
+        },
+        {
+          "agent": "ui-designer",
+          "task": "Design visual layouts and components",
+          "timeout": 480,
+          "depends_on": ["ux-designer"],
+          "output": "ui_designs.json"
+        },
+        {
+          "agent": "beauty-art-director",
+          "task": "Define art direction and imagery",
+          "timeout": 300,
+          "parallel": true,
+          "output": "art_direction.json"
+        },
+        {
+          "agent": "beauty-critic",
+          "task": "Refine visual aesthetics",
+          "timeout": 240,
+          "depends_on": ["ui-designer", "beauty-art-director"],
+          "output": "design_refinements.json"
+        }
+      ]
+    },
+    {
+      "phase": 5,
+      "name": "Technical Development",
+      "agents": [
+        {
+          "agent": "frontend-prototyper",
+          "task": "Create HTML/CSS prototype",
+          "timeout": 600,
+          "output": "prototype.html"
+        },
+        {
+          "agent": "eleventy-njk-specialist",
+          "task": "Convert to Eleventy templates",
+          "timeout": 480,
+          "depends_on": ["frontend-prototyper"],
+          "output": "templates/*.njk"
+        },
+        {
+          "agent": "stripe-event-specialist",
+          "task": "Implement payment integration",
+          "timeout": 420,
+          "parallel": true,
+          "output": "payment_setup.json"
+        }
+      ]
+    },
+    {
+      "phase": 6,
+      "name": "Analytics & Tracking",
+      "agents": [
+        {
+          "agent": "gtm-analytics-tracker",
+          "task": "Set up comprehensive tracking",
+          "timeout": 360,
+          "output": "tracking_implementation.json"
+        },
+        {
+          "agent": "conversion-optimizer",
+          "task": "Configure conversion goals",
+          "timeout": 240,
+          "depends_on": ["gtm-analytics-tracker"],
+          "output": "conversion_setup.json"
+        }
+      ]
+    },
+    {
+      "phase": 7,
+      "name": "Quality Assurance",
+      "agents": [
+        {
+          "agent": "design-compliance-specialist",
+          "task": "Validate design system compliance",
+          "timeout": 300,
+          "output": "design_audit.json"
+        },
+        {
+          "agent": "performance-auditor",
+          "task": "Audit performance metrics",
+          "timeout": 300,
+          "parallel": true,
+          "output": "performance_audit.json"
+        },
+        {
+          "agent": "value-optimization-specialist",
+          "task": "Validate value delivery",
+          "timeout": 240,
+          "parallel": true,
+          "output": "value_audit.json"
+        }
+      ]
+    },
+    {
+      "phase": 8,
+      "name": "Email Integration",
+      "agents": [
+        {
+          "agent": "email-automation-specialist",
+          "task": "Create follow-up email sequences",
+          "timeout": 420,
+          "output": "email_sequences.json"
+        },
+        {
+          "agent": "segmentation-architect",
+          "task": "Define audience segments",
+          "timeout": 240,
+          "parallel": true,
+          "output": "segments.json"
+        }
+      ]
+    },
+    {
+      "phase": 9,
+      "name": "Final Review",
+      "agents": [
+        {
+          "agent": "landing-page-orchestrator",
+          "task": "Coordinate final review and checklist",
+          "timeout": 300,
+          "output": "launch_readiness.md"
+        }
+      ]
+    }
+  ],
+  "deliverables": {
+    "documentation": [
+      "strategy_document.md",
+      "technical_specifications.md",
+      "launch_checklist.md"
+    ],
+    "code": [
+      "templates/*.njk",
+      "assets/css/*.css",
+      "assets/js/*.js"
+    ],
+    "content": [
+      "final_copy.md",
+      "email_sequences.json",
+      "social_proof.json"
+    ],
+    "analytics": [
+      "tracking_plan.json",
+      "conversion_goals.json",
+      "success_metrics.json"
+    ]
+  },
+  "success_metrics": {
+    "pre_launch": {
+      "lighthouse_score": ">90",
+      "wcag_compliance": "AA",
+      "mobile_responsive": true,
+      "cross_browser_tested": true
+    },
+    "post_launch": {
+      "conversion_rate": ">3%",
+      "bounce_rate": "<40%",
+      "average_time_on_page": ">3min",
+      "registration_completion": ">60%"
+    }
+  },
+  "estimated_duration": "8-12 hours",
+  "token_budget": 100000,
+  "priority": "critical",
+  "tags": ["landing-page", "full-stack", "conversion", "launch"]
+}

@@ -1,0 +1,242 @@
+{
+  "name": "email-campaign",
+  "version": "1.0.0",
+  "description": "Complete email campaign creation and automation workflow",
+  "trigger": {
+    "manual": ["Create email campaign", "Launch nurture sequence"],
+    "automatic": {
+      "event": "new_registration",
+      "condition": "email_opt_in === true"
+    }
+  },
+  "phases": [
+    {
+      "phase": 1,
+      "name": "Campaign Strategy",
+      "agents": [
+        {
+          "agent": "brief-intake-analyst",
+          "task": "Validate campaign requirements and goals",
+          "timeout": 180,
+          "output": "campaign_brief.json"
+        },
+        {
+          "agent": "customer-insights",
+          "task": "Define email audience segments",
+          "timeout": 240,
+          "parallel": true,
+          "output": "audience_segments.json"
+        },
+        {
+          "agent": "message-map-strategist",
+          "task": "Design message sequence and timing",
+          "timeout": 300,
+          "depends_on": ["brief-intake-analyst"],
+          "output": "message_sequence.json"
+        }
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Content Creation",
+      "agents": [
+        {
+          "agent": "education-strategist",
+          "task": "Create educational content framework",
+          "timeout": 300,
+          "output": "education_content.json"
+        },
+        {
+          "agent": "utility-librarian",
+          "task": "Select reusable value blocks",
+          "timeout": 180,
+          "parallel": true,
+          "output": "value_blocks.json"
+        },
+        {
+          "agent": "proof-curator",
+          "task": "Select testimonials and case studies",
+          "timeout": 180,
+          "parallel": true,
+          "output": "social_proof.json"
+        }
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Copy Development",
+      "agents": [
+        {
+          "agent": "angle-generator",
+          "task": "Generate email copy angles",
+          "timeout": 180,
+          "output": "email_angles.json"
+        },
+        {
+          "agent": "portuguese-copywriter",
+          "task": "Write email sequences in Portuguese",
+          "timeout": 600,
+          "depends_on": ["angle-generator"],
+          "output": "email_copy.md"
+        },
+        {
+          "agent": "cognitive-load-reviewer",
+          "task": "Optimize for mobile readability",
+          "timeout": 240,
+          "depends_on": ["portuguese-copywriter"],
+          "output": "mobile_optimized_copy.md"
+        },
+        {
+          "agent": "copy-quality-specialist",
+          "task": "Final copy review and polish",
+          "timeout": 300,
+          "depends_on": ["cognitive-load-reviewer"],
+          "output": "final_email_copy.md"
+        }
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "Value Optimization",
+      "agents": [
+        {
+          "agent": "value-optimization-specialist",
+          "task": "Enhance value delivery in each email",
+          "timeout": 360,
+          "output": "value_enhanced_emails.json"
+        }
+      ]
+    },
+    {
+      "phase": 5,
+      "name": "Technical Setup",
+      "agents": [
+        {
+          "agent": "segmentation-architect",
+          "task": "Build audience segments and filters",
+          "timeout": 300,
+          "output": "segmentation_rules.json"
+        },
+        {
+          "agent": "email-automation-specialist",
+          "task": "Configure automation workflows",
+          "timeout": 420,
+          "depends_on": ["segmentation-architect"],
+          "output": "automation_setup.json"
+        },
+        {
+          "agent": "stripe-event-specialist",
+          "task": "Set up payment-triggered emails",
+          "timeout": 300,
+          "parallel": true,
+          "output": "payment_triggers.json"
+        }
+      ]
+    },
+    {
+      "phase": 6,
+      "name": "Analytics Configuration",
+      "agents": [
+        {
+          "agent": "gtm-analytics-tracker",
+          "task": "Set up email tracking and UTM parameters",
+          "timeout": 240,
+          "output": "email_tracking.json"
+        },
+        {
+          "agent": "conversion-optimizer",
+          "task": "Define email conversion goals",
+          "timeout": 180,
+          "depends_on": ["gtm-analytics-tracker"],
+          "output": "email_goals.json"
+        }
+      ]
+    },
+    {
+      "phase": 7,
+      "name": "Final Review",
+      "agents": [
+        {
+          "agent": "email-generator-orchestrator",
+          "task": "Coordinate final review and testing",
+          "timeout": 360,
+          "output": "campaign_launch_plan.md"
+        }
+      ]
+    }
+  ],
+  "email_sequence": {
+    "welcome_series": {
+      "email_1": {
+        "timing": "immediate",
+        "purpose": "Welcome and set expectations",
+        "cta": "Access first resource"
+      },
+      "email_2": {
+        "timing": "+1 day",
+        "purpose": "Deliver quick win",
+        "cta": "Apply framework"
+      },
+      "email_3": {
+        "timing": "+3 days",
+        "purpose": "Share transformation story",
+        "cta": "Book discovery call"
+      },
+      "email_4": {
+        "timing": "+5 days",
+        "purpose": "Address main objection",
+        "cta": "Register for event"
+      },
+      "email_5": {
+        "timing": "+7 days",
+        "purpose": "Final urgency",
+        "cta": "Secure your spot"
+      }
+    }
+  },
+  "deliverables": {
+    "content": [
+      "final_email_copy.md",
+      "email_templates/*.html",
+      "subject_lines.json"
+    ],
+    "automation": [
+      "automation_workflows.json",
+      "segmentation_rules.json",
+      "trigger_conditions.json"
+    ],
+    "analytics": [
+      "tracking_setup.json",
+      "utm_parameters.json",
+      "conversion_goals.json"
+    ]
+  },
+  "success_metrics": {
+    "engagement": {
+      "open_rate": ">35%",
+      "click_rate": ">8%",
+      "unsubscribe_rate": "<2%"
+    },
+    "conversion": {
+      "email_to_registration": ">5%",
+      "email_to_payment": ">2%",
+      "nurture_to_customer": ">10%"
+    },
+    "deliverability": {
+      "bounce_rate": "<2%",
+      "spam_complaints": "<0.1%",
+      "inbox_placement": ">95%"
+    }
+  },
+  "compliance": {
+    "gdpr": true,
+    "can_spam": true,
+    "double_opt_in": true,
+    "unsubscribe_link": "required",
+    "sender_authentication": ["SPF", "DKIM", "DMARC"]
+  },
+  "estimated_duration": "6-8 hours",
+  "token_budget": 60000,
+  "priority": "high",
+  "tags": ["email", "automation", "nurture", "conversion", "retention"]
+}
