@@ -4,7 +4,7 @@
  * Follows strict Tailwind-only CSS approach with class manipulation only
  */
 
-import { ENV } from '../config/constants.js';
+import { ENV, CONFIG } from '../config/constants.js';
 import { Analytics } from '../core/analytics.js';
 import { safeQuery } from '../utils/index.js';
 
@@ -468,7 +468,7 @@ export const Checkout = {
 
   trackLeadConversion() {
     // Track successful lead capture
-    Analytics.track('lead_form_submitted', {
+    Analytics.track(CONFIG.analytics.events.LEAD_FORM_SUBMITTED, {
       event_category: 'Conversion',
       event_label: 'Lead Information Captured',
       lead_id: this.leadId,

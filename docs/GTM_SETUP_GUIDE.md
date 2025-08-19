@@ -252,7 +252,7 @@ VITE_GTM_CONTAINER_ID=GTM-T63QRLFT
 // Conversion Events  
 'checkout_opened'
 'checkout_closed'
-'lead_captured'
+'lead_form_submitted'
 'payment_completed'
 'payment_failed'
 
