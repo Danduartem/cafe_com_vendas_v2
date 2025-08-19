@@ -1,7 +1,9 @@
 /**
  * Google Tag Manager Helper
- * Provides helper functions for dataLayer events (GTM loaded via HTML)
+ * Provides helper functions for dataLayer events with automatic normalization
  */
+
+import { normalizeEventPayload } from '../utils/gtm-normalizer.js';
 
 export const GTM = {
   init() {
@@ -10,16 +12,19 @@ export const GTM = {
   },
 
   /**
-   * Helper function for consistent dataLayer event structure
+   * Helper function for consistent dataLayer event structure with normalization
    */
   pushEvent(eventName, parameters = {}) {
     // Ensure dataLayer exists
     window.dataLayer = window.dataLayer || [];
 
-    window.dataLayer.push({
+    // Normalize all parameters to prevent cardinality issues
+    const normalizedParams = normalizeEventPayload({
       event: eventName,
       ...parameters
     });
+
+    window.dataLayer.push(normalizedParams);
   },
 
   /**

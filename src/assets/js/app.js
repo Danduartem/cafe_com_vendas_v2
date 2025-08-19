@@ -6,6 +6,7 @@
 import { CONFIG } from './config/constants.js';
 import { state, StateManager } from './core/state.js';
 import { Analytics } from './core/analytics.js';
+import { ScrollTracker } from './utils/scroll-tracker.js';
 import {
   Hero,
   Banner,
@@ -42,6 +43,9 @@ export const CafeComVendas = {
 
       // Initialize analytics first
       Analytics.initPerformanceTracking();
+      
+      // Initialize scroll depth tracking
+      ScrollTracker.init();
 
       // Initialize all components
       this.initializeComponents();

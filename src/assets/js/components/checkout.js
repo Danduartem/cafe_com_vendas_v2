@@ -6,7 +6,7 @@
 
 import { ENV, CONFIG } from '../config/constants.js';
 import { Analytics } from '../core/analytics.js';
-import { safeQuery } from '../utils/index.js';
+import { safeQuery, normalizeEventPayload } from '../utils/index.js';
 
 // Pricing tier detection for dynamic analytics
 const PricingManager = {
@@ -278,13 +278,22 @@ export const Checkout = {
     // Get current pricing tier for analytics
     const currentTier = PricingManager.getCurrentPricingTier();
 
-    // Track analytics with dynamic pricing data
-    Analytics.track('checkout_opened', {
-      source: event.target.closest('[data-checkout-trigger]')?.getAttribute('data-source') || 'unknown',
-      amount: currentTier.price,
-      currency: currentTier.currency,
-      pricing_tier: currentTier.tier_id
+    // Track checkout opened event for GTM (matches GA4 Begin Checkout)
+    window.dataLayer = window.dataLayer || [];
+    const checkoutPayload = normalizeEventPayload({
+      event: 'checkout_opened',
+      value: currentTier.price, // Number, no quotes
+      currency: 'EUR', // 3-letter uppercase
+      pricing_tier: currentTier.tier_id,
+      items: [{
+        item_id: 'SKU_CCV_PT_2025',
+        item_name: 'Café com Vendas – Portugal 2025',
+        price: currentTier.price, // Number
+        quantity: 1,
+        item_category: 'Event'
+      }]
     });
+    window.dataLayer.push(checkoutPayload);
   },
 
   async openModal() {
@@ -466,14 +475,28 @@ export const Checkout = {
     return errorMessage;
   },
 
+  getSourceSection() {
+    // Determine which section the user clicked from
+    const trigger = document.querySelector('[data-checkout-trigger]:focus');
+    if (trigger) {
+      const section = trigger.closest('section');
+      if (section && section.id) {
+        return section.id; // hero, pricing_table, footer, etc.
+      }
+    }
+    return 'unknown';
+  },
+
   trackLeadConversion() {
-    // Track successful lead capture
-    Analytics.track(CONFIG.analytics.events.LEAD_FORM_SUBMITTED, {
-      event_category: 'Conversion',
-      event_label: 'Lead Information Captured',
-      lead_id: this.leadId,
-      form_location: 'checkout_modal'
+    // Track lead form submission for GTM (matches GA4 Generate Lead)
+    window.dataLayer = window.dataLayer || [];
+    const leadPayload = normalizeEventPayload({
+      event: 'lead_form_submitted',
+      lead_id: this.leadId, // String, unique per lead (will be normalized)
+      form_location: 'checkout_modal', // Where the form is located (will be normalized)
+      source_section: this.getSourceSection() // Optional: where user clicked from (will be normalized)
     });
+    window.dataLayer.push(leadPayload);
 
     // Track checkout initiation
     Analytics.track('checkout_initiated', {
@@ -644,17 +667,24 @@ export const Checkout = {
         // Get pricing tier for analytics
         const currentTier = PricingManager.getCurrentPricingTier();
 
-        // Track successful payment conversion
-        Analytics.track('purchase_completed', {
-          event_category: 'Conversion',
-          event_label: 'Event Registration Completed',
-          transaction_id: paymentIntent.id,
-          lead_id: this.leadId,
-          value: PricingManager.stripeAmountToEuros(paymentIntent.amount),
-          currency: 'EUR',
-          pricing_tier: currentTier.tier_id,
-          payment_intent_id: paymentIntent.id
+        // Track purchase completed event for GTM (matches GA4 Purchase)
+        const purchaseValue = PricingManager.stripeAmountToEuros(paymentIntent.amount);
+        window.dataLayer = window.dataLayer || [];
+        const purchasePayload = normalizeEventPayload({
+          event: 'purchase_completed',
+          transaction_id: paymentIntent.id, // String, unique (will be normalized)
+          value: purchaseValue, // Number, no quotes (not normalized)
+          currency: 'EUR', // 3-letter uppercase
+          items: [{
+            item_id: 'SKU_CCV_PT_2025',
+            item_name: 'Café com Vendas – Portugal 2025',
+            price: purchaseValue, // Number
+            quantity: 1,
+            item_category: 'Event'
+          }],
+          pricing_tier: currentTier.tier_id // Optional (will be normalized)
         });
+        window.dataLayer.push(purchasePayload);
 
         // Redirect to thank you page after delay
         setTimeout(() => {

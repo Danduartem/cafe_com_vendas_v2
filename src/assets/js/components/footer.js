@@ -5,7 +5,7 @@
 
 import { CONFIG } from '../config/constants.js';
 import { Analytics } from '../core/analytics.js';
-import { safeQuery, safeQueryAll, Animations, throttle } from '../utils/index.js';
+import { safeQuery, safeQueryAll, Animations, throttle, normalizeEventPayload } from '../utils/index.js';
 
 export const Footer = {
   init() {
@@ -89,7 +89,15 @@ export const Footer = {
       this.appendChild(ripple);
       setTimeout(() => ripple.remove(), 600);
 
-      Analytics.track('footer_whatsapp_click');
+      // Fixed: Use consistent WhatsApp event name with normalization
+      window.dataLayer = window.dataLayer || [];
+      const whatsappPayload = normalizeEventPayload({
+        event: 'whatsapp_click',
+        link_url: this.href || '', // Will be normalized
+        link_text: this.textContent?.trim() || 'WhatsApp', // Will be normalized to 50 chars
+        location: 'footer' // Will be normalized
+      });
+      window.dataLayer.push(whatsappPayload);
     });
   },
 

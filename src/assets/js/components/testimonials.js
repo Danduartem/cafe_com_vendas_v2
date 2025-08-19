@@ -3,9 +3,7 @@
  * Handles native carousel with video card effects
  */
 
-import { CONFIG } from '../config/constants.js';
-import { Analytics } from '../core/analytics.js';
-import { safeQuery, safeQueryAll, Animations, debounce } from '../utils/index.js';
+import { safeQuery, safeQueryAll, Animations, debounce, normalizeEventPayload } from '../utils/index.js';
 
 // Constants for carousel layout
 const CAROUSEL_GAP_DEFAULT = 24; // Default gap between slides in pixels
@@ -161,10 +159,16 @@ export const Testimonials = {
     this.updatePagination(this.carouselElements);
     this.updateNavigationButtons(this.carouselElements);
 
-    Analytics.track(CONFIG.analytics.events.TESTIMONIAL_VIEW, {
-      slide_index: this.currentIndex + 1,
-      total_slides: this.carouselElements.slides.length
+    // Track testimonial slide view for GTM
+    const testimonialId = this.carouselElements.slides[this.currentIndex]?.getAttribute('data-testimonial-id') || 
+                         `tst_${String(this.currentIndex + 1).padStart(2, '0')}`;
+    window.dataLayer = window.dataLayer || [];
+    const testimonialPayload = normalizeEventPayload({
+      event: 'view_testimonial_slide',
+      testimonial_id: testimonialId, // Will be normalized
+      position: this.currentIndex + 1 // 1-based index (number, not normalized)
     });
+    window.dataLayer.push(testimonialPayload);
   },
 
   scrollToSlide(index) {
@@ -227,7 +231,13 @@ export const Testimonials = {
   trackSectionView() {
     const observer = Animations.createObserver({
       callback: () => {
-        Analytics.track('view_testimonials_section');
+        // Track testimonials section view for GTM
+        window.dataLayer = window.dataLayer || [];
+        const sectionPayload = normalizeEventPayload({
+          event: 'view_testimonials_section',
+          section: 'testimonials' // Will be normalized
+        });
+        window.dataLayer.push(sectionPayload);
       },
       once: true,
       threshold: 0.3

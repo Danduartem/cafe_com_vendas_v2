@@ -3,8 +3,11 @@
  * Centralized state for the entire application
  */
 
+import { normalizeEventPayload } from '../utils/gtm-normalizer.js';
+
 export const state = {
   faqOpenTimes: {},
+  faqToggleCount: 0, // Track total FAQ toggles for meaningful engagement
   isInitialized: false
 };
 
@@ -17,6 +20,19 @@ export const StateManager = {
      */
   markFAQOpened(faqId) {
     state.faqOpenTimes[faqId] = Date.now();
+    state.faqToggleCount++; // Increment toggle count
+    
+    // Check for meaningful engagement (3+ toggles)
+    if (state.faqToggleCount === 3) {
+      // Push meaningful engagement event to dataLayer
+      window.dataLayer = window.dataLayer || [];
+      const engagementPayload = normalizeEventPayload({
+        event: 'faq_meaningful_engagement',
+        engagement_type: 'faq_meaningful', // Will be normalized
+        toggle_count: 3 // Number, not normalized
+      });
+      window.dataLayer.push(engagementPayload);
+    }
   },
 
   /**

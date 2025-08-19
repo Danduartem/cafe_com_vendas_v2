@@ -3,8 +3,7 @@
  * Handles YouTube embed loading and interactions
  */
 
-import { Analytics } from '../core/analytics.js';
-import { safeQueryAll } from '../utils/index.js';
+import { safeQueryAll, normalizeEventPayload } from '../utils/index.js';
 
 export const YouTube = {
   init() {
@@ -42,10 +41,14 @@ export const YouTube = {
     embed.innerHTML = '';
     embed.appendChild(iframe);
 
-    Analytics.track('video_play', {
-      event_category: 'Video',
-      event_label: videoId,
-      video_provider: 'youtube'
+    // Track video play for GTM
+    const videoTitle = embed.getAttribute('data-video-title') || `YouTube Video ${videoId}`;
+    window.dataLayer = window.dataLayer || [];
+    const videoPayload = normalizeEventPayload({
+      event: 'video_play',
+      video_title: videoTitle, // Will be normalized to 50 chars
+      percent_played: 0 // Initial play at 0% (number, not normalized)
     });
+    window.dataLayer.push(videoPayload);
   }
 };

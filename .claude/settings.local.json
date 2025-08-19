@@ -49,7 +49,8 @@
       "Bash(npx:*)",
       "Bash(cp:*)",
       "Bash(netlify dev:*)",
-      "Bash(stripe listen:*)"
+      "Bash(stripe listen:*)",
+      "Bash(touch:*)"
     ],
     "deny": [],
     "ask": []

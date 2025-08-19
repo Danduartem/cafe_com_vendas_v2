@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GTM Testing Harness - Café com Vendas</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 3px solid #4CAF50;
+      padding-bottom: 10px;
+    }
+    .section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #555;
+      margin-top: 0;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    .console {
+      background: #222;
+      color: #0f0;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+    .log-entry {
+      margin: 5px 0;
+      padding: 5px;
+      border-left: 3px solid #4CAF50;
+      padding-left: 10px;
+    }
+    .clear-btn {
+      background: #f44336;
+    }
+    .clear-btn:hover {
+      background: #da190b;
+    }
+    .info {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      border-left: 4px solid #2196F3;
+    }
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔬 GTM Event Testing Harness</h1>
+  
+  <div class="info">
+    <strong>Instructions:</strong>
+    <ol>
+      <li>Open GTM Preview Mode (Tag Assistant)</li>
+      <li>Click the test buttons below to fire events</li>
+      <li>Verify events appear in Tag Assistant and GA4 DebugView</li>
+      <li>Check the console output below for dataLayer pushes</li>
+    </ol>
+  </div>
+
+  <!-- Lead & Conversion Events -->
+  <div class="section">
+    <h2>📝 Lead & Conversion Events</h2>
+    <button onclick="testEvent.leadFormSubmitted()">Test lead_form_submitted</button>
+    <button onclick="testEvent.checkoutOpened()">Test checkout_opened</button>
+    <button onclick="testEvent.purchaseCompleted()">Test purchase_completed</button>
+  </div>
+
+  <!-- FAQ Events -->
+  <div class="section">
+    <h2>❓ FAQ Events</h2>
+    <button onclick="testEvent.faqToggle('open')">Test faq_toggle (open)</button>
+    <button onclick="testEvent.faqToggle('close')">Test faq_toggle (close)</button>
+    <button onclick="testEvent.faqMeaningful()">Test faq_meaningful_engagement</button>
+  </div>
+
+  <!-- Video & Testimonials -->
+  <div class="section">
+    <h2>🎥 Video & Testimonials Events</h2>
+    <button onclick="testEvent.videoPlay()">Test video_play</button>
+    <button onclick="testEvent.testimonialSlide()">Test view_testimonial_slide</button>
+    <button onclick="testEvent.testimonialSection()">Test view_testimonials_section</button>
+  </div>
+
+  <!-- Navigation Events -->
+  <div class="section">
+    <h2>🔗 Navigation Events</h2>
+    <button onclick="testEvent.whatsappClick()">Test whatsapp_click</button>
+    <button onclick="testEvent.scrollDepth(25)">Test scroll_depth (25%)</button>
+    <button onclick="testEvent.scrollDepth(50)">Test scroll_depth (50%)</button>
+    <button onclick="testEvent.scrollDepth(75)">Test scroll_depth (75%)</button>
+    <button onclick="testEvent.scrollDepth(90)">Test scroll_depth (90%)</button>
+  </div>
+
+  <!-- Console Output -->
+  <div class="section">
+    <h2>📊 DataLayer Console</h2>
+    <button class="clear-btn" onclick="clearConsole()">Clear Console</button>
+    <div id="console" class="console">
+      <div class="log-entry">Console ready. Click buttons to test events...</div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize dataLayer with logging
+    window.dataLayer = window.dataLayer || [];
+    const originalPush = window.dataLayer.push;
+    
+    // Override push to log events
+    window.dataLayer.push = function() {
+      const result = originalPush.apply(window.dataLayer, arguments);
+      logToConsole(arguments[0]);
+      return result;
+    };
+
+    // Console logging
+    function logToConsole(data) {
+      const consoleDiv = document.getElementById('console');
+      const timestamp = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<strong>[${timestamp}]</strong> ${JSON.stringify(data, null, 2)}`;
+      consoleDiv.appendChild(entry);
+      consoleDiv.scrollTop = consoleDiv.scrollHeight;
+      
+      // Also log to browser console
+      console.log('%cDL PUSH', 'background:#222;color:#0f0;padding:2px 4px', data);
+    }
+
+    function clearConsole() {
+      document.getElementById('console').innerHTML = '<div class="log-entry">Console cleared.</div>';
+    }
+
+    // Test event functions
+    const testEvent = {
+      // Lead & Conversion
+      leadFormSubmitted() {
+        window.dataLayer.push({
+          event: 'lead_form_submitted',
+          lead_id: 'TEST_' + Date.now(),
+          form_location: 'checkout_modal',
+          source_section: 'test_harness'
+        });
+      },
+
+      checkoutOpened() {
+        window.dataLayer.push({
+          event: 'checkout_opened',
+          value: 180,
+          currency: 'EUR',
+          pricing_tier: 'early_bird',
+          items: [{
+            item_id: 'SKU_CCV_PT_2025',
+            item_name: 'Café com Vendas – Portugal 2025',
+            price: 180,
+            quantity: 1,
+            item_category: 'Event'
+          }]
+        });
+      },
+
+      purchaseCompleted() {
+        window.dataLayer.push({
+          event: 'purchase_completed',
+          transaction_id: 'TX_TEST_' + Date.now(),
+          value: 180,
+          currency: 'EUR',
+          items: [{
+            item_id: 'SKU_CCV_PT_2025',
+            item_name: 'Café com Vendas – Portugal 2025',
+            price: 180,
+            quantity: 1,
+            item_category: 'Event'
+          }],
+          pricing_tier: 'early_bird'
+        });
+      },
+
+      // FAQ
+      faqToggle(action) {
+        window.dataLayer.push({
+          event: 'faq_toggle',
+          action: action,
+          question: 'Como funciona o Café com Vendas?'
+        });
+      },
+
+      faqMeaningful() {
+        window.dataLayer.push({
+          event: 'faq_meaningful_engagement',
+          engagement_type: 'faq_meaningful',
+          toggle_count: 3
+        });
+      },
+
+      // Video & Testimonials
+      videoPlay() {
+        window.dataLayer.push({
+          event: 'video_play',
+          video_title: 'Depoimento João – CCV 2024',
+          percent_played: 0
+        });
+      },
+
+      testimonialSlide() {
+        window.dataLayer.push({
+          event: 'view_testimonial_slide',
+          testimonial_id: 'tst_03',
+          position: 2
+        });
+      },
+
+      testimonialSection() {
+        window.dataLayer.push({
+          event: 'view_testimonials_section',
+          section: 'testimonials'
+        });
+      },
+
+      // Navigation
+      whatsappClick() {
+        window.dataLayer.push({
+          event: 'whatsapp_click',
+          link_url: 'https://wa.me/351912345678',
+          link_text: 'Falar no WhatsApp',
+          location: 'test_harness'
+        });
+      },
+
+      scrollDepth(percent) {
+        window.dataLayer.push({
+          event: 'scroll_depth',
+          percent_scrolled: percent,
+          timestamp: new Date().toISOString()
+        });
+      }
+    };
+
+    // Test all events automatically (for debugging)
+    function testAllEvents() {
+      const events = [
+        () => testEvent.leadFormSubmitted(),
+        () => testEvent.checkoutOpened(),
+        () => testEvent.purchaseCompleted(),
+        () => testEvent.faqToggle('open'),
+        () => testEvent.faqToggle('close'),
+        () => testEvent.faqMeaningful(),
+        () => testEvent.videoPlay(),
+        () => testEvent.testimonialSlide(),
+        () => testEvent.testimonialSection(),
+        () => testEvent.whatsappClick(),
+        () => testEvent.scrollDepth(25)
+      ];
+
+      events.forEach((event, index) => {
+        setTimeout(event, index * 500);
+      });
+    }
+
+    // Log initial page load
+    window.addEventListener('load', () => {
+      logToConsole({ event: 'page_loaded', page: 'GTM Test Harness' });
+    });
+  </script>
+</body>
+</html>

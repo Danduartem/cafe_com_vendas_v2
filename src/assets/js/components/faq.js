@@ -4,7 +4,7 @@
  */
 
 import { Analytics } from '../core/analytics.js';
-import { safeQuery, safeQueryAll, Animations } from '../utils/index.js';
+import { safeQuery, safeQueryAll, Animations, normalizeEventPayload } from '../utils/index.js';
 
 export const FAQ = {
   init() {
@@ -38,17 +38,23 @@ export const FAQ = {
           });
         }
 
-        // Track analytics
-        const analyticsEvent = detailsEl.getAttribute('data-analytics-event');
+        // Track FAQ toggle for GTM
         const itemNumber = detailsEl.getAttribute('data-faq-item');
+        const questionText = detailsEl.querySelector('summary')?.textContent?.trim() || `FAQ ${itemNumber}`;
         const label = `faq-${itemNumber}`;
+        
         try {
+          // Track engagement time
           Analytics.trackFAQEngagement(label, isOpen);
-          Analytics.track('faq_toggle', {
-            event_category: 'FAQ',
-            event_label: analyticsEvent || label,
-            action: isOpen ? 'open' : 'close'
+          
+          // Push FAQ toggle event to dataLayer for GTM
+          window.dataLayer = window.dataLayer || [];
+          const faqPayload = normalizeEventPayload({
+            event: 'faq_toggle',
+            action: isOpen ? 'open' : 'close', // "open" or "close" (will be normalized)
+            question: questionText // The actual question text (will be normalized to 100 chars)
           });
+          window.dataLayer.push(faqPayload);
         } catch { /* no-op */ }
       }, { passive: true });
     });

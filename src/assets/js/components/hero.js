@@ -4,7 +4,7 @@
  */
 
 import { CONFIG } from '../config/constants.js';
-import { safeQuery, Animations } from '../utils/index.js';
+import { safeQuery, Animations, normalizeEventPayload } from '../utils/index.js';
 // Inline minimal smooth scroll to avoid importing removed navigation module
 
 export const Hero = {
@@ -140,9 +140,28 @@ export const Hero = {
     const whatsappButton = safeQuery('#whatsapp-button');
     if (!whatsappButton) return;
 
+    // Animate entrance
     setTimeout(() => {
       whatsappButton.classList.remove('opacity-0', 'translate-y-4');
       whatsappButton.classList.add('opacity-100', 'translate-y-0');
     }, 500);
+
+    // Add WhatsApp click tracking
+    const whatsappLink = whatsappButton.querySelector('a[href*="wa.me"]');
+    if (whatsappLink && !whatsappLink.hasAttribute('data-gtm-tracked')) {
+      whatsappLink.setAttribute('data-gtm-tracked', 'true'); // Prevent duplicate listeners
+      
+      whatsappLink.addEventListener('click', function() {
+        // Push WhatsApp click event to dataLayer
+        window.dataLayer = window.dataLayer || [];
+        const whatsappPayload = normalizeEventPayload({
+          event: 'whatsapp_click',
+          link_url: this.href, // Will be normalized
+          link_text: this.textContent?.trim() || 'WhatsApp', // Will be normalized to 50 chars
+          location: 'floating_button' // Will be normalized
+        });
+        window.dataLayer.push(whatsappPayload);
+      });
+    }
   }
 };
