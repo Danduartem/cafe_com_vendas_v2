@@ -24,7 +24,7 @@
           Um dia inteiro de imersão estratégica, material de apoio prático, almoço de networking 
           e acesso a um plano de ação de 90 dias. Ambiente exclusivo para apenas 
           <span class="inline-flex items-center px-3 py-1 bg-burgundy-100 text-burgundy-700 rounded-full font-semibold text-sm">
-            {{ event.capacity.firstLot }} empreendedoras
+            {{ event.capacity.totalCapacity }} empreendedoras
           </span>
         </p>
       </div>
@@ -239,7 +239,7 @@
                 <svg class="w-5 h-5 text-red-500 mb-1" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                 </svg>
-                <span>{{ event.capacity.firstLot }} vagas</span>
+                <span>{{ event.capacity.totalCapacity }} vagas</span>
               </div>
               <div class="flex flex-col items-center hover:text-navy-800 transition-colors duration-200" role="img" aria-label="Garantia de 90 dias">
                 <svg class="w-5 h-5 text-green-500 mb-1" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">

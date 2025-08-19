@@ -10,7 +10,7 @@ export default {
   // Stats section - pulled from event data
   stats: [
     {
-      value: eventData.capacity.firstLot,
+      value: eventData.capacity.totalCapacity,
       label: 'Vagas Limitadas',
       counter: true
     },
@@ -55,9 +55,9 @@ export default {
   // Contact information
   contact: {
     whatsapp: {
-      number: '+351935251983',
+      number: '+5547991253299',
       message: 'Olá! Quero saber mais sobre o Café com Vendas em Lisboa.',
-      url: 'https://wa.me/351935251983?text=Olá! Quero saber mais sobre o Café com Vendas em Lisboa.'
+      url: 'https://wa.me/5547991253299?text=Olá! Quero saber mais sobre o Café com Vendas em Lisboa.'
     },
     email: {
       address: 'support@cafecomvendas.com',

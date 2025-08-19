@@ -22,7 +22,9 @@
   },
   "capacity": {
     "isLimited": true,
-    "firstLot": 8
+    "firstLot": 8,
+    "totalCapacity": 20
+
   },
   "pricing": {
     "currency": "EUR",
@@ -53,7 +55,7 @@
       "mbway": {
         "phone": "+351935251983",
         "contact": "Mónica",
-        "instruction": "Avisar a Mónica que o pagamento foi realizado para garantir a vaga"
+        "instruction": "Avisar a Lari que o pagamento foi realizado para garantir a vaga"
       }
     }
   },
