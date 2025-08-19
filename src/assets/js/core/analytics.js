@@ -16,7 +16,7 @@ export const Analytics = {
    */
   track(eventName, parameters = {}) {
     try {
-      // Initialize dataLayer if needed
+      // Always ensure dataLayer exists before pushing
       window.dataLayer = window.dataLayer || [];
 
       // Standardized event structure for GTM
@@ -39,7 +39,8 @@ export const Analytics = {
         performance.mark(`analytics-${eventName}`);
       }
     } catch (error) {
-      this.trackError('analytics_tracking_failed', error);
+      // Prevent infinite loop by not tracking analytics errors
+      console.error('Analytics tracking failed:', error);
     }
   },
 

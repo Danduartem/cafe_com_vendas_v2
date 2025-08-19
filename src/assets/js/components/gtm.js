@@ -1,53 +1,20 @@
 /**
- * Google Tag Manager Loader
- * Single source of truth for all analytics and tracking
+ * Google Tag Manager Helper
+ * Provides helper functions for dataLayer events (GTM loaded via HTML)
  */
 
-import { ENV } from '../config/constants.js';
-
 export const GTM = {
-  loaded: false,
-
   init() {
-    try {
-      const containerId = ENV.gtm?.containerId || '';
-      if (!containerId) return;
-
-      // Initialize dataLayer immediately
-      this.initializeDataLayer();
-
-      // Load GTM immediately for better conversion tracking
-      this.loadGTM(containerId);
-    } catch {
-      // no-op; analytics should not block UX
-    }
-  },
-
-  /**
-   * Initialize dataLayer with proper structure for GTM
-   */
-  initializeDataLayer() {
+    // Just ensure dataLayer exists (GTM is loaded via HTML)
     window.dataLayer = window.dataLayer || [];
-
-    // Push initial page data for enhanced tracking
-    window.dataLayer.push({
-      event: 'page_view_enhanced',
-      page_data: {
-        title: document.title,
-        url: window.location.href,
-        path: window.location.pathname,
-        referrer: document.referrer || '(direct)'
-      }
-    });
   },
 
   /**
    * Helper function for consistent dataLayer event structure
    */
   pushEvent(eventName, parameters = {}) {
-    if (!window.dataLayer) {
-      this.initializeDataLayer();
-    }
+    // Ensure dataLayer exists
+    window.dataLayer = window.dataLayer || [];
 
     window.dataLayer.push({
       event: eventName,
@@ -62,33 +29,6 @@ export const GTM = {
     this.pushEvent(eventName, {
       ecommerce: ecommerceData
     });
-  },
-
-  /**
-   * Load GTM immediately for conversion tracking
-   */
-  loadGTM(containerId) {
-    if (this.loaded) return;
-
-    // Push GTM start event
-    window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
-
-    // Inject GTM script
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(containerId)}&l=dataLayer`;
-
-    // Fire gtm_init event after script loads
-    script.onload = () => {
-      this.pushEvent('gtm_init', {
-        event_category: 'Application',
-        gtm_container_id: containerId
-      });
-    };
-
-    document.head.appendChild(script);
-
-    this.loaded = true;
   },
 
   /**
