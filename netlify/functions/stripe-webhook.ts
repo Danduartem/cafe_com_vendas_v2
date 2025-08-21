@@ -6,7 +6,7 @@
 import Stripe from 'stripe';
 
 // Initialize Stripe with secret key and timeout configuration
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   timeout: 30000, // 30 second timeout for Stripe API calls
   maxNetworkRetries: 2
 });
@@ -41,7 +41,13 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY_BASE = 1000; // 1 second base delay
 
 // Circuit breaker configuration
-const CIRCUIT_BREAKER_CONFIG = {
+interface CircuitBreakerConfig {
+  failureThreshold: number;
+  resetTimeout: number;
+  monitoringPeriod: number;
+}
+
+const CIRCUIT_BREAKER_CONFIG: CircuitBreakerConfig = {
   failureThreshold: 5,
   resetTimeout: 60000, // 1 minute
   monitoringPeriod: 300000 // 5 minutes
@@ -58,7 +64,15 @@ const circuitBreakers = new Map();
  * Circuit Breaker Pattern Implementation
  */
 class CircuitBreaker {
-  constructor(name, config = CIRCUIT_BREAKER_CONFIG) {
+  public name: string;
+  public failureCount: number;
+  public lastFailureTime: number | null;
+  public state: 'CLOSED' | 'OPEN' | 'HALF_OPEN';
+  public config: CircuitBreakerConfig;
+  public successCount: number;
+  public totalCalls: number;
+
+  constructor(name: string, config: CircuitBreakerConfig = CIRCUIT_BREAKER_CONFIG) {
     this.name = name;
     this.failureCount = 0;
     this.lastFailureTime = null;
@@ -68,7 +82,7 @@ class CircuitBreaker {
     this.totalCalls = 0;
   }
   
-  async execute(operation) {
+  async execute<T>(operation: () => Promise<T>): Promise<T> {
     this.totalCalls++;
     
     if (this.state === 'OPEN') {
@@ -90,7 +104,7 @@ class CircuitBreaker {
     }
   }
   
-  onSuccess() {
+  onSuccess(): void {
     this.successCount++;
     this.failureCount = 0;
     
@@ -100,7 +114,7 @@ class CircuitBreaker {
     }
   }
   
-  onFailure() {
+  onFailure(): void {
     this.failureCount++;
     this.lastFailureTime = Date.now();
     
@@ -113,7 +127,7 @@ class CircuitBreaker {
     }
   }
   
-  getStatus() {
+  getStatus(): { name: string; state: string; failureCount: number; successCount: number; totalCalls: number; lastFailureTime: number | null; } {
     return {
       name: this.name,
       state: this.state,

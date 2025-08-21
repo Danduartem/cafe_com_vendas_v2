@@ -48,7 +48,16 @@ const VALIDATION_RULES = {
  * Circuit Breaker Pattern Implementation for MailerLite API
  */
 class CircuitBreaker {
-  constructor(name, failureThreshold = 5, resetTimeout = 60000) {
+  public name: string;
+  public failureCount: number;
+  public lastFailureTime: number | null;
+  public state: 'CLOSED' | 'OPEN' | 'HALF_OPEN';
+  public failureThreshold: number;
+  public resetTimeout: number;
+  public successCount: number;
+  public totalCalls: number;
+
+  constructor(name: string, failureThreshold: number = 5, resetTimeout: number = 60000) {
     this.name = name;
     this.failureCount = 0;
     this.lastFailureTime = null;
@@ -59,7 +68,7 @@ class CircuitBreaker {
     this.totalCalls = 0;
   }
   
-  async execute(operation) {
+  async execute<T>(operation: () => Promise<T>): Promise<T> {
     this.totalCalls++;
     
     if (this.state === 'OPEN') {
@@ -81,7 +90,7 @@ class CircuitBreaker {
     }
   }
   
-  onSuccess() {
+  onSuccess(): void {
     this.successCount++;
     this.failureCount = 0;
     
@@ -91,7 +100,7 @@ class CircuitBreaker {
     }
   }
   
-  onFailure() {
+  onFailure(): void {
     this.failureCount++;
     this.lastFailureTime = Date.now();
     
@@ -252,10 +261,28 @@ function checkRateLimit(clientIP) {
   };
 }
 
+// MailerLite result types
+interface MailerLiteSuccess {
+  success: true;
+  action: 'created' | 'skipped';
+  subscriberId?: string;
+  reason?: string;
+}
+
+interface MailerLiteError {
+  success: false;
+  reason: string;
+  recoverable?: boolean;
+  action?: never;
+  subscriberId?: never;
+}
+
+type MailerLiteResult = MailerLiteSuccess | MailerLiteError;
+
 /**
  * Add lead to MailerLite with comprehensive error handling
  */
-async function addLeadToMailerLite(leadData) {
+async function addLeadToMailerLite(leadData: any): Promise<MailerLiteResult> {
   if (!MAILERLITE_API_KEY) {
     console.warn('MailerLite API key not configured - skipping lead integration');
     return { success: false, reason: 'API key not configured' };
@@ -465,7 +492,7 @@ export const handler = async (event, context) => {
       leadId: lead_id,
       clientIP: clientIP,
       success: mailerliteResult.success,
-      action: mailerliteResult.action,
+      action: mailerliteResult.success ? mailerliteResult.action : 'failed',
       reason: mailerliteResult.reason
     });
 
@@ -480,9 +507,9 @@ export const handler = async (event, context) => {
         email: email,
         mailerlite: {
           success: mailerliteResult.success,
-          action: mailerliteResult.action || 'attempted',
+          action: mailerliteResult.success ? mailerliteResult.action : 'attempted',
           reason: mailerliteResult.reason,
-          recoverable: mailerliteResult.recoverable
+          recoverable: !mailerliteResult.success && 'recoverable' in mailerliteResult ? (mailerliteResult.recoverable ?? false) : false
         },
         circuitBreaker: mailerliteCircuitBreaker.getStatus()
       })

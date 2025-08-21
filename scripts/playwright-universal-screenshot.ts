@@ -35,7 +35,7 @@ export async function takeUniversalScreenshotMCP(
   }
 
   // Use our universal screenshot with the MCP page instance
-  return await takeUniversalScreenshot(page, filename, {
+  return await takeUniversalScreenshot(page as any, filename, {
     timeout: 30000,
     retries: 3,
     waitForNetworkIdle: true,

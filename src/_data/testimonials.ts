@@ -7,7 +7,7 @@ import type { TestimonialsData } from './types.js';
  * @returns Testimonials data for the page
  */
 export default function(): TestimonialsData {
-  const testimonialsPath = resolve(process.cwd(), 'info/DATA_testimonials.json');
+  const testimonialsPath = resolve(process.cwd(), 'content/pt-PT/testimonials.json');
   const testimonialsData = JSON.parse(readFileSync(testimonialsPath, 'utf-8')) as TestimonialsData;
   return testimonialsData;
 }

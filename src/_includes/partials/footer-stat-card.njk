@@ -3,7 +3,7 @@
 
 <div class="group">
   <div class="relative backdrop-blur-sm bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-500 hover:transform hover:-translate-y-1 hover:shadow-2xl hover:shadow-gold-500/20">
-    <div class="text-3xl font-lora font-bold text-gold-400 mb-1{% if statData.hasCounter %}" data-counter="{{ statData.value }}"{% endif %}">
+    <div class="text-3xl font-lora font-bold text-gold-400 mb-1"{% if statData.hasCounter %} data-counter="{{ statData.value }}"{% endif %}>
       {{ statData.value }}
     </div>
     <div class="text-sm font-century text-neutral-300">{{ statData.label }}</div>

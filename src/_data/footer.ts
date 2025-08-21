@@ -1,65 +1,75 @@
 import type { FooterData } from './types.js';
 
 /**
- * Load footer data
+ * Load footer data - align with template expectations and JSON structure
  * @returns Footer content and links
  */
 export default function(): FooterData {
   return {
     stats: [
       {
-        number: '20',
-        label: 'Vagas Limitadas'
+        value: 8,
+        label: 'Vagas Limitadas',
+        counter: true
       },
       {
-        number: '7',
-        label: 'Horas Intensivas'
+        value: 8,
+        label: 'Horas Intensivas',
+        counter: true
       },
       {
-        date: '20/09',
-        location: 'Lisboa'
+        value: '20 Set',
+        label: 'Lisboa',
+        counter: false
       }
     ],
     brand: {
       name: 'Café com Vendas',
-      tagline: 'Evento para Empreendedoras em Portugal',
-      description: 'O encontro presencial que transforma empreendedoras sobrecarregadas em líderes estratégicas. Um dia de imersão para recuperar o seu tempo e multiplicar as vendas.',
-      guarantee: '90 dias de garantia ou seu dinheiro de volta'
+      tagline: 'Método prático para empreendedoras',
+      description: 'Transforme seu negócio em 20 de Setembro no evento mais exclusivo de Lisboa. Menos esforço, mais resultado — com método comprovado.',
+      guarantee: 'Garantia 90 dias'
     },
-    links: [
-      { label: 'Política de Privacidade', url: '/politica-privacidade' },
-      { label: 'Termos e Condições', url: '/termos-condicoes' },
-      { label: 'Garantia e Reembolso', url: '/garantia-reembolso' }
-    ],
+    navigation: {
+      legal: [
+        { label: 'Política de Privacidade', url: '/politica-privacidade' },
+        { label: 'Termos e Condições', url: '/termos-condicoes' },
+        { label: 'Garantia e Reembolso', url: '/garantia-reembolso' }
+      ]
+    },
     contact: {
       whatsapp: {
-        url: 'https://wa.me/5547991253299?text=Olá!%20Tenho%20interesse%20no%20Café%20com%20Vendas%20e%20gostaria%20de%20tirar%20algumas%20dúvidas.'
+        number: '+351935251983',
+        message: 'Olá! Quero saber mais sobre o Café com Vendas em Lisboa.',
+        url: 'https://wa.me/351935251983?text=Olá! Quero saber mais sobre o Café com Vendas em Lisboa.'
       },
       email: {
-        address: 'support@cafecomvendas.com'
+        address: 'support@cafecomvendas.com',
+        url: 'mailto:support@cafecomvendas.com'
       },
       social: [
         {
           platform: 'Instagram',
+          username: '@jucanamaximiliano',
           url: 'https://instagram.com/jucanamaximiliano'
         }
       ]
     },
+    copyright: {
+      year: '2024',
+      owner: 'Juçanã Maximiliano',
+      text: 'Todos os direitos reservados',
+      madein: 'Feito com ❤️ em Portugal'
+    },
     organization: {
-      name: 'Café com Vendas',
-      description: 'Evento de estratégias de vendas para empreendedoras',
+      name: 'Juçanã Maximiliano',
+      description: 'Mentora de negócios para empreendedoras em Portugal. Método prático para aumentar vendas trabalhando com mais inteligência.',
       url: 'https://cafecomvendas.com',
       logo: 'https://cafecomvendas.com/logo.png',
-      phone: '+5547991253299',
-      country: 'Portugal',
+      phone: '+351935251983',
       city: 'Lisboa',
+      country: 'Portugal',
       founderName: 'Juçanã Maximiliano',
-      founderTitle: 'Especialista em Vendas Estratégicas'
-    },
-    copyright: {
-      year: new Date().getFullYear(),
-      owner: 'Café com Vendas',
-      text: 'Todos os direitos reservados'
+      founderTitle: 'Business Mentor'
     }
   };
 }

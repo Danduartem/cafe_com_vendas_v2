@@ -92,7 +92,7 @@ export const solutionSection = {
     const target = event.target as HTMLElement;
     const card = target.closest('[data-analytics-event]');
 
-    if (card) {
+    if (card && card instanceof HTMLElement) {
       const eventName = card.dataset.analyticsEvent;
 
       if (eventName && typeof gtag !== 'undefined') {
@@ -111,7 +111,7 @@ export const solutionSection = {
     const target = event.target as HTMLElement;
     const card = target.closest('[data-analytics-event]');
 
-    if (card) {
+    if (card && card instanceof HTMLElement) {
       const eventName = card.dataset.analyticsEvent;
 
       if (eventName && typeof gtag !== 'undefined') {

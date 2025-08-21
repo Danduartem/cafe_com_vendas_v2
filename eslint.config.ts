@@ -8,6 +8,11 @@ export default [
   js.configs.recommended,
 
   {
+    // Global ignores
+    ignores: ['debug-gtm.ts']
+  },
+
+  {
     // Configuration for JavaScript files
     files: ['src/**/*.js', 'scripts/**/*.js', '*.js', '.eleventy.js'],
     languageOptions: {
@@ -79,6 +84,7 @@ export default [
   {
     // Configuration for TypeScript files
     files: ['src/**/*.ts', 'scripts/**/*.ts', '*.ts', 'vite.config.ts'],
+    ignores: ['debug-gtm.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -111,7 +117,7 @@ export default [
       '@typescript-eslint/explicit-function-return-type': 'off', // Too strict for this project
       '@typescript-eslint/explicit-module-boundary-types': 'off', // Too strict for this project
       '@typescript-eslint/no-non-null-assertion': 'warn',
-      '@typescript-eslint/prefer-nullish-coalescing': 'error',
+      '@typescript-eslint/prefer-nullish-coalescing': 'off', // Disabled while strictNullChecks is off
       '@typescript-eslint/prefer-optional-chain': 'error',
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
 

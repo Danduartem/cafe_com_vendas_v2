@@ -7,7 +7,7 @@ import type { FAQData } from './types.js';
  * @returns FAQ data for the page
  */
 export default function(): FAQData {
-  const faqPath = resolve(process.cwd(), 'info/DATA_faq.json');
+  const faqPath = resolve(process.cwd(), 'content/pt-PT/faq.json');
   const faqData = JSON.parse(readFileSync(faqPath, 'utf-8')) as FAQData;
   return faqData;
 }

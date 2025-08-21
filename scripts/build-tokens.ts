@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 const root = process.cwd();
-const tokensPath = path.join(root, 'info', 'DATA_design_tokens.json');
+const tokensPath = path.join(root, 'content', 'pt-PT', 'design_tokens.json');
 const outDir = path.join(root, 'src', 'assets', 'css');
 const outFile = path.join(outDir, '_tokens.generated.css');
 
@@ -32,7 +32,7 @@ function main(): void {
     // Load unified design tokens
     const tokens: DesignTokens = JSON.parse(fs.readFileSync(tokensPath, 'utf8'));
 
-    const themeHeader = `/* Generated from info/DATA_design_tokens.json. Do not edit directly. */\n/* Generated: ${new Date().toISOString()} */\n\n`;
+    const themeHeader = `/* Generated from content/pt-PT/design_tokens.json. Do not edit directly. */\n/* Generated: ${new Date().toISOString()} */\n\n`;
     const themeBlocks: string[] = [];
 
     // Extract CSS variables from the unified tokens

@@ -130,10 +130,10 @@ class APIVerifier {
       }
 
       // Check for deprecated APIs (these should NOT be used)
-      if ((stripe as Record<string, unknown>).charges) {
+      if ((stripe as unknown as Record<string, unknown>).charges) {
         console.log(`${colors.yellow}⚠️  Warning: Charges API is deprecated, use Payment Intents${colors.reset}`);
       }
-      if ((stripe as Record<string, unknown>).sources) {
+      if ((stripe as unknown as Record<string, unknown>).sources) {
         console.log(`${colors.yellow}⚠️  Warning: Sources API is deprecated, use Payment Methods${colors.reset}`);
       }
 

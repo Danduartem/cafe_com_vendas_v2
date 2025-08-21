@@ -69,10 +69,9 @@ export interface SiteData {
 
 // Footer structure
 export interface FooterStat {
-  number?: string;
-  label?: string;
-  date?: string;
-  location?: string;
+  value: number | string;
+  label: string;
+  counter: boolean;
 }
 
 export interface FooterBrand {
@@ -90,13 +89,17 @@ export interface FooterLink {
 
 export interface FooterContact {
   whatsapp: {
+    number: string;
+    message: string;
     url: string;
   };
   email: {
     address: string;
+    url: string;
   };
   social: Array<{
     platform: string;
+    username?: string;
     url: string;
   }>;
 }
@@ -114,15 +117,20 @@ export interface FooterOrganization {
 }
 
 export interface FooterCopyright {
-  year: number;
+  year: string;
   owner: string;
   text: string;
+  madein?: string;
+}
+
+export interface FooterNavigation {
+  legal: FooterLink[];
 }
 
 export interface FooterData {
   stats: FooterStat[];
   brand: FooterBrand;
-  links: FooterLink[];
+  navigation: FooterNavigation;
   contact: FooterContact;
   organization: FooterOrganization;
   copyright: FooterCopyright;

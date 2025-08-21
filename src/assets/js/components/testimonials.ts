@@ -23,6 +23,23 @@ interface CarouselElements {
 interface TestimonialsComponent extends Component {
   currentIndex: number;
   carouselElements: CarouselElements | null;
+  initTestimonialsCarousel(): void;
+  initVideoCardEffects(): void;
+  getCarouselElements(): CarouselElements;
+  validateCarouselElements(elements: CarouselElements): boolean;
+  setupCarouselState(elements: CarouselElements): void;
+  setupCarouselBehavior(elements: CarouselElements): void;
+  bindCarouselEvents(elements: CarouselElements): void;
+  trackSectionView(): void;
+  createCarouselPagination(elements: CarouselElements): void;
+  createPaginationDot(index: number): HTMLButtonElement;
+  updateNavigationButtons(elements: CarouselElements): void;
+  updatePagination(elements: CarouselElements): void;
+  handleCarouselScroll(elements: CarouselElements): void;
+  goToSlide(index: number): void;
+  toggleButtonState(button: HTMLElement, isDisabled: boolean): void;
+  scrollToSlide(index: number): void;
+  initTouchSupport(carouselTrack: HTMLElement, currentIndex: number): void;
 }
 
 export const Testimonials: TestimonialsComponent = {

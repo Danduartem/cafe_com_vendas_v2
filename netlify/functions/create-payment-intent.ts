@@ -6,7 +6,7 @@
 import Stripe from 'stripe';
 
 // Initialize Stripe with secret key and timeout configuration
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   timeout: 30000, // 30 second timeout for Stripe API calls
   maxNetworkRetries: 2
 });
@@ -391,7 +391,7 @@ export const handler = async (event, context) => {
         lead_id,
         source: 'cafe_com_vendas_checkout',
         created_at: new Date().toISOString(),
-        validation_passed: true
+        validation_passed: 'true'
       }
     };
 

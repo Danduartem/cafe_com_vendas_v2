@@ -7,12 +7,12 @@
  * Page interface for universal screenshot operations
  */
 interface UniversalPage {
-  addStyleTag: (options: { content: string }) => Promise<void>;
+  addStyleTag?: (options: { content: string }) => Promise<unknown>;
   evaluate: <T>(fn: (...args: unknown[]) => T, ...args: unknown[]) => Promise<T>;
   waitForTimeout: (timeout: number) => Promise<void>;
   waitForLoadState?: (state: string, options?: { timeout: number }) => Promise<void>;
   screenshot: (options: Record<string, unknown>) => Promise<Buffer>;
-  goto?: (url: string, options?: Record<string, unknown>) => Promise<void>;
+  goto?: (url: string, options?: Record<string, unknown>) => Promise<unknown>;
 }
 
 export interface ScreenshotOptions {
@@ -38,7 +38,7 @@ export interface ScreenshotResult {
 async function optimizePageForScreenshot(page: UniversalPage): Promise<void> {
   try {
     // Disable animations and transitions for faster capture
-    await page.addStyleTag({
+    await page.addStyleTag?.({
       content: `
         *, *::before, *::after {
           animation-duration: 0.01ms !important;
@@ -158,7 +158,7 @@ async function takeSectionalScreenshots(
       document.body.offsetHeight
     ),
     viewportHeight: window.innerHeight
-  }));
+  })) as { totalHeight: number; viewportHeight: number };
 
   // Calculate sections with overlap
   const effectiveHeight = viewportHeight - sectionOverlap;
@@ -178,7 +178,7 @@ async function takeSectionalScreenshots(
       // Ensure we don't scroll past the page
       const actualScrollY = Math.min(scrollY, totalHeight - viewportHeight);
 
-      await page.evaluate((y) => window.scrollTo(0, y), actualScrollY);
+      await page.evaluate((y: number) => window.scrollTo(0, y), actualScrollY);
       await page.waitForTimeout(500); // Let content settle
 
       const filename = baseFilename.replace(/\.png$/, `-section-${i + 1}.png`);

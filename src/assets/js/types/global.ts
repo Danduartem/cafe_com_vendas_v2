@@ -15,7 +15,6 @@ declare global {
 
     // Analytics and tracking
     dataLayer: Record<string, unknown>[];
-    gtag?: (...args: unknown[]) => void;
     ANALYTICS_EVENTS?: Record<string, AnalyticsEventType>;
 
     // External integrations
@@ -49,9 +48,6 @@ declare global {
 
   // Global Stripe type
   const Stripe: unknown;
-
-  // Google Analytics gtag function
-  function gtag(...args: unknown[]): void;
 }
 
 // Export empty object to make this a module

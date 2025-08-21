@@ -8,7 +8,14 @@ import { safeQuery, Animations, normalizeEventPayload } from '@/utils/index.js';
 import type { Component } from '@/types/component.js';
 import type { WhatsAppClickEvent } from '@/types/analytics.js';
 
-export const Hero: Component = {
+interface HeroComponent extends Component {
+  initAnimations(): void;
+  initInteractions(): void;
+  initScrollIndicator(): void;
+  initWhatsAppButton(): void;
+}
+
+export const Hero: HeroComponent = {
   init(): void {
     try {
       this.initAnimations();
@@ -82,7 +89,7 @@ export const Hero: Component = {
     });
 
     // Enhanced interactions
-    scrollIndicatorBtn.addEventListener('mouseenter', function(): void {
+    scrollIndicatorBtn.addEventListener('mouseenter', function(this: HTMLElement): void {
       const svg = this.querySelector('svg');
       if (svg) {
         svg.classList.remove('animate-bounce');
@@ -90,7 +97,7 @@ export const Hero: Component = {
       }
     });
 
-    scrollIndicatorBtn.addEventListener('mouseleave', function(): void {
+    scrollIndicatorBtn.addEventListener('mouseleave', function(this: HTMLElement): void {
       const svg = this.querySelector('svg');
       if (svg) {
         svg.classList.remove('animate-pulse');
@@ -99,7 +106,7 @@ export const Hero: Component = {
     });
 
     // Keyboard navigation
-    scrollIndicatorBtn.addEventListener('keydown', function(e: KeyboardEvent): void {
+    scrollIndicatorBtn.addEventListener('keydown', (e: KeyboardEvent): void => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         const heroSection = safeQuery('#hero');
@@ -118,11 +125,11 @@ export const Hero: Component = {
     if (!heroCtaButton) return;
 
     // Hover effects
-    heroCtaButton.addEventListener('mouseenter', function(): void {
+    heroCtaButton.addEventListener('mouseenter', function(this: HTMLElement): void {
       this.classList.add('scale-105');
     });
 
-    heroCtaButton.addEventListener('mouseleave', function(): void {
+    heroCtaButton.addEventListener('mouseleave', function(this: HTMLElement): void {
       this.classList.remove('scale-105');
     });
 
@@ -157,8 +164,8 @@ export const Hero: Component = {
         window.dataLayer = window.dataLayer || [];
         const whatsappPayload = normalizeEventPayload({
           event: 'whatsapp_click',
-          link_url: this.href,
-          link_text: this.textContent?.trim() ?? 'WhatsApp',
+          link_url: (this as HTMLAnchorElement).href,
+          link_text: (this as HTMLAnchorElement).textContent?.trim() ?? 'WhatsApp',
           location: 'floating_button'
         } as WhatsAppClickEvent);
         window.dataLayer.push(whatsappPayload);

@@ -82,9 +82,9 @@ async function main() {
   const options: ScreenshotOptions = {
     timeout: args.timeout,
     retries: args.retries,
-    waitForNetworkIdle: !args.noNetworkWait,
-    optimizePage: !args.noOptimize,
-    sectionOverlap: args.sectionOverlap
+    waitForNetworkIdle: !args['no-network-wait'],
+    optimizePage: !args['no-optimize'],
+    sectionOverlap: args['section-overlap']
   };
 
   try {

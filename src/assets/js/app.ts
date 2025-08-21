@@ -49,6 +49,7 @@ interface CafeComVendasInterface {
   getState(): AppState;
   getConfig(): Constants;
   getComponentStatus(): ComponentHealthStatus;
+  [key: string]: unknown;
 }
 
 /**
