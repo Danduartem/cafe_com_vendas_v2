@@ -6,7 +6,6 @@
 import { CONFIG } from '@/config/constants.js';
 import { safeQuery, Animations, normalizeEventPayload } from '@/utils/index.js';
 import type { Component } from '@/types/component.js';
-import type { SafeElement, SafeHTMLElement } from '@/types/dom.js';
 import type { WhatsAppClickEvent } from '@/types/analytics.js';
 
 export const Hero: Component = {
@@ -34,7 +33,7 @@ export const Hero: Component = {
       heroSection.querySelector('.hero-cta-primary'),
       heroSection.querySelector('a[class*="underline"]'),
       heroSection.querySelector('.hero-scroll-indicator')
-    ].filter(Boolean) as Element[];
+    ].filter(Boolean);
 
     Animations.prepareRevealElements(animatableElements);
 
@@ -52,7 +51,7 @@ export const Hero: Component = {
   },
 
   initScrollIndicator(): void {
-    const scrollIndicatorBtn = safeQuery('#scroll-indicator-btn') as SafeHTMLElement;
+    const scrollIndicatorBtn = safeQuery('#scroll-indicator-btn');
     if (!scrollIndicatorBtn) return;
 
     // Hide scroll indicator on very short viewports
@@ -115,7 +114,7 @@ export const Hero: Component = {
   },
 
   initInteractions(): void {
-    const heroCtaButton = safeQuery('.hero-cta-primary') as SafeHTMLElement;
+    const heroCtaButton = safeQuery('.hero-cta-primary');
     if (!heroCtaButton) return;
 
     // Hover effects
@@ -139,7 +138,7 @@ export const Hero: Component = {
   },
 
   initWhatsAppButton(): void {
-    const whatsappButton = safeQuery('#whatsapp-button') as SafeHTMLElement;
+    const whatsappButton = safeQuery('#whatsapp-button');
     if (!whatsappButton) return;
 
     // Animate entrance
@@ -149,7 +148,7 @@ export const Hero: Component = {
     }, 500);
 
     // Add WhatsApp click tracking
-    const whatsappLink = whatsappButton.querySelector('a[href*="wa.me"]') as SafeElement<HTMLAnchorElement>;
+    const whatsappLink = whatsappButton.querySelector('a[href*="wa.me"]');
     if (whatsappLink && !whatsappLink.hasAttribute('data-gtm-tracked')) {
       whatsappLink.setAttribute('data-gtm-tracked', 'true'); // Prevent duplicate listeners
 
@@ -159,7 +158,7 @@ export const Hero: Component = {
         const whatsappPayload = normalizeEventPayload({
           event: 'whatsapp_click',
           link_url: this.href,
-          link_text: this.textContent?.trim() || 'WhatsApp',
+          link_text: this.textContent?.trim() ?? 'WhatsApp',
           location: 'floating_button'
         } as WhatsAppClickEvent);
         window.dataLayer.push(whatsappPayload);

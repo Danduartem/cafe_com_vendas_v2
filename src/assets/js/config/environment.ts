@@ -7,6 +7,19 @@
  * They should only be stored as environment variables on your server/hosting platform.
  */
 
+interface ImportMetaEnv {
+  readonly VITE_FORMSPREE_FORM_ID?: string;
+  readonly VITE_STRIPE_PUBLIC_KEY?: string;
+  readonly VITE_CLOUDINARY_CLOUD_NAME?: string;
+}
+
+// Extend the global ImportMeta interface
+declare global {
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+}
+
 // Detect environment
 const isDevelopment = window.location.hostname === 'localhost' ||
                      window.location.hostname === '127.0.0.1' ||
@@ -59,13 +72,13 @@ const config: EnvironmentConfig = {
 
   // Formspree Configuration (Public - Safe to expose)
   formspree: {
-    endpoint: `https://formspree.io/f/${(import.meta as any).env?.VITE_FORMSPREE_FORM_ID || 'xanbnrvp'}`,
-    formId: (import.meta as any).env?.VITE_FORMSPREE_FORM_ID || 'xanbnrvp'
+    endpoint: `https://formspree.io/f/${import.meta.env?.VITE_FORMSPREE_FORM_ID ?? 'xanbnrvp'}`,
+    formId: import.meta.env?.VITE_FORMSPREE_FORM_ID ?? 'xanbnrvp'
   },
 
   // Stripe Configuration (Publishable keys only - Safe to expose)
   stripe: {
-    publishableKey: (import.meta as any).env?.VITE_STRIPE_PUBLIC_KEY ||
+    publishableKey: import.meta.env?.VITE_STRIPE_PUBLIC_KEY ??
       (isDevelopment ? 'pk_test_51QxTrfF2Zw0dHOvZoUHGr5nR068f9iuyuLrR86WW9gztjOkoRWgv1Q8cscSURSn45r1wX5qT2KKrj6sE2mD3a7CT009nkU8Wey' : '')
   },
 
@@ -77,7 +90,7 @@ const config: EnvironmentConfig = {
 
   // Cloudinary Configuration (Public)
   cloudinary: {
-    cloudName: (import.meta as any).env?.VITE_CLOUDINARY_CLOUD_NAME || 'ds4dhbneq'
+    cloudName: import.meta.env?.VITE_CLOUDINARY_CLOUD_NAME ?? 'ds4dhbneq'
   },
 
   // API Endpoints (Client-side safe endpoints only)

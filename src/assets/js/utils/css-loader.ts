@@ -36,7 +36,7 @@ export const CSSLoader = {
     };
 
     // Check if preload has already loaded
-    if (preloadLink.sheet || (preloadLink as any).readyState === 'complete') {
+    if (preloadLink.sheet || (preloadLink as HTMLLinkElement & { readyState?: string }).readyState === 'complete') {
       convertToStylesheet();
     } else {
       // Wait for preload to complete, then convert

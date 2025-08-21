@@ -3,6 +3,18 @@
  * Handles full-page screenshots with automatic fallback to sectional screenshots
  */
 
+/**
+ * Page interface for universal screenshot operations
+ */
+interface UniversalPage {
+  addStyleTag: (options: { content: string }) => Promise<void>;
+  evaluate: <T>(fn: (...args: unknown[]) => T, ...args: unknown[]) => Promise<T>;
+  waitForTimeout: (timeout: number) => Promise<void>;
+  waitForLoadState?: (state: string, options?: { timeout: number }) => Promise<void>;
+  screenshot: (options: Record<string, unknown>) => Promise<Buffer>;
+  goto?: (url: string, options?: Record<string, unknown>) => Promise<void>;
+}
+
 export interface ScreenshotOptions {
   timeout?: number;
   retries?: number;
@@ -23,7 +35,7 @@ export interface ScreenshotResult {
 /**
  * Optimizes page for better screenshot capture
  */
-async function optimizePageForScreenshot(page: any): Promise<void> {
+async function optimizePageForScreenshot(page: UniversalPage): Promise<void> {
   try {
     // Disable animations and transitions for faster capture
     await page.addStyleTag({
@@ -42,7 +54,7 @@ async function optimizePageForScreenshot(page: any): Promise<void> {
     await page.evaluate(() => {
       return new Promise<void>((resolve) => {
         const images = Array.from(document.querySelectorAll('img[loading="lazy"]'));
-        
+
         if (images.length === 0) {
           resolve();
           return;
@@ -71,10 +83,10 @@ async function optimizePageForScreenshot(page: any): Promise<void> {
     });
 
     // Scroll to trigger any scroll-based lazy loading
-    const totalHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+    const _totalHeight = await page.evaluate(() => document.documentElement.scrollHeight);
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(500);
-    
+
   } catch (error) {
     console.warn('Page optimization failed:', error);
   }
@@ -84,8 +96,8 @@ async function optimizePageForScreenshot(page: any): Promise<void> {
  * Attempts full-page screenshot with smart retry logic
  */
 async function attemptFullPageScreenshot(
-  page: any, 
-  filename: string, 
+  page: UniversalPage,
+  filename: string,
   options: ScreenshotOptions
 ): Promise<boolean> {
   const { timeout = 30000, retries = 3, waitForNetworkIdle = true } = options;
@@ -104,7 +116,7 @@ async function attemptFullPageScreenshot(
       await page.screenshot({
         path: filename,
         fullPage: true,
-        timeout: timeout,
+        timeout,
         type: 'png'
       });
 
@@ -113,12 +125,12 @@ async function attemptFullPageScreenshot(
 
     } catch (error) {
       console.log(`⚠️ Full page attempt ${attempt} failed: ${error.message}`);
-      
+
       if (attempt === retries) {
         console.log(`❌ Full page screenshot failed after ${retries} attempts`);
         return false;
       }
-      
+
       // Progressive backoff
       await page.waitForTimeout(1000 * attempt);
     }
@@ -131,8 +143,8 @@ async function attemptFullPageScreenshot(
  * Takes sectional screenshots as fallback
  */
 async function takeSectionalScreenshots(
-  page: any, 
-  baseFilename: string, 
+  page: UniversalPage,
+  baseFilename: string,
   options: ScreenshotOptions
 ): Promise<string[]> {
   const { sectionOverlap = 100 } = options;
@@ -162,15 +174,15 @@ async function takeSectionalScreenshots(
   for (let i = 0; i < sections; i++) {
     try {
       const scrollY = i * effectiveHeight;
-      
+
       // Ensure we don't scroll past the page
       const actualScrollY = Math.min(scrollY, totalHeight - viewportHeight);
-      
+
       await page.evaluate((y) => window.scrollTo(0, y), actualScrollY);
       await page.waitForTimeout(500); // Let content settle
 
       const filename = baseFilename.replace(/\.png$/, `-section-${i + 1}.png`);
-      
+
       await page.screenshot({
         path: filename,
         timeout: 10000,
@@ -196,12 +208,12 @@ async function takeSectionalScreenshots(
  * Universal screenshot function with automatic fallback
  */
 export async function takeUniversalScreenshot(
-  page: any, 
-  filename: string, 
+  page: UniversalPage,
+  filename: string,
   options: ScreenshotOptions = {}
 ): Promise<ScreenshotResult> {
   const startTime = Date.now();
-  
+
   try {
     console.log(`🚀 Starting universal screenshot: ${filename}`);
 
@@ -211,7 +223,7 @@ export async function takeUniversalScreenshot(
     }
 
     // Get page height for reporting
-    const pageHeight = await page.evaluate(() => 
+    const pageHeight = await page.evaluate(() =>
       Math.max(
         document.documentElement.scrollHeight,
         document.documentElement.offsetHeight,
@@ -222,11 +234,11 @@ export async function takeUniversalScreenshot(
 
     // Step 2: Try full page screenshot first
     const fullPageSuccess = await attemptFullPageScreenshot(page, filename, options);
-    
+
     if (fullPageSuccess) {
       const duration = Date.now() - startTime;
       console.log(`✅ Full page screenshot completed in ${duration}ms`);
-      
+
       return {
         success: true,
         type: 'fullpage',
@@ -236,13 +248,13 @@ export async function takeUniversalScreenshot(
     }
 
     // Step 3: Fallback to sectional screenshots
-    console.log(`🔄 Falling back to sectional screenshots...`);
+    console.log('🔄 Falling back to sectional screenshots...');
     const sectionFiles = await takeSectionalScreenshots(page, filename, options);
 
     if (sectionFiles.length > 0) {
       const duration = Date.now() - startTime;
       console.log(`✅ Sectional screenshots completed in ${duration}ms (${sectionFiles.length} sections)`);
-      
+
       return {
         success: true,
         type: 'sectional',
@@ -258,7 +270,7 @@ export async function takeUniversalScreenshot(
   } catch (error) {
     const duration = Date.now() - startTime;
     console.error(`❌ Universal screenshot failed after ${duration}ms:`, error);
-    
+
     return {
       success: false,
       type: 'fullpage',
@@ -273,24 +285,24 @@ export async function takeUniversalScreenshot(
  */
 export async function takeScreenshotCLI(url: string, output: string, options: ScreenshotOptions = {}) {
   const { chromium } = await import('@playwright/test');
-  
+
   const browser = await chromium.launch({
     headless: true,
     args: ['--no-sandbox', '--disable-dev-shm-usage']
   });
-  
+
   const page = await browser.newPage({
     viewport: { width: 1920, height: 1080 }
   });
-  
+
   try {
     console.log(`🌐 Navigating to: ${url}`);
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    
+
     const result = await takeUniversalScreenshot(page, output, options);
-    
+
     return result;
-    
+
   } finally {
     await browser.close();
   }

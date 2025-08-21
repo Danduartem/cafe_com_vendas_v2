@@ -23,6 +23,34 @@ import type { Component } from '@/types/component.js';
 //   notes: string;
 // }
 
+/**
+ * Basic Stripe types for payment processing
+ */
+interface StripeError {
+  message: string;
+  type?: string;
+  code?: string;
+  status?: number;
+}
+
+interface StripeElements {
+  create: (type: string, options?: Record<string, unknown>) => StripeElement;
+}
+
+interface StripeElement {
+  mount: (selector: string) => void;
+  on: (event: string, handler: (event: StripeElementChangeEvent) => void) => void;
+}
+
+interface StripeElementChangeEvent {
+  complete: boolean;
+  error?: StripeError;
+}
+
+interface StripeInstance {
+  elements: (options?: Record<string, unknown>) => StripeElements;
+  confirmPayment: (options: Record<string, unknown>) => Promise<{ error?: StripeError }>;
+}
 
 interface LeadData {
   lead_id: string;
@@ -32,7 +60,7 @@ interface LeadData {
   phone: string;
   page: string;
   timestamp: string;
-  [key: string]: any; // For UTM params
+  [key: string]: string | undefined; // For UTM params
 }
 
 interface FormElements {
@@ -112,7 +140,7 @@ const PricingManager = {
     // You can modify this number to test different tiers
     // 0-7: first tier active (€180)
     // 8+: second tier active (€240)
-    return parseInt(localStorage.getItem('cafecomvendas_sales_count') || '0', 10);
+    return parseInt(localStorage.getItem('cafecomvendas_sales_count') ?? '0', 10);
   },
 
   // Utility to manually set sales count for testing
@@ -152,9 +180,9 @@ if (ENV.isDevelopment) {
 
 export const Checkout: Component = {
   // Component state
-  stripe: null as any,
-  elements: null as any,
-  paymentElement: null as any,
+  stripe: null as StripeInstance | null,
+  elements: null as StripeElements | null,
+  paymentElement: null as StripeElement | null,
   clientSecret: null as string | null,
   leadId: null as string | null,
   currentStep: 1 as number | string,
@@ -442,10 +470,10 @@ export const Checkout: Component = {
   },
 
   extractLeadFormData(): CheckoutFormData {
-    const fullName = (safeQuery('#fullName') as HTMLInputElement)?.value.trim() || '';
-    const email = (safeQuery('#email') as HTMLInputElement)?.value.trim() || '';
-    const countryCode = (safeQuery('#countryCode') as HTMLSelectElement)?.value || '';
-    const phone = (safeQuery('#phone') as HTMLInputElement)?.value.trim() || '';
+    const fullName = (safeQuery('#fullName'))?.value.trim() ?? '';
+    const email = (safeQuery('#email'))?.value.trim() ?? '';
+    const countryCode = (safeQuery('#countryCode'))?.value ?? '';
+    const phone = (safeQuery('#phone'))?.value.trim() ?? '';
     const fullPhone = `${countryCode} ${phone}`.trim();
 
     return { fullName, email, phone, fullPhone };
@@ -508,7 +536,7 @@ export const Checkout: Component = {
     if (!paymentIntentResponse.ok) {
       const errorMessage = await this.extractPaymentErrorMessage(paymentIntentResponse);
       const error = new Error(errorMessage);
-      (error as any).status = paymentIntentResponse.status;
+      (error as StripeError).status = paymentIntentResponse.status;
       throw error;
     }
 
@@ -536,7 +564,7 @@ export const Checkout: Component = {
     const trigger = document.querySelector('[data-checkout-trigger]:focus');
     if (trigger) {
       const section = trigger.closest('section');
-      if (section && section.id) {
+      if (section?.id) {
         return section.id; // hero, pricing_table, footer, etc.
       }
     }
@@ -562,7 +590,7 @@ export const Checkout: Component = {
     });
   },
 
-  handleLeadSubmissionError(error: any): void {
+  handleLeadSubmissionError(error: StripeError): void {
     console.error('Lead submission error:', error);
 
     // Handle specific error types
@@ -572,12 +600,12 @@ export const Checkout: Component = {
       this.showError('leadError', 'Solicitação duplicada detectada. Tente novamente.');
     } else if (error.status === 400) {
       // Validation error - show specific message
-      this.showError('leadError', error.message || 'Dados inválidos. Verifique as informações e tente novamente.');
+      this.showError('leadError', error.message ?? 'Dados inválidos. Verifique as informações e tente novamente.');
     } else if (error.status === 429) {
       // Rate limit exceeded
       this.showError('leadError', 'Muitas tentativas. Aguarde alguns minutos e tente novamente.');
     } else {
-      this.showError('leadError', error.message || 'Erro inesperado. Tente novamente.');
+      this.showError('leadError', error.message ?? 'Erro inesperado. Tente novamente.');
     }
   },
 
@@ -610,7 +638,7 @@ export const Checkout: Component = {
     });
   },
 
-  async submitToMailerLiteWithValidation(leadData: LeadData): Promise<any> {
+  async submitToMailerLiteWithValidation(leadData: LeadData): Promise<Record<string, unknown>> {
     const response = await this.submitToMailerLite(leadData);
     if (!response.ok) {
       throw new Error('MailerLite lead capture failed');
@@ -702,7 +730,7 @@ export const Checkout: Component = {
     });
 
     // Handle real-time validation
-    this.paymentElement.on('change', (event: any) => {
+    this.paymentElement.on('change', (event: StripeElementChangeEvent) => {
       this.clearError('payError');
 
       if (event.error) {

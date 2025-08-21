@@ -1,10 +1,32 @@
 // Load environment variables from .env.local for development
 import 'dotenv/config';
 
-export default function(eleventyConfig: any) {
+interface EleventyConfig {
+  addDataExtension(extension: string, options: { parser: (contents: string, filePath: string) => Promise<unknown> }): void;
+  addTransform(name: string, transform: (content: string, outputPath: string) => string): void;
+  setDataDeepMerge(value: boolean): void;
+  addPassthroughCopy(path: string | Record<string, string>): void;
+  setServerOptions(options: { port?: number; showAllHosts?: boolean; showVersion?: boolean }): void;
+  setWatchThrottleWaitTime?(time: number): void;
+  return: {
+    dir: {
+      input: string;
+      output: string;
+      includes: string;
+      layouts: string;
+      data: string;
+    };
+    pathPrefix: string;
+    markdownTemplateEngine: string;
+    htmlTemplateEngine: string;
+    dataTemplateEngine: string;
+  };
+}
+
+export default function(eleventyConfig: EleventyConfig) {
   // Configure TypeScript support for data files
   eleventyConfig.addDataExtension('ts', {
-    parser: async (contents: string, filePath: string) => {
+    parser: async (_contents: string, filePath: string) => {
       // Use dynamic import to load TypeScript files with tsx
       const module = await import(filePath);
       return typeof module.default === 'function' ? module.default() : module.default;
@@ -18,7 +40,7 @@ export default function(eleventyConfig: any) {
   });
 
   // Enhanced watch options for better development experience
-  eleventyConfig.setWatchThrottleWaitTime(100);
+  eleventyConfig.setWatchThrottleWaitTime?.(100);
 
   // Passthrough copy for static assets (css, fonts, pictures) - excluding js since Vite handles bundling
   eleventyConfig.addPassthroughCopy({ 'src/assets/css': 'assets/css' });
@@ -33,8 +55,8 @@ export default function(eleventyConfig: any) {
   // Add useful transforms for production optimization
   if (process.env.NODE_ENV === 'production') {
     // Minify HTML in production
-    eleventyConfig.addTransform('htmlmin', function(content: any, outputPath: any) {
-      if (outputPath && outputPath.endsWith('.html')) {
+    eleventyConfig.addTransform('htmlmin', function(content: string, outputPath: string) {
+      if (outputPath?.endsWith('.html')) {
         return content
           .replace(/\s+/g, ' ')
           .replace(/>\s+</g, '><')

@@ -3,26 +3,37 @@
  * Extends the MCP browser instance with universal screenshot capability
  */
 
-import { takeUniversalScreenshot, ScreenshotOptions, ScreenshotResult } from './universal-screenshot.js';
+import type { ScreenshotOptions, ScreenshotResult } from './universal-screenshot.js';
+import { takeUniversalScreenshot } from './universal-screenshot.js';
+
+/**
+ * Playwright Page interface for screenshot operations
+ */
+interface PlaywrightPage {
+  screenshot: (options?: Record<string, unknown>) => Promise<Buffer>;
+  setViewportSize: (size: { width: number; height: number }) => Promise<void>;
+  waitForTimeout: (timeout: number) => Promise<void>;
+  evaluate: (fn: () => unknown) => Promise<unknown>;
+}
 
 /**
  * Enhanced screenshot function that works with Playwright MCP browser instances
  * This function can be called when you have an active Playwright MCP session
  */
 export async function takeUniversalScreenshotMCP(
-  page: any,
-  filename: string, 
+  page: PlaywrightPage,
+  filename: string,
   options: ScreenshotOptions = {}
 ): Promise<ScreenshotResult> {
   // Ensure we're working with a directory that exists
   const path = require('path');
   const fs = require('fs');
-  
+
   const dir = path.dirname(filename);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  
+
   // Use our universal screenshot with the MCP page instance
   return await takeUniversalScreenshot(page, filename, {
     timeout: 30000,
@@ -83,15 +94,15 @@ export const SCREENSHOT_PRESETS = {
     waitForNetworkIdle: false,
     sectionOverlap: 50
   },
-  
-  // Standard for most websites  
+
+  // Standard for most websites
   standard: {
     timeout: 30000,
     retries: 3,
     waitForNetworkIdle: true,
     sectionOverlap: 100
   },
-  
+
   // Robust for complex/heavy websites
   robust: {
     timeout: 60000,
@@ -100,7 +111,7 @@ export const SCREENSHOT_PRESETS = {
     optimizePage: true,
     sectionOverlap: 200
   },
-  
+
   // For SPA/React apps with lots of animations
   spa: {
     timeout: 45000,

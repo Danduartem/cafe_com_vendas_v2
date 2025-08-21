@@ -5,7 +5,7 @@
  */
 
 
-// Converted TypeScript components  
+// Converted TypeScript components
 export { FAQ } from './faq.js';
 export { Banner } from './banner.js';
 export { GTM } from './gtm.js';

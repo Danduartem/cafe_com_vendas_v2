@@ -21,6 +21,30 @@ interface NavigationTiming extends PerformanceNavigationTiming {
 }
 
 /**
+ * Extended Error interface with optional browser properties
+ */
+interface ExtendedError extends Error {
+  filename?: string;
+  lineno?: number;
+  colno?: number;
+}
+
+/**
+ * Performance entry with CLS-specific properties
+ */
+interface CLSPerformanceEntry extends PerformanceEntry {
+  hadRecentInput?: boolean;
+  value?: number;
+}
+
+/**
+ * Performance entry with FID-specific properties
+ */
+interface FIDPerformanceEntry extends PerformanceEntry {
+  processingStart?: number;
+}
+
+/**
  * Analytics interface
  */
 interface AnalyticsInterface {
@@ -85,9 +109,9 @@ export const Analytics: AnalyticsInterface = {
       event_label: errorType,
       error_message: error.message,
       error_stack: error.stack?.substring(0, 500),
-      error_filename: (error as any).filename,
-      error_lineno: (error as any).lineno,
-      error_colno: (error as any).colno,
+      error_filename: (error as ExtendedError).filename,
+      error_lineno: (error as ExtendedError).lineno,
+      error_colno: (error as ExtendedError).colno,
       ...context
     };
 
@@ -121,8 +145,8 @@ export const Analytics: AnalyticsInterface = {
         const clsObserver = new PerformanceObserver((list) => {
           let clsValue = 0;
           for (const entry of list.getEntries()) {
-            if (!(entry as any).hadRecentInput) {
-              clsValue += (entry as any).value || 0;
+            if (!(entry as CLSPerformanceEntry).hadRecentInput) {
+              clsValue += (entry as CLSPerformanceEntry).value ?? 0;
             }
           }
           if (clsValue > 0) {
@@ -147,7 +171,7 @@ export const Analytics: AnalyticsInterface = {
               event_category: 'Core Web Vitals',
               event_label: 'FID',
               metric_name: 'first_input_delay',
-              metric_value: Math.round((entry as any).processingStart - entry.startTime),
+              metric_value: Math.round(((entry as FIDPerformanceEntry).processingStart ?? 0) - entry.startTime),
               metric_unit: 'ms'
             };
             this.track('performance_metric', performanceEvent);

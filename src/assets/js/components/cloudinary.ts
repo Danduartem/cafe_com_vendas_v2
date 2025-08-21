@@ -109,10 +109,10 @@ export const CloudinaryComponent: Component = {
     const viewportWidth = window.innerWidth;
     let width, height;
 
-    if (viewportWidth <= (IMAGE_SIZES.MOBILE.MAX_WIDTH || 640)) {
+    if (viewportWidth <= (IMAGE_SIZES.MOBILE.MAX_WIDTH ?? 640)) {
       width = IMAGE_SIZES.MOBILE.WIDTH;
       height = IMAGE_SIZES.MOBILE.HEIGHT;
-    } else if (viewportWidth <= (IMAGE_SIZES.DESKTOP.MAX_WIDTH || 1024)) {
+    } else if (viewportWidth <= (IMAGE_SIZES.DESKTOP.MAX_WIDTH ?? 1024)) {
       width = IMAGE_SIZES.DESKTOP.WIDTH;
       height = IMAGE_SIZES.DESKTOP.HEIGHT;
     } else {

@@ -170,6 +170,7 @@ export default [
       'dist/**',
       '*.min.js',
       'src/assets/css/**', // CSS files handled by PostCSS/Tailwind
+      'src/platform/**', // Platform files excluded from TypeScript project
       'netlify/**', // Netlify functions and generated files
       '.netlify/**', // Netlify dev files
       '**/*.d.ts' // TypeScript declaration files

@@ -8,7 +8,7 @@ export interface Component {
   init(): void;
 
   // Allow additional properties for component-specific methods
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**

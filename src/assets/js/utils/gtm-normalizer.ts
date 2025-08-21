@@ -117,7 +117,7 @@ export function normalizeId(id: unknown): string {
   // Keep alphanumeric, dash, underscore (common in IDs)
   return String(id)
     .toLowerCase()
-    .replace(/[^a-z0-9_\-]+/g, '_')
+    .replace(/[^a-z0-9_-]+/g, '_')
     .slice(0, 100); // IDs can be longer
 }
 
@@ -132,7 +132,7 @@ export function normalizeSection(section: unknown): string {
     known === normalized || known.includes(normalized) || normalized.includes(known)
   );
 
-  return found || normalized;
+  return found ?? normalized;
 }
 
 /**

@@ -1,6 +1,6 @@
 /**
  * FAQ Section - Interactive Functionality
- * 
+ *
  * Handles FAQ accordion interactions and analytics tracking.
  */
 
@@ -58,7 +58,7 @@ export const faqSection = {
     if (typeof gtag !== 'undefined') {
       gtag('event', 'faq_section_view', {
         event_category: 'engagement',
-        event_label: 'faq',
+        event_label: 'faq'
       });
     }
   },
@@ -70,11 +70,11 @@ export const faqSection = {
     const target = event.target as HTMLDetailsElement;
     const faqNumber = target.dataset.faqItem;
     const analyticsEvent = target.dataset.analyticsEvent;
-    
+
     if (typeof gtag !== 'undefined') {
       gtag('event', target.open ? 'faq_open' : 'faq_close', {
         event_category: 'engagement',
-        event_label: analyticsEvent || `faq_${faqNumber}`,
+        event_label: analyticsEvent ?? `faq_${faqNumber}`
       });
     }
   }

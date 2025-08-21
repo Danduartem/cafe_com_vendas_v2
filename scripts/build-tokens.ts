@@ -17,10 +17,10 @@ interface DesignTokens {
     typography?: CSSVariables;
     semantic?: CSSVariables;
   };
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
-function toCssVars(obj: Record<string, any>, indent: string = '  '): string {
+function toCssVars(obj: Record<string, unknown>, indent: string = '  '): string {
   return Object.entries(obj)
     .filter(([k]) => k.startsWith('--'))
     .map(([k, v]) => `${indent}${k}: ${v};`)
@@ -36,7 +36,7 @@ function main(): void {
     const themeBlocks: string[] = [];
 
     // Extract CSS variables from the unified tokens
-    const cssVars = tokens.cssVariables || {};
+    const cssVars = tokens.cssVariables ?? {};
 
     // :root block with all CSS custom properties
     const rootVars: string[] = [];

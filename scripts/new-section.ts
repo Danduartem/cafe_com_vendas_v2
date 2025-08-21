@@ -1,10 +1,10 @@
 #!/usr/bin/env tsx
 /**
  * New Section - Scaffold New Section Structure
- * 
+ *
  * Usage: npm run new:section <section-id>
  * Example: npm run new:section testimonials
- * 
+ *
  * This creates all required files for a new section.
  */
 
@@ -297,20 +297,20 @@ writeFileSync(join(sectionPath, 'analytics.ts'), analyticsContent);
 writeFileSync(join(sectionPath, 'README.md'), readmeContent);
 
 console.log(`\n✅ Section '${sectionId}' scaffolded successfully!`);
-console.log(`\n📄 Created files:`);
-console.log(`   ├── index.njk      (Template with section contract)`);
-console.log(`   ├── index.ts       (TypeScript functionality)`); 
-console.log(`   ├── schema.ts      (Content validation)`);
-console.log(`   ├── analytics.ts   (Event tracking)`);
-console.log(`   └── README.md      (Documentation)`);
+console.log('\n📄 Created files:');
+console.log('   ├── index.njk      (Template with section contract)');
+console.log('   ├── index.ts       (TypeScript functionality)');
+console.log('   ├── schema.ts      (Content validation)');
+console.log('   ├── analytics.ts   (Event tracking)');
+console.log('   └── README.md      (Documentation)');
 
-console.log(`\n🎯 Next Steps:`);
-console.log(`   1. Update src/_includes/sections/manifest.ts`);
+console.log('\n🎯 Next Steps:');
+console.log('   1. Update src/_includes/sections/manifest.ts');
 console.log(`   2. Add to src/index.njk: {% include "sections/${sectionId}/index.njk" %}`);
-console.log(`   3. Import in src/assets/js/app.ts`);
+console.log('   3. Import in src/assets/js/app.ts');
 console.log(`   4. Test with: npm run dev:section ${sectionId}`);
 
-console.log(`\n💡 Quick commands:`);
+console.log('\n💡 Quick commands:');
 console.log(`   code src/_includes/sections/${sectionId}/`);
 console.log(`   npm run dev:section ${sectionId}`);
 console.log(`   http://localhost:8080#${anchor}`);

@@ -117,7 +117,7 @@ export const CafeComVendas: CafeComVendasInterface = {
     // Handle unhandled promise rejections
     window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent): void => {
       const errorContext: ErrorContext = {
-        message: event.reason?.message || 'Unknown promise rejection',
+        message: event.reason?.message ?? 'Unknown promise rejection',
         stack: event.reason?.stack
       };
       Analytics.trackError('unhandled_promise_rejection', new Error(errorContext.message), errorContext);
@@ -132,7 +132,7 @@ export const CafeComVendas: CafeComVendasInterface = {
         colno: event.colno,
         stack: event.error?.stack
       };
-      Analytics.trackError('global_javascript_error', event.error || new Error(event.message), errorContext);
+      Analytics.trackError('global_javascript_error', event.error ?? new Error(event.message), errorContext);
     });
   },
 
@@ -141,19 +141,19 @@ export const CafeComVendas: CafeComVendasInterface = {
    */
   initializeComponents(): void {
     const components: ComponentRegistration[] = [
-      { name: 'CloudinaryComponent', component: CloudinaryComponent as Component },
-      { name: 'Checkout', component: Checkout as Component },
+      { name: 'CloudinaryComponent', component: CloudinaryComponent },
+      { name: 'Checkout', component: Checkout },
       { name: 'Hero', component: Hero as Component },
       { name: 'Banner', component: Banner as Component },
       { name: 'GTM', component: GTM as Component },
-      { name: 'YouTube', component: YouTube as Component },
-      { name: 'About', component: About as Component },
+      { name: 'YouTube', component: YouTube },
+      { name: 'About', component: About },
       { name: 'Offer', component: Offer as Component },
       { name: 'FAQ', component: FAQ as Component },
-      { name: 'FinalCTA', component: FinalCTA as Component },
-      { name: 'Footer', component: Footer as Component },
+      { name: 'FinalCTA', component: FinalCTA },
+      { name: 'Footer', component: Footer },
       { name: 'Testimonials', component: Testimonials as Component },
-      { name: 'ThankYou', component: ThankYou as Component }
+      { name: 'ThankYou', component: ThankYou }
     ];
 
     let successCount = 0;

@@ -48,7 +48,7 @@ export const FAQ: FAQComponent = {
 
         // Track FAQ toggle for GTM
         const itemNumber = detailsEl.getAttribute('data-faq-item');
-        const questionText = detailsEl.querySelector('summary')?.textContent?.trim() || `FAQ ${itemNumber}`;
+        const questionText = detailsEl.querySelector('summary')?.textContent?.trim() ?? `FAQ ${itemNumber}`;
         const label = `faq-${itemNumber}`;
 
         try {

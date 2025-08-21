@@ -2,7 +2,7 @@
 
 /**
  * API Test Suite
- * 
+ *
  * Quick tests to validate that critical APIs are available
  * and working with the installed package versions.
  */
@@ -20,7 +20,7 @@ const colors = {
   yellow: '\x1b[33m',
   red: '\x1b[31m',
   cyan: '\x1b[36m',
-  bold: '\x1b[1m',
+  bold: '\x1b[1m'
 };
 
 interface TestResult {
@@ -37,23 +37,23 @@ class APITester {
    */
   testViteAPIs(): void {
     const testName = 'Vite 7.x APIs';
-    
+
     try {
       // Test defineConfig (should exist in v7)
       const config: UserConfig = defineConfig({
         build: {
           rollupOptions: {
-            input: 'index.html',
+            input: 'index.html'
           },
           lib: {
             entry: 'src/main.ts',
             name: 'TestLib',
-            fileName: 'test-lib',
-          },
+            fileName: 'test-lib'
+          }
         },
         optimizeDeps: {
-          include: ['test-dep'], // Modern API
-        },
+          include: ['test-dep'] // Modern API
+        }
       });
 
       // Test that deprecated APIs are NOT used
@@ -65,9 +65,9 @@ class APITester {
       this.results.push({ name: testName, passed: true });
       console.log(`${colors.green}✅ ${testName} passed${colors.reset}`);
     } catch (error) {
-      this.results.push({ 
-        name: testName, 
-        passed: false, 
+      this.results.push({
+        name: testName,
+        passed: false,
         error: error instanceof Error ? error.message : String(error)
       });
       console.log(`${colors.red}❌ ${testName} failed: ${error}${colors.reset}`);
@@ -79,21 +79,21 @@ class APITester {
    */
   testStripeAPIs(): void {
     const testName = 'Stripe 18.x APIs';
-    
+
     try {
       // Initialize Stripe with modern API version
       const stripe = new Stripe('sk_test_dummy', {
-        apiVersion: '2025-07-30.basil',
+        apiVersion: '2025-07-30.basil'
       });
 
       // Test modern APIs exist
-      assert(typeof stripe.paymentIntents.create === 'function', 
+      assert(typeof stripe.paymentIntents.create === 'function',
         'paymentIntents.create should be a function');
       assert(typeof stripe.checkout.sessions.create === 'function',
         'checkout.sessions.create should be a function');
       assert(typeof stripe.paymentMethods.create === 'function',
         'paymentMethods.create should be a function');
-      
+
       // Test that we're not using deprecated APIs
       // Note: These might still exist but shouldn't be used
       if ('charges' in stripe) {
@@ -106,9 +106,9 @@ class APITester {
       this.results.push({ name: testName, passed: true });
       console.log(`${colors.green}✅ ${testName} passed${colors.reset}`);
     } catch (error) {
-      this.results.push({ 
-        name: testName, 
-        passed: false, 
+      this.results.push({
+        name: testName,
+        passed: false,
         error: error instanceof Error ? error.message : String(error)
       });
       console.log(`${colors.red}❌ ${testName} failed: ${error}${colors.reset}`);
@@ -120,15 +120,15 @@ class APITester {
    */
   testESMAPIs(): void {
     const testName = 'ESM/import.meta APIs';
-    
+
     try {
       // Test import.meta properties
       assert(import.meta.url, 'import.meta.url should exist');
-      
+
       // Test Node.js ESM utilities
       const __filename = fileURLToPath(import.meta.url);
       const __dirname = dirname(__filename);
-      
+
       assert(__filename, '__filename should be derived from import.meta.url');
       assert(__dirname, '__dirname should be derived from import.meta.url');
 
@@ -139,9 +139,9 @@ class APITester {
       this.results.push({ name: testName, passed: true });
       console.log(`${colors.green}✅ ${testName} passed${colors.reset}`);
     } catch (error) {
-      this.results.push({ 
-        name: testName, 
-        passed: false, 
+      this.results.push({
+        name: testName,
+        passed: false,
         error: error instanceof Error ? error.message : String(error)
       });
       console.log(`${colors.red}❌ ${testName} failed: ${error}${colors.reset}`);
@@ -153,18 +153,18 @@ class APITester {
    */
   testTypeScriptConfig(): void {
     const testName = 'TypeScript Configuration';
-    
+
     try {
       // These would fail at compile time if types aren't configured
       const viteConfig: UserConfig = {
         base: '/',
         build: {
-          outDir: 'dist',
-        },
+          outDir: 'dist'
+        }
       };
 
       const stripeConfig: Stripe.StripeConfig = {
-        apiVersion: '2025-07-30.basil',
+        apiVersion: '2025-07-30.basil'
       };
 
       // Test that types are assignable
@@ -174,9 +174,9 @@ class APITester {
       this.results.push({ name: testName, passed: true });
       console.log(`${colors.green}✅ ${testName} passed${colors.reset}`);
     } catch (error) {
-      this.results.push({ 
-        name: testName, 
-        passed: false, 
+      this.results.push({
+        name: testName,
+        passed: false,
         error: error instanceof Error ? error.message : String(error)
       });
       console.log(`${colors.red}❌ ${testName} failed: ${error}${colors.reset}`);
@@ -187,7 +187,7 @@ class APITester {
    * Generate summary report
    */
   generateReport(): void {
-    console.log('\n' + colors.bold + colors.cyan + '📊 API Test Results' + colors.reset);
+    console.log(`\n${  colors.bold  }${colors.cyan  }📊 API Test Results${  colors.reset}`);
     console.log('═'.repeat(40));
 
     const passed = this.results.filter(r => r.passed).length;
@@ -216,7 +216,7 @@ class APITester {
    * Run all tests
    */
   runAll(): void {
-    console.log(colors.bold + colors.cyan + '🧪 Running API Tests...\n' + colors.reset);
+    console.log(`${colors.bold + colors.cyan  }🧪 Running API Tests...\n${  colors.reset}`);
 
     this.testViteAPIs();
     this.testStripeAPIs();

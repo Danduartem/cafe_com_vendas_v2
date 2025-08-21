@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 /**
  * Find Section - Instant Navigation to Section Files
- * 
+ *
  * Usage: npm run find:section <section-id>
  * Example: npm run find:section hero
  */
@@ -28,7 +28,7 @@ type SectionMap = Record<string, SectionInfo>;
 try {
   const manifestPath = join(projectRoot, 'src/_includes/sections/manifest.ts');
   const manifestContent = readFileSync(manifestPath, 'utf-8');
-  
+
   // Extract SECTIONS object (simple regex parsing for this case)
   const sectionsMatch = manifestContent.match(/export const SECTIONS: Record<SectionId, SectionConfig> = ({[\s\S]*?});/);
   if (!sectionsMatch) {
@@ -56,7 +56,7 @@ try {
     },
     'hero': {
       path: 'src/_includes/sections/hero',
-      template: 'index.njk', 
+      template: 'index.njk',
       script: 'index.ts',
       anchor: 's-hero',
       title: 'Hero Section'
@@ -64,7 +64,7 @@ try {
     'problem': {
       path: 'src/_includes/sections/problem',
       template: 'index.njk',
-      script: 'index.ts', 
+      script: 'index.ts',
       anchor: 's-problem',
       title: 'Problem & Pain Points'
     },
@@ -72,7 +72,7 @@ try {
       path: 'src/_includes/sections/solution',
       template: 'index.njk',
       script: 'index.ts',
-      anchor: 's-solution', 
+      anchor: 's-solution',
       title: 'Solution & Benefits'
     },
     'about': {
@@ -83,7 +83,7 @@ try {
       title: 'About & Authority'
     },
     'social-proof': {
-      path: 'src/_includes/sections/social-proof', 
+      path: 'src/_includes/sections/social-proof',
       template: 'index.njk',
       script: 'index.ts',
       anchor: 's-social-proof',
@@ -98,7 +98,7 @@ try {
     },
     'faq': {
       path: 'src/_includes/sections/faq',
-      template: 'index.njk', 
+      template: 'index.njk',
       script: 'index.ts',
       anchor: 's-faq',
       title: 'FAQ & Objections'
@@ -107,7 +107,7 @@ try {
       path: 'src/_includes/sections/final-cta',
       template: 'index.njk',
       script: 'index.ts',
-      anchor: 's-final-cta', 
+      anchor: 's-final-cta',
       title: 'Final CTA'
     },
     'footer': {
@@ -135,7 +135,7 @@ try {
   console.log(`📄 Template: ${section.path}/${section.template}`);
   console.log(`⚡ Script: ${section.path}/${section.script}`);
   console.log(`🔗 Anchor: #${section.anchor}`);
-  console.log(`\n💡 Quick access:`);
+  console.log('\n💡 Quick access:');
   console.log(`   code ${section.path}/${section.template}`);
   console.log(`   code ${section.path}/${section.script}`);
 

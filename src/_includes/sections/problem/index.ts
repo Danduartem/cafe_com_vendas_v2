@@ -1,6 +1,6 @@
 /**
  * Problem Section - Interactive Functionality
- * 
+ *
  * Handles interactive elements for the problem validation section.
  */
 
@@ -64,7 +64,7 @@ export const problemSection = {
     if (typeof gtag !== 'undefined') {
       gtag('event', 'problem_section_view', {
         event_category: 'engagement',
-        event_label: 'problem',
+        event_label: 'problem'
       });
     }
   },
@@ -73,12 +73,12 @@ export const problemSection = {
    * Handle CTA button clicks
    */
   handleCtaClick(event: Event): void {
-    const target = event.target as HTMLElement;
-    
+    const _target = event.target as HTMLElement;
+
     if (typeof gtag !== 'undefined') {
       gtag('event', 'click_problem_cta', {
         event_category: 'engagement',
-        event_label: 'problem_to_solution',
+        event_label: 'problem_to_solution'
       });
     }
   },
@@ -89,11 +89,11 @@ export const problemSection = {
   handlePainPointHover(event: Event): void {
     const target = event.target as HTMLElement;
     const listItem = target.closest('li');
-    
+
     if (listItem && typeof gtag !== 'undefined') {
       gtag('event', 'pain_point_hover', {
         event_category: 'engagement',
-        event_label: 'problem_pain_point',
+        event_label: 'problem_pain_point'
       });
     }
   }

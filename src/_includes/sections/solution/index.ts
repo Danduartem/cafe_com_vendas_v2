@@ -1,6 +1,6 @@
 /**
  * Solution Section - Interactive Functionality
- * 
+ *
  * Handles pillar interactions and checkout triggers for the solution section.
  */
 
@@ -65,7 +65,7 @@ export const solutionSection = {
     if (typeof gtag !== 'undefined') {
       gtag('event', 'solution_section_view', {
         event_category: 'engagement',
-        event_label: 'solution',
+        event_label: 'solution'
       });
     }
   },
@@ -75,12 +75,12 @@ export const solutionSection = {
    */
   handleCtaClick(event: Event): void {
     const target = event.target as HTMLElement;
-    const button = target.closest('[data-checkout-trigger]') as HTMLElement;
-    
+    const button = target.closest('[data-checkout-trigger]');
+
     if (button && typeof gtag !== 'undefined') {
       gtag('event', 'click_solution_cta', {
         event_category: 'conversion',
-        event_label: 'solution_to_checkout',
+        event_label: 'solution_to_checkout'
       });
     }
   },
@@ -90,15 +90,15 @@ export const solutionSection = {
    */
   handlePillarHover(event: Event): void {
     const target = event.target as HTMLElement;
-    const card = target.closest('[data-analytics-event]') as HTMLElement;
-    
+    const card = target.closest('[data-analytics-event]');
+
     if (card) {
       const eventName = card.dataset.analyticsEvent;
-      
+
       if (eventName && typeof gtag !== 'undefined') {
         gtag('event', 'pillar_hover', {
           event_category: 'engagement',
-          event_label: eventName,
+          event_label: eventName
         });
       }
     }
@@ -109,15 +109,15 @@ export const solutionSection = {
    */
   handlePillarClick(event: Event): void {
     const target = event.target as HTMLElement;
-    const card = target.closest('[data-analytics-event]') as HTMLElement;
-    
+    const card = target.closest('[data-analytics-event]');
+
     if (card) {
       const eventName = card.dataset.analyticsEvent;
-      
+
       if (eventName && typeof gtag !== 'undefined') {
         gtag('event', 'pillar_click', {
           event_category: 'interaction',
-          event_label: eventName,
+          event_label: eventName
         });
       }
     }

@@ -1,14 +1,14 @@
 #!/usr/bin/env tsx
 /**
  * Dev Section - Focus Development on Specific Section
- * 
+ *
  * Usage: npm run dev:section <section-id>
  * Example: npm run dev:section hero
- * 
+ *
  * This opens the section files and provides development guidance.
  */
 
-import { readFileSync, existsSync } from 'fs';
+import { existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -49,7 +49,7 @@ const sections: SectionMap = {
   },
   'hero': {
     path: 'src/_includes/sections/hero',
-    template: 'index.njk', 
+    template: 'index.njk',
     script: 'index.ts',
     anchor: 's-hero',
     title: 'Hero Section',
@@ -58,7 +58,7 @@ const sections: SectionMap = {
   'problem': {
     path: 'src/_includes/sections/problem',
     template: 'index.njk',
-    script: 'index.ts', 
+    script: 'index.ts',
     anchor: 's-problem',
     title: 'Problem & Pain Points',
     description: 'Pain validation and problem agitation'
@@ -67,7 +67,7 @@ const sections: SectionMap = {
     path: 'src/_includes/sections/solution',
     template: 'index.njk',
     script: 'index.ts',
-    anchor: 's-solution', 
+    anchor: 's-solution',
     title: 'Solution & Benefits',
     description: '5 pillars approach and transformation promise'
   },
@@ -80,7 +80,7 @@ const sections: SectionMap = {
     description: 'Presenter credibility and authority building'
   },
   'social-proof': {
-    path: 'src/_includes/sections/social-proof', 
+    path: 'src/_includes/sections/social-proof',
     template: 'index.njk',
     script: 'index.ts',
     anchor: 's-social-proof',
@@ -97,7 +97,7 @@ const sections: SectionMap = {
   },
   'faq': {
     path: 'src/_includes/sections/faq',
-    template: 'index.njk', 
+    template: 'index.njk',
     script: 'index.ts',
     anchor: 's-faq',
     title: 'FAQ & Objections',
@@ -107,7 +107,7 @@ const sections: SectionMap = {
     path: 'src/_includes/sections/final-cta',
     template: 'index.njk',
     script: 'index.ts',
-    anchor: 's-final-cta', 
+    anchor: 's-final-cta',
     title: 'Final CTA',
     description: 'Urgency close and final call to action'
   },
@@ -133,7 +133,7 @@ if (!section) {
 
 console.log(`🚀 Development Focus: ${section.title}`);
 console.log(`📝 ${section.description}`);
-console.log(`\n📁 Section Files:`);
+console.log('\n📁 Section Files:');
 
 // Check which files exist
 const templatePath = join(projectRoot, section.path, section.template);
@@ -148,22 +148,22 @@ console.log(`   🔧 Schema: ${section.path}/schema.ts ${existsSync(schemaPath) 
 console.log(`   📊 Analytics: ${section.path}/analytics.ts ${existsSync(analyticsPath) ? '✅' : '❌'}`);
 console.log(`   📚 README: ${section.path}/README.md ${existsSync(readmePath) ? '✅' : '❌'}`);
 
-console.log(`\n🎯 Development Commands:`);
-console.log(`   # Open section files`);
+console.log('\n🎯 Development Commands:');
+console.log('   # Open section files');
 console.log(`   code ${section.path}/`);
-console.log(`   \n   # Start development server`);
-console.log(`   npm run dev`);
-console.log(`   \n   # Navigate to section in browser`);
+console.log('   \n   # Start development server');
+console.log('   npm run dev');
+console.log('   \n   # Navigate to section in browser');
 console.log(`   http://localhost:8080#${section.anchor}`);
 
-console.log(`\n🔧 Section Development Guidelines:`);
+console.log('\n🔧 Section Development Guidelines:');
 console.log(`   1. Template must have: id="${section.anchor}" data-section="${sectionId}"`);
-console.log(`   2. Use only Tailwind utilities (no inline styles)`);
-console.log(`   3. Add data-analytics-event for tracking`);
-console.log(`   4. Include accessibility attributes (aria-label, etc.)`);
-console.log(`   5. Use design tokens from DATA_design_tokens.json`);
+console.log('   2. Use only Tailwind utilities (no inline styles)');
+console.log('   3. Add data-analytics-event for tracking');
+console.log('   4. Include accessibility attributes (aria-label, etc.)');
+console.log('   5. Use design tokens from DATA_design_tokens.json');
 
 if (!existsSync(templatePath) || !existsSync(scriptPath)) {
-  console.log(`\n⚠️  Missing files detected. Run to scaffold:`);
+  console.log('\n⚠️  Missing files detected. Run to scaffold:');
   console.log(`   npm run new:section ${sectionId}`);
 }

@@ -1,6 +1,6 @@
 /**
  * Top Banner Section - Interactive Functionality
- * 
+ *
  * Handles the sticky banner with urgency messaging and event countdown.
  */
 
@@ -32,7 +32,7 @@ export const topBannerSection = {
     if (typeof gtag !== 'undefined') {
       gtag('event', 'top_banner_section_view', {
         event_category: 'engagement',
-        event_label: 'top-banner',
+        event_label: 'top-banner'
       });
     }
   }

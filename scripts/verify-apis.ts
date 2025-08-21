@@ -2,7 +2,7 @@
 
 /**
  * API Verification Script
- * 
+ *
  * This script validates that all APIs used in the codebase
  * actually exist in the installed package versions.
  * It will fail TypeScript compilation if deprecated or
@@ -22,7 +22,7 @@ const colors = {
   yellow: '\x1b[33m',
   red: '\x1b[31m',
   cyan: '\x1b[36m',
-  bold: '\x1b[1m',
+  bold: '\x1b[1m'
 };
 
 // Get __dirname equivalent in ESM
@@ -48,7 +48,7 @@ class APIVerifier {
       package: 'vite',
       version: '7.x',
       status: 'valid',
-      issues: [],
+      issues: []
     };
 
     try {
@@ -58,31 +58,31 @@ class APIVerifier {
         build: {
           // Modern API: rollupOptions
           rollupOptions: {
-            input: 'index.html',
+            input: 'index.html'
           },
           // Modern API: lib mode
           lib: {
             entry: 'src/main.ts',
             name: 'MyLib',
-            fileName: 'my-lib',
-          },
+            fileName: 'my-lib'
+          }
         },
         // Modern API: optimizeDeps.include (not .entries)
         optimizeDeps: {
-          include: ['some-dep'],
-        },
+          include: ['some-dep']
+        }
       });
 
       // Test import.meta.glob (modern syntax)
       // Note: This is a compile-time feature, we're just checking syntax
       // Modern glob syntax check - compile-time feature
       console.log('Modern Vite glob syntax supported');
-      
+
       // Check for deprecated patterns
       // Check deprecated patterns
       const deprecatedPatterns = [
         'import.meta.globEager', // Deprecated in Vite 3+
-        'optimizeDeps.entries',  // Deprecated in Vite 5+
+        'optimizeDeps.entries'  // Deprecated in Vite 5+
       ];
       console.log(`Found ${deprecatedPatterns.length} deprecated patterns to avoid`);
 
@@ -108,14 +108,14 @@ class APIVerifier {
       modernAlternatives: {
         'charges.create': 'paymentIntents.create',
         'sources.create': 'paymentMethods.create',
-        'checkout.sessions.create (legacy)': 'checkout.sessions.create (with mode: payment)',
-      },
+        'checkout.sessions.create (legacy)': 'checkout.sessions.create (with mode: payment)'
+      }
     };
 
     try {
       // Test modern Stripe APIs
-      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy', {
-        apiVersion: '2025-07-30.basil', // Lock to specific API version
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? 'sk_test_dummy', {
+        apiVersion: '2025-07-30.basil' // Lock to specific API version
       });
 
       // Verify modern APIs exist
@@ -130,10 +130,10 @@ class APIVerifier {
       }
 
       // Check for deprecated APIs (these should NOT be used)
-      if ((stripe as any).charges) {
+      if ((stripe as Record<string, unknown>).charges) {
         console.log(`${colors.yellow}⚠️  Warning: Charges API is deprecated, use Payment Intents${colors.reset}`);
       }
-      if ((stripe as any).sources) {
+      if ((stripe as Record<string, unknown>).sources) {
         console.log(`${colors.yellow}⚠️  Warning: Sources API is deprecated, use Payment Methods${colors.reset}`);
       }
 
@@ -159,8 +159,8 @@ class APIVerifier {
       modernAlternatives: {
         'module.exports': 'export default',
         '.eleventy.cjs': '.eleventy.js (ESM)',
-        'callback filters': 'async/await filters',
-      },
+        'callback filters': 'async/await filters'
+      }
     };
 
     try {
@@ -179,7 +179,7 @@ class APIVerifier {
       }
 
       console.log(`${colors.green}✅ Eleventy 3.x ESM patterns validated${colors.reset}`);
-    } catch (error) {
+    } catch {
       // Config file might not exist or be readable
       console.log(`${colors.yellow}⚠️  Could not verify Eleventy config${colors.reset}`);
     }
@@ -200,8 +200,8 @@ class APIVerifier {
       modernAlternatives: {
         'tailwind.config.js': 'CSS @theme configuration',
         'JavaScript config': 'Pure CSS configuration',
-        '@apply in components': 'Direct utility classes',
-      },
+        '@apply in components': 'Direct utility classes'
+      }
     };
 
     try {
@@ -241,16 +241,16 @@ class APIVerifier {
    * Generate summary report
    */
   generateReport(): void {
-    console.log('\n' + colors.bold + colors.cyan + '📦 API Verification Report' + colors.reset);
+    console.log(`\n${  colors.bold  }${colors.cyan  }📦 API Verification Report${  colors.reset}`);
     console.log('═'.repeat(50));
 
     let hasIssues = false;
 
     for (const result of this.results) {
-      const statusIcon = 
+      const statusIcon =
         result.status === 'valid' ? '✅' :
-        result.status === 'warning' ? '⚠️ ' :
-        '❌';
+          result.status === 'warning' ? '⚠️ ' :
+            '❌';
 
       console.log(`\n${statusIcon} ${colors.bold}${result.package} ${result.version}${colors.reset}`);
 
@@ -270,8 +270,8 @@ class APIVerifier {
       }
     }
 
-    console.log('\n' + '═'.repeat(50));
-    
+    console.log(`\n${  '═'.repeat(50)}`);
+
     if (hasIssues) {
       console.log(`${colors.yellow}⚠️  Some issues were found. Consider updating your code.${colors.reset}`);
       process.exit(1);
@@ -284,7 +284,7 @@ class APIVerifier {
    * Run all verifications
    */
   async runAll(): Promise<void> {
-    console.log(colors.bold + colors.cyan + '🔍 Verifying API compatibility...\n' + colors.reset);
+    console.log(`${colors.bold + colors.cyan  }🔍 Verifying API compatibility...\n${  colors.reset}`);
 
     await this.verifyVite();
     await this.verifyStripe();

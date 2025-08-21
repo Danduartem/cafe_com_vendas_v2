@@ -9,18 +9,18 @@ import type { AnalyticsEventType } from '@/config/constants.js';
 declare global {
   interface Window {
     // Application globals
-    CafeComVendas?: any;
+    CafeComVendas?: Record<string, unknown>;
     CONFIG?: EnvironmentConfig;
     CLOUDINARY_CLOUD_NAME: string;
 
     // Analytics and tracking
-    dataLayer: any[];
-    gtag?: (...args: any[]) => void;
+    dataLayer: Record<string, unknown>[];
+    gtag?: (...args: unknown[]) => void;
     ANALYTICS_EVENTS?: Record<string, AnalyticsEventType>;
 
     // External integrations
-    Stripe?: any;
-    PricingManager?: any;
+    Stripe?: unknown;
+    PricingManager?: Record<string, unknown>;
 
     // Global functions
     openCheckout?: () => void;
@@ -48,10 +48,10 @@ declare global {
   }
 
   // Global Stripe type
-  const Stripe: any;
-  
+  const Stripe: unknown;
+
   // Google Analytics gtag function
-  function gtag(...args: any[]): void;
+  function gtag(...args: unknown[]): void;
 }
 
 // Export empty object to make this a module

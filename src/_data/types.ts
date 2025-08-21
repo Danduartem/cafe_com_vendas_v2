@@ -130,8 +130,8 @@ export interface FooterData {
 
 // Presenter structure
 export interface PresenterSchema {
-  "@context": string;
-  "@type": string;
+  '@context': string;
+  '@type': string;
   name: string;
   jobTitle: string;
   url: string;

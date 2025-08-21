@@ -4,7 +4,8 @@
  * Usage: npm run screenshot -- --url=https://example.com --output=screenshot.png
  */
 
-import { takeScreenshotCLI, ScreenshotOptions } from './universal-screenshot.js';
+import type { ScreenshotOptions } from './universal-screenshot.js';
+import { takeScreenshotCLI } from './universal-screenshot.js';
 
 interface CLIArgs {
   url?: string;
@@ -19,22 +20,22 @@ interface CLIArgs {
 
 function parseArgs(): CLIArgs {
   const args: CLIArgs = {};
-  
+
   process.argv.slice(2).forEach(arg => {
     if (arg.startsWith('--')) {
       const [key, value] = arg.slice(2).split('=');
       const camelKey = key.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-      
+
       if (value === undefined) {
-        args[camelKey as keyof CLIArgs] = true as any;
+        (args as Record<string, unknown>)[camelKey] = true;
       } else if (!isNaN(Number(value))) {
-        args[camelKey as keyof CLIArgs] = Number(value) as any;
+        (args as Record<string, unknown>)[camelKey] = Number(value);
       } else {
-        args[camelKey as keyof CLIArgs] = value as any;
+        (args as Record<string, unknown>)[camelKey] = value;
       }
     }
   });
-  
+
   return args;
 }
 
@@ -64,20 +65,20 @@ Examples:
 
 async function main() {
   const args = parseArgs();
-  
+
   if (args.help) {
     showHelp();
     process.exit(0);
   }
-  
+
   if (!args.url) {
     console.error('❌ Error: --url parameter is required');
     console.log('Use --help for usage information');
     process.exit(1);
   }
-  
-  const output = args.output || 'screenshot.png';
-  
+
+  const output = args.output ?? 'screenshot.png';
+
   const options: ScreenshotOptions = {
     timeout: args.timeout,
     retries: args.retries,
@@ -85,40 +86,40 @@ async function main() {
     optimizePage: !args.noOptimize,
     sectionOverlap: args.sectionOverlap
   };
-  
+
   try {
     console.log('🚀 Starting universal screenshot...');
     console.log(`   URL: ${args.url}`);
     console.log(`   Output: ${output}`);
     console.log('');
-    
+
     const result = await takeScreenshotCLI(args.url, output, options);
-    
+
     if (result.success) {
       console.log('');
       console.log('🎉 Screenshot completed successfully!');
       console.log(`   Type: ${result.type}`);
       console.log(`   Files: ${result.files.length}`);
-      
+
       if (result.totalSections) {
         console.log(`   Sections: ${result.totalSections}`);
       }
-      
+
       if (result.pageHeight) {
         console.log(`   Page height: ${result.pageHeight}px`);
       }
-      
+
       console.log('');
       console.log('📁 Generated files:');
       result.files.forEach(file => console.log(`   - ${file}`));
-      
+
     } else {
       console.error('');
       console.error('❌ Screenshot failed:');
       console.error(`   Error: ${result.error}`);
       process.exit(1);
     }
-    
+
   } catch (error) {
     console.error('');
     console.error('💥 Unexpected error:', error);

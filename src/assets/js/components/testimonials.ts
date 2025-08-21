@@ -120,7 +120,7 @@ export const Testimonials: TestimonialsComponent = {
 
   handleCarouselScroll(elements: CarouselElements): void {
     if (!elements.carousel || !elements.slides.length) return;
-    
+
     const scrollLeft = elements.carousel.scrollLeft;
     const slideWidth = elements.slides[0].offsetWidth;
     const firstChild = elements.carousel.firstElementChild;
@@ -182,7 +182,7 @@ export const Testimonials: TestimonialsComponent = {
     this.updateNavigationButtons(this.carouselElements);
 
     // Track testimonial slide view for GTM
-    const testimonialId = this.carouselElements.slides[this.currentIndex]?.getAttribute('data-testimonial-id') ||
+    const testimonialId = this.carouselElements.slides[this.currentIndex]?.getAttribute('data-testimonial-id') ??
                          `tst_${String(this.currentIndex + 1).padStart(2, '0')}`;
     window.dataLayer = window.dataLayer || [];
     const testimonialPayload = normalizeEventPayload({
@@ -195,7 +195,7 @@ export const Testimonials: TestimonialsComponent = {
 
   scrollToSlide(index: number): void {
     if (!this.carouselElements) return;
-    
+
     const slide = this.carouselElements.slides[index];
     if (slide) {
       slide.scrollIntoView({

@@ -33,7 +33,7 @@ window.gtmNormalizer = {
     if (!id) return 'unknown_id';
     return String(id)
       .toLowerCase()
-      .replace(/[^a-z0-9_\-]+/g, '_')
+      .replace(/[^a-z0-9_-]+/g, '_')
       .slice(0, 100);
   },
 
@@ -46,7 +46,7 @@ window.gtmNormalizer = {
 
     const normalized = this.normalizeString(section, 30, 'unknown');
     const found = knownSections.find(k => k === normalized || k.includes(normalized));
-    return found || normalized;
+    return found ?? normalized;
   },
 
   normalizeAction(action) {
@@ -75,49 +75,7 @@ window.gtmNormalizer = {
     normalizeEnabled: true
   };
 
-  window.dataLayer.push = function() {
-    const result = originalPush.apply(window.dataLayer, arguments);
-
-    if (window.gtmDebug.enabled) {
-      const event = arguments[0];
-      const timestamp = new Date().toISOString();
-
-      // Check normalization
-      const normalized = window.gtmDebug.normalizeEnabled ?
-        checkNormalization(event) : event;
-
-      window.gtmDebug.events.push({
-        timestamp,
-        original: event,
-        normalized,
-        warnings: getNormalizationWarnings(event)
-      });
-
-      // Enhanced logging with normalization info
-      console.log(
-        '%c📊 GTM Event',
-        'background: #4CAF50; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold;',
-        event.event || 'No event name'
-      );
-
-      // Show original vs normalized
-      if (window.gtmDebug.normalizeEnabled) {
-        console.log('%c  Original:', 'color: #888', event);
-        console.log('%c  Normalized:', 'color: #4CAF50', normalized);
-      } else {
-        console.log(event);
-      }
-
-      // Show warnings
-      const warnings = getNormalizationWarnings(event);
-      if (warnings.length > 0) {
-        console.warn('%c⚠️ Normalization Warnings:', 'color: #ff9800', warnings);
-      }
-    }
-
-    return result;
-  };
-
+  // Helper functions (defined before use)
   function checkNormalization(event) {
     const normalized = {};
     for (const [key, value] of Object.entries(event)) {
@@ -142,7 +100,7 @@ window.gtmNormalizer = {
         if (value.length > 50 && key !== 'question' && key !== 'transaction_id') {
           warnings.push(`${key}: exceeds 50 chars (${value.length} chars)`);
         }
-        if (/[^a-z0-9_\- ]/.test(value.toLowerCase())) {
+        if (/[^a-z0-9_- ]/.test(value.toLowerCase())) {
           warnings.push(`${key}: contains special chars (${value})`);
         }
         if (/[\u0300-\u036f]/.test(value)) {
@@ -153,6 +111,50 @@ window.gtmNormalizer = {
 
     return warnings;
   }
+
+  window.dataLayer.push = function() {
+    const result = originalPush.apply(window.dataLayer, arguments);
+
+    if (window.gtmDebug.enabled) {
+      const event = arguments[0];
+      const timestamp = new Date().toISOString();
+
+      // Check normalization
+      const normalized = window.gtmDebug.normalizeEnabled ?
+        checkNormalization(event) : event;
+
+      window.gtmDebug.events.push({
+        timestamp,
+        original: event,
+        normalized,
+        warnings: getNormalizationWarnings(event)
+      });
+
+      // Enhanced logging with normalization info
+      console.log(
+        '%c📊 GTM Event',
+        'background: #4CAF50; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold;',
+        event.event ?? 'No event name'
+      );
+
+      // Show original vs normalized
+      if (window.gtmDebug.normalizeEnabled) {
+        console.log('%c  Original:', 'color: #888', event);
+        console.log('%c  Normalized:', 'color: #4CAF50', normalized);
+      } else {
+        console.log(event);
+      }
+
+      // Show warnings
+      const warnings = getNormalizationWarnings(event);
+      if (warnings.length > 0) {
+        console.warn('%c⚠️ Normalization Warnings:', 'color: #ff9800', warnings);
+      }
+    }
+
+    return result;
+  };
+
 
   console.log('%c✅ GTM Debugger with Normalizer Activated', 'color: #4CAF50; font-size: 14px; font-weight: bold;');
 })();
@@ -383,7 +385,7 @@ window.gtmAnalyze = {
     window.gtmDebug.events.forEach(e => {
       Object.entries(e.normalized).forEach(([key, value]) => {
         if (typeof value === 'string') {
-          if (!fields[key]) fields[key] = new Set();
+          fields[key] ??= new Set();
           fields[key].add(value);
         }
       });

@@ -179,7 +179,7 @@ export const Footer: Component = {
     counters.forEach(counter => {
       const counterValue = counter.getAttribute('data-counter');
       if (!counterValue) return;
-      
+
       const target = parseInt(counterValue);
       const increment = target / 60;
       let current = 0;

@@ -12,8 +12,9 @@
     "isolatedModules": true,
     "noEmit": true,
 
-    // Type checking - less strict for migration
-    "strict": false,
+    // Type checking - gradually enabling strict mode
+    "strict": true,
+    "strictNullChecks": true,
     "noImplicitAny": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
@@ -62,7 +63,8 @@
     "vite.config.ts",
     ".eleventy.ts",
     "eslint.config.ts",
-    "postcss.config.ts"
+    "postcss.config.ts",
+    "debug-gtm.ts"
   ],
   "exclude": [
     "node_modules",

@@ -25,7 +25,7 @@ export const YouTube: Component = {
 
       if (playButton && videoId) {
         playButton.addEventListener('click', () => {
-          this.loadVideo(embed as Element, videoId);
+          this.loadVideo(embed, videoId);
         }, { passive: true });
       }
     });
@@ -44,7 +44,7 @@ export const YouTube: Component = {
     embed.appendChild(iframe);
 
     // Track video play for GTM
-    const videoTitle = embed.getAttribute('data-video-title') || `YouTube Video ${videoId}`;
+    const videoTitle = embed.getAttribute('data-video-title') ?? `YouTube Video ${videoId}`;
     window.dataLayer = window.dataLayer || [];
     const videoPayload = normalizeEventPayload({
       event: 'video_play',
