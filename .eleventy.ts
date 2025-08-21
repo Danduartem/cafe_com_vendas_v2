@@ -2,6 +2,14 @@
 import 'dotenv/config';
 
 export default function(eleventyConfig: any) {
+  // Configure TypeScript support for data files
+  eleventyConfig.addDataExtension('ts', {
+    parser: async (contents: string, filePath: string) => {
+      // Use dynamic import to load TypeScript files with tsx
+      const module = await import(filePath);
+      return typeof module.default === 'function' ? module.default() : module.default;
+    }
+  });
   // Eleventy 3.x ESM optimizations
   // Improved development server performance
   eleventyConfig.setServerOptions({

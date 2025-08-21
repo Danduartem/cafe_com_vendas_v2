@@ -1,0 +1,142 @@
+{# About the Presenter Section #}
+<section 
+  id="sobre" 
+  aria-labelledby="sobre-title" 
+  class="py-16 md:py-24 lg:py-32 bg-neutral-50 overflow-hidden" 
+  data-reveal
+>
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+    <div class="grid lg:grid-cols-12 gap-8 lg:gap-16 xl:gap-20 items-center">
+      
+      {# Content Column - Golden ratio: 61.8% #}
+      <div class="lg:col-span-7 space-y-8 lg:space-y-10 order-2 lg:order-1" data-reveal data-reveal-delay="100">
+        
+        {# Heading #}
+        <div class="space-y-4">
+          <h2 id="sobre-title" class="font-lora font-bold text-navy-900 leading-tight text-3xl md:text-4xl lg:text-5xl">
+            Quem é a {{ presenter.name }}?
+          </h2>
+          <p class="font-lora italic text-navy-800 opacity-80 leading-relaxed max-w-[60ch] text-lg md:text-xl lg:text-2xl">
+            {{ presenter.subtitle }}
+          </p>
+        </div>
+
+        {# Bio #}
+        <div class="prose prose-lg max-w-[65ch]">
+          <p class="text-navy-800 opacity-70 font-century leading-relaxed text-lg">
+            {{ presenter.bio }}
+          </p>
+        </div>
+
+        {# Highlights with enhanced spacing #}
+        <ul class="space-y-4 lg:space-y-5" role="list">
+          {% for highlight in presenter.highlights %}
+          <li class="flex items-start gap-4 text-navy-800 opacity-80 font-century">
+            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center mt-1">
+              <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <span class="text-base lg:text-lg leading-relaxed">
+              {% if highlight.includes('+') %}
+                <span class="font-lora font-semibold text-burgundy-600">{{ highlight.split(' ')[0] }}</span> {{ highlight.split(' ').slice(1).join(' ') }}
+              {% else %}
+                {{ highlight }}
+              {% endif %}
+            </span>
+          </li>
+          {% endfor %}
+        </ul>
+
+        {# Micro Story with enhanced styling #}
+        {% if presenter.microStory %}
+        <div class="relative pl-8 py-6 before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-gold-400 before:to-gold-500 before:rounded-full">
+          <div class="absolute left-1 top-4 w-3 h-3 bg-gold-400 rounded-full shadow-sm"></div>
+          <blockquote class="text-navy-800 opacity-75 italic font-century leading-relaxed text-lg max-w-[60ch]">
+            "{{ presenter.microStory }}"
+          </blockquote>
+        </div>
+        {% endif %}
+
+        {# CTA Section with improved hierarchy #}
+        <div class="space-y-6 pt-4">
+          <div class="flex flex-col sm:flex-row gap-4 lg:gap-6 items-center">
+            <button 
+              type="button"
+              data-checkout-trigger
+              data-source="about"
+              class="group inline-flex items-center justify-center px-8 lg:px-10 py-4 lg:py-5 bg-gradient-to-r from-burgundy-600 to-burgundy-700 text-neutral-50 font-century font-semibold rounded-xl shadow-lg hover:shadow-2xl focus:shadow-2xl focus:outline-none focus:ring-4 focus:ring-burgundy-600/30 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 ease-out cursor-pointer"
+              data-analytics-event="click_about_checkout_cta"
+              aria-label="Garantir a minha vaga no evento"
+            >
+              Garantir a minha vaga
+              <svg class="w-5 h-5 ml-3 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+              </svg>
+            </button>
+            
+            {# Social Link #}
+            {% if presenter.social.instagram %}
+            <a 
+              href="{{ presenter.social.instagram }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group inline-flex items-center gap-3 text-navy-700 hover:text-burgundy-600 focus:text-burgundy-600 font-century transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-burgundy-600/30 rounded-lg px-2 py-1"
+              data-analytics-event="click_about_instagram"
+              aria-label="Seguir {{ presenter.name }} no Instagram"
+            >
+              <svg class="w-6 h-6 transition-transform duration-200 group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
+              </svg>
+              <span class="text-sm lg:text-base font-medium">@jucanamaximiliano</span>
+            </a>
+            {% endif %}
+          </div>
+
+        </div>
+
+      </div>
+
+      {# Photo Column - Golden ratio: 38.2% #}
+      <div class="lg:col-span-5 relative order-1 lg:order-2" data-reveal data-reveal-delay="200">
+        <div class="relative group">
+          <div class="aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl border border-gold-200 bg-gradient-to-br from-neutral-100 to-neutral-200">
+            <picture>
+              <!-- High-resolution desktop image -->
+              <source media="(min-width: 1025px)" 
+                      srcset="https://res.cloudinary.com/ds4dhbneq/image/upload/w_600,h_750,c_fill,q_auto:good,f_auto,g_face/sobre3_pnikcv 1x,
+                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_1200,h_1500,c_fill,q_auto:good,f_auto,g_face/sobre3_pnikcv 2x">
+              
+              <!-- Tablet image -->
+              <source media="(min-width: 641px)" 
+                      srcset="https://res.cloudinary.com/ds4dhbneq/image/upload/w_500,h_625,c_fill,q_auto:good,f_auto,g_face/sobre3_pnikcv 1x,
+                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_1000,h_1250,c_fill,q_auto:good,f_auto,g_face/sobre3_pnikcv 2x">
+              
+              <!-- Mobile image -->
+              <source media="(max-width: 640px)" 
+                      srcset="https://res.cloudinary.com/ds4dhbneq/image/upload/w_400,h_500,c_fill,q_auto:good,f_auto,g_face/sobre3_pnikcv 1x,
+                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_800,h_1000,c_fill,q_auto:good,f_auto,g_face/sobre3_pnikcv 2x">
+              
+              <!-- Fallback image -->
+              <img src="https://res.cloudinary.com/ds4dhbneq/image/upload/w_600,h_750,c_fill,q_auto,f_auto,g_face/sobre3_pnikcv" 
+                   alt="{{ presenter.photoAlt }}"
+                   width="600" height="750"
+                   loading="lazy" decoding="async"
+                   class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+            </picture>
+          </div>
+          {# Enhanced accent border with gradient #}
+          <div class="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-br from-gold-400/30 to-burgundy-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 translate-x-3 translate-y-3"></div>
+          {# Subtle glow effect #}
+          <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold-400/10 to-transparent opacity-40 pointer-events-none"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{# Schema Markup for Person #}
+<script type="application/ld+json">
+{{ presenter.schema | dump | safe }}
+</script>

@@ -1,0 +1,25 @@
+{
+  "name": "Juçanã Maximiliano",
+  "subtitle": "Especialista em estratégias de vendas para empreendedoras",
+  "bio": "Juçanã Maximiliano é especialista em transformar empreendedoras sobrecarregadas em líderes estratégicas. Com mais de 10 anos de experiência em vendas e mentoria empresarial, desenvolveu o método 'Seja Livre' que já ajudou centenas de mulheres a multiplicarem seus resultados sem burnout.",
+  "photoAlt": "Juçanã Maximiliano, especialista em estratégias de vendas para empreendedoras",
+  "highlights": [
+    "+200 empreendedoras mentoradas",
+    "+150% aumento médio em vendas dos clientes",
+    "10+ anos de experiência em estratégia comercial",
+    "Criadora do método 'Seja Livre'",
+    "Palestrante e consultora empresarial"
+  ],
+  "microStory": "Eu também passei pela fase de trabalhar 12 horas por dia achando que era produtividade. Foi quando percebi que o problema não era fazer mais, mas fazer melhor, que tudo mudou.",
+  "social": {
+    "instagram": "https://instagram.com/jucanamaximiliano"
+  },
+  "schema": {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Juçanã Maximiliano",
+    "jobTitle": "Especialista em estratégias de vendas para empreendedoras",
+    "url": "https://instagram.com/jucanamaximiliano",
+    "sameAs": ["https://instagram.com/jucanamaximiliano"]
+  }
+}
