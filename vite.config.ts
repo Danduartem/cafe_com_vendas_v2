@@ -8,7 +8,13 @@ const isProduction = process.env.NODE_ENV === 'production';
 export default defineConfig({
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src/assets/js')
+      '@': resolve(__dirname, 'src/assets/js'),
+      '@sections': resolve(__dirname, 'src/_includes/sections'),
+      '@partials': resolve(__dirname, 'src/_includes/partials'),
+      '@data': resolve(__dirname, 'src/_data'),
+      '@platform': resolve(__dirname, 'src/platform'),
+      '@assets': resolve(__dirname, 'src/assets'),
+      '@types': resolve(__dirname, 'src/assets/js/types')
     }
   },
   plugins: [

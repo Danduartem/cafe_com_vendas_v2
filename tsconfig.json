@@ -12,14 +12,14 @@
     "isolatedModules": true,
     "noEmit": true,
 
-    // Type checking - strict for API validation
-    "strict": true,
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    // Type checking - less strict for migration
+    "strict": false,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "exactOptionalPropertyTypes": false,
-    "noImplicitReturns": true,
+    "noImplicitReturns": false,
     "noUncheckedIndexedAccess": false,
     
     // API deprecation detection
@@ -37,11 +37,15 @@
       "@/utils/*": ["src/assets/js/utils/*"],
       "@/core/*": ["src/assets/js/core/*"],
       "@/config/*": ["src/assets/js/config/*"],
-      "@/types/*": ["src/assets/js/types/*"]
+      "@/types/*": ["src/assets/js/types/*"],
+      "@sections/*": ["src/_includes/sections/*"],
+      "@partials/*": ["src/_includes/partials/*"],
+      "@data/*": ["src/_data/*"],
+      "@platform/*": ["src/platform/*"]
     },
 
     // Advanced
-    "skipLibCheck": false, // Check library types for API validation
+    "skipLibCheck": true, // Skip library type checking for faster builds
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,

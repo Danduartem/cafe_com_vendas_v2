@@ -1,0 +1,191 @@
+{% from "partials/icons.njk" import pillarIcon %}
+{# solution.njk - Solution & Benefits Section Template #}
+
+<!-- Solution Section Start -->
+<section
+  id="s-solution"
+  data-section="solution"
+  aria-label="{{ pillars.title }} - 5 pilares para vender mais trabalhando menos"
+  data-analytics-section="solution"
+  class="relative overflow-hidden py-12 scroll-mt-14"
+  data-scroll-offset
+>
+  {# Premium gradient background with subtle animation #}
+  <div class="absolute inset-0 bg-gradient-to-br from-neutral-50 via-white to-peach-100/30"></div>
+  
+  {# Decorative geometric elements with parallax potential #}
+  <div class="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-gold-500/5 to-transparent rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
+  <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gradient-to-tl from-burgundy-700/5 to-transparent rounded-full blur-3xl transform translate-x-1/4 translate-y-1/4"></div>
+  
+  {# Subtle pattern overlay #}
+  <div class="absolute inset-0 opacity-[0.015] bg-[radial-gradient(circle_at_2px_2px,theme(colors.navy.900)_1px,transparent_1px)] bg-[length:32px_32px]"></div>
+
+  <div class="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+    
+    {# Section Introduction with enhanced typography #}
+    <div class="text-center max-w-5xl mx-auto mb-24" data-reveal>
+      
+      {# Small accent label #}
+      <div class="inline-flex items-center gap-2 mb-8">
+        <span class="w-12 h-[1px] bg-gradient-to-r from-transparent to-gold-500"></span>
+        <span class="font-century text-gold-500 text-sm font-medium tracking-[0.2em] uppercase">{{ pillars.subtitle }}</span>
+        <span class="w-12 h-[1px] bg-gradient-to-l from-transparent to-gold-500"></span>
+      </div>
+      
+      <h2 class="font-lora font-bold mb-8 text-navy-800 text-[clamp(2.5rem,5vw,3.5rem)] leading-[1.1]">
+        <span class="block">Apresentamos o</span>
+        <span class="relative inline-block mt-2">
+          <span class="relative z-10 bg-gradient-to-r from-burgundy-700 via-gold-500 to-burgundy-700 bg-clip-text text-transparent">{{ pillars.title }}</span>
+          {# Decorative underline #}
+          <svg class="absolute -bottom-2 left-0 w-full h-3 text-gold-500/20" preserveAspectRatio="none" viewBox="0 0 300 12">
+            <path d="M0,6 Q75,0 150,6 T300,6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </h2>
+      
+      <p class="font-century text-navy-800/80 text-lg leading-[1.8] max-w-[75ch] mx-auto">
+        {{ pillars.description | safe }}
+      </p>
+    </div>
+
+    {# 5 Pillars Grid System with Golden Ratio and Premium Design #}
+    {% set pillarClasses = "group relative" %}
+    {% set cardClasses = "relative h-full bg-white rounded-2xl p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl overflow-hidden" %}
+    {% set iconContainerClasses = "relative flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-neutral-50 to-white shadow-md group-hover:shadow-xl transition-all duration-300" %}
+    
+    <div class="relative" data-reveal>
+      
+      {# First Row - 3 Pillars with staggered animation #}
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
+        {% for pillar in pillars.pillars %}
+        {% if loop.index <= 3 %}
+        <div class="{{ pillarClasses }} [animation-delay:{{ pillar.animationDelay }}]" data-analytics-event="{{ pillar.analyticsEvent }}">
+          <div class="{{ cardClasses }}">
+            {# Gradient border effect #}
+            <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold-500/10 via-transparent to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            
+            {# Number indicator with golden ratio sizing #}
+            <div class="absolute top-6 right-6 font-lora text-6xl font-bold text-peach-100 select-none">{{ pillar.number }}</div>
+            
+            <div class="relative flex flex-col items-center text-center">
+              {# Enhanced icon container with gradient background #}
+              <div class="relative mb-6">
+                <div class="absolute inset-0 bg-gradient-to-br from-gold-500/20 to-burgundy-700/20 rounded-full blur-xl transform scale-150 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                <div class="{{ iconContainerClasses }}">
+                  <div class="absolute inset-0 rounded-full bg-gradient-to-br from-gold-500/10 to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  {{ pillarIcon(pillar.icon) }}
+                </div>
+              </div>
+              
+              <h3 class="font-lora font-bold text-[1.25rem] text-navy-800 mb-4 transition-colors duration-300 group-hover:text-burgundy-700">
+                {{ pillar.title }}
+              </h3>
+              
+              <p class="font-century text-navy-800/70 text-base leading-[1.618] max-w-[30ch]">
+                {{ pillar.description }}
+              </p>
+              
+              {# Hidden detail that appears on hover #}
+              <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+
+      {# Second Row - 2 Pillars centered with golden ratio spacing #}
+      <div class="grid md:grid-cols-2 gap-8 max-w-[800px] mx-auto">
+        {% for pillar in pillars.pillars %}
+        {% if loop.index > 3 %}
+        <div class="{{ pillarClasses }} [animation-delay:{{ pillar.animationDelay }}]" data-analytics-event="{{ pillar.analyticsEvent }}">
+          <div class="{{ cardClasses }}">
+            {# Gradient border effect #}
+            <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold-500/10 via-transparent to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            
+            {# Number indicator with golden ratio sizing #}
+            <div class="absolute top-6 right-6 font-lora text-6xl font-bold text-peach-100 select-none">{{ pillar.number }}</div>
+            
+            <div class="relative flex flex-col items-center text-center">
+              {# Enhanced icon container with gradient background #}
+              <div class="relative mb-6">
+                <div class="absolute inset-0 bg-gradient-to-br from-gold-500/20 to-burgundy-700/20 rounded-full blur-xl transform scale-150 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                <div class="{{ iconContainerClasses }}">
+                  <div class="absolute inset-0 rounded-full bg-gradient-to-br from-gold-500/10 to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  {{ pillarIcon(pillar.icon) }}
+                </div>
+              </div>
+              
+              <h3 class="font-lora font-bold text-[1.25rem] text-navy-800 mb-4 transition-colors duration-300 group-hover:text-burgundy-700">
+                {{ pillar.title }}
+              </h3>
+              
+              <p class="font-century text-navy-800/70 text-base leading-[1.618] max-w-[30ch]">
+                {{ pillar.description }}
+              </p>
+              
+              {# Hidden detail that appears on hover #}
+              <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    {# CTA Section with Premium Design #}
+    <div class="relative mt-12" data-reveal>
+      
+      {# Decorative divider with golden ratio proportions #}
+      <div class="flex items-center justify-center mb-16">
+        <div class="w-24 h-[1px] bg-gradient-to-r from-transparent to-gold-500/30"></div>
+        <div class="mx-4 w-2 h-2 rounded-full bg-gold-500/40"></div>
+        <div class="w-24 h-[1px] bg-gradient-to-l from-transparent to-gold-500/30"></div>
+      </div>
+      
+      <div class="text-center">
+        {# CTA button using the same style as hero section #}
+        <button type="button"
+                data-checkout-trigger
+                data-source="solution"
+                class="inline-flex items-center justify-center px-6 py-3 min-h-[48px] rounded-[14px] bg-gradient-to-r from-burgundy-700 to-navy-800 text-white font-bold shadow-[0_10px_30px_rgba(2,6,23,0.5)] transform-gpu transition-all duration-250 hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-neutral-200/20"
+                data-analytics-event="click_solution_cta"
+                aria-label="Conhecer os 5 pilares em detalhe - abrir modal de inscrição">
+          Quero conhecer os 5 pilares em detalhe
+          <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+          </svg>
+        </button>
+        
+        {# Supporting text with refined styling #}
+        <div class="mt-8 relative">
+          <p class="font-century text-navy-800/70 text-base leading-relaxed max-w-[65ch] mx-auto">
+            Cada pilar será aprofundado durante o evento — 
+            <span class="font-semibold text-navy-800">exemplos práticos</span>, 
+            <span class="font-semibold text-navy-800">templates</span> e uma 
+            <span class="font-semibold text-navy-800">folha de ação</span>.
+          </p>
+          
+          {# Trust indicators - responsive layout #}
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mt-6 text-xs sm:text-sm text-navy-800/50">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <span class="font-century whitespace-nowrap">90 dias de garantia</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+              </svg>
+              <span class="font-century whitespace-nowrap">Apenas 20 vagas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<!-- Solution Section End -->

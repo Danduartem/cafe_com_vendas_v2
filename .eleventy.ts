@@ -1,7 +1,7 @@
 // Load environment variables from .env.local for development
 import 'dotenv/config';
 
-export default function(eleventyConfig) {
+export default function(eleventyConfig: any) {
   // Eleventy 3.x ESM optimizations
   // Improved development server performance
   eleventyConfig.setServerOptions({
@@ -25,7 +25,7 @@ export default function(eleventyConfig) {
   // Add useful transforms for production optimization
   if (process.env.NODE_ENV === 'production') {
     // Minify HTML in production
-    eleventyConfig.addTransform('htmlmin', function(content, outputPath) {
+    eleventyConfig.addTransform('htmlmin', function(content: any, outputPath: any) {
       if (outputPath && outputPath.endsWith('.html')) {
         return content
           .replace(/\s+/g, ' ')

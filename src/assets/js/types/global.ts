@@ -49,6 +49,9 @@ declare global {
 
   // Global Stripe type
   const Stripe: any;
+  
+  // Google Analytics gtag function
+  function gtag(...args: any[]): void;
 }
 
 // Export empty object to make this a module

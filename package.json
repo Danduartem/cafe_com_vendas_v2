@@ -10,7 +10,7 @@
   },
   "scripts": {
     "clean": "node -e \"const fs=require('fs'); fs.rmSync('_site', {recursive:true, force:true})\"",
-    "tokens:build": "node scripts/build-tokens.js",
+    "tokens:build": "tsx scripts/build-tokens.ts",
     "build:css": "postcss ./src/assets/css/main.css -o ./_site/tailwind.css",
     "build:js": "cross-env NODE_ENV=production vite build",
     "build:js:dev": "cross-env NODE_ENV=development vite build",
@@ -23,8 +23,8 @@
     "start": "npm run dev",
     "preview": "npm run build && npx serve _site",
     "dev:netlify": "netlify dev",
-    "lint": "eslint . --ext .js,.ts",
-    "lint:fix": "eslint . --fix --ext .js,.ts",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --fix --ext .ts",
     "lighthouse": "npx lighthouse http://localhost:8080 --output=html,json --output-path=./reports/lighthouse-mobile --form-factor=mobile --preset=perf --chrome-flags=\"--headless --no-sandbox\" && npx lighthouse http://localhost:8080 --output=html,json --output-path=./reports/lighthouse-desktop --form-factor=desktop --preset=desktop --chrome-flags=\"--headless --no-sandbox\"",
     "lighthouse:mobile": "npx lighthouse http://localhost:8080 --output=html,json --output-path=./reports/lighthouse-mobile --form-factor=mobile --preset=perf --chrome-flags=\"--headless --no-sandbox\"",
     "lighthouse:desktop": "npx lighthouse http://localhost:8080 --output=html,json --output-path=./reports/lighthouse-desktop --form-factor=desktop --preset=desktop --chrome-flags=\"--headless --no-sandbox\"",
@@ -35,7 +35,10 @@
     "verify-apis": "tsx scripts/verify-apis.ts",
     "test-apis": "tsx scripts/test-apis.ts",
     "screenshot": "tsx scripts/screenshot-cli.ts",
-    "screenshot:local": "npm run screenshot -- --url=http://localhost:8080"
+    "screenshot:local": "npm run screenshot -- --url=http://localhost:8080",
+    "find:section": "tsx scripts/find-section.ts",
+    "dev:section": "tsx scripts/dev-section.ts",
+    "new:section": "tsx scripts/new-section.ts"
   },
   "keywords": [
     "landing-page",
