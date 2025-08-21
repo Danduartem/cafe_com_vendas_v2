@@ -1,0 +1,123 @@
+/**
+ * Problem Section Schema and Validation
+ *
+ * Type-safe contracts and runtime validation for the problem section
+ */
+
+import type { ProblemSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types.js';
+import { validateSectionBase, assertSectionBase } from '../../../_data/types.js';
+
+// Extend the existing ProblemSection interface for strict validation
+export interface ProblemProps extends ProblemSection {
+  id: 'problem';
+  copy: {
+    eyebrow?: string;
+    headline: string;
+    subhead?: string;
+    description?: string;
+    cta?: SectionCTA;
+    pain_points: string[];
+    highlights: string[];
+  };
+  media?: SectionMedia;
+  design: SectionDesign;
+  tracking: SectionTracking;
+}
+
+// Validation functions
+export function validateProblemCopy(copy: unknown): copy is ProblemProps['copy'] {
+  if (!copy || typeof copy !== 'object') return false;
+  const copyObj = copy as Record<string, unknown>;
+
+  // Required fields
+  if (typeof copyObj.headline !== 'string') return false;
+  if (!Array.isArray(copyObj.pain_points) || !copyObj.pain_points.every(p => typeof p === 'string')) return false;
+  if (!Array.isArray(copyObj.highlights) || !copyObj.highlights.every(h => typeof h === 'string')) return false;
+
+  // Optional fields
+  if (copyObj.eyebrow !== undefined && typeof copyObj.eyebrow !== 'string') return false;
+  if (copyObj.subhead !== undefined && typeof copyObj.subhead !== 'string') return false;
+  if (copyObj.description !== undefined && typeof copyObj.description !== 'string') return false;
+
+  // CTA validation
+  if (copyObj.cta !== undefined) {
+    if (!copyObj.cta || typeof copyObj.cta !== 'object') return false;
+    const ctaObj = copyObj.cta as Record<string, unknown>;
+
+    if (typeof ctaObj.label !== 'string' || typeof ctaObj.href !== 'string' || typeof ctaObj.variant !== 'string') {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export function validateProblemMedia(media: unknown): media is SectionMedia {
+  if (media === undefined) return true;
+  if (!media || typeof media !== 'object') return false;
+
+  const mediaObj = media as Record<string, unknown>;
+
+  return (
+    (mediaObj.image === undefined || typeof mediaObj.image === 'string') &&
+    (mediaObj.alt === undefined || typeof mediaObj.alt === 'string') &&
+    (mediaObj.background === undefined || typeof mediaObj.background === 'string') &&
+    (mediaObj.aspect_ratio === undefined || typeof mediaObj.aspect_ratio === 'string')
+  );
+}
+
+export function validateProblemDesign(design: unknown): design is SectionDesign {
+  if (!design || typeof design !== 'object') return false;
+  const designObj = design as Record<string, unknown>;
+
+  return (
+    (designObj.theme === 'light' || designObj.theme === 'dark') &&
+    typeof designObj.accent === 'string' &&
+    typeof designObj.background === 'string' &&
+    typeof designObj.layout === 'string'
+  );
+}
+
+export function validateProblemTracking(tracking: unknown): tracking is SectionTracking {
+  if (!tracking || typeof tracking !== 'object') return false;
+  const trackingObj = tracking as Record<string, unknown>;
+
+  return (
+    typeof trackingObj.section_id === 'string' &&
+    typeof trackingObj.impression_event === 'string'
+  );
+}
+
+export function validateProblemSection(data: unknown): data is ProblemProps {
+  if (!validateSectionBase(data)) return false;
+
+  const section = data as Record<string, unknown>;
+
+  return (
+    section.id === 'problem' &&
+    validateProblemCopy(section.copy) &&
+    validateProblemMedia(section.media) &&
+    validateProblemDesign(section.design) &&
+    validateProblemTracking(section.tracking)
+  );
+}
+
+export function assertProblemSection(data: unknown): ProblemProps {
+  assertSectionBase(data, 'problem');
+
+  if (!validateProblemSection(data)) {
+    throw new Error(`Invalid problem section data: ${JSON.stringify(data, null, 2)}`);
+  }
+
+  return data;
+}
+
+// Export the schema for runtime use
+export const ProblemSchema = {
+  validate: validateProblemSection,
+  assert: assertProblemSection,
+  validateCopy: validateProblemCopy,
+  validateMedia: validateProblemMedia,
+  validateDesign: validateProblemDesign,
+  validateTracking: validateProblemTracking
+} as const;

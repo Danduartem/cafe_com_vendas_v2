@@ -1,0 +1,39 @@
+{
+  "id": "final-cta",
+  "variant": "urgency",
+  "enabled": true,
+  "copy": {
+    "eyebrow": "Última chamada",
+    "headline": "O momento é agora",
+    "subhead": "As vagas do primeiro lote estão quase esgotadas",
+    "description": "Este é o seu convite para parar de adiar a sua liberdade. Para transformar o 'um dia' em '20 de setembro'. Apenas 8 vagas com desconto especial.",
+    "urgency_points": [
+      "Apenas 8 vagas no primeiro lote",
+      "25% de desconto + brindes exclusivos",
+      "Garantia de 90 dias",
+      "Evento único em Lisboa"
+    ],
+    "cta": {
+      "label": "Sim, quero garantir minha vaga agora",
+      "href": "#checkout",
+      "variant": "gradient-large"
+    },
+    "alternative_cta": {
+      "label": "Ainda tenho dúvidas",
+      "href": "#faq",
+      "variant": "link"
+    }
+  },
+  "design": {
+    "theme": "dark",
+    "accent": "gold-400",
+    "background": "gradient-to-br from-navy-900 to-burgundy-900",
+    "layout": "centered"
+  },
+  "tracking": {
+    "section_id": "final-cta",
+    "impression_event": "final_cta_view",
+    "cta_event": "click_final_cta",
+    "alternative_cta_event": "click_final_cta_alternative"
+  }
+}

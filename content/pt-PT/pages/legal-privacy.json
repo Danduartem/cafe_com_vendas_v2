@@ -1,0 +1,13 @@
+{
+  "route": "/politica-privacidade/",
+  "title": "Política de Privacidade - Café com Vendas",
+  "description": "Política de Privacidade do evento Café com Vendas - Como protegemos e utilizamos os seus dados pessoais",
+  "layout": "layout.njk",
+  "eleventyNavigation": {
+    "key": "politica-privacidade"
+  },
+  "sections": [
+    { "slug": "legal-page", "variant": "privacy", "enabled": true, "data": "legal.privacyPolicy" }
+  ],
+  "customTemplate": "politica-privacidade.njk"
+}

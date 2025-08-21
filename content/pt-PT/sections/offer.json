@@ -1,0 +1,63 @@
+{
+  "id": "offer",
+  "variant": "pricing",
+  "enabled": true,
+  "copy": {
+    "eyebrow": "Sua transformação começa aqui",
+    "headline": "O seu lugar na mesa está à sua espera",
+    "subhead": "Isto é mais do que um evento: é um ponto de viragem.",
+    "description": "Um dia inteiro de imersão estratégica, material de apoio prático, almoço de networking e acesso a um plano de ação de 90 dias. Ambiente exclusivo para apenas 20 empreendedoras",
+    "pricing": {
+      "first_lot": {
+        "label": "Primeiro lote • 25% desconto",
+        "original_price": 240,
+        "discounted_price": 180,
+        "currency": "EUR",
+        "capacity": 8,
+        "bonuses": [
+          "Pingente delicado banhado a ouro",
+          "Presentes especiais edição Lisboa",
+          "Assento VIP"
+        ]
+      },
+      "second_lot": {
+        "label": "Segundo lote",
+        "price": 240,
+        "currency": "EUR",
+        "capacity": 12
+      }
+    },
+    "includes": [
+      "7 horas de conteúdo prático",
+      "Roundtable de networking e cocriação",
+      "Ambiente intimista na Mesa Corrida",
+      "Almoço com sobremesa e bebidas",
+      "Acesso aos 5 pilares da mentoria Seja Livre",
+      "Cronograma de 90 dias",
+      "Material de apoio (Trello)",
+      "Suporte via WhatsApp após o evento"
+    ],
+    "guarantee": {
+      "type": "performance",
+      "claim": "Aumento de pelo menos 20% nas vendas",
+      "period": "90 dias",
+      "policy": "Se aplicar o método e todas as atividades propostas e não aumentar as vendas em pelo menos 20%, reembolsamos o valor do convite."
+    },
+    "cta": {
+      "label": "Garantir minha vaga no primeiro lote",
+      "href": "#checkout",
+      "variant": "gradient"
+    }
+  },
+  "design": {
+    "theme": "light",
+    "accent": "burgundy-600",
+    "background": "gradient-to-br from-neutral-50 via-white to-neutral-100",
+    "layout": "pricing-card"
+  },
+  "tracking": {
+    "section_id": "offer",
+    "impression_event": "offer_view",
+    "cta_event": "click_offer_cta"
+  }
+}

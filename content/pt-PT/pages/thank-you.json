@@ -1,0 +1,11 @@
+{
+  "route": "/thank-you/",
+  "title": "Obrigada! Falta 1 passo",
+  "description": "Página de confirmação do pagamento - próximos passos para o evento Café com Vendas",
+  "layout": "layout.njk",
+  "permalink": "/thank-you/index.html",
+  "sections": [
+    { "slug": "thank-you-content", "variant": "default", "enabled": true }
+  ],
+  "customTemplate": "thank-you.njk"
+}

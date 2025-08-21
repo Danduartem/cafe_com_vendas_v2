@@ -13,7 +13,7 @@ interface PlaywrightPage {
   screenshot: (options?: Record<string, unknown>) => Promise<Buffer>;
   setViewportSize: (size: { width: number; height: number }) => Promise<void>;
   waitForTimeout: (timeout: number) => Promise<void>;
-  evaluate: (fn: () => unknown) => Promise<unknown>;
+  evaluate: <T>(fn: (...args: unknown[]) => T, ...args: unknown[]) => Promise<T>;
 }
 
 /**
@@ -35,7 +35,7 @@ export async function takeUniversalScreenshotMCP(
   }
 
   // Use our universal screenshot with the MCP page instance
-  return await takeUniversalScreenshot(page as any, filename, {
+  return await takeUniversalScreenshot(page, filename, {
     timeout: 30000,
     retries: 3,
     waitForNetworkIdle: true,

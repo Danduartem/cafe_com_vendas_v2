@@ -1,35 +1,33 @@
 ---
 layout: layout.njk
-title: "Café com Vendas - Evento para Empreendedoras em Portugal"
+title: "Café com Vendas — Lisboa"
 description: "Chega de usar o burnout como medalha de honra. O evento presencial e intimista que lhe dará o mapa para trocar o 'trabalhar duro' pelo 'trabalhar com inteligência'. Para empreendedoras em Portugal que querem estratégia, leveza e liberdade nos seus negócios."
 ---
 
-{# TOP WARNING BANNER - Only on main page #}
-{% include "sections/top-banner/index.njk" %}
-
-{# Include the Hero Section Component #}
-{% include "sections/hero/index.njk" %}
-
-{# Include the Problem & Agitation Section Component #}
-{% include "sections/problem/index.njk" %}
-
-{# Include the Solution & Benefits Section Component #}
-{% include "sections/solution/index.njk" %}
-
-{# Include the About Section Component #}
-{% include "sections/about/index.njk" %}
-
-{# Include the Social Proof Section Component #}
-{% include "sections-legacy/social-proof.njk" %}
-
-{# Include the Offer Section Component #}
-{% include "sections/offer/index.njk" %}
-
-{# Include the FAQ Section Component #}
-{% include "sections/faq/index.njk" %}
-
-{# Include the Final CTA Section Component #}
-{% include "sections-legacy/final-cta.njk" %}
-
-{# Include the Footer Section Component #}
-{% include "sections-legacy/footer.njk" %}
+{# Render sections from page composition #}
+{% for section in pages.landing.sections %}
+  {% if section.enabled %}
+    {# Section: {{ section.slug }}{% if section.variant %} ({{ section.variant }}){% endif %} #}
+    {% if section.slug == "top-banner" %}
+      {% include "sections/top-banner/index.njk" %}
+    {% elif section.slug == "hero" %}
+      {% include "sections/hero/index.njk" %}
+    {% elif section.slug == "problem" %}
+      {% include "sections/problem/index.njk" %}
+    {% elif section.slug == "solution" %}
+      {% include "sections/solution/index.njk" %}
+    {% elif section.slug == "about" %}
+      {% include "sections/about/index.njk" %}
+    {% elif section.slug == "social-proof" %}
+      {% include "sections-legacy/social-proof.njk" %}
+    {% elif section.slug == "offer" %}
+      {% include "sections/offer/index.njk" %}
+    {% elif section.slug == "faq" %}
+      {% include "sections/faq/index.njk" %}
+    {% elif section.slug == "final-cta" %}
+      {% include "sections-legacy/final-cta.njk" %}
+    {% elif section.slug == "footer" %}
+      {% include "sections-legacy/footer.njk" %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
