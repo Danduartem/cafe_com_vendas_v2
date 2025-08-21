@@ -50,7 +50,9 @@
       "Bash(cp:*)",
       "Bash(netlify dev:*)",
       "Bash(stripe listen:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(mkdir:*)",
+      "Bash(do mv \"$file\" \"$file#DATA_\")"
     ],
     "deny": [],
     "ask": []

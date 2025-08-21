@@ -11,7 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default function() {
   try {
-    const faqDataPath = path.join(__dirname, '../../info/DATA_faq.json');
+    const faqDataPath = path.join(__dirname, '../../content/pt-PT/faq.json');
     const faqData = JSON.parse(fs.readFileSync(faqDataPath, 'utf8'));
 
     // Add computed properties for easier template usage

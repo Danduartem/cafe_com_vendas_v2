@@ -7,11 +7,14 @@ import { CONFIG } from './config/constants.js';
 import { state, StateManager } from './core/state.js';
 import { Analytics } from './core/analytics.js';
 import { ScrollTracker } from './utils/scroll-tracker.js';
+// Import co-located sections
+import { Hero } from '../../_includes/sections/hero/index.ts';
+import { Offer } from '../../_includes/sections/offer/index.ts';
+
+// Import remaining components from old structure (to be migrated later)
 import {
-  Hero,
   Banner,
   YouTube,
-  Offer,
   FAQ,
   FinalCTA,
   Footer,

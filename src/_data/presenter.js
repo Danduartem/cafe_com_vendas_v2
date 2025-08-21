@@ -1,39 +1,13 @@
 // Presenter data for the About section
-export default {
-  name: 'Juçanã Maximiliano',
-  title: 'Estratega de Negócios para Empreendedoras',
-  subtitle: 'Criadora do Método Seja Livre, ajuda mulheres a vender mais, trabalhar menos e recuperar a sua vida — sem burnout, com método.',
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-  bio: 'Juçanã é estratega de negócios e fundadora do Café com Vendas. Ao longo de 7 anos, guiou empreendedoras de serviços, cursos e produtos digitais a simplificarem ofertas, aumentarem margens e criarem rotinas que libertam tempo. O seu enfoque é prático: clareza, oferta lucrativa, funil simples, operação automatizada e um plano de 90 dias para execução. A missão é clara: provar que é possível crescer com leveza — lucro e liberdade podem coexistir.',
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-  highlights: [
-  ],
+// Load presenter data from content directory
+const presenterData = JSON.parse(
+  fs.readFileSync(path.join(__dirname, '../../content/pt-PT/presenter.json'), 'utf8')
+);
 
-  microStory: 'Eu também acreditava que \'trabalhar duro\' era o único caminho. Até perceber que o meu negócio precisava de sistemas — não de mais horas. O Método nasceu dessa viragem.',
-
-  ctaText: 'Quero aprender no evento',
-
-  photoUrl: 'https://res.cloudinary.com/ds4dhbneq/image/upload/w_600,h_800,c_fill,q_auto,f_auto,g_auto/jucana-maximiliano',
-  photoAlt: 'Juçanã Maximiliano — especialista em escalar negócios de empreendedoras',
-
-  social: {
-    instagram: 'https://www.instagram.com/jucanamaximiliano'
-  },
-
-  schema: {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
-    'name': 'Juçanã Maximiliano',
-    'jobTitle': 'Estratega de Negócios para Empreendedoras',
-    'description': 'Criadora do Método Seja Livre. Ajuda empreendedoras a vender mais e trabalhar menos, com sistemas e um plano de 90 dias.',
-    'image': 'https://res.cloudinary.com/ds4dhbneq/image/upload/w_600,h_800,c_fill,q_auto,f_auto,g_auto/jucana-maximiliano',
-    'url': 'https://cafecomvendas.com',
-    'sameAs': [
-      'https://www.instagram.com/jucanamaximiliano'
-    ],
-    'worksFor': {
-      '@type': 'Organization',
-      'name': 'Café com Vendas'
-    }
-  }
-};
+export default presenterData;

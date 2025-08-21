@@ -3,10 +3,9 @@
  * Centralized export for all page components
  */
 
-export { Hero } from './hero.js';
+// Hero and Offer migrated to co-located structure
 export { Banner } from './banner.js';
 export { YouTube } from './youtube.js';
-export { Offer } from './offer.js';
 export { FAQ } from './faq.js';
 export { FinalCTA } from './final-cta.js';
 export { Footer } from './footer.js';

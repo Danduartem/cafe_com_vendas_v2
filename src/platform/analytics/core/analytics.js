@@ -1,0 +1,155 @@
+/**
+ * Analytics Module for Café com Vendas
+ * Centralized tracking through Google Tag Manager dataLayer
+ */
+
+import { CONFIG } from '../config/constants.js';
+import { StateManager } from './state.js';
+
+export const Analytics = {
+  // Error tracking for improved reliability
+  errors: new Set(),
+
+  /**
+   * Track event via GTM dataLayer
+   * All events flow through GTM for centralized tag management
+   */
+  track(eventName, parameters = {}) {
+    try {
+      // Always ensure dataLayer exists before pushing
+      window.dataLayer = window.dataLayer || [];
+
+      // Standardized event structure for GTM
+      const eventData = {
+        event: eventName,
+        timestamp: new Date().toISOString(),
+        ...parameters
+      };
+
+      // Push to dataLayer
+      window.dataLayer.push(eventData);
+
+      // Debug logging in development
+      if (CONFIG.isDevelopment) {
+        console.log(`[GTM Event] ${eventName}:`, parameters);
+      }
+
+      // Track to performance timeline for debugging
+      if ('performance' in window && 'mark' in window.performance) {
+        performance.mark(`analytics-${eventName}`);
+      }
+    } catch (error) {
+      // Prevent infinite loop by not tracking analytics errors
+      console.error('Analytics tracking failed:', error);
+    }
+  },
+
+  /**
+     * Track JavaScript errors for improved debugging
+     */
+  trackError(errorType, error, context = {}) {
+    const errorKey = `${errorType}-${error.message}`;
+    if (this.errors.has(errorKey)) return; // Prevent duplicate error reports
+
+    this.errors.add(errorKey);
+    console.error(`Error [${errorType}]:`, error, context);
+
+    this.track('javascript_error', {
+      event_category: 'Error',
+      event_label: errorType,
+      error_message: error.message,
+      error_stack: error.stack?.substring(0, 500),
+      ...context
+    });
+  },
+
+  /**
+     * Initialize comprehensive performance tracking with modern Web APIs
+     */
+  initPerformanceTracking() {
+    try {
+      // Core Web Vitals tracking
+      if ('PerformanceObserver' in window) {
+        // Largest Contentful Paint (LCP)
+        const lcpObserver = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            this.track('performance_lcp', {
+              event_category: 'Core Web Vitals',
+              event_label: 'LCP',
+              value: Math.round(entry.startTime)
+            });
+          }
+        });
+        lcpObserver.observe({entryTypes: ['largest-contentful-paint']});
+
+        // Cumulative Layout Shift (CLS)
+        const clsObserver = new PerformanceObserver((list) => {
+          let clsValue = 0;
+          for (const entry of list.getEntries()) {
+            if (!entry.hadRecentInput) {
+              clsValue += entry.value;
+            }
+          }
+          if (clsValue > 0) {
+            this.track('performance_cls', {
+              event_category: 'Core Web Vitals',
+              event_label: 'CLS',
+              value: Math.round(clsValue * 1000)
+            });
+          }
+        });
+        clsObserver.observe({entryTypes: ['layout-shift']});
+
+        // First Input Delay (FID) / Interaction to Next Paint (INP)
+        const fidObserver = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            this.track('performance_fid', {
+              event_category: 'Core Web Vitals',
+              event_label: 'FID',
+              value: Math.round(entry.processingStart - entry.startTime)
+            });
+          }
+        });
+        fidObserver.observe({entryTypes: ['first-input']});
+      }
+
+      // Page load performance
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const navigation = performance.getEntriesByType('navigation')[0];
+          if (navigation) {
+            this.track('page_load_performance', {
+              event_category: 'Performance',
+              dom_content_loaded: Math.round(navigation.domContentLoadedEventEnd),
+              load_complete: Math.round(navigation.loadEventEnd),
+              ttfb: Math.round(navigation.responseStart)
+            });
+          }
+        }, 1000);
+      });
+
+    } catch (error) {
+      this.trackError('performance_tracking_init_failed', error);
+    }
+  },
+
+
+  /**
+     * Track FAQ engagement time
+     */
+  trackFAQEngagement(faqId, isOpening) {
+    if (isOpening) {
+      StateManager.markFAQOpened(faqId);
+    } else {
+      const engagementTime = StateManager.getFAQEngagementTime(faqId);
+
+      if (engagementTime > 3) {
+        this.track('faq_meaningful_engagement', {
+          event_category: 'FAQ',
+          event_label: faqId,
+          value: engagementTime
+        });
+      }
+    }
+  }
+};

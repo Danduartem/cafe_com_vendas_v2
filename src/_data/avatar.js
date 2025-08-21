@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 
-// Load avatar/persona data from info directory
+// Load avatar/persona data from content directory
 const avatarData = JSON.parse(
   fs.readFileSync(
-    path.join(process.cwd(), 'info', 'DATA_avatar.json'),
+    path.join(process.cwd(), 'content', 'pt-PT', 'avatar.json'),
     'utf-8'
   )
 );
