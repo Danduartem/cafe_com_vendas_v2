@@ -13,15 +13,16 @@ Premium landing page for an intimate business transformation event in Lisbon, de
 ## 🛠 Tech Stack
 
 - **Framework**: [Eleventy](https://www.11ty.dev/) 3.1.2 (Static Site Generator)
+- **Language**: **TypeScript** 5.x (100% codebase coverage)
 - **Templating**: Nunjucks (.njk files)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) 4.1.12 + PostCSS 8.5.6 (pure CSS-based configuration)
-- **Build Tool**: [Vite](https://vite.dev/) 7.1.2 (ES6 modules → optimized bundle)
+- **Build Tool**: [Vite](https://vite.dev/) 7.1.2 (TypeScript modules → optimized bundle)
 - **Runtime**: Node.js 22.18.0 (LTS) + npm 10.9.3
-- **Payments**: Stripe 18.4.0 (Node.js SDK)
+- **Payments**: Stripe 18.4.0 (Node.js SDK) - TypeScript
 - **Design System**: JSON tokens → CSS custom properties
 - **Fonts**: Local Lora (display) + Century Gothic (body)
-- **JavaScript**: Modular ES6 architecture (performance optimized)
-- **Edge**: Netlify Edge Functions (CSP header)
+- **Architecture**: **TypeScript-first** modular architecture (type-safe)
+- **Edge**: Netlify Edge Functions (TypeScript CSP header)
 
 ## 🚀 Quick Start
 
@@ -45,66 +46,109 @@ npm run clean
 ## 📁 Project Structure
 
 ```
+├── content/                    # 🌍 i18n-Ready Content Structure
+│   └── pt-PT/                 # Portuguese content (primary language)
+│       ├── site.json          # Global site metadata & SEO
+│       ├── event.json         # Event data (prices, dates, logistics)
+│       ├── design_tokens.json # Unified design system
+│       └── *.json             # All content as structured data
+│
 ├── src/
 │   ├── _includes/
 │   │   ├── layout.njk           # Base HTML template
-│   │   └── components/*.njk     # Section components
-│   ├── _data/                   # Eleventy data layer
-│   │   ├── site.js             # Site metadata
-│   │   ├── event.js            # Event data (from DATA_event.json)
-│   │   ├── avatar.js           # Target persona data
-│   │   ├── testimonials.js     # Customer testimonials
-│   │   └── tokens.js           # Design tokens
+│   │   ├── sections/             # 🏗️ Co-located Sections (TypeScript)
+│   │   │   ├── hero/
+│   │   │   │   ├── index.njk    # Template
+│   │   │   │   └── index.ts     # Logic (TypeScript)
+│   │   │   └── offer/           # Same pattern
+│   │   └── components/*.njk     # Legacy components (templates only)
+│   │
+│   ├── _data/                   # 🗃️ Data Adapters (TypeScript)
+│   │   ├── site.ts             # Loads content/pt-PT/site.json
+│   │   ├── event.ts            # Loads content/pt-PT/event.json
+│   │   ├── tokens.ts           # Loads content/pt-PT/design_tokens.json
+│   │   └── *.ts                # All data adapters in TypeScript
+│   │
 │   ├── index.njk               # Main landing page
 │   ├── politica-privacidade.njk # Privacy policy
 │   ├── termos-condicoes.njk    # Terms & conditions
-│   └── assets/
-│       ├── css/main.css        # Tailwind + tokens
-│       ├── js/main.js          # All JavaScript
-│       └── fonts/              # Local fonts
-├── info/                       # Design system & content
-│   ├── DATA_design_tokens.json      # Unified design system
-│   ├── DATA_event.json               # Event details & pricing
-│   ├── DATA_avatar.json              # Target persona & objections
-│   ├── CONTENT_copy_library.md       # Copy examples & headlines
-│   ├── GUIDE_voice_tone.md           # Voice & tone guidelines
-│   ├── GUIDE_brand_visual.md         # Brand guidelines
-│   └── BUILD_landing_page.md         # Development blueprint
-├── docs/                       # Technical documentation
-│   ├── GTM_SETUP_GUIDE.md      # Google Tag Manager configuration
-│   ├── DEVELOPMENT_GUIDELINES.md    # Security & code patterns
-│   ├── ACCESSIBILITY_GUIDELINES.md  # WCAG AA compliance guide
-│   └── STRIPE_TEST_CARDS.md     # Payment testing procedures
-├── .claude/                    # Custom Claude Code commands (14 total)
-│   ├── commands/
-│   │   ├── update-libs.md      # Dependency updates
-│   │   ├── update-refactor.md  # Code refactoring
-│   │   ├── commit.md           # Smart git commits
-│   │   ├── push.md             # Safe deployment
-│   │   ├── lighthouse.md       # Performance audits
-│   │   ├── stripe-test.md      # Payment testing
-│   │   ├── copy-pick.md        # Copy optimization
-│   │   ├── design-pick.md      # Design prototyping
-│   │   ├── conversion-optimize.md   # CRO techniques
-│   │   ├── landing-page-strategy.md # Strategic optimization
-│   │   ├── email-generator.md  # Email campaigns
-│   │   ├── online-bizplan.md   # Business planning
-│   │   └── rollback-deploy.md  # Emergency procedures
-│   └── agents/                 # Specialized AI agents (9 total)
-├── bizplan/                    # Business strategy artifacts
-├── copy-pick/                  # Copy optimization experiments
-├── strategy/                   # Strategic planning materials
-└── CLAUDE.md                   # AI development guidelines
+│   │
+│   ├── assets/
+│   │   ├── css/
+│   │   │   ├── main.css        # Tailwind + tokens entry
+│   │   │   └── _tokens.generated.css # Generated from design_tokens.json
+│   │   │
+│   │   ├── js/                 # ⚡ Complete TypeScript Architecture
+│   │   │   ├── main.ts         # Entry point (TypeScript)
+│   │   │   ├── app.ts          # Application controller (TypeScript)
+│   │   │   ├── types/          # 🏷️ TypeScript Definitions
+│   │   │   │   ├── global.ts    # Global types
+│   │   │   │   ├── component.ts # Component interfaces
+│   │   │   │   └── *.ts        # All type definitions
+│   │   │   ├── core/
+│   │   │   │   ├── analytics.ts # GTM/GA4 tracking (TypeScript)
+│   │   │   │   └── state.ts    # State management (TypeScript)
+│   │   │   ├── utils/
+│   │   │   │   ├── dom.ts      # DOM helpers (TypeScript)
+│   │   │   │   ├── animations.ts # Animation utilities (TypeScript)
+│   │   │   │   └── index.ts    # Utils barrel export (TypeScript)
+│   │   │   └── components/
+│   │   │       ├── banner.ts   # Top banner (TypeScript)
+│   │   │       ├── faq.ts      # FAQ accordion (TypeScript)
+│   │   │       ├── gtm.ts      # Google Tag Manager (TypeScript)
+│   │   │       └── *.ts        # All components in TypeScript
+│   │   │
+│   │   └── fonts/              # Local Lora & Century Gothic
+│   │
+│   └── platform/               # 🏗️ Platform Foundation (TypeScript)
+│       ├── lib/utils/          # Shared utilities (TypeScript)
+│       └── analytics/core/     # Analytics abstraction (TypeScript)
+│
+├── netlify/                    # ☁️ Serverless Functions (TypeScript)
+│   ├── functions/
+│   │   ├── create-payment-intent.ts # Stripe payments (TypeScript)
+│   │   ├── stripe-webhook.ts        # Stripe webhooks (TypeScript)
+│   │   └── mailerlite-lead.ts       # Email integration (TypeScript)
+│   └── edge-functions/
+│       └── csp.ts                   # Content Security Policy (TypeScript)
+│
+├── scripts/                    # 🔧 Build Tools (TypeScript)
+│   ├── build-tokens.ts         # Design tokens → CSS (TypeScript)
+│   ├── universal-screenshot.ts  # Screenshot system (TypeScript)
+│   └── *.ts                    # All build scripts in TypeScript
+│
+├── .eleventy.ts                # ⚙️ Eleventy config (TypeScript)
+├── vite.config.ts              # ⚙️ Vite bundler config (TypeScript)
+├── tsconfig.json               # ⚙️ TypeScript configuration
+├── eslint.config.ts            # ⚙️ ESLint config (TypeScript)
+│
+├── info/                       # ❌ DEPRECATED - Old content structure
+│   └── *.json                  # Superseded by content/pt-PT/
+├── docs/                       # 📖 Technical documentation
+├── .claude/                    # 🤖 Custom Claude Code commands
+├── bizplan/                    # 📈 Business strategy artifacts
+├── copy-pick/                  # ✏️ Copy optimization experiments
+├── strategy/                   # 🎯 Strategic planning materials
+└── CLAUDE.md                   # 🤖 AI development guidelines
 ```
 
-## 🎨 Design System
+### 🏗️ Architecture Highlights
 
-The design system is centralized in `info/DATA_design_tokens.json` and automatically converted to CSS custom properties:
+- **100% TypeScript**: Complete type safety across entire codebase
+- **Co-located Sections**: Template + TypeScript logic in same folder
+- **i18n-Ready**: Content separated by language (`content/pt-PT/`)
+- **Platform Layer**: Shared utilities with TypeScript interfaces
+- **Type-Safe Data Flow**: `content/*.json` → `_data/*.ts` → templates
+
+## 🎨 Design System (TypeScript-Powered)
+
+The design system is centralized in `content/pt-PT/design_tokens.json` and automatically converted to CSS custom properties via TypeScript:
 
 - **Colors**: Navy `#191F3A`, Burgundy `#81171F`, Neutral `#ECECEC`
 - **Typography**: Lora (headings), Century Gothic (body)
 - **Spacing**: Consistent scale from `xs` to `5xl`
-- **Build Process**: `npm run tokens:build` generates CSS variables
+- **Build Process**: `npm run tokens:build` (TypeScript) generates type-safe CSS variables
+- **Type Safety**: All design tokens have TypeScript definitions for IDE support
 
 ## 📄 Landing Page Sections
 
@@ -118,32 +162,38 @@ The design system is centralized in `info/DATA_design_tokens.json` and automatic
 
 ## 🔧 Development Guidelines
 
-### Code Standards
+### Code Standards (TypeScript-First)
 - **CSS**: Pure Tailwind utilities only (NO custom CSS)
-- **JavaScript**: Modular ES6 components (NO inline scripts)
+- **TypeScript**: Modular TypeScript components with type safety (NO JavaScript)
 - **Templates**: Semantic HTML with proper ARIA labels
 - **Performance**: WebP images, lazy loading, LCP optimization
+- **Type Safety**: All APIs (Stripe, Analytics, DOM) properly typed
 
-### Build Process
-1. `DATA_design_tokens.json` → CSS custom properties
-2. Tailwind v4 processes CSS via `@theme` block configuration
-3. Vite bundles modular ES6 JavaScript into optimized output
-4. Eleventy generates static HTML
-5. PostCSS optimizes final CSS
+### TypeScript Build Process
+1. **TypeScript Compilation**: All `.ts` files validated and compiled with type checking
+2. **Design Tokens**: `content/pt-PT/design_tokens.json` → CSS custom properties (TypeScript)
+3. **Content Loading**: TypeScript data adapters load from `content/pt-PT/` with type safety
+4. **Tailwind CSS**: v4 processes CSS via `@theme` block configuration
+5. **Vite Bundling**: TypeScript modules → optimized output with tree-shaking
+6. **Eleventy Generation**: Static HTML from templates using type-safe data
+7. **PostCSS Optimization**: Final CSS optimization and purging
 
-**Note**: Modern ESM architecture with Vite bundling. Uses Tailwind v4's pure CSS-based configuration.
+**Benefits**: Compile-time error detection, superior IDE support, type-safe refactoring, self-documenting code through TypeScript interfaces.
 
-### Critical Rules
+### Critical Rules (TypeScript-First)
 - ❌ No `element.style.*` assignments
 - ❌ No `<style>` blocks or `style=""` attributes  
 - ❌ No hardcoded colors/values (use design tokens)
 - ❌ No inline event handlers (`onclick=""`, `onsubmit=""`)
 - ❌ No inline JavaScript (`<script>` without src)
+- ❌ No JavaScript files (`.js`) - TypeScript only (`.ts`)
 - ✅ Only `element.classList` manipulation
 - ✅ Tailwind utilities for all styling
 - ✅ Design token CSS variables
 - ✅ Event handlers via `addEventListener()` only
 - ✅ ARIA roles for interactive elements
+- ✅ **TypeScript interfaces for all APIs** (Stripe, Analytics, DOM)
+- ✅ **Type-safe data loading** from content files
 
 ## 📊 Analytics & Conversion
 

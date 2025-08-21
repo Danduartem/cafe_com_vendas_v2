@@ -20,12 +20,7 @@ import type {
 import type { AppState } from '@/types/state.js';
 import type { Constants } from '@/types/config.js';
 
-// Import co-located sections (these are already TypeScript)
-import { Hero } from '../../_includes/sections/hero/index.js';
-import { Offer } from '../../_includes/sections/offer/index.js';
-
-// Import remaining components from old structure (to be migrated)
-// For now, we'll import them as 'any' until we convert them
+// Import all components from centralized components directory
 import {
   Banner,
   YouTube,
@@ -37,7 +32,9 @@ import {
   Checkout,
   CloudinaryComponent,
   GTM,
-  About
+  About,
+  Hero,
+  Offer
 } from './components/index.js';
 
 /**
