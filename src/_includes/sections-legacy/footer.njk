@@ -37,7 +37,7 @@
   <div class="relative pt-20 pb-8">
     <div class="container mx-auto px-8 md:px-12 max-w-7xl">
       <div class="grid grid-cols-3 gap-8 lg:gap-12 text-center" data-reveal>
-        {% for stat in footer.stats %}
+        {% for stat in currentSection.copy.stats %}
           {% set statData = { 
             value: stat.value, 
             label: stat.label, 
@@ -70,10 +70,10 @@
                 </div>
                 <div>
                   <div class="text-2xl font-lora font-bold bg-gradient-to-r from-white to-gold-200 bg-clip-text text-transparent">
-                    {{ footer.brand.name }}
+                    {{ currentSection.copy.brand.name }}
                   </div>
                   <div class="text-sm font-century text-neutral-200 mt-1">
-                    {{ footer.brand.tagline }}
+                    {{ currentSection.copy.brand.tagline }}
                   </div>
                 </div>
               </div>
@@ -82,7 +82,7 @@
             {# Premium Description #}
             <div class="space-y-4">
               <p class="text-neutral-200 font-century leading-relaxed max-w-lg">
-                {{ footer.brand.description }}
+                {{ currentSection.copy.brand.description }}
               </p>
               
               {# Guarantee Badge with Pulse Animation #}
@@ -92,7 +92,7 @@
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                   </svg>
                 </div>
-                <span class="text-sm font-century text-gold-300 font-medium">{{ footer.brand.guarantee }}</span>
+                <span class="text-sm font-century text-gold-300 font-medium">{{ currentSection.copy.brand.guarantee }}</span>
               </div>
             </div>
             
@@ -108,7 +108,7 @@
             {# Glassmorphism Navigation Card #}
             <div class="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all duration-500">
               <nav aria-label="Links legais" class="space-y-6">
-                {% for link in footer.navigation.legal %}
+                {% for link in currentSection.copy.navigation.legal %}
                 <a 
                   href="{{ link.url }}" 
                   class="group flex items-center justify-between font-century text-neutral-200 hover:text-gold-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-400/50 focus:ring-offset-2 focus:ring-offset-transparent rounded-lg p-2 hover:bg-white/5"
@@ -147,7 +147,7 @@
       <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0 md:space-x-8">
         
         <div class="text-sm font-century text-white">
-          © {{ footer.copyright.year }} {{ footer.copyright.owner }}. {{ footer.copyright.text }}.
+          © {{ currentSection.copy.copyright.year }} {{ currentSection.copy.copyright.owner }}. {{ currentSection.copy.copyright.text }}.
         </div>
         
         <div class="flex items-center space-x-2 text-sm font-century text-white">

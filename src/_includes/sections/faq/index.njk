@@ -4,7 +4,7 @@
 <section
   id="s-faq"
   data-section="faq"
-  aria-label="{{ faq.meta.section_title }}"
+  aria-label="{{ currentSection.copy.headline }}"
   class="relative py-20 lg:py-32 overflow-hidden"
 >
   <!-- Background -->
@@ -17,16 +17,16 @@
         <div class="h-1 w-16 bg-gradient-to-r from-burgundy-500 to-gold-400 rounded-full mx-auto mb-4"></div>
       </div>
       <h2 class="font-lora text-4xl lg:text-5xl font-bold text-navy-800 mb-6 tracking-tight">
-        {{ faq.meta.section_title }}
+        {{ currentSection.copy.headline }}
       </h2>
       <p class="font-century text-lg text-navy-600 max-w-2xl mx-auto leading-relaxed">
-        {{ faq.meta.section_subtitle }}
+        {{ currentSection.copy.subhead }}
       </p>
     </div>
 
     <!-- FAQ Items -->
     <div class="space-y-4" data-reveal data-faq-container>
-      {% for item in faq.items %}
+      {% for item in currentSection.items %}
       <details class="group relative {% if item.is_special %}bg-gradient-to-br from-white/95 to-gold-50/50 border border-gold-300/40{% else %}bg-white/90 border border-white/50{% endif %} backdrop-blur-sm rounded-2xl shadow-lg {% if item.is_special %}shadow-gold-900/10{% else %}shadow-navy-900/5{% endif %} transition-all duration-300 open:shadow-xl" data-faq-item="{{ item.number }}" data-analytics-event="{{ item.analytics_event }}">
         <summary class="flex items-start justify-between w-full cursor-pointer px-6 py-5 focus:outline-none focus:ring-2 focus:ring-{% if item.is_special %}gold{% else %}burgundy{% endif %}-400/50 focus:ring-offset-2 focus:ring-offset-white">
           <div class="pr-4">

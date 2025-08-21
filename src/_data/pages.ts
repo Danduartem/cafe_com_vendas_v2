@@ -1,29 +1,6 @@
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
-
-export interface PageSection {
-  slug: string;
-  variant?: string;
-  enabled: boolean;
-  data?: string;
-}
-
-export interface PageComposition {
-  route: string;
-  title: string;
-  description?: string;
-  layout: string;
-  permalink?: string;
-  eleventyNavigation?: {
-    key: string;
-  };
-  sections: PageSection[];
-  customTemplate?: string;
-}
-
-export interface PagesData {
-  [key: string]: PageComposition;
-}
+import type { PageComposition, PagesData } from './types.js';
 
 export default function(): PagesData {
   const pagesDir = join(process.cwd(), 'content/pt-PT/pages');

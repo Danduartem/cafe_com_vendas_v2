@@ -443,6 +443,62 @@ export function assertSectionBase(data: unknown, sectionName: string): void {
   }
 }
 
+// Page Composition Types (moved from pages.ts)
+export interface PageSection {
+  slug: string;
+  variant?: string;
+  enabled: boolean;
+  data?: string;
+}
+
+export interface PageComposition {
+  route: string;
+  title: string;
+  description?: string;
+  layout: string;
+  permalink?: string;
+  eleventyNavigation?: {
+    key: string;
+  };
+  sections: PageSection[];
+  customTemplate?: string;
+}
+
+export interface PagesData {
+  [key: string]: PageComposition;
+}
+
+// Page Loading System Types
+export interface LoadedPageSection {
+  slug: SectionSlug;
+  variant?: string;
+  enabled: boolean;
+  data: Section;
+}
+
+export interface LoadedPage {
+  meta: {
+    route: string;
+    title: string;
+    description?: string;
+    layout: string;
+    permalink?: string;
+    eleventyNavigation?: {
+      key: string;
+    };
+  };
+  sections: LoadedPageSection[];
+}
+
+export interface PageLoader {
+  (context?: { page?: { url?: string } }): LoadedPage;
+}
+
+export interface SectionValidationError extends Error {
+  sectionSlug: string;
+  filePath: string;
+}
+
 // Global strings structure
 export interface GlobalStrings {
   nav: Record<string, string>;

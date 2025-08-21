@@ -4,10 +4,12 @@ title: "Café com Vendas — Lisboa"
 description: "Chega de usar o burnout como medalha de honra. O evento presencial e intimista que lhe dará o mapa para trocar o 'trabalhar duro' pelo 'trabalhar com inteligência'. Para empreendedoras em Portugal que querem estratégia, leveza e liberdade nos seus negócios."
 ---
 
-{# Render sections from page composition #}
-{% for section in pages.landing.sections %}
+{# Render sections from new unified page loader #}
+{% for section in page.sections %}
   {% if section.enabled %}
     {# Section: {{ section.slug }}{% if section.variant %} ({{ section.variant }}){% endif %} #}
+    {# Set section data for template access #}
+    {% set currentSection = section.data %}
     {% if section.slug == "top-banner" %}
       {% include "sections/top-banner/index.njk" %}
     {% elif section.slug == "hero" %}
