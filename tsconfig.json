@@ -1,0 +1,59 @@
+{
+  "compilerOptions": {
+    // Language and environment
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+
+    // Bundler mode
+    "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "noEmit": true,
+
+    // Type checking - strict mode
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": false,
+
+    // Module resolution
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/assets/*": ["src/assets/*"],
+      "@/js/*": ["src/assets/js/*"],
+      "@/components/*": ["src/assets/js/components/*"],
+      "@/utils/*": ["src/assets/js/utils/*"],
+      "@/core/*": ["src/assets/js/core/*"],
+      "@/config/*": ["src/assets/js/config/*"],
+      "@/types/*": ["src/assets/js/types/*"]
+    },
+
+    // Advanced
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+
+    // Source maps
+    "inlineSourceMap": true,
+    "inlineSources": true
+  },
+  "include": [
+    "src/assets/js/**/*",
+    "src/assets/js/types/global.ts",
+    "vite.config.ts",
+    "scripts/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "_site",
+    "dist",
+    "**/*.js" // We'll convert these to .ts gradually
+  ]
+}
