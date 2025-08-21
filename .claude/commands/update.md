@@ -13,22 +13,29 @@ Update dependencies and refactor code to use latest features.
 ## What it does
 
 ### Dependency Updates (default)
-1. Checks outdated packages
-2. Updates to latest minor/patch
-3. Runs build to verify
-4. Tests key features
-5. Shows changelog summary
+1. Runs `/version-check` first to understand current state
+2. Checks outdated packages with `npm outdated`
+3. Fetches documentation via Context7 for new versions
+4. Updates to latest minor/patch versions
+5. Runs TypeScript validation with `npm run type-check`
+6. Runs API verification with `npm run verify-apis`
+7. Runs build to verify compatibility
+8. Shows changelog summary with breaking changes
 
 ### Code Refactoring
-1. Updates to latest syntax
-2. Removes deprecated patterns
-3. Optimizes imports
-4. Improves performance patterns
+1. Scans for deprecated API patterns
+2. Updates to latest syntax based on fetched docs
+3. Removes deprecated patterns identified by verify-apis
+4. Optimizes imports using modern patterns
+5. Improves performance patterns per latest docs
+6. Validates all changes with TypeScript
 
 ## Safety Features
+- Runs `/version-check` to establish baseline
 - Creates backup branch first
 - Only minor/patch by default
-- Runs full test suite
+- TypeScript validation at each step
+- API compatibility verification
 - Validates build output
 - Can rollback if needed
 

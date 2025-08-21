@@ -52,9 +52,9 @@ const VALID_FORM_LOCATIONS = [
 ] as const;
 
 /**
- * Type for known section names
+ * Type for known section names (unused but kept for potential future use)
  */
-type KnownSection = typeof KNOWN_SECTIONS[number];
+// type KnownSection = typeof KNOWN_SECTIONS[number];
 
 /**
  * Type for valid actions

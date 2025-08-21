@@ -52,7 +52,12 @@
       "Bash(stripe listen:*)",
       "Bash(touch:*)",
       "Bash(mkdir:*)",
-      "Bash(do mv \"$file\" \"$file#DATA_\")"
+      "Bash(do mv \"$file\" \"$file#DATA_\")",
+      "Bash(find:*)",
+      "Bash(do)",
+      "Bash(sed:*)",
+      "Bash(npm update:*)",
+      "mcp__playwright-mcp__browser_wait_for"
     ],
     "deny": [],
     "ask": []

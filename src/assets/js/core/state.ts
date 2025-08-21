@@ -5,7 +5,6 @@
 
 import { normalizeEventPayload } from '@/utils/gtm-normalizer.js';
 import type { AppState, StateManager as StateManagerInterface } from '@/types/state.js';
-import type { ComponentsInitializedEvent } from '@/types/analytics.js';
 
 /**
  * FAQ open times tracking

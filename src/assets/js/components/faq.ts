@@ -6,7 +6,6 @@
 import { Analytics } from '@/core/analytics.js';
 import { safeQuery, safeQueryAll, Animations, normalizeEventPayload } from '@/utils/index.js';
 import type { Component } from '@/types/component.js';
-import type { SafeElement, SafeElements } from '@/types/dom.js';
 
 interface FAQComponent extends Component {
   initializeNativeDetailsFAQ(): void;

@@ -12,14 +12,20 @@
     "isolatedModules": true,
     "noEmit": true,
 
-    // Type checking - strict mode
+    // Type checking - strict for API validation
     "strict": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "exactOptionalPropertyTypes": false,
     "noImplicitReturns": true,
     "noUncheckedIndexedAccess": false,
+    
+    // API deprecation detection
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types"],
+    "checkJs": true,
 
     // Module resolution
     "baseUrl": ".",
@@ -35,7 +41,7 @@
     },
 
     // Advanced
-    "skipLibCheck": true,
+    "skipLibCheck": false, // Check library types for API validation
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -45,15 +51,19 @@
     "inlineSources": true
   },
   "include": [
-    "src/assets/js/**/*",
-    "src/assets/js/types/global.ts",
+    "src/**/*.ts",
+    "src/**/*.js",
+    "netlify/functions/**/*.ts",
+    "scripts/**/*.ts",
     "vite.config.ts",
-    "scripts/**/*"
+    ".eleventy.ts",
+    "eslint.config.ts",
+    "postcss.config.ts"
   ],
   "exclude": [
     "node_modules",
     "_site",
     "dist",
-    "**/*.js" // We'll convert these to .ts gradually
+    "src/platform/**/*"
   ]
 }

@@ -21,8 +21,8 @@ import type { AppState } from '@/types/state.js';
 import type { Constants } from '@/types/config.js';
 
 // Import co-located sections (these are already TypeScript)
-// import { Hero } from '../../_includes/sections/hero/index.js';
-// import { Offer } from '../../_includes/sections/offer/index.js';
+import { Hero } from '../../_includes/sections/hero/index.js';
+import { Offer } from '../../_includes/sections/offer/index.js';
 
 // Import remaining components from old structure (to be migrated)
 // For now, we'll import them as 'any' until we convert them
@@ -146,12 +146,12 @@ export const CafeComVendas: CafeComVendasInterface = {
     const components: ComponentRegistration[] = [
       { name: 'CloudinaryComponent', component: CloudinaryComponent as Component },
       { name: 'Checkout', component: Checkout as Component },
-      // { name: 'Hero', component: Hero },
+      { name: 'Hero', component: Hero as Component },
       { name: 'Banner', component: Banner as Component },
       { name: 'GTM', component: GTM as Component },
       { name: 'YouTube', component: YouTube as Component },
       { name: 'About', component: About as Component },
-      // { name: 'Offer', component: Offer },
+      { name: 'Offer', component: Offer as Component },
       { name: 'FAQ', component: FAQ as Component },
       { name: 'FinalCTA', component: FinalCTA as Component },
       { name: 'Footer', component: Footer as Component },

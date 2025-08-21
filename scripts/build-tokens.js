@@ -18,50 +18,37 @@ function toCssVars(obj, indent = '  ') {
 }
 
 function main() {
-  // Load unified design tokens
-  const tokens = JSON.parse(fs.readFileSync(tokensPath, 'utf8'));
+  try {
+    // Load unified design tokens
+    const tokens = JSON.parse(fs.readFileSync(tokensPath, 'utf8'));
 
-  const themeHeader = `/* Generated from content/pt-PT/design_tokens.json. Do not edit directly. */\n/* Generated: ${new Date().toISOString()} */\n\n`;
-  const themeBlocks = [];
+    const themeHeader = `/* Generated from content/pt-PT/design_tokens.json. Do not edit directly. */\n/* Generated: ${new Date().toISOString()} */\n\n`;
+    const themeBlocks = [];
 
-  // Extract CSS variables from the unified tokens
-  const cssVars = tokens.cssVariables || {};
+    // Extract CSS variables from the unified tokens
+    const cssVars = tokens.cssVariables || {};
 
-  // :root block with all CSS custom properties
-  const rootVars = [];
+    // :root block with all CSS custom properties
+    if (Object.keys(cssVars).length > 0) {
+      const rootVars = toCssVars(cssVars);
+      themeBlocks.push(`:root {\n${rootVars}\n}`);
+    }
 
-  // Colors
-  if (cssVars.colors) {
-    rootVars.push('  /* Color Palette */');
-    rootVars.push(toCssVars(cssVars.colors));
+    // Ensure output directory exists
+    if (!fs.existsSync(outDir)) {
+      fs.mkdirSync(outDir, { recursive: true });
+    }
+
+    // Write the generated CSS
+    const output = themeHeader + themeBlocks.join('\n\n') + '\n';
+    fs.writeFileSync(outFile, output);
+    
+    console.log(`✅ Design tokens compiled to ${outFile}`);
+    console.log(`📊 Generated ${Object.keys(cssVars).length} CSS variables`);
+  } catch (error) {
+    console.error('❌ Error building tokens:', error.message);
+    process.exit(1);
   }
-
-  // Typography
-  if (cssVars.typography) {
-    rootVars.push('\n  /* Typography */');
-    rootVars.push(toCssVars(cssVars.typography));
-  }
-
-  // Semantic tokens
-  if (cssVars.semantic) {
-    rootVars.push('\n  /* Semantic Tokens */');
-    rootVars.push(toCssVars(cssVars.semantic));
-  }
-
-  themeBlocks.push(`:root {\n${rootVars.join('\n')}\n}`);
-
-  // Note: @theme directive removed for compatibility
-  // Tailwind will use the CSS custom properties from :root block above
-
-  const css = `${themeHeader + themeBlocks.join('\n\n')  }\n`;
-
-  // Ensure output directory exists
-  if (!fs.existsSync(outDir)) {
-    fs.mkdirSync(outDir, { recursive: true });
-  }
-
-  fs.writeFileSync(outFile, css, 'utf8');
-  console.log(`✅ Tokens generated: ${path.relative(root, outFile)}`);
 }
 
 main();

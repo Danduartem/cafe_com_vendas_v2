@@ -81,7 +81,7 @@ export const Hero = {
     });
 
     // Enhanced interactions
-    scrollIndicatorBtn.addEventListener('mouseenter', function() {
+    scrollIndicatorBtn.addEventListener('mouseenter', function(this: HTMLElement) {
       const svg = this.querySelector('svg');
       if (svg) {
         svg.classList.remove('animate-bounce');
@@ -89,7 +89,7 @@ export const Hero = {
       }
     });
 
-    scrollIndicatorBtn.addEventListener('mouseleave', function() {
+    scrollIndicatorBtn.addEventListener('mouseleave', function(this: HTMLElement) {
       const svg = this.querySelector('svg');
       if (svg) {
         svg.classList.remove('animate-pulse');
@@ -98,8 +98,8 @@ export const Hero = {
     });
 
     // Keyboard navigation
-    scrollIndicatorBtn.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.key === ' ') {
+    scrollIndicatorBtn.addEventListener('keydown', function(this: HTMLElement, e: Event) {
+      if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
         e.preventDefault();
         const heroSection = safeQuery('#hero');
         const nextSection = heroSection?.nextElementSibling;
@@ -117,11 +117,11 @@ export const Hero = {
     if (!heroCtaButton) return;
 
     // Hover effects
-    heroCtaButton.addEventListener('mouseenter', function() {
+    heroCtaButton.addEventListener('mouseenter', function(this: HTMLElement) {
       this.classList.add('scale-105');
     });
 
-    heroCtaButton.addEventListener('mouseleave', function() {
+    heroCtaButton.addEventListener('mouseleave', function(this: HTMLElement) {
       this.classList.remove('scale-105');
     });
 
@@ -129,8 +129,8 @@ export const Hero = {
     Animations.addClickFeedback(heroCtaButton);
 
     // Keyboard feedback
-    heroCtaButton.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.key === ' ') {
+    heroCtaButton.addEventListener('keydown', function(this: HTMLElement, e: Event) {
+      if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
         Animations.addClickFeedback(this);
       }
     });
@@ -151,7 +151,7 @@ export const Hero = {
     if (whatsappLink && !whatsappLink.hasAttribute('data-gtm-tracked')) {
       whatsappLink.setAttribute('data-gtm-tracked', 'true'); // Prevent duplicate listeners
 
-      whatsappLink.addEventListener('click', function() {
+      whatsappLink.addEventListener('click', function(this: HTMLAnchorElement) {
         // Push WhatsApp click event to dataLayer
         window.dataLayer = window.dataLayer || [];
         const whatsappPayload = normalizeEventPayload({

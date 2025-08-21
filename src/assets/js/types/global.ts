@@ -20,6 +20,11 @@ declare global {
 
     // External integrations
     Stripe?: any;
+    PricingManager?: any;
+
+    // Global functions
+    openCheckout?: () => void;
+    closeCheckout?: () => void;
 
     // Component toggle functions (used by onclick handlers)
     toggleFAQ?: (faqId: string) => void;
@@ -41,6 +46,9 @@ declare global {
       [key: string]: string | undefined;
     }
   }
+
+  // Global Stripe type
+  const Stripe: any;
 }
 
 // Export empty object to make this a module

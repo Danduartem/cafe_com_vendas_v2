@@ -5,7 +5,6 @@
 
 import { safeQuery } from '@/utils/index.js';
 import type { Component } from '@/types/component.js';
-import type { SafeElement } from '@/types/dom.js';
 
 interface BannerComponent extends Component {
   setupHeightVariable(): void;

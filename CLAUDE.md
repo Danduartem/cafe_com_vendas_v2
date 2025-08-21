@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Guidance for Claude Code when working with the Café com Vendas landing page.
 
 ## 📖 Quick Navigation
-- [Tech Stack](#-current-tech-stack) • [Project Context](#project-context) • [Commands](#commands)
+- [Tech Stack](#-current-tech-stack) • [Version Awareness](#-version-awareness-protocol) • [Project Context](#project-context) • [Commands](#commands)
 - [Environment Variables](#-environment-variables) • [Claude Commands](#-claude-commands)
 - [Critical Rules](#critical-rules) • [Development Workflow](#-development-workflow)
 - [Deployment](#-deployment--production) • [Troubleshooting](#-troubleshooting)
@@ -31,6 +31,114 @@ Guidance for Claude Code when working with the Café com Vendas landing page.
 - **Vite 7.x requirements**: Node.js 22.17.1+ (current LTS, optimal performance)
 - **Package.json**: `"type": "module"` enables ESM everywhere
 
+## 🎯 Version Awareness Protocol
+
+### MANDATORY Pre-Code Checklist
+**BEFORE writing any code, you MUST:**
+
+1. **Check Installed Versions**
+   ```bash
+   npm run versions  # View current installed packages
+   cat package.json  # Check exact dependency versions
+   ```
+
+2. **Fetch Version-Specific Documentation**
+   - Use Context7 MCP to load docs for EXACT installed versions
+   - Example: If package.json shows `"vite": "^7.1.2"`, fetch docs for Vite 7.x
+   - Command: `mcp__context7__get-library-docs` with the exact version
+
+3. **Verify API Compatibility**
+   ```bash
+   npm run type-check  # Run TypeScript validation
+   npm run verify-apis # Check API existence (if available)
+   ```
+
+### Version Check Workflow
+**Every coding session MUST start with:**
+```bash
+# 1. Check what's installed
+npm run versions
+
+# 2. Check for updates (but don't update without permission)
+npm run outdated
+
+# 3. Run type checking to ensure compatibility
+npm run type-check
+```
+
+### Using Context7 for Documentation
+**ALWAYS use Context7 to fetch current docs:**
+```typescript
+// BEFORE: Using potentially outdated knowledge
+import { someOldAPI } from 'vite';  // ❌ May not exist in v7
+
+// AFTER: Check Context7 first
+// 1. Resolve library ID: mcp__context7__resolve-library-id('vite')
+// 2. Get docs: mcp__context7__get-library-docs('/vitejs/vite', topic: 'config')
+// 3. Use the documented API from the fetched docs
+import { defineConfig } from 'vite';  // ✅ Verified from v7 docs
+```
+
+### Banned Patterns (Common Outdated APIs)
+**NEVER use these deprecated patterns:**
+
+#### Vite
+- ❌ `import.meta.globEager` → ✅ `import.meta.glob({ eager: true })`
+- ❌ `optimizeDeps.entries` → ✅ `optimizeDeps.include`
+- ❌ Old plugin API → ✅ Check current plugin docs via Context7
+
+#### Eleventy
+- ❌ `.eleventy.cjs` → ✅ `.eleventy.js` with ESM
+- ❌ `module.exports` → ✅ `export default`
+- ❌ Callback-based filters → ✅ Async/await patterns
+
+#### Tailwind CSS v4
+- ❌ `tailwind.config.js` → ✅ CSS-based `@theme` configuration
+- ❌ JavaScript config → ✅ Pure CSS configuration
+- ❌ `@apply` in components → ✅ Direct utility classes
+
+#### Stripe
+- ❌ Legacy checkout → ✅ Payment Intents API
+- ❌ Charges API → ✅ Payment Intents + Payment Methods
+- ❌ Sources → ✅ Payment Methods
+
+### TypeScript Integration
+**All verification scripts use TypeScript:**
+```typescript
+// scripts/verify-apis.ts
+import * as vite from 'vite';
+import Stripe from 'stripe';
+
+// This file will fail TypeScript compilation if APIs don't exist
+const config = vite.defineConfig({});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-06-20', // Lock API version
+});
+```
+
+### API Verification Command
+Run `/version-check` at the start of each session to:
+1. Display all installed package versions
+2. Fetch latest docs via Context7
+3. Run TypeScript validation
+4. Show any deprecated patterns found
+5. Suggest modern alternatives
+
+### When Updating Dependencies
+**Use `/update` command which:**
+1. Checks current versions
+2. Updates to latest stable
+3. Fetches new documentation
+4. Refactors code to use new APIs
+5. Runs full validation suite
+
+### CI/CD Version Gates
+**Every build MUST pass:**
+- `npm run type-check` - TypeScript validation
+- `npm run verify-apis` - API existence checks
+- `npm run build` - Full build process
+- No deprecated API warnings
+
 ## Project Context
 **What**: Premium landing page for female entrepreneur event (Sept 20, 2025, Lisbon, 8 spots)  
 **Audience**: See `info/DATA_avatar.json` - overworked female entrepreneurs seeking transformation  
@@ -47,11 +155,91 @@ npm run build:css    # Build Tailwind CSS with PostCSS
 npm run build:js     # Build JavaScript with Vite (production)
 npm run build:js:dev # Build JavaScript with Vite (development + source maps)
 npm run clean        # Clean build directory
-npm run versions     # Generate VERSIONS.txt with current dependency versions
+npm run versions     # Show current installed package versions
 npm run outdated     # Check for package updates
+npm run type-check   # Run TypeScript validation
+npm run lint         # Run ESLint checks
+
+# Universal Screenshot Commands
+npm run screenshot -- --url=<URL> --output=<filename>  # Universal screenshot with auto-fallback
+npm run screenshot:local --output=<filename>           # Screenshot localhost:8080
 ```
 
-**Note**: No test or lint commands are configured in this project. Don't assume their existence.
+**Note**: TypeScript checking is available via `npm run type-check`. Linting is available via `npm run lint`.
+
+## 📸 Universal Screenshot System
+
+This project includes a robust universal screenshot system that automatically handles complex websites with smart fallbacks.
+
+### Features
+- ✅ **Full Page First**: Always attempts fast full-page screenshot
+- ✅ **Automatic Fallback**: Switches to sectional screenshots if full-page fails
+- ✅ **Smart Optimization**: Disables animations, waits for lazy loading
+- ✅ **Configurable**: Timeout, retry, and overlap settings
+- ✅ **Reliable**: Works with heavy sites, SPAs, and complex layouts
+
+### Usage
+
+**CLI Commands:**
+```bash
+# Basic screenshot
+npm run screenshot -- --url=https://example.com --output=example.png
+
+# Local development server
+npm run screenshot:local --output=my-site.png
+
+# With custom options
+npm run screenshot -- --url=https://heavy-site.com --timeout=60000 --retries=5
+
+# For SPAs with animations
+npm run screenshot -- --url=https://app.com --no-optimize --section-overlap=200
+```
+
+**Available Options:**
+- `--timeout=<ms>` - Timeout for full page attempts (default: 30000)
+- `--retries=<number>` - Number of retry attempts (default: 3)  
+- `--section-overlap=<px>` - Overlap between sections (default: 100)
+- `--no-network-wait` - Skip waiting for network idle
+- `--no-optimize` - Skip page optimization
+
+**Playwright MCP Integration:**
+When using Playwright MCP browser, import and use:
+```typescript
+import { takeUniversalScreenshotMCP, SCREENSHOT_PRESETS } from './scripts/playwright-universal-screenshot.js';
+
+// Standard usage
+const result = await takeUniversalScreenshotMCP(page, 'screenshot.png');
+
+// With preset for complex sites
+const result = await takeUniversalScreenshotMCP(page, 'complex-site.png', SCREENSHOT_PRESETS.robust);
+
+// Custom options
+const result = await takeUniversalScreenshotMCP(page, 'custom.png', {
+  timeout: 45000,
+  retries: 4,
+  sectionOverlap: 150
+});
+```
+
+**Result Information:**
+```typescript
+interface ScreenshotResult {
+  success: boolean;           // Whether screenshot succeeded
+  type: 'fullpage' | 'sectional'; // Method used
+  files: string[];           // Generated file paths
+  totalSections?: number;    // Number of sections (if sectional)
+  pageHeight?: number;       // Total page height
+  error?: string;           // Error message (if failed)
+}
+```
+
+### Presets
+- `SCREENSHOT_PRESETS.fast` - Quick for simple pages
+- `SCREENSHOT_PRESETS.standard` - Default for most websites
+- `SCREENSHOT_PRESETS.robust` - For complex/heavy websites  
+- `SCREENSHOT_PRESETS.spa` - For React/Vue apps with animations
+
+This system automatically handles the complexity that caused issues with your Café com Vendas site (11,506px height, animations) and will work reliably across different website types.
 
 ## 🔐 Environment Variables
 
@@ -77,6 +265,7 @@ NODE_ENV=production                # Build environment (development/production)
 Custom commands available in `.claude/commands/`:
 
 ```bash
+/version-check         # Check versions and fetch latest docs via Context7
 /update-libs           # Update all dependencies to latest stable versions
 /update-refactor       # Refactor code to leverage latest framework features  
 /commit                # Smart git commits with conventional messages
@@ -334,11 +523,20 @@ additional requirements on top of these base guidelines.
 
 Commands inherit from CLAUDE.md but can add specific workflows, constraints, and output formats.
 
+### `/version-check`
+Ensure you're using correct library APIs:
+- Display all installed package versions
+- Fetch documentation via Context7 MCP for exact versions
+- Run TypeScript type checking to validate APIs
+- Identify deprecated patterns in codebase
+- Suggest modern API alternatives
+
 ### `/update-libs`
 Update all project dependencies to latest stable versions:
 - Check outdated packages with `npm outdated`
+- Fetch new documentation via Context7 for updated versions
 - Update dependencies safely
-- Test build compatibility
+- Test build compatibility with TypeScript checks
 - Update documentation with new versions
 
 ### `/update-refactor`  

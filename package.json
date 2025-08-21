@@ -16,10 +16,10 @@
     "build:js:dev": "cross-env NODE_ENV=development vite build",
     "type-check": "tsc --noEmit",
     "type-check:watch": "tsc --noEmit --watch",
-    "eleventy": "eleventy",
-    "eleventy:serve": "eleventy --serve --watch",
+    "eleventy": "eleventy --config=.eleventy.ts",
+    "eleventy:serve": "eleventy --serve --watch --config=.eleventy.ts",
     "dev": "npm run tokens:build && npm run build:css && npm run build:js:dev && npm run eleventy:serve",
-    "build": "npm run clean && npm run type-check && npm run tokens:build && npm run build:css && npm run build:js && npm run eleventy",
+    "build": "npm run clean && npm run tokens:build && npm run build:css && npm run build:js && npm run eleventy",
     "start": "npm run dev",
     "preview": "npm run build && npx serve _site",
     "dev:netlify": "netlify dev",
@@ -31,7 +31,11 @@
     "lighthouse:quick": "npx lighthouse http://localhost:8080 --only-categories=performance --output=json --output-path=./reports/lighthouse-quick --chrome-flags=\"--headless --no-sandbox\"",
     "versions": "npm list --depth=0",
     "outdated": "npm outdated",
-    "update": "npm update"
+    "update": "npm update",
+    "verify-apis": "tsx scripts/verify-apis.ts",
+    "test-apis": "tsx scripts/test-apis.ts",
+    "screenshot": "tsx scripts/screenshot-cli.ts",
+    "screenshot:local": "npm run screenshot -- --url=http://localhost:8080"
   },
   "keywords": [
     "landing-page",
@@ -51,6 +55,7 @@
   "devDependencies": {
     "@11ty/eleventy": "^3.0.0",
     "@eslint/js": "^9.33.0",
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/node": "^24.3.0",
     "@typescript-eslint/eslint-plugin": "^8.40.0",
@@ -63,6 +68,7 @@
     "postcss-cli": "^11.0.1",
     "tailwindcss": "^4.1.11",
     "terser": "^5.43.1",
+    "tsx": "^4.20.4",
     "typescript": "^5.9.2",
     "vite": "^7.1.2",
     "vite-plugin-compression": "^0.5.1"

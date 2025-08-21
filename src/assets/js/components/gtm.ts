@@ -5,7 +5,6 @@
 
 import { normalizeEventPayload } from '@/utils/gtm-normalizer.js';
 import type { Component } from '@/types/component.js';
-import type { AnalyticsEvent } from '@/types/analytics.js';
 
 interface GTMComponent extends Component {
   pushEvent(eventName: string, parameters?: Record<string, unknown>): void;

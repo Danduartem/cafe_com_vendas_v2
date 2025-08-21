@@ -4,7 +4,6 @@
  * Mixes TypeScript and JavaScript components during migration
  */
 
-import type { Component } from '@/types/component.js';
 
 // Converted TypeScript components
 export { Hero } from './hero.js';

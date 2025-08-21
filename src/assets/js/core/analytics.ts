@@ -3,14 +3,12 @@
  * Centralized tracking through Google Tag Manager dataLayer
  */
 
-import { CONFIG, ENV } from '@/config/constants.js';
+import { ENV } from '@/config/constants.js';
 import { StateManager } from './state.js';
 import type {
   AnalyticsEvent,
   ErrorEvent,
-  PerformanceEvent,
-  AppInitializedEvent,
-  ComponentsInitializedEvent
+  PerformanceEvent
 } from '@/types/analytics.js';
 
 /**
