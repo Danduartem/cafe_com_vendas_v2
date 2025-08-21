@@ -3,14 +3,14 @@
  * Handles hero section animations, interactions, and scroll indicator
  */
 
-import { CONFIG } from '../config/constants.js';
-import { safeQuery } from '../utils/dom.js';
-import { Animations } from '../utils/animations.js';
-import { normalizeEventPayload } from '../utils/gtm-normalizer.js';
-// Inline minimal smooth scroll to avoid importing removed navigation module
+import { CONFIG } from '@/config/constants.js';
+import { safeQuery, Animations, normalizeEventPayload } from '@/utils/index.js';
+import type { Component } from '@/types/component.js';
+import type { SafeElement, SafeHTMLElement } from '@/types/dom.js';
+import type { WhatsAppClickEvent } from '@/types/analytics.js';
 
-export const Hero = {
-  init() {
+export const Hero: Component = {
+  init(): void {
     try {
       this.initAnimations();
       this.initInteractions();
@@ -21,7 +21,7 @@ export const Hero = {
     }
   },
 
-  initAnimations() {
+  initAnimations(): void {
     const heroSection = safeQuery('#hero');
     if (!heroSection) return;
 
@@ -34,12 +34,12 @@ export const Hero = {
       heroSection.querySelector('.hero-cta-primary'),
       heroSection.querySelector('a[class*="underline"]'),
       heroSection.querySelector('.hero-scroll-indicator')
-    ].filter(Boolean);
+    ].filter(Boolean) as Element[];
 
     Animations.prepareRevealElements(animatableElements);
 
     const observer = Animations.createObserver({
-      callback: (entry, index) => {
+      callback: () => {
         Animations.revealElements(animatableElements, {
           initialDelay: 300
         });
@@ -51,12 +51,12 @@ export const Hero = {
     observer.observe(heroSection);
   },
 
-  initScrollIndicator() {
-    const scrollIndicatorBtn = safeQuery('#scroll-indicator-btn');
+  initScrollIndicator(): void {
+    const scrollIndicatorBtn = safeQuery('#scroll-indicator-btn') as SafeHTMLElement;
     if (!scrollIndicatorBtn) return;
 
-    // Hide scroll indicator on very short viewports (replaces CSS media query)
-    const checkViewportHeight = () => {
+    // Hide scroll indicator on very short viewports
+    const checkViewportHeight = (): void => {
       if (window.innerHeight <= 600) {
         scrollIndicatorBtn.classList.add('!hidden');
       } else {
@@ -67,7 +67,7 @@ export const Hero = {
     checkViewportHeight();
     window.addEventListener('resize', checkViewportHeight);
 
-    scrollIndicatorBtn.addEventListener('click', () => {
+    scrollIndicatorBtn.addEventListener('click', (): void => {
       const explicitNext = safeQuery('#inscricao');
       if (explicitNext) {
         explicitNext.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -83,7 +83,7 @@ export const Hero = {
     });
 
     // Enhanced interactions
-    scrollIndicatorBtn.addEventListener('mouseenter', function() {
+    scrollIndicatorBtn.addEventListener('mouseenter', function(): void {
       const svg = this.querySelector('svg');
       if (svg) {
         svg.classList.remove('animate-bounce');
@@ -91,7 +91,7 @@ export const Hero = {
       }
     });
 
-    scrollIndicatorBtn.addEventListener('mouseleave', function() {
+    scrollIndicatorBtn.addEventListener('mouseleave', function(): void {
       const svg = this.querySelector('svg');
       if (svg) {
         svg.classList.remove('animate-pulse');
@@ -100,7 +100,7 @@ export const Hero = {
     });
 
     // Keyboard navigation
-    scrollIndicatorBtn.addEventListener('keydown', function(e) {
+    scrollIndicatorBtn.addEventListener('keydown', function(e: KeyboardEvent): void {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         const heroSection = safeQuery('#hero');
@@ -114,16 +114,16 @@ export const Hero = {
     });
   },
 
-  initInteractions() {
-    const heroCtaButton = safeQuery('.hero-cta-primary');
+  initInteractions(): void {
+    const heroCtaButton = safeQuery('.hero-cta-primary') as SafeHTMLElement;
     if (!heroCtaButton) return;
 
     // Hover effects
-    heroCtaButton.addEventListener('mouseenter', function() {
+    heroCtaButton.addEventListener('mouseenter', function(): void {
       this.classList.add('scale-105');
     });
 
-    heroCtaButton.addEventListener('mouseleave', function() {
+    heroCtaButton.addEventListener('mouseleave', function(): void {
       this.classList.remove('scale-105');
     });
 
@@ -131,15 +131,15 @@ export const Hero = {
     Animations.addClickFeedback(heroCtaButton);
 
     // Keyboard feedback
-    heroCtaButton.addEventListener('keydown', function(e) {
+    heroCtaButton.addEventListener('keydown', function(e: KeyboardEvent): void {
       if (e.key === 'Enter' || e.key === ' ') {
         Animations.addClickFeedback(this);
       }
     });
   },
 
-  initWhatsAppButton() {
-    const whatsappButton = safeQuery('#whatsapp-button');
+  initWhatsAppButton(): void {
+    const whatsappButton = safeQuery('#whatsapp-button') as SafeHTMLElement;
     if (!whatsappButton) return;
 
     // Animate entrance
@@ -149,19 +149,19 @@ export const Hero = {
     }, 500);
 
     // Add WhatsApp click tracking
-    const whatsappLink = whatsappButton.querySelector('a[href*="wa.me"]');
+    const whatsappLink = whatsappButton.querySelector('a[href*="wa.me"]') as SafeElement<HTMLAnchorElement>;
     if (whatsappLink && !whatsappLink.hasAttribute('data-gtm-tracked')) {
       whatsappLink.setAttribute('data-gtm-tracked', 'true'); // Prevent duplicate listeners
 
-      whatsappLink.addEventListener('click', function() {
+      whatsappLink.addEventListener('click', function(): void {
         // Push WhatsApp click event to dataLayer
         window.dataLayer = window.dataLayer || [];
         const whatsappPayload = normalizeEventPayload({
           event: 'whatsapp_click',
-          link_url: this.href, // Will be normalized
-          link_text: this.textContent?.trim() || 'WhatsApp', // Will be normalized to 50 chars
-          location: 'floating_button' // Will be normalized
-        });
+          link_url: this.href,
+          link_text: this.textContent?.trim() || 'WhatsApp',
+          location: 'floating_button'
+        } as WhatsAppClickEvent);
         window.dataLayer.push(whatsappPayload);
       });
     }

@@ -3,7 +3,8 @@
  * Handles YouTube embed loading and interactions
  */
 
-import { safeQueryAll, normalizeEventPayload } from '../utils/index.js';
+import { safeQueryAll } from '../utils/dom.js';
+import { normalizeEventPayload } from '../utils/gtm-normalizer.js';
 
 export const YouTube = {
   init() {

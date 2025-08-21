@@ -3,24 +3,51 @@
  * Centralized tracking through Google Tag Manager dataLayer
  */
 
-import { CONFIG } from '../config/constants.js';
+import { CONFIG, ENV } from '@/config/constants.js';
 import { StateManager } from './state.js';
+import type {
+  AnalyticsEvent,
+  ErrorEvent,
+  PerformanceEvent,
+  AppInitializedEvent,
+  ComponentsInitializedEvent
+} from '@/types/analytics.js';
 
-export const Analytics = {
+/**
+ * Performance navigation timing interface
+ */
+interface NavigationTiming extends PerformanceNavigationTiming {
+  domContentLoadedEventEnd: number;
+  loadEventEnd: number;
+  responseStart: number;
+}
+
+/**
+ * Analytics interface
+ */
+interface AnalyticsInterface {
+  errors: Set<string>;
+  track<T extends AnalyticsEvent>(eventName: T['event'], parameters?: Omit<T, 'event'>): void;
+  trackError(errorType: string, error: Error, context?: Record<string, unknown>): void;
+  initPerformanceTracking(): void;
+  trackFAQEngagement(faqId: string, isOpening: boolean): void;
+}
+
+export const Analytics: AnalyticsInterface = {
   // Error tracking for improved reliability
-  errors: new Set(),
+  errors: new Set<string>(),
 
   /**
    * Track event via GTM dataLayer
    * All events flow through GTM for centralized tag management
    */
-  track(eventName, parameters = {}) {
+  track<T extends AnalyticsEvent>(eventName: T['event'], parameters: Omit<T, 'event'> = {} as Omit<T, 'event'>): void {
     try {
       // Always ensure dataLayer exists before pushing
       window.dataLayer = window.dataLayer || [];
 
       // Standardized event structure for GTM
-      const eventData = {
+      const eventData: AnalyticsEvent = {
         event: eventName,
         timestamp: new Date().toISOString(),
         ...parameters
@@ -30,7 +57,7 @@ export const Analytics = {
       window.dataLayer.push(eventData);
 
       // Debug logging in development
-      if (CONFIG.isDevelopment) {
+      if (ENV.isDevelopment) {
         console.log(`[GTM Event] ${eventName}:`, parameters);
       }
 
@@ -45,39 +72,49 @@ export const Analytics = {
   },
 
   /**
-     * Track JavaScript errors for improved debugging
-     */
-  trackError(errorType, error, context = {}) {
+   * Track JavaScript errors for improved debugging
+   */
+  trackError(errorType: string, error: Error, context: Record<string, unknown> = {}): void {
     const errorKey = `${errorType}-${error.message}`;
     if (this.errors.has(errorKey)) return; // Prevent duplicate error reports
 
     this.errors.add(errorKey);
     console.error(`Error [${errorType}]:`, error, context);
 
-    this.track('javascript_error', {
+    const errorEvent: ErrorEvent = {
+      event: 'error',
       event_category: 'Error',
       event_label: errorType,
       error_message: error.message,
       error_stack: error.stack?.substring(0, 500),
+      error_filename: (error as any).filename,
+      error_lineno: (error as any).lineno,
+      error_colno: (error as any).colno,
       ...context
-    });
+    };
+
+    this.track('error', errorEvent);
   },
 
   /**
-     * Initialize comprehensive performance tracking with modern Web APIs
-     */
-  initPerformanceTracking() {
+   * Initialize comprehensive performance tracking with modern Web APIs
+   */
+  initPerformanceTracking(): void {
     try {
       // Core Web Vitals tracking
       if ('PerformanceObserver' in window) {
         // Largest Contentful Paint (LCP)
         const lcpObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            this.track('performance_lcp', {
+            const performanceEvent: PerformanceEvent = {
+              event: 'performance_metric',
               event_category: 'Core Web Vitals',
               event_label: 'LCP',
-              value: Math.round(entry.startTime)
-            });
+              metric_name: 'largest_contentful_paint',
+              metric_value: Math.round(entry.startTime),
+              metric_unit: 'ms'
+            };
+            this.track('performance_metric', performanceEvent);
           }
         });
         lcpObserver.observe({entryTypes: ['largest-contentful-paint']});
@@ -86,16 +123,20 @@ export const Analytics = {
         const clsObserver = new PerformanceObserver((list) => {
           let clsValue = 0;
           for (const entry of list.getEntries()) {
-            if (!entry.hadRecentInput) {
-              clsValue += entry.value;
+            if (!(entry as any).hadRecentInput) {
+              clsValue += (entry as any).value || 0;
             }
           }
           if (clsValue > 0) {
-            this.track('performance_cls', {
+            const performanceEvent: PerformanceEvent = {
+              event: 'performance_metric',
               event_category: 'Core Web Vitals',
               event_label: 'CLS',
-              value: Math.round(clsValue * 1000)
-            });
+              metric_name: 'cumulative_layout_shift',
+              metric_value: Math.round(clsValue * 1000),
+              metric_unit: 'count'
+            };
+            this.track('performance_metric', performanceEvent);
           }
         });
         clsObserver.observe({entryTypes: ['layout-shift']});
@@ -103,11 +144,15 @@ export const Analytics = {
         // First Input Delay (FID) / Interaction to Next Paint (INP)
         const fidObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            this.track('performance_fid', {
+            const performanceEvent: PerformanceEvent = {
+              event: 'performance_metric',
               event_category: 'Core Web Vitals',
               event_label: 'FID',
-              value: Math.round(entry.processingStart - entry.startTime)
-            });
+              metric_name: 'first_input_delay',
+              metric_value: Math.round((entry as any).processingStart - entry.startTime),
+              metric_unit: 'ms'
+            };
+            this.track('performance_metric', performanceEvent);
           }
         });
         fidObserver.observe({entryTypes: ['first-input']});
@@ -116,7 +161,7 @@ export const Analytics = {
       // Page load performance
       window.addEventListener('load', () => {
         setTimeout(() => {
-          const navigation = performance.getEntriesByType('navigation')[0];
+          const navigation = performance.getEntriesByType('navigation')[0] as NavigationTiming;
           if (navigation) {
             this.track('page_load_performance', {
               event_category: 'Performance',
@@ -129,15 +174,14 @@ export const Analytics = {
       });
 
     } catch (error) {
-      this.trackError('performance_tracking_init_failed', error);
+      this.trackError('performance_tracking_init_failed', error as Error);
     }
   },
 
-
   /**
-     * Track FAQ engagement time
-     */
-  trackFAQEngagement(faqId, isOpening) {
+   * Track FAQ engagement time
+   */
+  trackFAQEngagement(faqId: string, isOpening: boolean): void {
     if (isOpening) {
       StateManager.markFAQOpened(faqId);
     } else {
@@ -153,3 +197,5 @@ export const Analytics = {
     }
   }
 };
+
+// Global types are now centralized in types/global.ts

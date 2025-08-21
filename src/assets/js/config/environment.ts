@@ -15,8 +15,43 @@ const isDevelopment = window.location.hostname === 'localhost' ||
 
 const isProduction = window.location.hostname === 'cafecomvendas.com';
 
+/**
+ * Environment configuration interface
+ */
+export interface EnvironmentConfig {
+  environment: 'development' | 'production';
+  isDevelopment: boolean;
+  isProduction: boolean;
+  formspree: {
+    endpoint: string;
+    formId: string;
+  };
+  stripe: {
+    publishableKey: string;
+  };
+  contact: {
+    email: string;
+    whatsapp: string;
+  };
+  cloudinary: {
+    cloudName: string;
+  };
+  api: {
+    spotsRemaining: string;
+    webhook: {
+      formspree: string;
+    };
+  };
+  urls: {
+    base: string;
+    thankYou: string;
+    instagram: string;
+    linkedin: string;
+  };
+}
+
 // Environment-specific configuration
-const config = {
+const config: EnvironmentConfig = {
   // Environment info
   environment: isDevelopment ? 'development' : 'production',
   isDevelopment,
@@ -24,16 +59,15 @@ const config = {
 
   // Formspree Configuration (Public - Safe to expose)
   formspree: {
-    endpoint: `https://formspree.io/f/${import.meta.env.VITE_FORMSPREE_FORM_ID || 'xanbnrvp'}`,
-    formId: import.meta.env.VITE_FORMSPREE_FORM_ID || 'xanbnrvp'
+    endpoint: `https://formspree.io/f/${(import.meta as any).env?.VITE_FORMSPREE_FORM_ID || 'xanbnrvp'}`,
+    formId: (import.meta as any).env?.VITE_FORMSPREE_FORM_ID || 'xanbnrvp'
   },
 
   // Stripe Configuration (Publishable keys only - Safe to expose)
   stripe: {
-    publishableKey: import.meta.env.VITE_STRIPE_PUBLIC_KEY ||
+    publishableKey: (import.meta as any).env?.VITE_STRIPE_PUBLIC_KEY ||
       (isDevelopment ? 'pk_test_51QxTrfF2Zw0dHOvZoUHGr5nR068f9iuyuLrR86WW9gztjOkoRWgv1Q8cscSURSn45r1wX5qT2KKrj6sE2mD3a7CT009nkU8Wey' : '')
   },
-
 
   // Contact Information (Public)
   contact: {
@@ -43,7 +77,7 @@ const config = {
 
   // Cloudinary Configuration (Public)
   cloudinary: {
-    cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'ds4dhbneq'
+    cloudName: (import.meta as any).env?.VITE_CLOUDINARY_CLOUD_NAME || 'ds4dhbneq'
   },
 
   // API Endpoints (Client-side safe endpoints only)
@@ -69,6 +103,8 @@ Object.freeze(config);
 
 // Export for use in other modules
 export default config;
+
+// Global types are now centralized in types/global.ts
 
 // Also make available globally for debugging (development only)
 if (isDevelopment) {

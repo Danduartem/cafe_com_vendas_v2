@@ -3,7 +3,8 @@
  * Handles premium interactions, animations, and parallax effects
  */
 
-import { safeQuery, safeQueryAll, Animations } from '../utils/index.js';
+import { safeQuery, safeQueryAll } from '../utils/dom.js';
+import { Animations } from '../utils/animations.js';
 
 export const FinalCTA = {
   init() {
@@ -23,7 +24,7 @@ export const FinalCTA = {
     if (!finalCtaSection || !finalCtaButton) return;
 
     const observer = Animations.createObserver({
-      callback: (entry) => {
+      callback: (entry, index) => {
         const elements = [
           entry.target.querySelector('h2'),
           entry.target.querySelector('.space-y-6'),

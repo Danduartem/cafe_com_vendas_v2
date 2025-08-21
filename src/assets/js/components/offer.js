@@ -5,7 +5,8 @@
 
 import { CONFIG } from '../config/constants.js';
 import { Analytics } from '../core/analytics.js';
-import { safeQuery, safeQueryAll, Animations } from '../utils/index.js';
+import { safeQuery, safeQueryAll } from '../utils/dom.js';
+import { Animations } from '../utils/animations.js';
 
 export const Offer = {
   init() {
@@ -72,7 +73,7 @@ export const Offer = {
     });
 
     const observer = Animations.createObserver({
-      callback: (entry) => {
+      callback: (entry, index) => {
         if (entry.target.classList.contains('deliverable-item')) {
           entry.target.classList.remove('opacity-0', 'translate-y-2');
           entry.target.classList.add('opacity-100', 'translate-y-0');

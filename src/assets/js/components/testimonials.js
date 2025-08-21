@@ -3,7 +3,10 @@
  * Handles native carousel with video card effects
  */
 
-import { safeQuery, safeQueryAll, Animations, debounce, normalizeEventPayload } from '../utils/index.js';
+import { safeQuery, safeQueryAll } from '../utils/dom.js';
+import { Animations } from '../utils/animations.js';
+import { debounce } from '../utils/throttle.js';
+import { normalizeEventPayload } from '../utils/gtm-normalizer.js';
 
 // Constants for carousel layout
 const CAROUSEL_GAP_DEFAULT = 24; // Default gap between slides in pixels
@@ -230,7 +233,7 @@ export const Testimonials = {
 
   trackSectionView() {
     const observer = Animations.createObserver({
-      callback: () => {
+      callback: (entry, index) => {
         // Track testimonials section view for GTM
         window.dataLayer = window.dataLayer || [];
         const sectionPayload = normalizeEventPayload({

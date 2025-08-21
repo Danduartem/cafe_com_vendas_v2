@@ -5,19 +5,85 @@
  */
 
 /**
+ * Known section names for validation
+ */
+const KNOWN_SECTIONS = [
+  'hero',
+  'problem',
+  'solution',
+  'social_proof',
+  'testimonials',
+  'offer',
+  'pricing_table',
+  'faq',
+  'final_cta',
+  'footer',
+  'checkout_modal',
+  'floating_button',
+  'top_banner'
+] as const;
+
+/**
+ * Valid action types
+ */
+const VALID_ACTIONS = [
+  'open', 'close', 'click', 'submit',
+  'view', 'play', 'pause', 'complete'
+] as const;
+
+/**
+ * Valid pricing tiers
+ */
+const VALID_TIERS = [
+  'early_bird', 'regular', 'last_minute',
+  'vip', 'standard'
+] as const;
+
+/**
+ * Valid form locations
+ */
+const VALID_FORM_LOCATIONS = [
+  'checkout_modal',
+  'footer_form',
+  'popup_leadgen',
+  'inline_form',
+  'sidebar_form',
+  'header_form'
+] as const;
+
+/**
+ * Type for known section names
+ */
+type KnownSection = typeof KNOWN_SECTIONS[number];
+
+/**
+ * Type for valid actions
+ */
+type ValidAction = typeof VALID_ACTIONS[number];
+
+/**
+ * Type for valid pricing tiers
+ */
+type ValidTier = typeof VALID_TIERS[number];
+
+/**
+ * Type for valid form locations
+ */
+type ValidFormLocation = typeof VALID_FORM_LOCATIONS[number];
+
+/**
  * Normalize a string value for GTM/GA4 tracking
  * - Converts to lowercase
  * - Trims whitespace
  * - Limits to safe characters (alphanumeric, dash, underscore, space)
  * - Limits length to prevent cardinality issues
  * - Returns 'other' for empty/invalid values
- *
- * @param {any} value - The value to normalize
- * @param {number} maxLength - Maximum length (default: 50)
- * @param {string} fallback - Fallback value (default: 'other')
- * @returns {string} Normalized string value
  */
-export function normalizeString(value, maxLength = 50, fallback = 'other') {
+export function normalizeString(
+  value: unknown,
+  maxLength: number = 50,
+  fallback: string = 'other'
+): string {
   // Handle null/undefined/empty
   if (value == null || value === '') {
     return fallback;
@@ -44,10 +110,8 @@ export function normalizeString(value, maxLength = 50, fallback = 'other') {
 
 /**
  * Normalize an ID value (preserves uniqueness but sanitizes format)
- * @param {any} id - The ID to normalize
- * @returns {string} Normalized ID
  */
-export function normalizeId(id) {
+export function normalizeId(id: unknown): string {
   if (!id) return 'unknown_id';
 
   // Keep alphanumeric, dash, underscore (common in IDs)
@@ -59,30 +123,12 @@ export function normalizeId(id) {
 
 /**
  * Normalize a section/location value
- * @param {any} section - The section name
- * @returns {string} Normalized section name
  */
-export function normalizeSection(section) {
-  const knownSections = [
-    'hero',
-    'problem',
-    'solution',
-    'social_proof',
-    'testimonials',
-    'offer',
-    'pricing_table',
-    'faq',
-    'final_cta',
-    'footer',
-    'checkout_modal',
-    'floating_button',
-    'top_banner'
-  ];
-
+export function normalizeSection(section: unknown): string {
   const normalized = normalizeString(section, 30, 'unknown');
 
   // Map to known section if close match
-  const found = knownSections.find(known =>
+  const found = KNOWN_SECTIONS.find(known =>
     known === normalized || known.includes(normalized) || normalized.includes(known)
   );
 
@@ -91,10 +137,8 @@ export function normalizeSection(section) {
 
 /**
  * Normalize a URL (keeps it readable but safe)
- * @param {any} url - The URL to normalize
- * @returns {string} Normalized URL
  */
-export function normalizeUrl(url) {
+export function normalizeUrl(url: unknown): string {
   if (!url) return 'no_url';
 
   try {
@@ -109,65 +153,50 @@ export function normalizeUrl(url) {
 
 /**
  * Normalize event action values
- * @param {any} action - The action value
- * @returns {string} Normalized action
  */
-export function normalizeAction(action) {
-  const validActions = ['open', 'close', 'click', 'submit', 'view', 'play', 'pause', 'complete'];
+export function normalizeAction(action: unknown): ValidAction | 'other' {
   const normalized = normalizeString(action, 20, 'unknown');
 
   // Map to valid action if match found
-  return validActions.includes(normalized) ? normalized : 'other';
+  return VALID_ACTIONS.includes(normalized as ValidAction)
+    ? normalized as ValidAction
+    : 'other';
 }
 
 /**
  * Normalize pricing tier values
- * @param {any} tier - The pricing tier
- * @returns {string} Normalized tier
  */
-export function normalizePricingTier(tier) {
-  const validTiers = ['early_bird', 'regular', 'last_minute', 'vip', 'standard'];
+export function normalizePricingTier(tier: unknown): ValidTier {
   const normalized = normalizeString(tier, 30, 'standard');
 
-  return validTiers.includes(normalized) ? normalized : 'standard';
+  return VALID_TIERS.includes(normalized as ValidTier)
+    ? normalized as ValidTier
+    : 'standard';
 }
 
 /**
  * Normalize question text (keeps readable but limited)
- * @param {any} question - The question text
- * @returns {string} Normalized question
  */
-export function normalizeQuestion(question) {
+export function normalizeQuestion(question: unknown): string {
   // Questions can be longer but still need limits
   return normalizeString(question, 100, 'faq_question');
 }
 
 /**
  * Normalize form location values
- * @param {any} location - The form location
- * @returns {string} Normalized location
  */
-export function normalizeFormLocation(location) {
-  const validLocations = [
-    'checkout_modal',
-    'footer_form',
-    'popup_leadgen',
-    'inline_form',
-    'sidebar_form',
-    'header_form'
-  ];
-
+export function normalizeFormLocation(location: unknown): ValidFormLocation | string {
   const normalized = normalizeString(location, 30, 'unknown_form');
-  return validLocations.includes(normalized) ? normalized : normalized;
+
+  return VALID_FORM_LOCATIONS.includes(normalized as ValidFormLocation)
+    ? normalized as ValidFormLocation
+    : normalized;
 }
 
 /**
  * Normalize any GTM parameter based on type
- * @param {string} key - The parameter key/name
- * @param {any} value - The parameter value
- * @returns {any} Normalized value (keeps numbers as numbers)
  */
-export function normalizeParameter(key, value) {
+export function normalizeParameter(key: string, value: unknown): unknown {
   // Don't normalize numbers
   if (typeof value === 'number') {
     return value;
@@ -225,11 +254,9 @@ export function normalizeParameter(key, value) {
 
 /**
  * Normalize entire event payload
- * @param {object} payload - The event payload
- * @returns {object} Normalized payload
  */
-export function normalizeEventPayload(payload) {
-  const normalized = {};
+export function normalizeEventPayload(payload: Record<string, unknown>): Record<string, unknown> {
+  const normalized: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(payload)) {
     // Skip 'event' key itself (don't normalize event names)

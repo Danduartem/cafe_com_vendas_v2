@@ -6,7 +6,8 @@
 
 import { ENV, CONFIG } from '../config/constants.js';
 import { Analytics } from '../core/analytics.js';
-import { safeQuery, normalizeEventPayload } from '../utils/index.js';
+import { safeQuery } from '../utils/dom.js';
+import { normalizeEventPayload } from '../utils/gtm-normalizer.js';
 
 // Pricing tier detection for dynamic analytics
 const PricingManager = {

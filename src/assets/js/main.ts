@@ -6,17 +6,22 @@
  */
 
 import { CafeComVendas } from './app.js';
-import { ENV } from './config/constants.js';
+import { ENV } from '@/config/constants.js';
+import '@/types/global.js'; // Import global types
 
 // Set global Cloudinary configuration
 window.CLOUDINARY_CLOUD_NAME = ENV.cloudinary.cloudName;
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+/**
+ * Initialize application when DOM is ready
+ */
+document.addEventListener('DOMContentLoaded', (): void => {
   CafeComVendas.init();
 });
 
-// Expose for debugging in development
+/**
+ * Expose for debugging in development
+ */
 if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
   window.CafeComVendas = CafeComVendas;
 }

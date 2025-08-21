@@ -5,7 +5,10 @@
 
 import { CONFIG } from '../config/constants.js';
 import { Analytics } from '../core/analytics.js';
-import { safeQuery, safeQueryAll, Animations, throttle, normalizeEventPayload } from '../utils/index.js';
+import { safeQuery, safeQueryAll } from '../utils/dom.js';
+import { Animations } from '../utils/animations.js';
+import { throttle } from '../utils/throttle.js';
+import { normalizeEventPayload } from '../utils/gtm-normalizer.js';
 
 export const Footer = {
   init() {
@@ -135,7 +138,7 @@ export const Footer = {
         footer.classList.remove('bg-gradient-to-b', 'bg-gradient-to-bl');
         footer.classList.add('bg-gradient-to-br');
       }
-    }, CONFIG.scroll.throttle);
+    }, CONFIG.performance.throttleMs);
 
     window.addEventListener('scroll', scrollHandler, { passive: true });
   },
@@ -185,7 +188,7 @@ export const Footer = {
           counter.textContent = target;
           clearInterval(timer);
         }
-      }, CONFIG.scroll.throttle);
+      }, CONFIG.performance.throttleMs);
     });
   },
 

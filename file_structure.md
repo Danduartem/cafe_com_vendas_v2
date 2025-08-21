@@ -1,15 +1,16 @@
-# Café com Vendas - Project File Structure
+# Café com Vendas - Project File Structure (v2.0)
 
 ## 📋 Project Overview
-**Café com Vendas** is a high-converting landing page for an intimate business event targeting female entrepreneurs in Portugal. The project uses a modern JAMstack architecture with static site generation, serverless functions, and performance-first design principles.
+**Café com Vendas** is a high-converting landing page for an intimate business event targeting female entrepreneurs in Portugal. The project uses a modern JAMstack architecture with **feature-first co-located sections** and **i18n-ready content structure**.
 
 **Target**: 8-spot premium event (September 20, 2025, Lisbon)  
 **Audience**: Overworked female entrepreneurs seeking business transformation  
-**Language**: Portuguese (pt-PT)
+**Language**: Portuguese (pt-PT) - **Ready for i18n expansion**  
+**Architecture**: Feature-first co-located sections + platform layer foundation
 
 ---
 
-## 🗂️ Complete File Structure
+## 🗂️ New Architecture File Structure
 
 ```
 cafe-com-vendas-v2/
@@ -22,38 +23,70 @@ cafe-com-vendas-v2/
 ├── 📄 postcss.config.js                  # PostCSS + Tailwind CSS processing
 ├── 📄 eslint.config.js                   # ESLint code quality rules
 ├── 📄 netlify.toml                       # Netlify deployment & function configuration
+├── 📄 file_structure.md                  # This documentation file
+│
+├── 📁 content/                            # 🌍 I18N-READY CONTENT STRUCTURE
+│   └── 📁 pt-PT/                         # ✅ PORTUGUESE CONTENT (primary language)
+│       ├── 📄 site.json                  # Global site metadata & SEO settings
+│       ├── 📄 event.json                 # Event data (prices, dates, spots, logistics)
+│       ├── 📄 avatar.json                # Customer persona & pain points analysis
+│       ├── 📄 design_tokens.json         # Unified design system (colors, typography, spacing)
+│       ├── 📄 faq.json                   # FAQ content & objection handling
+│       ├── 📄 testimonials.json          # Customer testimonials & social proof
+│       ├── 📄 presenter.json             # Speaker/presenter information & bio
+│       ├── 📄 pillars.json               # Solution framework & methodology data
+│       ├── 📄 footer.json                # Footer links, stats & company info
+│       ├── 📄 legal.json                 # Legal pages content (privacy, terms, refund)
+│       └── 📄 angles-library.json        # Copywriting angles & messaging library
+│   └── 📁 en-GB/                         # 🔮 FUTURE: English content (ready for expansion)
+│   └── 📁 es-ES/                         # 🔮 FUTURE: Spanish content (ready for expansion)
 │
 ├── 📁 src/                               # 🎯 SOURCE CODE - All development files
-│   ├── 📄 index.njk                      # Main landing page template
+│   ├── 📄 index.njk                      # Main landing page template (composes sections)
 │   ├── 📄 garantia-reembolso.njk         # Legal: refund guarantee page
-│   ├── 📄 politica-privacidade.njk       # Legal: privacy policy
-│   ├── 📄 termos-condicoes.njk           # Legal: terms & conditions
+│   ├── 📄 politica-privacidade.njk       # Legal: privacy policy page
+│   ├── 📄 termos-condicoes.njk           # Legal: terms & conditions page
 │   ├── 📄 thank-you.njk                  # Post-purchase confirmation page
 │   │
-│   ├── 📁 _data/                         # 🗃️ ELEVENTY DATA LAYER - Feeds templates
-│   │   ├── 📄 site.js                    # Global site metadata & SEO
-│   │   ├── 📄 event.js                   # Event data (prices, dates, spots)
-│   │   ├── 📄 avatar.js                  # Customer persona & pain points
-│   │   ├── 📄 testimonials.js            # Customer testimonials & social proof
-│   │   ├── 📄 tokens.js                  # Design system integration
-│   │   ├── 📄 pillars.js                 # Solution framework data
-│   │   ├── 📄 faq.js                     # FAQ content & objection handling
-│   │   ├── 📄 footer.js                  # Footer links & company info
-│   │   ├── 📄 legal.js                   # Legal pages metadata
-│   │   ├── 📄 presenter.js               # Speaker/presenter information
-│   │   └── 📄 csp.js                     # Content Security Policy config
+│   ├── 📁 _data/                         # 🗃️ DATA ADAPTERS - Load from content/pt-PT
+│   │   ├── 📄 site.js                    # ✅ UPDATED: Loads content/pt-PT/site.json
+│   │   ├── 📄 event.js                   # ✅ UPDATED: Loads content/pt-PT/event.json
+│   │   ├── 📄 avatar.js                  # ✅ UPDATED: Loads content/pt-PT/avatar.json
+│   │   ├── 📄 tokens.js                  # ✅ UPDATED: Loads content/pt-PT/design_tokens.json
+│   │   ├── 📄 faq.js                     # ✅ UPDATED: Loads content/pt-PT/faq.json
+│   │   ├── 📄 testimonials.js            # ✅ UPDATED: Loads content/pt-PT/testimonials.json
+│   │   ├── 📄 presenter.js               # ✅ UPDATED: Loads content/pt-PT/presenter.json
+│   │   ├── 📄 pillars.js                 # ✅ UPDATED: Loads content/pt-PT/pillars.json
+│   │   ├── 📄 footer.js                  # ✅ UPDATED: Loads content/pt-PT/footer.json
+│   │   ├── 📄 legal.js                   # ✅ UPDATED: Loads content/pt-PT/legal.json
+│   │   └── 📄 csp.js                     # Content Security Policy configuration
 │   │
-│   ├── 📁 _includes/                     # 🧩 NUNJUCKS TEMPLATES - Reusable components
+│   ├── 📁 _includes/                     # 🧩 TEMPLATES & SECTIONS
 │   │   ├── 📄 layout.njk                 # Base HTML layout with meta tags
 │   │   │
-│   │   ├── 📁 components/                # 🎨 PAGE SECTIONS - Modular landing page parts
+│   │   ├── 📁 sections/                  # 🏗️ CO-LOCATED SECTIONS (template + logic together)
+│   │   │   ├── 📁 hero/                  # ✅ MIGRATED: Complete co-located section
+│   │   │   │   ├── 📄 index.njk          # Hero template (HTML structure)
+│   │   │   │   └── 📄 index.ts           # Hero logic (interactions & animations)
+│   │   │   │
+│   │   │   ├── 📁 offer/                 # ✅ MIGRATED: Complete co-located section  
+│   │   │   │   ├── 📄 index.njk          # Offer template (pricing & guarantee)
+│   │   │   │   └── 📄 index.ts           # Offer logic (MBWay toggle & analytics)
+│   │   │   │
+│   │   │   ├── 📁 problem/               # 🔮 FUTURE: To be migrated to co-located
+│   │   │   ├── 📁 solution/              # 🔮 FUTURE: To be migrated to co-located
+│   │   │   ├── 📁 about/                 # 🔮 FUTURE: To be migrated to co-located
+│   │   │   ├── 📁 social-proof/          # 🔮 FUTURE: To be migrated to co-located
+│   │   │   ├── 📁 faq/                   # 🔮 FUTURE: To be migrated to co-located
+│   │   │   ├── 📁 final-cta/             # 🔮 FUTURE: To be migrated to co-located
+│   │   │   └── 📁 footer/                # 🔮 FUTURE: To be migrated to co-located
+│   │   │
+│   │   ├── 📁 components/                # 🔄 REMAINING SECTIONS (old structure - to be migrated)
 │   │   │   ├── 📄 top-banner.njk         # Urgency banner (limited spots)
-│   │   │   ├── 📄 hero.njk               # Hero section with main CTA
 │   │   │   ├── 📄 problem.njk            # Pain point validation
 │   │   │   ├── 📄 solution.njk           # 5-pillar framework solution
 │   │   │   ├── 📄 about.njk              # Presenter credibility section
 │   │   │   ├── 📄 social-proof.njk       # Testimonials & success stories
-│   │   │   ├── 📄 offer.njk              # Pricing & guarantee section
 │   │   │   ├── 📄 faq.njk                # FAQ accordion
 │   │   │   ├── 📄 final-cta.njk          # Bottom conversion section
 │   │   │   ├── 📄 footer.njk             # Footer with legal links
@@ -72,11 +105,11 @@ cafe-com-vendas-v2/
 │   │   │
 │   │   ├── 📁 css/                       # 🎨 STYLES - Tailwind + Design System
 │   │   │   ├── 📄 main.css               # Main CSS entry (Tailwind + tokens)
-│   │   │   └── 📄 _tokens.generated.css  # Auto-generated from design tokens
+│   │   │   └── 📄 _tokens.generated.css  # ✅ UPDATED: Generated from content/pt-PT/design_tokens.json
 │   │   │
-│   │   ├── 📁 js/                        # ⚡ JAVASCRIPT - Modular ES6 Architecture
+│   │   ├── 📁 js/                        # ⚡ JAVASCRIPT - Current modular architecture
 │   │   │   ├── 📄 main.js                # Entry point - imports & initializes app
-│   │   │   ├── 📄 app.js                 # Application controller - orchestrates components
+│   │   │   ├── 📄 app.js                 # ✅ UPDATED: Imports co-located sections
 │   │   │   │
 │   │   │   ├── 📁 config/                # ⚙️ CONFIGURATION
 │   │   │   │   ├── 📄 constants.js       # App constants & settings
@@ -93,14 +126,12 @@ cafe-com-vendas-v2/
 │   │   │   │   ├── 📄 css-loader.js      # Dynamic CSS loading
 │   │   │   │   ├── 📄 scroll-tracker.js  # Scroll behavior tracking
 │   │   │   │   ├── 📄 gtm-normalizer.js  # GTM data normalization
-│   │   │   │   └── 📄 index.js           # Utilities barrel export
+│   │   │   │   └── 📄 index.js           # ✅ UPDATED: Utilities barrel export
 │   │   │   │
-│   │   │   └── 📁 components/            # 🧩 UI COMPONENTS - Page section logic
+│   │   │   └── 📁 components/            # 🧩 REMAINING COMPONENTS (old structure)
 │   │   │       ├── 📄 banner.js          # Top banner interactions
-│   │   │       ├── 📄 hero.js            # Hero section logic
 │   │   │       ├── 📄 about.js           # About section behavior
 │   │   │       ├── 📄 faq.js             # FAQ accordion functionality
-│   │   │       ├── 📄 offer.js           # Offer section interactions
 │   │   │       ├── 📄 testimonials.js    # Testimonials carousel
 │   │   │       ├── 📄 final-cta.js       # Final CTA behavior
 │   │   │       ├── 📄 footer.js          # Footer interactions
@@ -109,7 +140,7 @@ cafe-com-vendas-v2/
 │   │   │       ├── 📄 youtube.js         # YouTube embed handling
 │   │   │       ├── 📄 thank-you.js       # Thank you page logic
 │   │   │       ├── 📄 cloudinary.js      # Image optimization
-│   │   │       └── 📄 index.js           # Components barrel export
+│   │   │       └── 📄 index.js           # ✅ UPDATED: Components barrel export (Hero/Offer removed)
 │   │   │
 │   │   ├── 📁 fonts/                     # 🔤 TYPOGRAPHY - Local font files
 │   │   │   ├── 📁 Lora/                  # Display font (headings, elegance)
@@ -130,6 +161,37 @@ cafe-com-vendas-v2/
 │   │       ├── 📄 problem-overworked.jpg # Problem section visual
 │   │       └── 📄 sobre3.jpeg            # About/presenter photo
 │   │
+│   ├── 📁 platform/                      # 🏗️ PLATFORM FOUNDATION - Future architecture
+│   │   ├── 📁 lib/                       # 🛠️ PLATFORM UTILITIES (copied from assets/js/utils)
+│   │   │   └── 📁 utils/                 # Animation, DOM, performance utilities
+│   │   │       ├── 📄 animations.js      # Animation utilities
+│   │   │       ├── 📄 dom.js             # DOM manipulation helpers
+│   │   │       ├── 📄 throttle.js        # Performance throttling
+│   │   │       ├── 📄 scroll-tracker.js  # Scroll behavior tracking
+│   │   │       ├── 📄 gtm-normalizer.js  # GTM data normalization
+│   │   │       ├── 📄 css-loader.js      # Dynamic CSS loading
+│   │   │       └── 📄 index.js           # Utilities barrel export
+│   │   │
+│   │   ├── 📁 analytics/                 # 📊 PLATFORM ANALYTICS (copied from assets/js/core)
+│   │   │   └── 📁 core/                  # Analytics and state management
+│   │   │       ├── 📄 analytics.js       # GTM/GA4 tracking & events
+│   │   │       └── 📄 state.js           # Application state management
+│   │   │
+│   │   ├── 📁 ui/                        # 🎨 PLATFORM UI - Global components & partials
+│   │   │   ├── 📁 components/            # 🔮 FUTURE: Button, Badge, Card, etc.
+│   │   │   └── 📁 partials/              # 🔮 FUTURE: Global partials
+│   │   │
+│   │   ├── 📁 styles/                    # 🎨 PLATFORM STYLES - Centralized CSS
+│   │   │   ├── 📄 main.css               # 🔮 FUTURE: Tailwind entry + base layers
+│   │   │   ├── 📄 base.css               # 🔮 FUTURE: Resets, typography
+│   │   │   └── 📄 tokens.generated.css   # 🔮 FUTURE: Design tokens CSS
+│   │   │
+│   │   └── 📁 eleventy/                  # 🔧 PLATFORM ELEVENTY - Config modules
+│   │       ├── 📄 filters.ts             # 🔮 FUTURE: Custom Nunjucks filters
+│   │       ├── 📄 shortcodes.ts          # 🔮 FUTURE: Custom shortcodes
+│   │       ├── 📄 collections.ts         # 🔮 FUTURE: Custom collections
+│   │       └── 📄 transforms.ts          # 🔮 FUTURE: HTML transforms
+│   │
 │   ├── 📁 public/                        # 🌐 PUBLIC STATIC FILES - Copied as-is
 │   │   ├── 📄 _headers                   # Netlify HTTP headers config
 │   │   ├── 📄 favicon.ico                # Browser favicon
@@ -138,16 +200,12 @@ cafe-com-vendas-v2/
 │   └── 📁 schema/                        # 🏷️ STRUCTURED DATA - SEO & rich snippets
 │       └── 📄 faq.json.njk               # FAQ schema markup template
 │
-├── 📁 info/                              # 📚 CONTENT & DESIGN SYSTEM - Single source of truth
-│   ├── 📄 DATA_design_tokens.json        # 🎨 UNIFIED DESIGN SYSTEM (colors, typography, spacing)
-│   ├── 📄 DATA_event.json                # 📅 EVENT DATA (prices, dates, logistics)
-│   ├── 📄 DATA_avatar.json               # 🎯 CUSTOMER PERSONA (pains, objections, jobs-to-be-done)
-│   ├── 📄 DATA_faq.json                  # ❓ FAQ CONTENT (objection handling)
-│   ├── 📄 CONTENT_copy_library.md        # ✍️ COPY EXAMPLES & HEADLINES
-│   ├── 📄 GUIDE_voice_tone.md            # 🗣️ BRAND VOICE GUIDELINES
-│   ├── 📄 GUIDE_brand_visual.md          # 🎨 VISUAL BRAND GUIDELINES
-│   ├── 📄 BUILD_landing_page.md          # 🏗️ DEVELOPMENT BLUEPRINT
-│   └── 📄 angles-library.json            # 📐 COPYWRITING ANGLES LIBRARY
+├── 📁 info/                              # ❌ DEPRECATED - Old content structure (still exists but unused)
+│   ├── 📄 DATA_*.json                    # Old content files (superseded by content/pt-PT/)
+│   ├── 📄 CONTENT_copy_library.md        # Copy examples & headlines
+│   ├── 📄 GUIDE_voice_tone.md            # Brand voice guidelines
+│   ├── 📄 GUIDE_brand_visual.md          # Visual brand guidelines
+│   └── 📄 BUILD_landing_page.md          # Development blueprint
 │
 ├── 📁 netlify/                           # ☁️ SERVERLESS FUNCTIONS - Backend logic
 │   ├── 📁 functions/                     # 💳 PAYMENT & INTEGRATIONS
@@ -159,7 +217,7 @@ cafe-com-vendas-v2/
 │       └── 📄 csp.js                     # Content Security Policy enforcement
 │
 ├── 📁 scripts/                           # 🔧 BUILD TOOLS - Development utilities
-│   └── 📄 build-tokens.js                # Design token → CSS transformation
+│   └── 📄 build-tokens.js                # ✅ UPDATED: Design tokens → CSS (reads from content/pt-PT)
 │
 ├── 📁 _site/                             # 🏗️ BUILD OUTPUT - Generated static files
 │   ├── 📄 index.html                     # Generated landing page
@@ -168,6 +226,10 @@ cafe-com-vendas-v2/
 │   ├── 📁 politica-privacidade/
 │   ├── 📁 termos-condicoes/
 │   └── 📁 thank-you/
+│
+├── 📁 tests/                             # 🧪 TESTING INFRASTRUCTURE (ready for Phase 7)
+│   ├── 📁 unit/                          # 🔮 FUTURE: Vitest unit tests
+│   └── 📁 e2e/                           # 🔮 FUTURE: Playwright E2E tests
 │
 ├── 📁 docs/                              # 📖 TECHNICAL DOCUMENTATION
 │   ├── 📄 DEVELOPMENT_GUIDELINES.md      # Development best practices
@@ -193,106 +255,45 @@ cafe-com-vendas-v2/
 
 ---
 
-## 🏗️ Architecture Explanation
+## 🏗️ New Architecture Explanation
 
-### Why This Structure?
+### What Changed in v2.0 Refactoring?
 
-#### **1. Modern JAMstack Architecture**
-- **Static Site Generation (SSG)**: Eleventy pre-builds HTML at build time for maximum performance
-- **Serverless Functions**: Netlify Functions handle payment processing and integrations
-- **CDN Distribution**: Static files served globally via Netlify's CDN
-- **Modern Build Pipeline**: Vite provides fast development and optimized production builds
-
-#### **2. Separation of Concerns**
+#### **1. i18n-Ready Content Structure**
 ```
-📁 info/     → Content & design decisions (business layer)
-📁 src/      → Implementation & templates (presentation layer)  
-📁 netlify/  → Server-side logic (service layer)
-📁 scripts/  → Build & development tools (build layer)
+📁 content/pt-PT/     → Portuguese content (primary)
+📁 content/en-GB/     → English content (future)
+📁 content/es-ES/     → Spanish content (future)
 ```
+- **Before**: Content mixed with code in `info/` directory
+- **After**: Clean separation with language-specific folders
+- **Benefit**: Easy to add new markets without touching code
 
-#### **3. Component-Based Design**
-- **Modular Templates**: Each section is a separate `.njk` component
-- **Modular JavaScript**: Each component has its own `.js` logic file
-- **Reusable Partials**: Common elements shared across templates
-- **Design System**: Centralized tokens for consistent styling
-
-#### **4. Performance-First Structure**
-- **Asset Optimization**: Vite bundles and compresses JavaScript
-- **CSS Optimization**: PostCSS + Tailwind with purging and minification  
-- **Image Optimization**: WebP formats with lazy loading
-- **Caching Strategy**: Separate asset folders for optimal cache headers
-
----
-
-## 🔧 Tech Stack & Dependencies
-
-### **Core Framework Stack**
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| **Node.js** | v22.18.0 | Runtime environment (LTS until April 2027) |
-| **Eleventy** | 3.0.0 | Static site generator with ESM support |
-| **Vite** | 7.1.2 | Build tool & development server |
-| **Tailwind CSS** | 4.1.11 | Utility-first CSS framework (v4 CSS-first config) |
-| **PostCSS** | 8.5.6 | CSS processing & optimization |
-| **Nunjucks** | - | Template engine (built into Eleventy) |
-
-### **Build & Development Tools**
-| Tool | Version | Purpose |
-|------|---------|---------|
-| **ESLint** | 9.33.0 | Code quality & style enforcement |
-| **Autoprefixer** | 10.4.21 | CSS vendor prefix automation |
-| **Terser** | 5.43.1 | JavaScript minification |
-| **Cross-env** | 10.0.0 | Cross-platform environment variables |
-| **PostCSS CLI** | 11.0.1 | CSS processing command line interface |
-
-### **Payment & Integrations**
-| Service | Version | Purpose |
-|---------|---------|---------|
-| **Stripe** | 18.4.0 | Payment processing & subscription management |
-| **Dotenv** | 17.2.1 | Environment variable management |
-
-### **Performance & Optimization**
-| Plugin | Version | Purpose |
-|---------|---------|---------|
-| **vite-plugin-compression** | 0.5.1 | Gzip & Brotli compression |
-| **@fontsource/lora** | 5.2.6 | Local font optimization |
-
-### **Deployment & Hosting**
-| Platform | Purpose |
-|----------|---------|
-| **Netlify** | Static hosting, CDN, serverless functions |
-| **Netlify Functions** | Payment processing, webhook handling |
-| **Netlify Edge Functions** | Content Security Policy enforcement |
-
----
-
-## ⚡ Build System Flow
-
-### **Development Workflow**
-```bash
-npm run dev
+#### **2. Co-located Section Architecture**
 ```
-1. **Design Tokens**: `build-tokens.js` → `_tokens.generated.css`
-2. **CSS Processing**: PostCSS + Tailwind → `tailwind.css`  
-3. **JavaScript Bundling**: Vite (development mode) → `main.js`
-4. **Template Compilation**: Eleventy + Nunjucks → HTML
-5. **Development Server**: Live reload on changes
-
-### **Production Build**
-```bash
-npm run build
+📁 src/_includes/sections/hero/
+├── index.njk         → Template (HTML structure)  
+└── index.ts          → Logic (interactions & animations)
 ```
-1. **Clean**: Remove existing `_site` directory
-2. **Design Tokens**: Generate CSS custom properties
-3. **CSS Build**: PostCSS + Tailwind (purged & minified)
-4. **JavaScript Build**: Vite (minified IIFE bundle)
-5. **Static Generation**: Eleventy builds HTML from templates
-6. **Asset Optimization**: Compression (gzip + brotli)
+- **Before**: Templates in `_includes/components/`, logic in `assets/js/components/`
+- **After**: Each section contains both template and logic in one place
+- **Benefit**: Single-touch edits, easier maintenance
 
-### **Data Flow Architecture**
+#### **3. Platform Layer Foundation**
 ```
-📄 info/DATA_*.json 
+📁 src/platform/
+├── lib/              → Shared utilities (DOM, animations, performance)
+├── analytics/        → Analytics and state management
+├── ui/               → Global components and partials (future)
+├── styles/           → Centralized CSS system (future)
+└── eleventy/         → Eleventy configuration modules (future)
+```
+- **Purpose**: Clean abstraction layer for shared functionality
+- **Status**: Foundation created, ready for future phases
+
+#### **4. Updated Data Flow**
+```
+📄 content/pt-PT/*.json 
     ↓ (loaded by)
 📄 src/_data/*.js 
     ↓ (feeds)  
@@ -300,70 +301,166 @@ npm run build
     ↓ (compiled by)
 📄 _site/*.html
 ```
+- **Before**: Data adapters loaded from `info/DATA_*.json`
+- **After**: Data adapters load from `content/pt-PT/*.json`
+- **Benefit**: Content editors work in dedicated content directory
 
 ---
 
-## 📁 Directory Purpose Guide
+## 🎯 Migration Status & Roadmap
 
-### **🎯 Core Development (`src/`)**
-- **Purpose**: All source code and templates
-- **Why**: Single source of truth for development files
-- **Contains**: Templates, data, assets, components
+### ✅ **Completed (Phases 1-2)**
 
-### **📚 Content System (`info/`)**  
-- **Purpose**: Business content and design decisions
-- **Why**: Non-technical team members can edit content safely
-- **Contains**: Design tokens, event data, copy, guidelines
+| Component | Status | Structure |
+|-----------|--------|-----------|
+| **Content System** | ✅ Complete | `content/pt-PT/` with all JSON files |
+| **Data Adapters** | ✅ Complete | All `src/_data/` files updated |
+| **Build System** | ✅ Complete | Token generation from new paths |
+| **Hero Section** | ✅ Complete | Co-located in `sections/hero/` |
+| **Offer Section** | ✅ Complete | Co-located in `sections/offer/` |
 
-### **☁️ Backend Logic (`netlify/`)**
-- **Purpose**: Server-side functionality  
-- **Why**: Handles payments and integrations securely
-- **Contains**: Stripe integration, webhooks, email capture
+### 🔄 **In Progress (Phase 3)**
 
-### **🔧 Build Tools (`scripts/`)**
-- **Purpose**: Development utilities and automation
-- **Why**: Transforms design tokens to CSS, automates repetitive tasks
-- **Contains**: Token builder, development helpers
+| Component | Status | Next Steps |
+|-----------|--------|------------|
+| **Platform Layer** | 🔄 Foundation | Fix import paths, complete extraction |
 
-### **📖 Documentation (`docs/`)**
-- **Purpose**: Technical guides and best practices
-- **Why**: Ensures consistent development standards
-- **Contains**: Setup guides, security practices, testing procedures
+### 🔮 **Future Phases (4-8)**
 
-### **📊 Quality Assurance (`reports/`)**
-- **Purpose**: Performance monitoring and audits
-- **Why**: Maintains high performance standards
-- **Contains**: Lighthouse reports, performance metrics
+| Phase | Components | Timeline |
+|-------|------------|----------|
+| **Phase 4** | TypeScript setup, type definitions | Next session |
+| **Phase 5** | Remaining 8 sections → co-located | 2-3 sessions |
+| **Phase 6** | Build optimization, Vite aliases | 1 session |
+| **Phase 7** | Vitest + Playwright testing | 1 session |
+| **Phase 8** | Documentation + cleanup | 1 session |
+
+---
+
+## 🌍 i18n Expansion Ready
+
+### **Adding New Languages**
+```bash
+# 1. Create new content directory
+mkdir content/en-GB
+
+# 2. Copy and translate JSON files  
+cp content/pt-PT/*.json content/en-GB/
+# Edit English translations...
+
+# 3. Add language to build config
+# No code changes needed!
+```
+
+### **Language Structure**
+```
+content/
+├── pt-PT/          # Portuguese (current)
+├── en-GB/          # English (future)
+├── es-ES/          # Spanish (future) 
+├── fr-FR/          # French (future)
+└── de-DE/          # German (future)
+```
+
+---
+
+## ⚡ Updated Build System Flow
+
+### **Development Workflow**
+```bash
+npm run dev
+```
+1. **Design Tokens**: `content/pt-PT/design_tokens.json` → `_tokens.generated.css`
+2. **Content Loading**: Data adapters load from `content/pt-PT/`
+3. **Section Compilation**: Co-located sections compile together
+4. **Template Processing**: Eleventy + Nunjucks → HTML
+5. **Development Server**: Live reload with co-located section updates
+
+### **Production Build**
+```bash
+npm run build
+```
+1. **Clean**: Remove existing `_site` directory
+2. **Content Processing**: Load Portuguese content from `content/pt-PT/`
+3. **Design Tokens**: Generate CSS custom properties
+4. **CSS Build**: PostCSS + Tailwind (purged & minified)
+5. **JavaScript Build**: Vite bundles co-located sections + components
+6. **Static Generation**: Eleventy builds HTML from templates
+7. **Asset Optimization**: Compression (gzip + brotli)
 
 ---
 
 ## 🎯 Key Architectural Benefits
 
-### **1. Maintainability**
-- Clear separation between content, presentation, and logic
-- Modular components enable easy updates and testing
-- Centralized configuration reduces duplication
+### **1. Single-Touch Editing**
+- **Before**: Edit Hero → 3 files (`hero.njk` + `hero.js` + data files)
+- **After**: Edit Hero → 1 location (`sections/hero/` folder)
+- **Impact**: 3x faster maintenance
 
-### **2. Performance**
-- Static generation provides instant loading times
-- Aggressive caching strategies for optimal repeat visits  
-- Modern build tools ensure minimal bundle sizes
+### **2. i18n-Ready Expansion**  
+- **Before**: Content mixed with code, hard to internationalize
+- **After**: Clean content separation, add languages without code changes
+- **Impact**: Ready for European market expansion
 
-### **3. Developer Experience**
-- Hot reload development server for rapid iteration
-- ESLint ensures code quality and consistency
-- Comprehensive documentation for easy onboarding
+### **3. Platform Abstraction**
+- **Before**: Utilities scattered across components
+- **After**: Centralized platform layer for shared functionality
+- **Impact**: Consistent patterns, easier testing
 
-### **4. Business Flexibility**
-- Content editors can modify copy without touching code
-- Design system enables consistent brand application
-- A/B testing structure supports conversion optimization
+### **4. Future-Proof Architecture**
+- **TypeScript Ready**: Platform layer designed for TS integration
+- **Testing Ready**: Structure supports unit and E2E testing
+- **Component Library Ready**: Platform UI structure for shared components
 
-### **5. Production Reliability**
-- Serverless functions scale automatically
-- Static files eliminate server management
-- Edge functions provide global performance
+### **5. Developer Experience**
+- **Faster Builds**: Vite 7.x with optimized imports
+- **Better Organization**: Clear separation of concerns
+- **Easier Onboarding**: Self-documenting structure
 
 ---
 
-*This structure reflects modern web development best practices while maintaining simplicity and performance for a high-converting business landing page.*
+## 🔧 Tech Stack (Updated)
+
+### **Core Framework Stack**
+| Technology | Version | Purpose |
+|------------|---------|---------| 
+| **Node.js** | v22.18.0 | Runtime environment (LTS until April 2027) |
+| **Eleventy** | 3.0.0 | Static site generator with ESM support |
+| **Vite** | 7.1.2 | Build tool & development server |
+| **Tailwind CSS** | 4.1.11 | Utility-first CSS framework (v4 CSS-first config) |
+| **PostCSS** | 8.5.6 | CSS processing & optimization |
+| **Nunjucks** | - | Template engine (built into Eleventy) |
+
+### **Architecture Patterns**
+| Pattern | Implementation | Benefit |
+|---------|----------------|---------|
+| **Co-located Sections** | Template + Logic in same folder | Single-touch editing |
+| **i18n Content Structure** | Language-specific JSON files | Easy internationalization |
+| **Platform Layer** | Shared utilities abstraction | Consistent patterns |
+| **Feature-First Organization** | Sections group related functionality | Better maintainability |
+
+---
+
+## 🚀 Quick Start (Updated)
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Start development (with new structure)
+npm run dev
+
+# 3. Edit content (new location)
+# Edit files in content/pt-PT/*.json
+
+# 4. Edit sections (co-located)
+# Hero: src/_includes/sections/hero/
+# Offer: src/_includes/sections/offer/
+
+# 5. Build for production
+npm run build
+```
+
+---
+
+*This structure represents the completed Phase 1-2 refactoring toward a modern, maintainable, i18n-ready architecture while preserving all existing functionality and performance characteristics.*

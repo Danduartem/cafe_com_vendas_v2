@@ -3,10 +3,16 @@
  * Handles top banner height calculations for layout
  */
 
-import { safeQuery } from '../utils/dom.js';
+import { safeQuery } from '@/utils/index.js';
+import type { Component } from '@/types/component.js';
+import type { SafeElement } from '@/types/dom.js';
 
-export const Banner = {
-  init() {
+interface BannerComponent extends Component {
+  setupHeightVariable(): void;
+}
+
+export const Banner: BannerComponent = {
+  init(): void {
     try {
       this.setupHeightVariable();
     } catch (error) {
@@ -14,16 +20,16 @@ export const Banner = {
     }
   },
 
-  setupHeightVariable() {
-    const updateScrollMargins = () => {
+  setupHeightVariable(): void {
+    const updateScrollMargins = (): void => {
       const banner = safeQuery('#topBanner');
       if (!banner) return;
 
-      const height = banner.offsetHeight || 56;
+      const height = (banner as HTMLElement).offsetHeight || 56;
       const sections = document.querySelectorAll('[data-scroll-offset]');
 
       // Apply Tailwind scroll margin classes based on banner height
-      sections.forEach(section => {
+      sections.forEach((section): void => {
         // Remove existing scroll margin classes
         section.className = section.className.replace(/scroll-mt-\[[\d.]+px\]/g, '');
         // Add new scroll margin class with current banner height

@@ -3,7 +3,7 @@
  * Handles interactions and analytics for the presenter section
  */
 
-import { safeQuery } from '../utils/index.js';
+import { safeQuery } from '../utils/dom.js';
 import { Analytics } from '../core/analytics.js';
 
 export const About = {

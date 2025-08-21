@@ -1,7 +1,8 @@
 // src/assets/js/components/thank-you.js
 
 import { Analytics } from '../core/analytics.js';
-import { safeQuery, Animations } from '../utils/index.js';
+import { safeQuery } from '../utils/dom.js';
+import { Animations } from '../utils/animations.js';
 
 export const ThankYou = {
   init() {
@@ -117,7 +118,7 @@ export const ThankYou = {
 
     // Create observer for staggered animations
     const observer = Animations.createObserver({
-      callback: () => {
+      callback: (entry, index) => {
         Animations.revealElements(revealElements, {
           initialDelay: 100,
           staggerDelay: 100

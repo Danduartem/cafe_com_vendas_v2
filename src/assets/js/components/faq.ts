@@ -3,13 +3,18 @@
  * Handles premium FAQ system with accordion functionality
  */
 
-import { Analytics } from '../core/analytics.js';
-import { safeQuery, safeQueryAll } from '../utils/dom.js';
-import { Animations } from '../utils/animations.js';
-import { normalizeEventPayload } from '../utils/gtm-normalizer.js';
+import { Analytics } from '@/core/analytics.js';
+import { safeQuery, safeQueryAll, Animations, normalizeEventPayload } from '@/utils/index.js';
+import type { Component } from '@/types/component.js';
+import type { SafeElement, SafeElements } from '@/types/dom.js';
 
-export const FAQ = {
-  init() {
+interface FAQComponent extends Component {
+  initializeNativeDetailsFAQ(): void;
+  initializeFAQRevealAnimation(faqItems: Element[]): void;
+}
+
+export const FAQ: FAQComponent = {
+  init(): void {
     try {
       this.initializeNativeDetailsFAQ();
     } catch (error) {
@@ -17,9 +22,9 @@ export const FAQ = {
     }
   },
 
-  initializeNativeDetailsFAQ() {
+  initializeNativeDetailsFAQ(): void {
     const faqContainer = safeQuery('[data-faq-container]');
-    const faqDetails = safeQueryAll('details[data-faq-item]');
+    const faqDetails = safeQueryAll<HTMLDetailsElement>('details[data-faq-item]');
 
     if (!faqContainer || !faqDetails.length) {
       console.warn('FAQ elements not found - FAQ functionality disabled');
@@ -31,12 +36,14 @@ export const FAQ = {
 
     // Accordion behavior: only one open at a time
     faqDetails.forEach((detailsEl) => {
-      detailsEl.addEventListener('toggle', () => {
+      detailsEl.addEventListener('toggle', (): void => {
         const isOpen = detailsEl.open;
         if (isOpen) {
           // Close others
           faqDetails.forEach((other) => {
-            if (other !== detailsEl && other.open) other.open = false;
+            if (other !== detailsEl && other.open) {
+              other.open = false;
+            }
           });
         }
 
@@ -53,31 +60,40 @@ export const FAQ = {
           window.dataLayer = window.dataLayer || [];
           const faqPayload = normalizeEventPayload({
             event: 'faq_toggle',
-            action: isOpen ? 'open' : 'close', // "open" or "close" (will be normalized)
-            question: questionText // The actual question text (will be normalized to 100 chars)
+            action: isOpen ? 'open' : 'close',
+            question: questionText
           });
           window.dataLayer.push(faqPayload);
-        } catch { /* no-op */ }
+        } catch (error) {
+          // Silent fail for analytics errors
+          console.debug('FAQ analytics tracking failed:', error);
+        }
       }, { passive: true });
     });
   },
 
-  initializeFAQRevealAnimation(faqItems) {
+  initializeFAQRevealAnimation(faqItems: Element[]): void {
     Animations.prepareRevealElements(faqItems, {
       transitionClasses: ['transition-all', 'duration-500', 'ease-out']
     });
 
     const observer = Animations.createObserver({
-      callback: (entry, index) => {
-        setTimeout(() => {
-          entry.target.classList.add('opacity-100', 'translate-y-0');
-          entry.target.classList.remove('opacity-0', 'translate-y-4');
-        }, index * 100);
+      callback: () => {
+        // Reveal elements with staggered animation
+        faqItems.forEach((item, index) => {
+          setTimeout(() => {
+            item.classList.add('opacity-100', 'translate-y-0');
+            item.classList.remove('opacity-0', 'translate-y-4');
+          }, index * 100);
+        });
       },
       once: true,
       rootMargin: '0px 0px -50px 0px'
     });
 
-    faqItems.forEach(item => observer.observe(item));
+    // Observe the container rather than individual items for better performance
+    if (faqItems.length > 0) {
+      observer.observe(faqItems[0]);
+    }
   }
 };
