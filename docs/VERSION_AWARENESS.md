@@ -1,197 +1,135 @@
-# Version Awareness System
+# Version Awareness — Café com Vendas
 
-This document describes the version awareness system implemented to ensure Claude Code always uses the correct, up-to-date library APIs.
+> Keep changes **safe, current, and minimal** by checking the *actual installed versions* before coding. This doc is short by design and aligned with our Claude‑first workflow.
 
-## Problem Solved
+---
 
-Claude Code's training data may contain outdated library APIs, leading to:
-- Code that uses deprecated or non-existent functions
-- Incompatibility issues with installed package versions
-- Time wasted refactoring code to use modern APIs
-- Build failures due to API mismatches
+## TL;DR
 
-## Solution Overview
+* **Always run** `/project:version-check` before touching APIs or writing new code.
+* **Fetch exact‑version docs** via Context7 and code to what’s installed, not memory.
+* **Prefer tiny, reversible diffs**; if an API changed, isolate the change and verify with tests.
+* **Imports** in TS use **`.js` extensions** (ESM emit). Sources are **`.ts` only**.
 
-We've implemented a comprehensive version awareness system that:
-1. **Checks installed versions** before writing any code
-2. **Fetches current documentation** via Context7 MCP
-3. **Validates API compatibility** with TypeScript
-4. **Tests critical APIs** to ensure they exist
-5. **Identifies deprecated patterns** and suggests alternatives
+---
 
-## Components
+## What we’re on (source of truth: README)
 
-### 1. Enhanced CLAUDE.md Guidelines
-- Added "Version Awareness Protocol" section
-- Mandatory pre-code checklist
-- Banned patterns list for common outdated APIs
-- Context7 integration instructions
+| Area                  | Current          | Notes                                                          |
+| --------------------- | ---------------- | -------------------------------------------------------------- |
+| **Node.js**           | LTS (per README) | Use `npm ci` for reproducible installs.                        |
+| **TypeScript**        | 5.9.x            | Strict; no implicit `any`.                                     |
+| **Vite**              | 7.1.x            | Use `import.meta.glob({ eager: true })`.                       |
+| **Eleventy**          | 3.1.x            | ESM config in **`.eleventy.ts`** with `export default`.        |
+| **Tailwind CSS**      | 4.1.x            | **CSS‑first**; no `tailwind.config.js`; use `@theme` + tokens. |
+| **PostCSS**           | 8.5.x            | Autoprefixer, minimal plugins.                                 |
+| **Stripe (Node SDK)** | 18.4.x           | Payment Intents + Methods; lazy‑load `stripe.js` in UI.        |
+| **Playwright**        | 1.55.x           | E2E + optional visual snapshots.                               |
+| **GA4/GTM**           | –                | dataLayer **`payment_completed` → GA4 `purchase`**.            |
 
-### 2. New `/version-check` Command
-Location: `.claude/commands/version-check.md`
+> If the README changes, update this table in the same commit.
 
-Features:
-- Displays all installed package versions
-- Fetches documentation via Context7 for exact versions
-- Runs TypeScript type checking
-- Identifies deprecated patterns
-- Suggests modern API alternatives
+---
 
-Usage:
+## Default Flow (use this every time)
+
+1. **Probe versions**
+
+* Run `/project:version-check` (shows installed versions + fetches docs).
+* Skim breaking changes sections for any library you’ll touch.
+
+2. **Plan a tiny diff**
+
+* Propose with `/project:plan-then-apply "<one small change>"`.
+
+3. **Code to installed APIs**
+
+* Follow our standards (TS‑only, Tailwind‑only, ESM imports use `.js`).
+
+4. **Verify locally**
+
+* `npm run type-check && npm run lint && npm test`
+* If UI changed, run Playwright + quick Lighthouse.
+
+---
+
+## Known Deprecations & Gotchas
+
+* **Vite 7**: `globEager` removed — use `import.meta.glob({ eager: true })`.
+* **Tailwind v4**: No `tailwind.config.js`. Configure tokens in CSS via `@theme`; design tokens pipeline emits `_tokens.generated.css` consumed by Tailwind utilities.
+* **Eleventy 3**: ESM default; config in **`.eleventy.ts`** with `export default`. Avoid CommonJS patterns.
+* **Stripe**: Use **Payment Intents**/**Payment Element** patterns; do **not** load `stripe.js` on first paint — lazy‑load on checkout open.
+* **Analytics**: Use typed helper; never inline GA snippets; **event canon** is `payment_completed` in dataLayer mapped to GA4 `purchase`.
+
+---
+
+## Upgrade Recipe (safe, minimal)
+
+1. Create a branch `chore/upgrade-<lib>-to-<version>`.
+2. `/project:version-check` → read migration notes for that lib.
+3. `npm run outdated` → confirm target update.
+4. Update one dependency at a time (or a **small coherent set**), then:
+
+   * Fix type errors.
+   * Run unit + e2e tests.
+   * Verify Dev build + a quick Lighthouse.
+5. Commit with a conventional message; open PR with a 1‑paragraph migration note.
+
+Rollback rule: if tests break and the fix isn’t obvious in 30 minutes, revert and open a tracking issue.
+
+---
+
+## Compatibility Patterns
+
+* **Imports in TS**: `import { x } from './module.js'` (compile to ESM JS).
+* **Sections**: `src/_includes/sections/<name>/{index.njk,index.ts}`; no inline styles or handlers.
+* **Design tokens**: `design/tokens.json` → `scripts/build-tokens.ts` → `_tokens.generated.css` → Tailwind.
+* **Analytics**: Push **typed**, **normalized** events; do not change event names without updating GTM docs.
+
+---
+
+## Decision Matrix — Add/Replace a Library
+
+* **Size**: will this add >10KB gzipped to the main bundle? If yes, reconsider.
+* **Native first**: can the platform API (Fetch, DOM, Intl) do it instead?
+* **DX vs Lock‑in**: does this API create migration debt?
+* **SSR/SSG safety**: is it browser‑only or safe at build time?
+* **A11y impact**: does it obstruct keyboard/screen readers?
+
+Only add if it passes **3+** of the above and fails none critically.
+
+---
+
+## Quick Checks (copy/paste)
+
+**See what changed since last install**
+
 ```bash
-/version-check              # Full check with docs
-/version-check --quick      # Just show versions
-/version-check vite         # Check specific package
+npm ci --dry-run
+npm run outdated
 ```
 
-### 3. TypeScript API Verification Script
-Location: `scripts/verify-apis.ts`
+**List top‑level versions**
 
-Purpose:
-- Validates that APIs used in code actually exist
-- Checks for deprecated patterns
-- Provides modern alternatives
-- Fails CI/CD if outdated APIs are detected
-
-Run with: `npm run verify-apis`
-
-### 4. API Test Suite
-Location: `scripts/test-apis.ts`
-
-Purpose:
-- Quick tests for critical APIs
-- Validates Vite 7.x, Stripe 18.x, ESM, and TypeScript configs
-- Ensures modern patterns are available
-- Catches API breaking changes
-
-Run with: `npm run test-apis`
-
-### 5. Enhanced TypeScript Configuration
-Location: `tsconfig.json`
-
-Changes:
-- Strict type checking enabled
-- Checks JavaScript files too
-- Validates library types (skipLibCheck: false)
-- Includes all project files for comprehensive checking
-
-### 6. Updated Package.json Scripts
-New scripts added:
-- `npm run verify-apis` - Run API verification
-- `npm run test-apis` - Run API tests
-- `npm run type-check` - TypeScript validation
-
-## Workflow
-
-### For Every Coding Session
-
-1. **Start with version check:**
-   ```bash
-   /version-check
-   ```
-
-2. **Before writing code:**
-   - Check package.json for exact versions
-   - Use Context7 to fetch docs for those versions
-   - Review banned patterns list
-
-3. **After writing code:**
-   ```bash
-   npm run type-check
-   npm run verify-apis
-   npm run test-apis
-   ```
-
-### When Updating Dependencies
-
-1. **Use the enhanced `/update` command:**
-   - Automatically runs version-check first
-   - Fetches new documentation
-   - Refactors code to use new APIs
-   - Validates with TypeScript
-
-## Context7 MCP Integration
-
-Context7 MCP is crucial for getting up-to-date documentation:
-
-### How to Use:
-```typescript
-// 1. Resolve library ID
-mcp__context7__resolve-library-id('vite')
-
-// 2. Get documentation
-mcp__context7__get-library-docs('/vitejs/vite', { 
-  tokens: 1000,
-  topic: 'config'
-})
+```bash
+node -p "Object.entries(require('./package.json').dependencies).sort()"
 ```
 
-### Benefits:
-- Real-time documentation for exact versions
-- No reliance on outdated training data
-- Version-specific API examples
-- Breaking change notifications
+**Find usage of a removed API** (example: `globEager`)
 
-## Banned Patterns
-
-### Vite (v7.x)
-- ❌ `import.meta.globEager` → ✅ `import.meta.glob({ eager: true })`
-- ❌ `optimizeDeps.entries` → ✅ `optimizeDeps.include`
-
-### Eleventy (v3.x)
-- ❌ `module.exports` → ✅ `export default`
-- ❌ `.eleventy.cjs` → ✅ `.eleventy.js` (ESM)
-
-### Tailwind CSS (v4.x)
-- ❌ `tailwind.config.js` → ✅ CSS `@theme` configuration
-- ❌ JavaScript config → ✅ Pure CSS configuration
-
-### Stripe (v18.x)
-- ❌ Charges API → ✅ Payment Intents API
-- ❌ Sources → ✅ Payment Methods
-
-## CI/CD Integration
-
-Add to your CI pipeline:
-```yaml
-- name: Check Types
-  run: npm run type-check
-  
-- name: Verify APIs
-  run: npm run verify-apis
-  
-- name: Test APIs
-  run: npm run test-apis
+```bash
+rg -n "globEager" src scripts
 ```
 
-## Benefits
+---
 
-1. **Accuracy**: Code always uses correct APIs for installed versions
-2. **Speed**: No time wasted on refactoring outdated code
-3. **Reliability**: TypeScript catches API mismatches at compile time
-4. **Documentation**: Always have access to current, version-specific docs
-5. **Confidence**: Know that generated code will work with your dependencies
+## PR Acceptance Criteria (versioned changes)
 
-## Maintenance
+* [ ] `/project:version-check` output pasted or summarized in the PR.
+* [ ] API changes documented (1 paragraph) in the PR description.
+* [ ] `npm run type-check && npm run lint && npm test` green.
+* [ ] If build tooling/styles affected, short Lighthouse note attached.
 
-- Keep banned patterns list updated when upgrading major versions
-- Run `/version-check` at the start of each coding session
-- Update Context7 MCP regularly for latest documentation sources
-- Review and update test suites when adding new dependencies
+---
 
-## Troubleshooting
-
-### "API not found" errors
-1. Run `/version-check` to sync documentation
-2. Check package.json for actual installed version
-3. Use Context7 to get correct API for that version
-
-### TypeScript errors
-1. Run `npm run type-check` to see specific issues
-2. Check tsconfig.json includes all necessary files
-3. Ensure @types packages are installed
-
-### Deprecated API warnings
-1. Run `npm run verify-apis` to identify patterns
-2. Check the modern alternatives suggested
-3. Update code to use recommended APIs
+*Last updated: 2025‑08‑22*

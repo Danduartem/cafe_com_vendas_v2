@@ -1,285 +1,133 @@
-# 📊 Performance Monitoring Guide - Café com Vendas
+# Performance Monitoring — Café com Vendas
 
-Comprehensive performance monitoring recommendations based on website analysis and testing results.
-
-## 🎯 Current Performance Status
-
-### ✅ Excellent Metrics Achieved
-- **LCP (Largest Contentful Paint)**: 280ms (Target: <2.5s) ✅
-- **FID (First Input Delay)**: 2ms (Target: <100ms) ✅  
-- **CLS (Cumulative Layout Shift)**: 0.004 (Target: <0.1) ✅
-- **Page Load**: Fast initial render with efficient asset loading
-
-### 🔧 Minor Issues Identified & Resolved
-1. **Missing favicon.svg** → ✅ **Fixed**: Created brand-aligned SVG favicon
-2. **Console logs in development** → ✅ **Optimized**: Removed in production build
-3. **Stripe HTTP warning** → ⚠️ **Expected**: Test environment behavior
-
-## 📈 Monitoring Strategy
-
-### Core Web Vitals Tracking
-```javascript
-// Already implemented in src/assets/js/core/analytics.js
-gtag('event', 'core_web_vitals_cls', {
-  event_category: 'Core Web Vitals',
-  metric_value: Math.round(metric.value * 1000),
-  custom_parameter: Math.round(metric.value * 1000)
-});
-```
-
-### Real User Monitoring (RUM)
-- **Current**: Google Analytics 4 with Core Web Vitals
-- **Data Collection**: LCP, FID, CLS automatically tracked
-- **Threshold Alerts**: Monitor for performance degradation
-
-## 🚀 Performance Optimization Checklist
-
-### Image Optimization
-- [x] **WebP format**: Used throughout for optimal compression
-- [x] **Lazy loading**: `loading="lazy"` implemented
-- [x] **Async decoding**: `decoding="async"` for better rendering
-- [x] **Proper dimensions**: Width/height attributes prevent layout shift
-
-### JavaScript Performance  
-- [x] **ES6 Modules**: Efficient bundling with Vite
-- [x] **Tree Shaking**: Unused code eliminated in production
-- [x] **Code Splitting**: Single optimized bundle for performance
-- [x] **Source Maps**: Available in development for debugging
-- [x] **Lazy Loading**: Stripe.js loads only when needed (-187 KiB, -1.65s)
-- [x] **No Inline Scripts**: All JavaScript in external files for CSP compliance
-
-### CSS Optimization
-- [x] **Tailwind CSS**: Utility-first approach reduces bundle size
-- [x] **PostCSS**: Autoprefixer and optimizations applied
-- [x] **Critical CSS**: Above-the-fold styles inlined
-- [x] **No unused CSS**: Purged in production build
-
-### Font Loading
-- [x] **Local fonts**: Lora and Century Gothic self-hosted
-- [x] **Font display**: `swap` used for better performance
-- [x] **Preload critical fonts**: Display fonts prioritized
-
-## 🚀 Latest Performance Optimizations (Aug 2025)
-
-### ✅ **Third-Party Script Lazy Loading**
-**Implementation**: Stripe.js Dynamic Loading
-- **Before**: 187 KiB loaded on every page visit
-- **After**: 0 KiB on initial load, loads only when checkout is opened
-- **Performance Impact**: -1.65s from unused JavaScript audit
-- **User Impact**: Faster page loads for 95% of visitors who don't checkout
-
-**Implementation Pattern**:
-```javascript
-// Lazy loading pattern for expensive third-party scripts
-export const CheckoutComponent = {
-  stripeLoaded: false,
-  stripeLoadPromise: null,
-
-  async loadStripeScript() {
-    if (this.stripeLoadPromise) return this.stripeLoadPromise;
-    if (this.stripeLoaded) return Promise.resolve();
-
-    this.stripeLoadPromise = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://js.stripe.com/v3/';
-      script.async = true;
-      script.onload = () => {
-        this.stripe = Stripe(ENV.stripe.publishableKey);
-        this.stripeLoaded = true;
-        resolve();
-      };
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-
-    return this.stripeLoadPromise;
-  },
-
-  async openModal() {
-    // Load Stripe only when user shows purchase intent
-    if (!this.stripeLoaded) {
-      await this.loadStripeScript();
-    }
-    // Continue with modal logic...
-  }
-};
-```
-
-### 🔒 **Security Performance Improvements**
-- **CSP Implementation**: Removed all inline scripts for XSS protection
-- **Event Handler Optimization**: Replaced `onclick=""` with `addEventListener()`
-- **ARIA Compliance**: Achieved 95/100 accessibility score
-- **No Performance Impact**: Security improvements maintain page speed
-
-### 📈 **Updated Performance Metrics**
-- **Lighthouse Performance**: 84/100 (Mobile), 90+ (Desktop)
-- **Lighthouse Accessibility**: 95/100 (improved from ARIA fixes)
-- **Lighthouse Best Practices**: 100/100 (perfect security score)
-- **Unused JavaScript**: Reduced from 1.65s to 23 KiB (only local optimizations remaining)
-
-## 📊 Monitoring Tools & Setup
-
-### 1. Google Analytics 4
-```javascript
-// Enhanced tracking configuration
-gtag('config', 'GA_MEASUREMENT_ID', {
-  // Performance monitoring
-  send_page_view: true,
-  enhanced_measurement: true,
-  
-  // Core Web Vitals
-  custom_map: {
-    'custom_parameter_1': 'lcp_value',
-    'custom_parameter_2': 'fid_value', 
-    'custom_parameter_3': 'cls_value'
-  }
-});
-```
-
-### 2. Lighthouse CI Integration
-```bash
-# Add to package.json scripts
-"lighthouse": "lighthouse https://yourdomain.com --output json html",
-"lighthouse:ci": "lhci autorun"
-```
-
-### 3. Web Vitals Library
-```bash
-npm install web-vitals
-```
-
-### 4. Performance Budget
-```json
-{
-  "budget": {
-    "performance": 90,
-    "accessibility": 95,
-    "best-practices": 90,
-    "seo": 95
-  },
-  "thresholds": {
-    "lcp": 2500,
-    "fid": 100,
-    "cls": 0.1
-  }
-}
-```
-
-## 🛠 Development Monitoring
-
-### Build Analysis
-```bash
-# Bundle size analysis
-npm run build:analyze
-
-# Performance testing
-npm run dev:lighthouse
-```
-
-### Hot Reload Performance
-```javascript
-// vite.config.js - Already optimized
-server: {
-  hmr: { overlay: true },
-  watch: { include: ['src/assets/js/**'] }
-}
-```
-
-## 🚨 Performance Alerts
-
-### Key Metrics to Monitor
-1. **Page Load Time** > 3 seconds
-2. **LCP** > 2.5 seconds  
-3. **FID** > 100ms
-4. **CLS** > 0.1
-5. **Bundle Size** increase > 20%
-
-### Alert Thresholds
-```javascript
-// Performance monitoring alerts
-const PERFORMANCE_THRESHOLDS = {
-  LCP_WARNING: 2000,    // 2s
-  LCP_ERROR: 2500,      // 2.5s
-  FID_WARNING: 50,      // 50ms
-  FID_ERROR: 100,       // 100ms
-  CLS_WARNING: 0.05,    // 0.05
-  CLS_ERROR: 0.1        // 0.1
-};
-```
-
-## 📱 Mobile Performance
-
-### Current Status
-- **Mobile-first design**: Responsive across all breakpoints
-- **Touch targets**: 44px minimum for accessibility
-- **Viewport optimized**: Proper meta viewport configuration
-
-### Mobile Monitoring
-```javascript
-// Device-specific tracking
-gtag('event', 'performance_mobile', {
-  event_category: 'Performance',
-  device_type: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-  connection_type: navigator.connection?.effectiveType || 'unknown'
-});
-```
-
-## 🔧 Optimization Recommendations
-
-### Priority 1: Critical Performance
-- [x] **Optimize critical rendering path** 
-- [x] **Minimize main thread blocking**
-- [x] **Efficient resource loading**
-
-### Priority 2: Advanced Optimization  
-- [ ] **Service worker caching** (consider for static assets)
-- [ ] **Resource hints** (preconnect, prefetch)
-- [ ] **Critical resource bundling**
-
-### Priority 3: Monitoring Enhancement
-- [ ] **Real User Monitoring dashboard**
-- [ ] **Performance regression detection**
-- [ ] **A/B testing performance impact**
-
-## 📊 Reporting & Analytics
-
-### Monthly Performance Reports
-1. **Core Web Vitals trends**
-2. **Page load time distribution**
-3. **Mobile vs Desktop performance**
-4. **Geographic performance variations**
-
-### Performance Dashboard Metrics
-```javascript
-// Key metrics to track
-const DASHBOARD_METRICS = {
-  'Page Views': 'ga:pageviews',
-  'Average Load Time': 'ga:avgPageLoadTime', 
-  'Bounce Rate': 'ga:bounceRate',
-  'Core Web Vitals': 'custom_metrics'
-};
-```
-
-## 🎯 Success Criteria
-
-### Target Performance Goals
-- **Lighthouse Performance Score**: >90 ✅ (Currently achieved)
-- **Mobile Performance**: >85 ✅ (Currently achieved)  
-- **Time to Interactive**: <3s ✅ (Currently achieved)
-- **First Contentful Paint**: <1.5s ✅ (Currently achieved)
-
-### Business Impact Metrics
-- **Conversion Rate**: Monitor payment completion rates
-- **User Engagement**: Track scroll depth and interaction events
-- **SEO Performance**: Monitor search rankings and organic traffic
+> Short, practical guide to keep performance **measurable and green**. Lab = Lighthouse. Field = Web Vitals via GTM/GA4. Repo rules apply: **TypeScript‑first**, **Tailwind‑only**, **ESM imports use `.js` for local paths**.
 
 ---
 
-## 🚀 Next Steps
+## 🎯 Targets (what “good” means)
 
-1. **Set up automated Lighthouse CI** in GitHub Actions
-2. **Configure performance alerts** in Google Analytics
-3. **Implement performance budgets** in build process
-4. **Create performance dashboard** for stakeholder reporting
+* **Lighthouse (mobile)**: **Performance ≥ 90**
+* **Accessibility**: **≥ 95** (tracked elsewhere)
+* **Core Web Vitals (field)**:
 
-**Current Status**: Website is performing excellently with room for advanced monitoring enhancements.
+  * **LCP** < 2.5s
+  * **INP** < 200ms
+  * **CLS** < 0.10
+
+> We don’t hard‑code brag metrics here; we measure continuously and keep hitting the targets above.
+
+---
+
+## 🔎 What we measure
+
+**Lab (pre‑merge & local)**
+
+* Lighthouse in Chrome DevTools on key pages (home, checkout/CTA, thank‑you)
+
+**Field (real users)**
+
+* Web Vitals (LCP, INP, CLS, TTFB, FID) sent to **dataLayer → GTM → GA4**
+
+---
+
+## 📡 Field collection: Web Vitals → dataLayer
+
+Create/ensure `src/assets/js/core/web-vitals.ts` with this minimal bridge:
+
+```ts
+import { onCLS, onFID, onLCP, onINP, onTTFB } from 'web-vitals';
+
+type Wv = { name: string; value: number; id: string; rating?: 'good'|'needs-improvement'|'poor' };
+
+function push(metric: Wv): void {
+  (window as any).dataLayer = (window as any).dataLayer || [];
+  (window as any).dataLayer.push({
+    event: 'web_vitals',
+    name: metric.name,
+    value: metric.value,
+    id: metric.id,
+    rating: metric.rating || undefined
+  });
+}
+
+[onCLS, onFID, onLCP, onINP, onTTFB].forEach((api) => api((m: any) => push(m)));
+```
+
+Load it once on pages where you want field data (e.g., globally in your main entry). **Do not** call `gtag()` directly; we standardize on GTM.
+
+---
+
+## 🏷️ GTM/GA4 mapping (one event)
+
+* **Custom Event Trigger**: `web_vitals`
+* **GA4 Event**: `web_vitals`
+* **Parameters**: `name`, `value`, `id`, `rating` (as GA4 event parameters). Create matching **Data Layer Variables** in GTM.
+
+> Keep it one event type to reduce cardinality. Slice by `name` in GA4 Explorations (LCP/INP/CLS…).
+
+---
+
+## 🧪 Lab checks (quick, every PR)
+
+1. Open page in Chrome → **DevTools → Lighthouse → Mobile**
+2. Disable throttling only when debugging; run with defaults for comparable scores
+3. Check **Performance ≥ 90**; if below, see remediation below
+
+Optional script to remind yourself:
+
+```bash
+# macOS (open DevTools Lighthouse automatically)
+# No strict automation here to keep the doc simple and tool‑agnostic.
+```
+
+---
+
+## 🛠️ Common remediations (keep it simple)
+
+* **Hero & media**: use Cloudinary URLs with explicit `width`/`height`; lazy‑load non‑LCP images
+* **Third‑party**: **lazy‑load Stripe** (only on checkout open) and any heavy embeds
+* **CSS/JS size**: ship minimal entry; code‑split long‑tail features; avoid heavy libs
+* **Fonts**: self‑host, `font-display: swap`; preload only if measurably beneficial
+* **DOM work**: avoid layout thrash; batch class toggles; prefer CSS transitions
+
+See `docs/CLOUDINARY_SETUP.md` and `docs/coding-standards.md` for concrete patterns.
+
+---
+
+## ✅ Verification checklist (before merge)
+
+* [ ] Lighthouse (mobile) ≥ 90 on changed pages
+* [ ] No unexpected **layout shifts** (CLS) during interactions
+* [ ] `stripe.js` not requested until user shows purchase intent
+* [ ] No large, unused libraries added to the main bundle
+* [ ] Web Vitals event (`web_vitals`) present in GTM Preview at least once
+
+---
+
+## 🔍 Post‑deploy sanity checks
+
+* **GA4 Realtime**: `web_vitals` events flowing; parameters populated
+* **Stripe Dashboard**: no unusual latency during confirmation
+* **Netlify Analytics/Logs**: error rate not elevated
+
+---
+
+## 🧯 Troubleshooting quickies
+
+* **No `web_vitals` events** → confirm the bridge script is loaded once; GTM trigger is active
+* **Low LCP** → inspect LCP element in Performance panel; reduce hero size or defer non‑critical CSS/JS
+* **High INP** → find long tasks in Performance; debounce listeners; avoid heavy synchronous work
+* **CLS spikes** → ensure intrinsic sizes and reserve space; avoid injecting banners above content
+
+---
+
+## 📚 Related docs
+
+* `docs/CLOUDINARY_SETUP.md`
+* `docs/GTM_CONFIGURATION_REFERENCE.md`
+* `docs/GTM_SETUP_GUIDE.md`
+* `docs/coding-standards.md`
+
+---
+
+*Last updated: 2025‑08‑22*

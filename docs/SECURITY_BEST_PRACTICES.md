@@ -1,307 +1,126 @@
-# 🔒 Security Best Practices - Café com Vendas
+# Security Best Practices — Café com Vendas
 
-Comprehensive security guidelines and implementation details for maintaining XSS protection and accessibility compliance.
-
-## 🎯 Security Overview
-
-### ✅ **Current Security Implementation**
-- **Content Security Policy (CSP)**: Strict policy with no 'unsafe-inline' 
-- **XSS Protection**: All inline scripts eliminated
-- **Event Handler Security**: No `onclick=""` attributes, only `addEventListener()`
-- **ARIA Compliance**: 95/100 accessibility score with proper roles
-- **Third-Party Script Control**: Lazy loading with domain whitelisting
-
-## 🛡️ Content Security Policy (CSP)
-
-### **Production CSP Configuration** (Edge Function: `netlify/edge-functions/csp.js`)
-```toml
-default-src 'self';
-script-src 'self' https://js.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://plausible.io;
-style-src 'self' 'unsafe-inline';
-img-src 'self' data: https: blob:;
-font-src 'self' data:;
-connect-src 'self' https://api.stripe.com https://formspree.io https://connect.mailerlite.com https://www.google-analytics.com https://plausible.io;
-frame-src https://js.stripe.com https://hooks.stripe.com https://www.youtube-nocookie.com https://www.youtube.com https://www.googletagmanager.com;
-form-action 'self' https://formspree.io;
-base-uri 'self';
-object-src 'none';
-```
-
-### **Key Security Features**
-- ❌ **No 'unsafe-inline' for scripts**: Prevents XSS via script injection
-- ✅ **Whitelisted domains**: Only trusted third-party scripts allowed
-- ✅ **Strict default-src**: Everything restricted to same-origin by default
-- ⚠️ **style-src 'unsafe-inline'**: Required for Tailwind utility classes
-
-## 🚨 CRITICAL: No Inline Scripts Policy
-
-### ❌ **NEVER DO THIS**
-```html
-<!-- SECURITY VIOLATION: Inline event handler -->
-<button onclick="doSomething()">Click me</button>
-
-<!-- SECURITY VIOLATION: Inline script -->
-<script>
-  window.someConfig = 'value';
-</script>
-
-<!-- SECURITY VIOLATION: Event attributes -->
-<form onsubmit="handleSubmit()">
-```
-
-### ✅ **ALWAYS DO THIS**
-```javascript
-// SECURE: External event handlers
-export const Component = {
-  init() {
-    const button = document.querySelector('#my-button');
-    button?.addEventListener('click', this.handleClick.bind(this));
-  },
-  
-  handleClick(event) {
-    // Handle click securely
-  }
-};
-
-// SECURE: Configuration in external files
-// src/assets/js/config/environment.js
-export const config = {
-  cloudinary: {
-    cloudName: 'your-cloud-name'
-  }
-};
-```
-
-## 🔧 Secure Event Handling Patterns
-
-### **Component Event Binding**
-```javascript
-export const SecureComponent = {
-  init() {
-    this.bindEvents();
-  },
-
-  bindEvents() {
-    // ✅ SECURE: Query and bind events
-    const button = safeQuery('#action-button');
-    if (button) {
-      button.addEventListener('click', this.handleAction.bind(this));
-      button.addEventListener('keydown', this.handleKeydown.bind(this));
-    }
-
-    // ✅ SECURE: Form handling
-    const form = safeQuery('#contact-form');
-    if (form) {
-      form.addEventListener('submit', this.handleSubmit.bind(this));
-    }
-  },
-
-  handleAction(event) {
-    event.preventDefault();
-    // Secure action handling
-  },
-
-  handleKeydown(event) {
-    // Keyboard accessibility
-    if (event.key === 'Enter' || event.key === ' ') {
-      this.handleAction(event);
-    }
-  },
-
-  handleSubmit(event) {
-    event.preventDefault();
-    // Secure form processing
-  }
-};
-```
-
-## ♿ ARIA Security & Accessibility
-
-### **Required ARIA Patterns**
-```javascript
-// ✅ SECURE: Proper ARIA implementation
-const createTabButton = (index, totalPages) => {
-  const button = document.createElement('button');
-  
-  // Required ARIA attributes for tablist
-  button.setAttribute('role', 'tab');
-  button.setAttribute('aria-selected', 'false');
-  button.setAttribute('aria-controls', `panel-${index}`);
-  button.setAttribute('aria-label', `Go to page ${index + 1} of ${totalPages}`);
-  button.setAttribute('tabindex', '-1');
-  
-  // Event handler (not inline)
-  button.addEventListener('click', () => goToPage(index));
-  
-  return button;
-};
-
-// ✅ SECURE: Update ARIA states
-const updateTabStates = (activeIndex, buttons) => {
-  buttons.forEach((button, index) => {
-    const isActive = index === activeIndex;
-    button.setAttribute('aria-selected', isActive.toString());
-    button.setAttribute('tabindex', isActive ? '0' : '-1');
-  });
-};
-```
-
-### **ARIA Role Requirements**
-- `role="tablist"` requires children with `role="tab"`
-- `role="tab"` requires `aria-selected` and `aria-controls`
-- Interactive elements need `aria-label` for screen readers
-- Keyboard navigation with proper `tabindex` management
-
-## 🔄 Lazy Loading Security Pattern
-
-### **Secure Third-Party Script Loading**
-```javascript
-export const SecureScriptLoader = {
-  scriptCache: new Map(),
-  
-  async loadScript(url, globalName) {
-    // Check cache first
-    if (this.scriptCache.has(url)) {
-      return this.scriptCache.get(url);
-    }
-    
-    // Create loading promise
-    const loadPromise = new Promise((resolve, reject) => {
-      // Security: Validate URL against whitelist
-      if (!this.isWhitelistedDomain(url)) {
-        reject(new Error(`Unauthorized script domain: ${url}`));
-        return;
-      }
-      
-      const script = document.createElement('script');
-      script.src = url;
-      script.async = true;
-      script.crossOrigin = 'anonymous'; // Security: CORS
-      
-      script.onload = () => {
-        if (globalName && !window[globalName]) {
-          reject(new Error(`Script did not create expected global: ${globalName}`));
-          return;
-        }
-        resolve(window[globalName]);
-      };
-      
-      script.onerror = () => {
-        reject(new Error(`Failed to load script: ${url}`));
-      };
-      
-      document.head.appendChild(script);
-    });
-    
-    // Cache the promise
-    this.scriptCache.set(url, loadPromise);
-    return loadPromise;
-  },
-  
-  isWhitelistedDomain(url) {
-    const whitelist = [
-      'https://js.stripe.com',
-      'https://www.googletagmanager.com',
-      'https://www.google-analytics.com'
-    ];
-    
-    return whitelist.some(domain => url.startsWith(domain));
-  }
-};
-```
-
-## 🛡️ Input Validation & Sanitization
-
-### **Form Security Patterns**
-```javascript
-export const SecureFormHandler = {
-  validateEmail(email) {
-    // Security: Prevent injection via email field
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email) && email.length < 255;
-  },
-  
-  sanitizeInput(input) {
-    // Security: Basic sanitization
-    return input
-      .trim()
-      .replace(/[<>]/g, '') // Remove potential HTML
-      .substring(0, 1000); // Limit length
-  },
-  
-  async submitForm(formData) {
-    // Security: Validate all inputs
-    const errors = [];
-    
-    if (!this.validateEmail(formData.email)) {
-      errors.push('Invalid email format');
-    }
-    
-    if (formData.name && formData.name.length < 2) {
-      errors.push('Name too short');
-    }
-    
-    if (errors.length > 0) {
-      throw new Error(`Validation failed: ${errors.join(', ')}`);
-    }
-    
-    // Security: Sanitize before sending
-    const sanitizedData = {
-      name: this.sanitizeInput(formData.name),
-      email: this.sanitizeInput(formData.email),
-      phone: this.sanitizeInput(formData.phone)
-    };
-    
-    return this.sendToAPI(sanitizedData);
-  }
-};
-```
-
-## 🔍 Security Testing Checklist
-
-### **Pre-Deployment Security Audit**
-- [ ] **No inline scripts**: Scan HTML for `<script>` without `src`
-- [ ] **No inline handlers**: Scan for `onclick=""`, `onsubmit=""`, etc.
-- [ ] **CSP compliance**: Test with strict CSP in browser
-- [ ] **ARIA validation**: Run accessibility audit (target: 95/100)
-- [ ] **Input validation**: Test form submission with malicious input
-- [ ] **Script loading**: Verify lazy loading works correctly
-- [ ] **Domain whitelist**: Confirm only approved third-party domains
-
-### **Browser Testing Commands**
-```bash
-# Test CSP violations in browser console
-# Should show no CSP errors
-
-# Lighthouse security audit
-npx lighthouse https://your-site.com --only-categories=best-practices
-
-# Accessibility testing  
-npx lighthouse https://your-site.com --only-categories=accessibility
-```
-
-## 🚨 Security Incident Response
-
-### **If CSP Violations Detected**
-1. **Immediate**: Check browser console for CSP violation reports
-2. **Identify**: Find the source of inline script/handler
-3. **Fix**: Move to external file with proper event binding
-4. **Test**: Verify fix with Lighthouse audit
-5. **Deploy**: Push fix immediately
-
-### **If Accessibility Regression**
-1. **Audit**: Run full accessibility scan
-2. **Fix**: Add missing ARIA roles and states
-3. **Verify**: Test with screen reader
-4. **Score**: Ensure 95/100+ Lighthouse accessibility score
-
-## 📚 Security Resources
-
-- **CSP Reference**: [MDN Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
-- **ARIA Guidelines**: [W3C ARIA Authoring Practices](https://w3c.github.io/aria-practices/)
-- **OWASP Security**: [OWASP XSS Prevention](https://owasp.org/www-community/xss-filter-evasion-cheatsheet)
-- **Lighthouse Security**: [Web.dev Security Audits](https://web.dev/lighthouse-security/)
+> Canonical, **minimal** security baseline for this repo. Matches our rules: **TypeScript‑only**, **Tailwind‑only**, **no inline styles/handlers**, analytics via **GTM → GA4** (typed), and **lazy‑loaded** third‑party.
 
 ---
 
-**Remember**: Security is not optional. Every component must pass the security checklist before deployment.
+## TL;DR (what to actually do)
+
+* ✅ **No inline scripts or styles**. Use TS modules and Tailwind classes only.
+* ✅ **Strict CSP** headers; whitelist Stripe + GTM domains; prefer **nonce‑based** loading over `'unsafe-inline'`.
+* ✅ **Client never sees secrets** (Stripe **secret key** stays server‑side only).
+* ✅ **Sanitize** any HTML you must inject; otherwise prefer `textContent`.
+* ✅ **Load third‑party only on intent** (e.g., load `stripe.js` at checkout open).
+* ✅ **Lock dependencies** (`npm ci`), keep versions current, avoid `eval`/`new Function`.
+
+---
+
+## 1) Content Security Policy (CSP)
+
+### Recommended CSP (strict, production)
+
+Add these headers at the edge (Netlify) for all pages. Adjust GA/GTM domains if needed.
+
+```
+Content-Security-Policy: \
+  default-src 'self'; \
+  base-uri 'none'; \
+  object-src 'none'; \
+  frame-ancestors 'none'; \
+  img-src 'self' data: https:; \
+  style-src 'self'; \
+  font-src 'self' data:; \
+  script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com; \
+  connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://api.stripe.com https://o.stripe.com; \
+  frame-src https://js.stripe.com; \
+  form-action 'self';
+```
+
+> If you bootstrap GTM with the **default inline snippet**, you must either: (a) add a **nonce** to that inline script and use `script-src 'self' 'nonce-<value>' ...`, or (b) allow `'unsafe-inline'` for scripts (not recommended). This repo prefers **nonced** loading and **no inline** code.
+
+### Netlify headers example (`netlify/_headers`)
+
+```
+/*
+  Content-Security-Policy: default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https:; style-src 'self'; font-src 'self' data:; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://api.stripe.com https://o.stripe.com; frame-src https://js.stripe.com; form-action 'self'
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+```
+
+> If you need a **nonce‑based** approach, wire it via an Edge Function that sets a per‑request nonce in headers/HTML and adds `script-src 'nonce-…'`. Keep this doc minimal: implement only if you keep GTM inline.
+
+---
+
+## 2) Stripe (secure usage)
+
+* **Secret key** (`STRIPE_SECRET_KEY`) only in server context (Netlify Functions). Never expose to client.
+* **Publishable key** (`STRIPE_PUBLISHABLE_KEY`) may be used in the browser.
+* **Load `https://js.stripe.com/v3/` lazily** on checkout open; never on first paint.
+* Create **Payment Intents** server‑side; **confirm** client‑side using the Payment Element; handle 3DS as needed.
+* Verify **webhooks** with `STRIPE_WEBHOOK_SECRET`; respond **2xx** quickly.
+
+---
+
+## 3) DOM, Inputs & Sanitization
+
+* Prefer **`textContent`** over `innerHTML` for user‑visible strings.
+* If HTML insertion is required, use a small allowlist sanitizer (tags/attrs you explicitly permit).
+* Validate all inputs server‑side (length, type, format); reject unexpected fields.
+* For links with `target="_blank"`, add `rel="noopener noreferrer"`.
+
+**Tiny helper (TS)**
+
+```ts
+export function safeSetText(el: Element | null, value: unknown): void {
+  if (!el) return;
+  el.textContent = String(value ?? '');
+}
+```
+
+---
+
+## 4) Third‑party & Analytics
+
+* **No raw `gtag()`** calls in templates; use the **typed analytics helper** → `dataLayer` → GTM → GA4.
+* Canonical purchase mapping: **`payment_completed`** (dataLayer) → GA4 **`purchase`**.
+* Avoid unneeded SDKs; prefer platform APIs (Fetch, DOM, Intl) first.
+
+---
+
+## 5) Dependencies & Build
+
+* Use `npm ci` in CI to ensure a reproducible tree; commit `package-lock.json`.
+* Keep libraries updated (see `VERSION_AWARENESS.md`); avoid deprecated APIs.
+* Do **not** use `eval`, `new Function`, or dynamic script strings.
+* Treat warnings as errors in CI for type/lint.
+
+---
+
+## 6) Environment & Secrets
+
+* Keep secrets in environment variables (Netlify Site settings). Never commit `.env`.
+* In client code, read only **non‑secret** vars via Vite’s `import.meta.env.*` (or your ENV bridge); never expose server secrets.
+
+---
+
+## 7) Clickjacking & Forms
+
+* Block framing site‑wide (`X-Frame-Options: DENY` and `frame-ancestors 'none'`).
+* `form-action 'self'` in CSP to limit where forms can submit.
+
+---
+
+## 8) Minimal PR security checklist
+
+* [ ] No inline scripts/styles added
+* [ ] CSP allowlist unchanged or reduced; any additions justified
+* [ ] Stripe keys handled correctly (secret server‑side only)
+* [ ] Inputs validated/sanitized where needed; no unsafe `innerHTML`
+* [ ] Third‑party loaded lazily; no heavy SDKs by default
+* [ ] `payment_completed` → GA4 `purchase` contract preserved
+
+---
+
+*Last updated: 2025‑08‑22*

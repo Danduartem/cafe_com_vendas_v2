@@ -1,287 +1,231 @@
-# 🏷️ GTM Setup Guide - Café com Vendas
-## Clear Step-by-Step Configuration
+# 🏷️ GTM Setup Guide — Café com Vendas (Unified with `payment_completed`)
 
-> **Container ID**: `GTM-T63QRLFT` | **Environment Variable**: `VITE_GTM_CONTAINER_ID`
+> **Container ID**: `GTM-T63QRLFT`
+> **Env Var**: `VITE_GTM_CONTAINER_ID`
+> **Updated**: 2025‑08‑22
+> **Change**: Standardizes the dataLayer payment event to **`payment_completed`** (mapped to GA4 **`purchase`**). All previous references to `purchase_completed` are removed.
 
 ---
 
-## 🚀 Quick Start (5 Minutes)
+## 🚀 Quick Start (5 minutes)
 
-### Step 1: Environment Setup
+### 1) Environment
+
+Create/update `.env.local`:
+
 ```bash
-# Add to your .env.local file
-echo "VITE_GTM_CONTAINER_ID=GTM-T63QRLFT" >> .env.local
+VITE_GTM_CONTAINER_ID=GTM-T63QRLFT
 ```
 
-### Step 2: Access GTM Console
-1. Go to [tagmanager.google.com](https://tagmanager.google.com)
-2. Select container `GTM-T63QRLFT`
-3. Create workspace: "Café com Vendas Setup"
+### 2) Access GTM
 
-### Step 3: Enable Built-in Variables
-Go to **Variables > Built-In Variables > Configure** and enable:
-- ✅ Event
-- ✅ Page URL, Page Title, Page Path
-- ✅ Click Element, Click Text, Click Classes
-- ✅ Form Element, Form ID, Form Classes
+1. Open **tagmanager.google.com**
+2. Select container **GTM‑T63QRLFT**
+3. Create/choose workspace: *Café com Vendas Setup*
 
-### Step 4: Test
+### 3) Enable Built‑in Variables
+
+**Variables → Built‑In → Configure**
+
+* Event
+* Page URL, Page Title, Page Path
+* Click Element, Click Text, Click Classes
+* Form Element, Form ID, Form Classes
+
+### 4) Local Test
+
 ```bash
 npm run dev
-# Visit http://localhost:8081
-# Check console: window.dataLayer
+# Visit http://localhost:8081 and open DevTools console
+window.dataLayer;            // inspect events
+console.table(window.dataLayer);
 ```
 
-**✅ If you see events in dataLayer, you're ready for detailed configuration!**
+---
+
+## 📋 Phase 1 — Core Data Layer Variables (Required)
+
+Create these **Data Layer Variables** in GTM (Name → DL key):
+
+| Variable Name             | Data Layer Variable Name |
+| ------------------------- | ------------------------ |
+| **DL - Source**           | `source`                 |
+| **DL - Amount**           | `amount`                 |
+| **DL - Value**            | `value`                  |
+| **DL - Currency**         | `currency`               |
+| **DL - Pricing Tier**     | `pricing_tier`           |
+| **DL - Items**            | `items`                  |
+| **DL - Lead ID**          | `lead_id`                |
+| **DL - Transaction ID**   | `transaction_id`         |
+| **DL - Percent Scrolled** | `percent_scrolled`       |
+| **DL - Section**          | `section`                |
+| **DL - FAQ Action**       | `action`                 |
+| **DL - FAQ Question**     | `question`               |
+| **DL - Engagement Type**  | `engagement_type`        |
+| **DL - Toggle Count**     | `toggle_count`           |
+
+> Optional: create **Custom JS** normalizers (e.g., `JS - Normalize String`, `JS - Normalize Section`) to lower cardinality if your inputs vary.
 
 ---
 
-## 📋 Detailed Configuration
+## 🔔 Phase 2 — Essential Triggers (Required)
 
-### PHASE 1: Core Variables (Required)
+Create **Custom Event** triggers for these dataLayer events:
 
-Create these **Data Layer Variables** in GTM:
+### A) GTM Init (GA4 boot)
 
-| Variable Name | Data Layer Variable Name | Purpose |
-|---------------|--------------------------|---------|
-| **DL - Event Category** | `event_category` | Event categorization |
-| **DL - Source** | `source` | CTA source attribution |
-| **DL - Amount** | `amount` | Dynamic pricing (€180/€240) |
-| **DL - Lead ID** | `lead_id` | Lead tracking |
-| **DL - Transaction ID** | `transaction_id` | Payment tracking |
-| **DL - Pricing Tier** | `pricing_tier` | Tier tracking |
-| **DL - Value** | `value` | Engagement metrics |
+* **Type**: Custom Event
+* **Event name**: `gtm_init`
 
-**How to create**: Variables > New > Data Layer Variable > Enter variable name
+### B) Checkout Opened
 
----
+* **Type**: Custom Event
+* **Event name**: `checkout_opened`
 
-### PHASE 2: Essential Triggers (Required)
+### C) **Payment Completed** (Unified)
 
-Create these **Custom Event Triggers**:
+* **Type**: Custom Event
+* **Event name**: `payment_completed`
 
-#### 🔥 CRITICAL CONVERSION TRIGGERS
+### D) Engagement
 
-**1. GTM Init** (Required for GA4)
-- **Type**: Custom Event
-- **Event Name**: `gtm_init`
-- **Condition**: Event equals `gtm_init`
-
-**2. Checkout Opened** (Revenue tracking)
-- **Type**: Custom Event  
-- **Event Name**: `checkout_opened`
-- **Condition**: Event equals `checkout_opened`
-
-**3. Payment Completed** (Conversions)
-- **Type**: Custom Event
-- **Event Name**: `payment_completed`
-- **Condition**: Event equals `payment_completed`
-
-#### 📊 ENGAGEMENT TRIGGERS
-
-**4. Scroll Depth**
-- **Type**: Custom Event
-- **Event Name**: `scroll_depth`
-- **Condition**: Event equals `scroll_depth`
-
-**5. FAQ Engagement**
-- **Type**: Custom Event
-- **Event Name**: `faq_meaningful_engagement`
-- **Condition**: Event equals `faq_meaningful_engagement`
-
-**How to create**: Triggers > New > Custom Event > Enter event name
+* **Type**: Custom Event
+* **Event names**: `scroll_depth`, `faq_meaningful_engagement`
 
 ---
 
-### PHASE 3: GA4 Configuration (Required)
+## 📈 Phase 3 — GA4 Tagging (Required)
 
-#### 1. GA4 Config Tag
-- **Type**: Google Analytics: GA4 Configuration
-- **Measurement ID**: `G-XXXXXXXXXX` (get from Google Analytics)
-- **Trigger**: GTM Init
-- **Parameters**:
-  - `page_location`: {{Page URL}}
-  - `page_title`: {{Page Title}}
-  - `cafe_com_vendas_version`: v2025
+### 1) GA4 Configuration Tag
 
-#### 2. GA4 Conversion Events
-- **Type**: Google Analytics: GA4 Event
-- **Configuration Tag**: Select GA4 Config above
-- **Event Name**: checkout_opened
-- **Parameters**:
-  - `source`: {{DL - Source}}
-  - `amount`: {{DL - Amount}}
-  - `currency`: EUR
-- **Trigger**: Checkout Opened
+* **Type**: *Google Analytics: GA4 Configuration*
+* **Measurement ID**: your GA4 ID (e.g., `G‑XXXXXXXXXX`)
+* **Trigger**: `gtm_init`
+* **Parameters** (recommended):
 
-#### 3. GA4 Purchase Event
-- **Type**: Google Analytics: GA4 Event
-- **Configuration Tag**: Select GA4 Config above
-- **Event Name**: purchase
-- **Parameters**:
-  - `transaction_id`: {{DL - Transaction ID}}
-  - `value`: {{DL - Amount}}
-  - `currency`: EUR
-- **Trigger**: Payment Completed
+  * `page_location`: {{Page URL}}
+  * `page_title`: {{Page Title}}
+  * `cafe_com_vendas_version`: `v2025` (optional)
+
+### 2) GA4 — Checkout Opened (Custom Event)
+
+* **Type**: *GA4 Event*
+* **Event Name**: `checkout_opened`
+* **Configuration Tag**: GA4 Config (above)
+* **Parameters** (as needed):
+
+  * `source`: {{DL - Source}}
+  * `amount`: {{DL - Amount}} *or* {{DL - Value}}
+  * `currency`: `EUR`
+  * `pricing_tier`: {{DL - Pricing Tier}}
+  * `items`: {{DL - Items}}
+* **Trigger**: `checkout_opened`
+
+### 3) **GA4 — Purchase (Maps from `payment_completed`)**
+
+* **Type**: *GA4 Event*
+* **Event Name**: `purchase`
+* **Configuration Tag**: GA4 Config (above)
+* **Parameters**:
+
+  * `transaction_id`: {{DL - Transaction ID}}
+  * `value`: {{DL - Value}} (or {{DL - Amount}})
+  * `currency`: `EUR`
+  * `items`: {{DL - Items}}
+  * `pricing_tier`: {{DL - Pricing Tier}} *(optional custom dimension)*
+* **Trigger**: `payment_completed`
 
 ---
 
 ## 🧪 Testing & Validation
 
-### Test Checklist
+### GTM Preview
 
-1. **Preview Mode**:
-   - GTM > Preview > Enter `http://localhost:8081`
-   - Verify all triggers fire
+1. **Preview** → enter site URL (e.g., `http://localhost:8081`)
+2. Interact with the page
+3. Confirm triggers fire: `gtm_init`, `checkout_opened`, `payment_completed`, plus engagement events
 
-2. **Expected Events**:
-   - ✅ `gtm_init` on page load
-   - ✅ `checkout_opened` when clicking CTA buttons
-   - ✅ `scroll_depth` at 25%, 50%, 75%
-   - ✅ `faq_meaningful_engagement` on FAQ interaction
+### GA4 Real‑time
 
-3. **GA4 Real-Time**:
-   - Google Analytics > Real-time
-   - Should see events as they occur
+* Open **Google Analytics → Realtime**
+* Confirm receipt of `checkout_opened` and **`purchase`** (from `payment_completed`)
 
-### Debug Commands
-```javascript
-// In browser console:
-window.dataLayer                    // View all events
-console.table(window.dataLayer)    // Formatted view
-window.CafeComVendas.getComponentStatus() // Component health
+### Console Debug
+
+```js
+window.dataLayer
+console.table(window.dataLayer)
 ```
 
 ---
 
-## 🚨 Common Issues & Solutions
+## 📦 Reference — Minimal dataLayer Examples
 
-### Problem: GTM Assistant shows PNG icon
-**Solution**:
-1. Check `VITE_GTM_CONTAINER_ID` is set in environment
-2. Verify GTM container is published
-3. Ensure event names match exactly between code and triggers
+### Checkout Opened
 
-### Problem: Events not appearing
-**Solution**:
-1. Check browser console for JavaScript errors
-2. Verify triggers are active (not paused)
-3. Check trigger conditions match event names exactly
+```js
+window.dataLayer.push({
+  event: 'checkout_opened',
+  value: 180,
+  currency: 'EUR',
+  pricing_tier: 'early_bird',
+  items: [{
+    item_id: 'SKU_CCV_PT_2025',
+    item_name: 'Café com Vendas – Portugal 2025',
+    price: 180,
+    quantity: 1,
+    item_category: 'Event'
+  }]
+});
+```
 
-### Problem: GA4 not receiving data
-**Solution**:
-1. Ensure GA4 Config tag fires on GTM Init trigger
-2. Check Measurement ID is correct
-3. Verify GA4 event tags use correct Configuration Tag
+### Payment Completed (Unified)
 
----
-
-## 📈 Performance Tracking (Optional)
-
-Add these if you want performance monitoring:
-
-### Performance Triggers
-- **Performance LCP**: `performance_lcp`
-- **Performance FID**: `performance_fid`  
-- **Performance CLS**: `performance_cls`
-
-### Create GA4 Performance Tag
-- **Event Name**: {{Event}} (built-in variable)
-- **Parameters**:
-  - `metric_value`: {{DL - Custom Parameter}}
-  - `event_category`: Performance
-- **Triggers**: Performance LCP, Performance FID, Performance CLS
-
----
-
-## 🔄 Enhanced Ecommerce (Optional)
-
-For advanced conversion tracking:
-
-### Begin Checkout Event
-- **Event Name**: `begin_checkout`
-- **Parameters**:
-  - `currency`: EUR
-  - `value`: {{DL - Amount}}
-  - `items`: Array with product info
-- **Trigger**: Checkout Opened
-
-### Purchase Event Items Array
-```javascript
-[{
-  item_id: "cafe_com_vendas_2025",
-  item_name: "Café com Vendas - Lisboa 2025",
-  category: "Event Ticket",
-  price: {{DL - Amount}},
-  quantity: 1,
-  item_variant: {{DL - Pricing Tier}}
-}]
+```js
+window.dataLayer.push({
+  event: 'payment_completed',
+  transaction_id: 'pi_1abc2def3ghi',
+  value: 180,
+  currency: 'EUR',
+  items: [{
+    item_id: 'SKU_CCV_PT_2025',
+    item_name: 'Café com Vendas – Portugal 2025',
+    price: 180,
+    quantity: 1,
+    item_category: 'Event'
+  }],
+  pricing_tier: 'early_bird'
+});
 ```
 
 ---
 
-## 🚀 Production Deployment
+## 🚨 Common Issues & Fixes
 
-### 1. Environment Variables
-**Netlify Dashboard** > Site Settings > Environment Variables:
-```
-VITE_GTM_CONTAINER_ID=GTM-T63QRLFT
-```
+**Purchase not visible in GA4**
 
-### 2. Publish GTM Container
-1. Submit all changes in GTM workspace
-2. Click **Publish**
-3. Version Name: "Café com Vendas v1.0"
+* Ensure **trigger** exists for `payment_completed` and fires
+* GA4 event name must be **`purchase`** (not `payment_completed`)
+* Verify `transaction_id` and `items` are sent
 
-### 3. Verify Production
-- [ ] GTM loads on production site
-- [ ] Events appear in GA4 Real-time
-- [ ] No console errors
+**GTM Assistant shows PNG icon**
 
----
+* Ensure `VITE_GTM_CONTAINER_ID` is set and container is published
 
-## 📞 Quick Reference
+**Events not appearing in Preview**
 
-### Event Names (Copy/Paste)
-```javascript
-// Application Events
-'gtm_init'
-'app_initialized'
-'components_initialized'
-
-// Conversion Events  
-'checkout_opened'
-'checkout_closed'
-'lead_form_submitted'
-'payment_completed'
-'payment_failed'
-
-// Engagement Events
-'scroll_depth'
-'faq_meaningful_engagement'
-'view_testimonial_slide'
-
-// Performance Events (Optional)
-'performance_lcp'
-'performance_fid'
-'performance_cls'
-'page_load_performance'
-```
-
-### GTM Console Links
-- **Container**: [GTM-T63QRLFT](https://tagmanager.google.com/)
-- **GA4 Setup**: [analytics.google.com](https://analytics.google.com)
-- **Debug Extension**: [GTM Assistant](https://chrome.google.com/webstore/detail/tag-assistant-legacy-by/kejbdjndbnbjgmefkgdddjlbokphdefk)
+* Check DevTools console for JS errors
+* Verify event names match **exactly**
+* Confirm triggers are **not paused**
 
 ---
 
-## 🎯 Success Criteria
+## 🔁 Migration Note
 
-You've configured GTM correctly when:
-- ✅ GTM Assistant shows tracking data (no PNG icon)
-- ✅ All conversion events fire in preview mode
-- ✅ GA4 receives events in real-time
-- ✅ No JavaScript errors in console
-- ✅ Dynamic pricing values are captured correctly (€180/€240)
+* **Rename** any existing `purchase_completed` triggers/events to **`payment_completed`**.
+* Keep GA4 event name as **`purchase`**.
+* Re‑publish container after changes.
 
-**Need help?** Check the console commands above or refer to the [GTM Events Reference](GTM_EVENTS_REFERENCE.md) for detailed event specifications.
+---
+
+*End of file — save as `/docs/GTM_SETUP_GUIDE.md`.*

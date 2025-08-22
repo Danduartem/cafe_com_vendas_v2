@@ -1,506 +1,222 @@
-# Architecture Overview
+# Architecture Overview — Café com Vendas
 
-> **High-Level System Architecture for Café com Vendas**
->
-> A comprehensive map of the TypeScript-first, performance-optimized landing page architecture designed for conversion and maintainability.
+> High‑level system map for a **TypeScript‑first**, performance‑optimized landing page designed for conversion and maintainability. This document is concise by design and defers deep details to the linked docs.
+
+---
 
 ## 🎯 System Overview
 
-**Purpose**: Premium event landing page for female entrepreneurs (September 20, 2025, Lisbon)  
-**Architecture**: TypeScript-first modular architecture with type safety  
-**Language**: Portuguese (pt-PT) with i18n-ready structure  
-**Goal**: High-converting, elegant design with proven conversion principles  
+**Purpose**: Premium event landing page for female entrepreneurs in Lisbon
+**Architecture**: TypeScript‑first modular SSG with strict styling and analytics conventions
+**Language**: Portuguese (pt‑PT), i18n‑ready
+**Goal**: High‑converting, elegant design grounded in proven UX + performance
 
-### Key Metrics
-- **TypeScript Coverage**: 100% file coverage (45 type errors being resolved)
-- **Performance Target**: Lighthouse >90
-- **Accessibility Target**: WCAG 2.1 AA compliance (>95)
-- **Bundle Size**: <100KB JavaScript gzipped, <50KB CSS
-- **Component Architecture**: Platform UI library with reusable patterns
+### Key Metrics (source of truth: README)
 
-## 🏗️ High-Level Architecture
+* **TypeScript Coverage**: 100% file coverage (**0 type errors**)
+* **Performance Target**: Lighthouse ≥ 90 (mobile), ≥ 90 (desktop)
+* **Accessibility Target**: WCAG 2.1 AA, Lighthouse A11y ≥ 95
+* **Bundle Size**: JS < 100 KB gzip (goal), CSS < 50 KB gzip
+* **First Party Code Rules**: TS‑only, Tailwind‑only, tokenized design
+
+### Core Principles
+
+* **TS‑only**: no `.js` sources; **imports use `.js` extensions** (ESM TS emit)
+* **Tailwind v4 only**: CSS‑first `@theme`; no `tailwind.config.js`; no inline styles
+* **Design Tokens**: JSON → build → CSS custom properties
+* **Security**: strict CSP; no inline scripts/handlers; typed analytics helpers
+* **Performance**: lazy‑load third‑party (e.g., Stripe), small bundles, optimized images
+* **Analytics**: normalized dataLayer; **`payment_completed` → GA4 `purchase`** (see GTM docs)
+
+---
+
+## 🏗️ High‑Level Architecture
 
 ```mermaid
 graph TB
-    Content[Content Layer<br/>JSON Data] --> Data[Data Adapter Layer<br/>TypeScript]
-    Data --> Templates[Template Layer<br/>Nunjucks]
-    Templates --> Static[Static Site<br/>Eleventy]
-    
-    DesignTokens[Design Tokens<br/>JSON] --> TokenBuild[Token Builder<br/>TypeScript]
-    TokenBuild --> CSS[CSS Layer<br/>Tailwind v4]
-    
-    TypeScript[TypeScript Modules] --> Vite[Vite Builder]
-    Vite --> JavaScript[Optimized Bundle]
-    
-    Static --> CDN[Netlify CDN]
-    JavaScript --> CDN
-    CSS --> CDN
-    
-    CDN --> Browser[Browser Runtime]
-    Browser --> Analytics[Analytics Tracking]
-    Browser --> Payments[Stripe Integration]
+  Content[Content Layer\nJSON Data] --> Data[Data Adapter Layer\nTypeScript]
+  Data --> Templates[Template Layer\nNunjucks]
+  Templates --> Static[Static Site\nEleventy]
+
+  DesignTokens[Design Tokens\nJSON] --> TokenBuild[Token Builder\nTypeScript]
+  TokenBuild --> CSS[CSS Layer\nTailwind v4]
+
+  TS[TypeScript Modules] --> Vite[Vite Builder]
+  Vite --> JS[Optimized Bundle]
+
+  Static --> CDN[Netlify CDN]
+  JS --> CDN
+  CSS --> CDN
+
+  CDN --> Browser[Browser Runtime]
+  Browser --> Analytics[Analytics Tracking]
+  Browser --> Payments[Stripe Integration]
 ```
 
-## 📂 Directory Structure Map
+---
+
+## 📂 Directory Structure (concise)
 
 ```
 📦 Project Root
-├── 🌍 content/pt-PT/           # Content Source (i18n-ready)
-│   ├── design_tokens.json     # Design system definitions
-│   ├── site.json              # Global site metadata
-│   ├── event.json             # Event data & pricing
-│   ├── avatar.json            # Customer persona
-│   ├── faq.json               # FAQ content
-│   └── testimonials.json      # Social proof data
-│
-├── 🗃️ src/_data/               # Data Adapter Layer (TypeScript)
-│   ├── site.ts                # Site metadata loader
-│   ├── event.ts               # Event data loader
-│   ├── tokens.ts              # Design tokens loader
-│   └── *.ts                   # Type-safe data adapters
-│
-├── 🎨 src/_includes/           # Template Layer
-│   ├── layout.njk             # Base HTML template
-│   ├── sections/              # Co-located Sections
-│   │   ├── hero/
-│   │   │   ├── index.njk      # Hero template
-│   │   │   └── index.ts       # Hero logic (TypeScript)
-│   │   ├── offer/             # Same pattern for all sections
-│   │   └── */                 # Modular section architecture
-│   └── sections-legacy/       # Legacy components (templates only)
-│
-├── ⚡ src/assets/js/           # TypeScript Architecture
-│   ├── main.ts                # Application entry point
-│   ├── app.ts                 # Application controller
-│   ├── types/                 # Type definitions
-│   │   ├── global.ts          # Global types
-│   │   ├── component.ts       # Component interfaces
-│   │   └── *.ts               # All type definitions
-│   ├── core/
-│   │   ├── analytics.ts       # GTM/GA4 tracking
-│   │   └── state.ts           # State management
-│   ├── utils/
-│   │   ├── dom.ts             # DOM helpers
-│   │   ├── animations.ts      # Animation utilities
-│   │   └── index.ts           # Utils barrel export
-│   └── components/
-│       ├── banner.ts          # Top banner
-│       ├── faq.ts             # FAQ accordion
-│       ├── gtm.ts             # Google Tag Manager
-│       └── *.ts               # All components in TypeScript
-│
-├── 🎨 src/assets/css/          # Styling Layer
-│   ├── main.css               # Tailwind + tokens entry
-│   └── _tokens.generated.css  # Generated from JSON tokens
-│
-├── 🏗️ src/platform/           # Platform Foundation
-│   ├── lib/utils/             # Shared utilities
-│   ├── analytics/core/        # Analytics abstraction
-│   └── ui/components/         # UI component library
-│
-├── ☁️ netlify/                # Serverless Functions
-│   ├── functions/
-│   │   ├── create-payment-intent.ts  # Stripe payments
-│   │   ├── stripe-webhook.ts         # Stripe webhooks
-│   │   └── mailerlite-lead.ts        # Email integration
-│   └── edge-functions/
-│       └── csp.ts             # Content Security Policy
-│
-├── 🔧 scripts/                # Build Tools
-│   ├── build-tokens.ts        # Design tokens → CSS
-│   ├── universal-screenshot.ts # Screenshot system
-│   └── *.ts                   # All build scripts in TypeScript
-│
-├── 📋 docs/                   # Documentation
-│   ├── coding-standards.md    # Development standards
-│   ├── architecture-overview.md # This document
-│   └── *.md                   # Technical documentation
-│
-└── ⚙️ Configuration Files
-    ├── .eleventy.ts           # Eleventy config (TypeScript)
-    ├── vite.config.ts         # Vite bundler config
-    ├── tsconfig.json          # TypeScript configuration
-    ├── eslint.config.ts       # ESLint config
-    └── postcss.config.ts      # PostCSS config
+├─ content/pt-PT/           # i18n content (site, event, pages, sections, strings)
+│  └─ design_tokens.json
+├─ design/tokens.json       # Design tokens (source of truth)
+├─ src/
+│  ├─ _data/                # Type‑safe data adapters (TS)
+│  ├─ _includes/            # Nunjucks templates + sections (co‑located {index.njk,index.ts})
+│  ├─ assets/
+│  │  ├─ css/               # Tailwind + generated tokens CSS
+│  │  └─ js/                # TS entry + core + types + config
+│  ├─ platform/             # Platform foundation (utils, UI components)
+│  └─ pages/                # Page templates (index, legal, thank‑you)
+├─ netlify/
+│  ├─ functions/            # Stripe, MailerLite, webhooks (TS)
+│  └─ edge-functions/       # CSP headers (TS)
+├─ scripts/                 # Build tools (tokens, scaffolds) (TS)
+├─ docs/                    # Architecture, standards, setup guides
+└─ config files             # .eleventy.ts, vite.config.ts, tsconfig.json, etc.
 ```
 
-## 🔄 Data Flow Architecture
+> Full map with file examples lives in the README and section docs. This overview avoids duplication to stay current.
 
-### Content to Display Pipeline
+---
+
+## 🔄 Data Flow
+
+### Content → Display
+
 ```mermaid
 sequenceDiagram
-    participant JSON as content/pt-PT/*.json
-    participant Adapter as src/_data/*.ts
-    participant Template as *.njk Templates
-    participant Eleventy as Eleventy SSG
-    participant Browser as Browser
+  participant JSON as content/pt-PT/*.json
+  participant Adapter as src/_data/*.ts
+  participant Template as *.njk Templates
+  participant Eleventy as Eleventy SSG
+  participant Browser as Browser
 
-    JSON->>Adapter: Load structured content
-    Adapter->>Adapter: Type validation & transformation
-    Adapter->>Template: Provide typed data
-    Template->>Eleventy: Generate static HTML
-    Eleventy->>Browser: Serve optimized pages
+  JSON->>Adapter: Load structured content
+  Adapter->>Adapter: Type validation & transformation
+  Adapter->>Template: Provide typed data
+  Template->>Eleventy: Generate static HTML
+  Eleventy->>Browser: Serve optimized pages
 ```
 
 ### Design System Pipeline
+
 ```mermaid
 sequenceDiagram
-    participant Tokens as design_tokens.json
-    participant Builder as build-tokens.ts
-    participant CSS as _tokens.generated.css
-    participant Tailwind as Tailwind v4
-    participant Browser as Browser
+  participant Tokens as design/tokens.json
+  participant Builder as scripts/build-tokens.ts
+  participant CSS as _tokens.generated.css
+  participant Tailwind as Tailwind v4
+  participant Browser as Browser
 
-    Tokens->>Builder: Load design definitions
-    Builder->>CSS: Generate CSS custom properties
-    CSS->>Tailwind: Configure utility classes
-    Tailwind->>Browser: Deliver optimized styles
+  Tokens->>Builder: Load definitions
+  Builder->>CSS: Emit CSS custom properties
+  CSS->>Tailwind: Utility composition
+  Tailwind->>Browser: Optimized styles
 ```
 
-### JavaScript Build Pipeline
+### Build & Runtime
+
 ```mermaid
 sequenceDiagram
-    participant TS as TypeScript Modules
-    participant Vite as Vite Bundler
-    participant Bundle as Optimized Bundle
-    participant Browser as Browser Runtime
+  participant TS as TypeScript
+  participant Vite as Vite
+  participant Bundle as Optimized Bundle
+  participant Edge as Netlify
+  participant Browser as Browser
 
-    TS->>Vite: Type checking & compilation
-    Vite->>Bundle: Tree shaking & minification
-    Bundle->>Browser: Single IIFE bundle
-    Browser->>Browser: Component initialization
+  TS->>Vite: Compile + type‑check
+  Vite->>Bundle: Tree‑shake + minify
+  Bundle->>Edge: Deploy to CDN/Edge
+  Edge->>Browser: Cached assets + pages
 ```
+
+---
 
 ## 🧩 Component Architecture
 
-### Platform UI Components (New Pattern)
-```typescript
+### Platform UI Components (example, TS)
+
+```ts
 // src/platform/ui/components/accordion.ts
-export class Accordion implements UIComponent {
-    private container: HTMLElement;
-    
-    constructor(container: HTMLElement) {
-        this.container = container;
-    }
-    
-    init(): void {
-        this.bindEvents();
-    }
-    
-    private bindEvents(): void {
-        // Type-safe event delegation
-    }
-}
-```
-
-### Co-located Sections (Modern Pattern)
-```typescript
-// src/_includes/sections/hero/index.ts
-export const HeroSection: Component = {
-    init(): void {
-        this.bindEvents();
-        // Make methods globally available for onclick handlers
-        const global = window as typeof window & {
-            scrollToOffer: () => void;
-        };
-        global.scrollToOffer = this.scrollToOffer.bind(this);
-    },
-    
-    bindEvents(): void {
-        // Component-specific event handling
-    },
-    
-    scrollToOffer(): void {
-        // Type-safe DOM manipulation with Tailwind classes
-    }
-};
-```
-
-### Legacy Components (Transitional Pattern)
-```typescript
-// src/platform/ui/components/faq.ts
-import type { Component } from '../types/component.js';
-
-export const FAQ: Component = {
-    init(): void {
-        this.bindEvents();
-        (window as any).toggleFAQ = this.toggle.bind(this);
-    },
-    
-    toggle(questionId: string): void {
-        // Pure Tailwind class manipulation
-        const answer = document.getElementById(questionId);
-        if (!answer) return;
-        
-        answer.classList.toggle('hidden');
-        answer.classList.toggle('max-h-0');
-        answer.classList.toggle('max-h-96');
-    }
-};
-```
-
-## 🎨 Styling Architecture
-
-### Design Token System
-```json
-// design/tokens.json
-{
-  "colors": {
-    "navy": {
-      "50": "#f0f2f5",
-      "600": "#1a365d",
-      "900": "#0a1628"
-    },
-    "burgundy": {
-      "50": "#fdf2f8",
-      "500": "#be185d",
-      "900": "#581c34"
-    }
+export class Accordion {
+  constructor(private container: HTMLElement) {}
+  init(): void {
+    this.container.addEventListener('click', (e: Event) => {
+      const t = e.target as HTMLElement;
+      if (t?.matches('[data-accordion-trigger]')) this.toggle(t);
+    });
+  }
+  private toggle(trigger: HTMLElement): void {
+    const content = trigger.nextElementSibling as HTMLElement | null;
+    content?.classList.toggle('hidden'); // Tailwind‑only state change
   }
 }
 ```
 
-### CSS Generation Process
-```css
-/* Generated: src/assets/css/_tokens.generated.css */
-:root {
-  --color-navy-50: #f0f2f5;
-  --color-navy-600: #1a365d;
-  --color-burgundy-500: #be185d;
-}
+### Co‑located Sections (modern pattern)
 
-/* Usage in Tailwind v4 */
-@theme {
-  --color-navy-50: var(--color-navy-50);
-  --color-navy-600: var(--color-navy-600);
-  --color-burgundy-500: var(--color-burgundy-500);
-}
-```
-
-### Tailwind Utility Generation
-```html
-<!-- Available utility classes -->
-<div class="bg-navy-600 text-burgundy-500 hover:bg-navy-700">
-  <!-- Pure utility-based styling -->
-</div>
-```
-
-## 💳 Payment Processing Architecture
-
-### Stripe Integration Flow
-```mermaid
-sequenceDiagram
-    participant User as User Browser
-    participant Client as Client JS
-    participant Function as Netlify Function
-    participant Stripe as Stripe API
-    participant Webhook as Webhook Handler
-
-    User->>Client: Initiate payment
-    Client->>Function: create-payment-intent.ts
-    Function->>Stripe: Create PaymentIntent
-    Stripe-->>Function: Return client_secret
-    Function-->>Client: Return payment details
-    Client->>Stripe: Confirm payment (client-side)
-    Stripe->>Webhook: stripe-webhook.ts
-    Webhook->>Webhook: Verify & process
-```
-
-### Security Architecture
-- **Client-side**: Only public keys and payment confirmation
-- **Server-side**: All sensitive operations in Netlify functions
-- **Webhook Validation**: Stripe signature verification
-- **Environment Variables**: Secure secret management
-
-## 📊 Analytics Architecture
-
-### Tracking System
-```typescript
-// src/core/analytics.ts
-interface AnalyticsEvent {
-    readonly event_name: string;
-    readonly section: string;
-    readonly element_type: string;
-    readonly element_text?: string;
-}
-
-class Analytics {
-    track(event: AnalyticsEvent): void {
-        // GTM/GA4 event tracking with type safety
-    }
-}
-```
-
-### Data Layer Structure
-```javascript
-// Generated GTM data layer
-window.dataLayer = window.dataLayer || [];
-window.dataLayer.push({
-    event: 'section_view',
-    section: 'hero',
-    element_type: 'section_entry',
-    page_language: 'pt-PT'
-});
-```
-
-## 🚀 Build & Deployment Architecture
-
-### Development Workflow
-```bash
-# 1. Token Generation
-npm run tokens:build  # JSON → CSS custom properties
-
-# 2. CSS Build
-npm run build:css     # Tailwind processing with PostCSS
-
-# 3. TypeScript Build
-npm run build:js      # Vite bundling with type checking
-
-# 4. Static Site Generation
-npm run build         # Eleventy processes templates with data
-```
-
-### Production Pipeline
-```mermaid
-graph TB
-    Code[Source Code] --> TypeCheck[TypeScript Validation]
-    TypeCheck --> Build[Production Build]
-    Build --> Test[Quality Gates]
-    Test --> Deploy[Netlify Deployment]
-    Deploy --> CDN[Global CDN Distribution]
-    
-    subgraph "Quality Gates"
-        Lint[ESLint Checks]
-        Performance[Lighthouse Audit]
-        Accessibility[WCAG Compliance]
-    end
-```
-
-### Performance Optimizations
-- **Tree Shaking**: Dead code elimination via Vite
-- **CSS Purging**: Unused Tailwind utilities removed
-- **Image Optimization**: WebP format with lazy loading
-- **Font Loading**: Local fonts with font-display: swap
-- **Bundle Splitting**: Optimal chunk sizes for caching
-
-## 🔐 Security Architecture
-
-### Content Security Policy
-```typescript
-// netlify/edge-functions/csp.ts
-const csp = [
-    "default-src 'self'",
-    "script-src 'self' https://js.stripe.com https://www.googletagmanager.com",
-    "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: https:",
-    "connect-src 'self' https://api.stripe.com"
-].join('; ');
-```
-
-### Security Measures
-- **HTTPS Enforcement**: Netlify automatic SSL
-- **Environment Variables**: Never exposed client-side
-- **Payment Security**: PCI DSS compliance via Stripe
-- **Input Validation**: Type-safe data processing
-- **XSS Prevention**: CSP headers and template escaping
-
-## 🧪 Testing Architecture
-
-### Type Safety Validation
-```typescript
-// scripts/verify-apis.ts
-import type { ComponentConfig } from '../src/assets/js/types/config.js';
-
-// Compile-time API validation
-const testConfig: ComponentConfig = {
-    containerId: 'test',
-    autoInit: false
+```ts
+// src/_includes/sections/hero/index.ts
+export const HeroSection = {
+  init(): void {
+    (window as typeof window & { scrollToOffer: () => void }).scrollToOffer =
+      this.scrollToOffer.bind(this);
+  },
+  scrollToOffer(): void {
+    // Type‑safe DOM ops, Tailwind classes only
+    document.getElementById('offer')?.scrollIntoView({ behavior: 'smooth' });
+  }
 };
 ```
 
-### Quality Gates
-- **TypeScript Compilation**: Working towards zero errors (45 remaining)
-- **ESLint**: Code quality and consistency
-- **Lighthouse**: Performance and accessibility metrics
-- **Build Validation**: Successful production build
-- **Type Coverage**: 100% file coverage, resolving edge cases
+---
 
-## 📱 Responsive Architecture
+## 🎨 Styling
 
-### Breakpoint Strategy
-```css
-/* Tailwind responsive utilities */
-.hero-title {
-  @apply text-2xl md:text-4xl lg:text-6xl;
-  @apply leading-tight md:leading-relaxed;
-}
-```
-
-### Mobile-First Design
-- **Progressive Enhancement**: Base styles for mobile
-- **Touch Interactions**: Optimized button sizes (44px minimum)
-- **Performance**: Prioritized mobile performance metrics
-- **Accessibility**: Touch and keyboard navigation support
-
-## 🔧 Development Tools Integration
-
-### IDE Configuration
-- **TypeScript Language Server**: Full IntelliSense support
-- **ESLint Integration**: Real-time code quality feedback
-- **Prettier**: Consistent code formatting
-- **Tailwind IntelliSense**: CSS class auto-completion
-
-### Development Server
-```bash
-npm run dev  # Concurrent development processes:
-# - Token building (watch mode)
-# - CSS compilation (watch mode)  
-# - TypeScript compilation (watch mode)
-# - Eleventy server (watch mode)
-```
-
-## 📈 Monitoring & Analytics
-
-### Performance Monitoring
-- **Core Web Vitals**: LCP, FID, CLS tracking
-- **Lighthouse CI**: Automated performance audits
-- **Bundle Analysis**: Size tracking and optimization
-- **Error Tracking**: Runtime error monitoring
-
-### Business Analytics
-- **Conversion Tracking**: Purchase funnel analysis
-- **User Behavior**: Scroll depth, section engagement
-- **A/B Testing**: Copy and design variation testing
-- **Attribution**: Traffic source and campaign tracking
-
-## 🔄 Maintenance & Updates
-
-### Dependency Management
-```bash
-npm run versions     # Check current versions
-npm run outdated     # Check for updates
-/version-check       # Claude command for version validation
-/update-libs         # Claude command for safe updates
-```
-
-### Documentation Maintenance
-- **Automated Updates**: Version-aware documentation
-- **Architecture Decisions**: Recorded in docs/
-- **API Changes**: Breaking change documentation
-- **Migration Guides**: Version upgrade instructions
-
-## 🆕 Recent Architecture Changes
-
-### December 2024 Updates
-- **Platform UI Library**: Added `src/platform/ui/components/` for reusable UI patterns
-- **TypeScript Migration**: Achieved 100% file coverage, resolving remaining type errors
-- **Data Consolidation**: Unified data loaders into cohesive page system
-- **Component Architecture**: Enhanced separation between platform and application components
-- **Type Safety**: Improved error handling with `unknown` types and proper null checks
+* **Tailwind v4** (CSS‑first): tokens → generated CSS → utilities
+* **No inline styles**; mutate state via classList only
+* **Fonts**: self‑hosted; `font-display: swap`
+* **Critical CSS**: above‑the‑fold inlined by build where applicable
 
 ---
 
-**Last Updated**: December 2024  
-**Architecture Version**: 2.1 (TypeScript-First with Platform UI)  
-**Maintainer**: Development Team  
-**Next Review**: January 2025
+## 📈 Analytics & Events
+
+* **GTM/GA4** with normalized dataLayer
+* Canonical event naming: **`payment_completed`** in dataLayer, mapped to GA4 **`purchase`**
+* See: `docs/GTM_CONFIGURATION_REFERENCE.md` and `docs/GTM_SETUP_GUIDE.md`
+
+---
+
+## 🔒 Security & Privacy
+
+* Strict **CSP**; no inline scripts/handlers
+* Avoid direct DOM injection; sanitize external inputs
+* Stripe loaded **on demand** (purchase intent only)
+
+---
+
+## ✅ Quality Gates (must pass before merge)
+
+* `npm run type-check` → **0 errors**
+* `npm run lint` → **0 errors**
+* Tests (unit/e2e/visual) green when applicable
+* Lighthouse: Perf ≥ 90, A11y ≥ 95, Best‑Practices 100 on key pages
+
+---
+
+## 📚 Linked References (single sources of truth)
+
+* **README.md** — canonical versions, quick start, full file map
+* **docs/coding-standards.md** — TS‑only, Tailwind‑only rules
+* **docs/ACCESSIBILITY\_GUIDELINES.md** — a11y rules & checklists
+* **docs/GTM\_CONFIGURATION\_REFERENCE.md** — events & payloads
+* **docs/GTM\_SETUP\_GUIDE.md** — container setup & GA4 mapping
+* **docs/CLOUDINARY\_SETUP.md** — responsive images pipeline
+
+---
+
+*Last updated: 2025‑08‑22*

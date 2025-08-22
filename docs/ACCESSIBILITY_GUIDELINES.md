@@ -1,207 +1,179 @@
-# Accessibility Guidelines - Café com Vendas
+# Accessibility Guidelines — Café com Vendas
 
-## Overview
-This document outlines accessibility best practices and requirements for the Café com Vendas landing page, ensuring WCAG AA compliance and optimal user experience for all visitors.
-
-## 🎯 Accessibility Standards
-
-### WCAG AA Compliance Requirements
-- **Color Contrast**: Minimum 4.5:1 for normal text, 3:1 for large text (18pt+)
-- **Keyboard Navigation**: All interactive elements must be keyboard accessible
-- **Screen Reader**: Proper semantic markup and ARIA attributes
-- **Focus Management**: Visible focus indicators and logical tab order
-
-### Target Lighthouse Scores
-- **Accessibility**: 95+ (Current: 95/100)
-- **Performance**: 90+ (Current: 84/100)
-- **Best Practices**: 100 (Current: 100/100)
-
-## 🚨 Critical Rules - ZERO TOLERANCE
-
-### ARIA Attributes
-- ❌ **NEVER** use invalid ARIA roles (`role="tab"` without proper tabpanel)
-- ❌ **NEVER** use `aria-controls` pointing to non-existent elements
-- ❌ **NEVER** use `aria-selected` on non-tab elements
-- ✅ **ALWAYS** use `aria-current` for pagination/carousel indicators
-- ✅ **ALWAYS** use proper semantic HTML before adding ARIA
-- ✅ **ALWAYS** validate ARIA usage with accessibility testing tools
-
-**Example - Carousel Pagination (CORRECT):**
-```javascript
-// ✅ CORRECT: Simple pagination buttons
-const dot = document.createElement('button');
-dot.setAttribute('type', 'button');
-dot.setAttribute('aria-label', `Ir para página ${i + 1} dos testemunhos`);
-dot.setAttribute('aria-current', 'false'); // 'true' for active page
-
-// ❌ WRONG: Invalid tab semantics
-// dot.setAttribute('role', 'tab'); // Don't use unless proper tablist/tabpanel structure
-// dot.setAttribute('aria-controls', 'non-existent-id'); // Don't reference missing elements
-```
-
-### Color Contrast Requirements
-
-#### Navy Blue Text (Primary Brand Color)
-```css
-/* ✅ CORRECT: WCAG AA Compliant */
-.text-navy-800/80  /* Contrast ratio: 5.2:1 - AA compliant */
-.text-navy-800/70  /* Contrast ratio: 4.7:1 - AA compliant */
-
-/* ❌ WRONG: Insufficient contrast */
-.text-navy-800/60  /* Contrast ratio: 3.1:1 - Fails AA */
-.text-navy-800/50  /* Contrast ratio: 2.4:1 - Fails AA */
-```
-
-#### Gold Accent Text (On Dark Backgrounds)
-```css
-/* ✅ CORRECT: Better contrast on dark backgrounds */
-.text-gold-200     /* Use on burgundy/navy gradients */
-.text-gold-100     /* Use on very dark backgrounds */
-
-/* ❌ WRONG: Poor contrast */
-.text-gold-300     /* Can fail on burgundy backgrounds */
-.text-gold-400     /* Often fails on dark gradients */
-```
-
-#### Footer & Low-Contrast Areas
-```css
-/* ✅ CORRECT: Sufficient contrast on dark backgrounds */
-.text-neutral-300  /* Contrast ratio: 5.5:1 on navy-900 */
-.text-neutral-200  /* Contrast ratio: 7.2:1 on navy-900 */
-
-/* ❌ WRONG: Insufficient contrast */
-.text-neutral-400  /* Contrast ratio: 3.5:1 - Fails AA */
-.text-neutral-500  /* Contrast ratio: 2.8:1 - Fails AA */
-```
-
-## 🛠️ Implementation Checklist
-
-### Before Adding New Components
-- [ ] Use semantic HTML (`<nav>`, `<main>`, `<section>`, `<article>`)
-- [ ] Add proper heading hierarchy (`h1` → `h2` → `h3`)
-- [ ] Include `aria-label` for sections without visible headings
-- [ ] Ensure keyboard navigation works without mouse
-- [ ] Test with screen reader (VoiceOver on macOS, NVDA on Windows)
-
-### Interactive Elements Checklist
-- [ ] All buttons have `type="button"` (or `type="submit"` for forms)
-- [ ] Focus states are visible (`focus:outline-none focus:ring-4`)
-- [ ] Click targets are minimum 44x44px
-- [ ] Touch targets have adequate spacing (8px minimum)
-- [ ] Hover states don't rely solely on color change
-
-### ARIA Implementation Checklist
-- [ ] Use native HTML elements when possible
-- [ ] Add ARIA only when semantic HTML isn't sufficient
-- [ ] Validate all `aria-*` attributes point to existing elements
-- [ ] Test with accessibility tree in browser dev tools
-- [ ] Ensure `aria-hidden="true"` on decorative elements
-
-## 🔧 Testing & Validation
-
-### Automated Testing
-```bash
-# Run Lighthouse accessibility audit
-npm run lighthouse
-
-# Quick accessibility-only check
-npm run lighthouse:quick
-```
-
-### Manual Testing Checklist
-- [ ] **Keyboard Navigation**: Tab through all interactive elements
-- [ ] **Screen Reader**: Test with VoiceOver (Cmd+F5 on macOS)
-- [ ] **Color Blindness**: Test with browser's vision simulation
-- [ ] **Zoom Test**: Ensure usability at 200% zoom level
-- [ ] **Focus Management**: Visible focus indicators on all controls
-
-### Browser Dev Tools Validation
-1. **Chrome DevTools** → Lighthouse → Accessibility
-2. **Firefox** → Inspector → Accessibility tab
-3. **Safari** → Develop → Show Web Inspector → Audit tab
-
-## 📋 Common Issues & Solutions
-
-### Issue: Invalid ARIA Attributes
-**Problem**: Using `role="tab"` without proper tablist structure
-**Solution**: Use semantic pagination buttons with `aria-current`
-
-### Issue: Poor Color Contrast
-**Problem**: Text failing WCAG AA 4.5:1 ratio
-**Solution**: Use tested color combinations from design tokens
-
-### Issue: Missing Focus States
-**Problem**: Interactive elements not keyboard accessible
-**Solution**: Add Tailwind focus utilities (`focus:ring-4 focus:ring-gold-400/30`)
-
-### Issue: Decorative Elements Confusing Screen Readers
-**Problem**: Background graphics being announced
-**Solution**: Add `aria-hidden="true"` to decorative elements
-
-## 🎨 Design Token Accessibility
-
-### Approved Color Combinations
-All combinations below meet WCAG AA standards:
-
-```css
-/* Light backgrounds */
-.bg-peach-50 .text-navy-800     /* 12.5:1 - AAA */
-.bg-neutral-100 .text-navy-800  /* 11.8:1 - AAA */
-
-/* Dark backgrounds */
-.bg-navy-900 .text-neutral-300  /* 5.5:1 - AA */
-.bg-navy-900 .text-gold-200     /* 6.2:1 - AA */
-.bg-burgundy-800 .text-gold-200 /* 4.8:1 - AA */
-
-/* Medium backgrounds */
-.bg-white .text-navy-800/80     /* 5.2:1 - AA */
-.bg-neutral-50 .text-navy-800/70 /* 4.7:1 - AA */
-```
-
-## 🚀 Performance Impact
-
-### Accessibility Optimizations That Improve Performance
-- **Semantic HTML**: Reduces need for ARIA attributes
-- **Proper Focus Management**: Eliminates unnecessary DOM queries
-- **Efficient Color Usage**: Leverages design token CSS variables
-- **Screen Reader Optimization**: Uses `aria-hidden` to reduce noise
-
-### Accessibility Features Cost
-- **Impact**: <1KB additional JavaScript for ARIA management
-- **Benefit**: 95/100 Lighthouse accessibility score
-- **ROI**: Increased user base, legal compliance, better SEO
-
-## 📚 Resources & References
-
-### WCAG Guidelines
-- [WCAG 2.1 AA Guidelines](https://www.w3.org/WAI/WCAG21/quickref/?levels=aaa)
-- [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/)
-- [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/)
-
-### Testing Tools
-- [axe DevTools](https://www.deque.com/axe/devtools/) - Browser extension
-- [WAVE Web Accessibility Evaluator](https://wave.webaim.org/)
-- [VoiceOver User Guide](https://support.apple.com/guide/voiceover/welcome/mac)
-
-### Design System References
-- [Design Tokens](../info/DATA_design_tokens.json) - WCAG AA compliant colors
-- [Brand Guidelines](../info/GUIDE_brand_visual.md) - Accessibility considerations
-- [Component Examples](../src/_includes/components/) - Accessible implementation patterns
+> Canonical rules to reach and keep **WCAG 2.1 AA** while staying fast and simple. This file supersedes older accessibility notes and consolidates duplicated guidance into a single source. (Tailwind‑only + TypeScript‑first rules stay in effect.)
 
 ---
 
-## 🔄 Maintenance
+## TL;DR (what actually matters)
 
-### Regular Audits
-- **Weekly**: Run `npm run lighthouse` during development
-- **Pre-deployment**: Full accessibility test with real screen readers
-- **Post-deployment**: Monitor Core Web Vitals and accessibility metrics
+* **Use semantic HTML first** (landmarks, headings, lists). Add ARIA only when native elements can’t express the intent.
+* **Keyboard must work everywhere** (Tab/Shift+Tab order, visible focus ring, Escape to close modals, Space/Enter to activate controls).
+* **Color contrast AA**: text ≥ 4.5:1 (≥ 3:1 for large text). Don’t ship low‑contrast UI.
+* **No inline styles; Tailwind only** for state and motion (honor `prefers-reduced-motion`).
+* **Forms**: label every field, announce errors politely, never rely on color alone.
+* **Test before merge**: keyboard walkthrough, VoiceOver quick pass, Lighthouse A11y ≥ 95 (desktop & mobile).
 
-### Update Process
-1. Test new components with accessibility checklist
-2. Validate ARIA attributes with browser dev tools
-3. Check color contrast ratios with design tokens
-4. Update this documentation with new patterns/solutions
+---
 
-**Last Updated**: August 15, 2025
-**Next Review**: September 15, 2025
+## Targets & Definitions
+
+* **Standard**: WCAG **2.1 AA** (site‑wide).
+* **Lighthouse Accessibility**: **≥ 95** (local dev & preview).
+* **Focus outline**: always visible on interactive elements (buttons/links/inputs).
+* **Touch targets**: minimum **44×44px** and at least **8px** spacing.
+
+---
+
+## Landmarks, Language & Headings
+
+* Use landmarks: `<header>`, `<nav>`, `<main id="main">`, `<footer>`.
+* Add a **skip link** as the first focusable element:
+
+  ```html
+  <a href="#main" class="sr-only focus:not-sr-only focus:outline-none focus:ring-4">Saltar para o conteúdo</a>
+  ```
+* Set page language on `<html lang="pt-PT">`.
+* Keep heading hierarchy logical (`h1` → `h2` → `h3`…), one **visible** `h1` per page/route.
+
+---
+
+## Keyboard & Focus Management
+
+* All controls must be reachable with **Tab**, in a sensible order.
+* **Focus states**: never rely on color alone—use Tailwind rings (e.g., `focus:ring-4`).
+* **Escape** closes modals, menus, and dialogs; restore focus to the opener.
+* Don’t trap focus unless inside a modal/dialog; when you do, create a focus trap and loop.
+* Avoid global `outline: none;`. Tailwind focus utilities only.
+
+---
+
+## Color & Contrast
+
+* **Text**: ≥ **4.5:1** (normal), ≥ **3:1** (≥ 18pt or 14pt bold).
+* Don’t use brand colors below AA thresholds on backgrounds.
+* Prefer tokenized colors (design tokens) rather than hardcoded hex values.
+
+**Practical checks**
+
+* Test dark overlays and gradient backgrounds with real copy.
+* Footer and low‑contrast regions: pick token values already verified for AA.
+
+---
+
+## Motion, Media & Images
+
+* Respect **reduced motion**:
+
+  ```html
+  <div class="transition-all duration-300 motion-reduce:transition-none motion-reduce:transform-none">
+    <!-- animated content -->
+  </div>
+  ```
+* Provide captions or transcripts for essential video content.
+* For decorative images, set `alt=""` and `aria-hidden="true"`; informative images need meaningful `alt`.
+* Use responsive images (`<picture>`/`srcset`); prefer the Cloudinary pipeline already configured.
+
+---
+
+## Forms & Errors
+
+* Every input has a `<label for>`, or an explicit `aria-label`.
+* Mark required fields and explain the rule near the control.
+* Show errors **inline**, near the field, and announce them:
+
+  ```html
+  <div id="email-error" role="alert" aria-live="polite" class="mt-2 text-red-600">
+    Introduza um e-mail válido.
+  </div>
+  ```
+* Use clear input types (`type="email"`, `type="tel"`) and attributes (`autocomplete`, `aria-invalid`).
+* Never rely on color alone for error states; combine color + text/icon.
+
+---
+
+## Components: Accessible Patterns
+
+### Buttons vs Links
+
+* **Links** navigate; **buttons** act.
+* Don’t use `<div role="button">`. Use `<button type="button">` (or `type="submit"`).
+
+### Modals
+
+* Wrap in a dialog container; add `aria-modal="true"` and a focus trap.
+* On open: move focus to the dialog; on close: return focus to the trigger.
+
+### Accordion / FAQ
+
+* Use buttons with `aria-expanded` and `aria-controls` pointing at the content region ID.
+* Content region: `role="region"` + `aria-labelledby="trigger-id"`.
+
+### Carousels & Pagination Dots
+
+* **Simple pagination dots** (preferred): plain buttons with `aria-label="Ir para slide X"` and `aria-current="true"` on the active item. This avoids tab semantics when there is no real “tabpanel”.
+* **True tabs** (only if you expose panels): then and only then use `role="tablist"`, `role="tab"`, and matching `role="tabpanel"` with `aria-controls`. Document the keyboard model (Left/Right to switch, Tab to move into panel).
+
+**Dot example (correct, simple)**
+
+```ts
+// TypeScript (Tailwind-only) — simple dots, no tab roles
+const btn = document.createElement('button');
+btn.type = 'button';
+btn.className = 'h-2.5 w-2.5 rounded-full bg-neutral-400 aria-[current=true]:bg-neutral-900';
+btn.setAttribute('aria-label', `Ir para slide ${i + 1}`);
+btn.setAttribute('aria-current', active ? 'true' : 'false');
+```
+
+---
+
+## Touch Targets & Spacing
+
+* Minimum **44×44px** interactive area; keep **8px** spacing between adjacent targets to prevent accidental taps.
+* Don’t attach click events to tiny icons without padding.
+
+---
+
+## “Zero‑Inline‑CSS” & Tailwind‑Only
+
+* Change visual state via **classList** (Tailwind utilities), never via `element.style`.
+* No inline `style=""` attributes; animation/state done with utility classes.
+* Follow the **TypeScript‑first + Tailwind‑only** repo standard at all times.
+
+---
+
+## Testing & Validation
+
+### Manual (quick, every PR)
+
+1. **Keyboard tour**: Tab through header → hero → CTAs → footer; check visible focus and order.
+2. **Screen reader spot‑check**: macOS **VoiceOver** (⌘+F5) or NVDA; verify landmark navigation and control names.
+3. **Zoom**: 200%—layout must remain usable; content must not be cut off.
+4. **Color‑only states**: ensure an additional cue exists (icon/text/shape).
+
+### Automated (lightweight)
+
+* **Lighthouse** in Chrome DevTools → **Accessibility ≥ 95** on mobile and desktop.
+* Optional: integrate into CI alongside existing perf checks.
+
+---
+
+## “Before Merge” Checklist
+
+* [ ] Landmarks and headings are present and logical.
+* [ ] All interactive elements reachable by keyboard; focus is **visible**.
+* [ ] No invalid ARIA; every `aria-*` points to an existing element.
+* [ ] Contrast passes AA in all states (including hover/focus/disabled).
+* [ ] Forms are labeled, errors announced, and don’t rely on color alone.
+* [ ] Motion respects `prefers-reduced-motion`.
+* [ ] Lighthouse Accessibility ≥ 95 on the modified pages.
+
+---
+
+## Notes on Source of Truth
+
+* This file is the **canonical accessibility reference**. Other docs should link here rather than restate A11y rules to avoid drift.
+* Styling and implementation constraints (TypeScript‑only, Tailwind‑only) live in **`coding-standards.md`** and remain enforceable by humans and agents.
+
+---
+
+*Last updated: 2025‑08‑22*

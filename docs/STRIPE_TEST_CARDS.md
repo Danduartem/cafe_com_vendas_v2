@@ -1,153 +1,80 @@
-# 💳 Stripe Test Cards - Café com Vendas
+# 💳 Stripe Test Cards — Café com Vendas (Test Mode)
 
-Guia completo de cartões de teste para testar o fluxo de pagamento do evento Café com Vendas, focado nos mercados de Portugal (90%) e Brasil (10%).
-
-## 🎯 Cartões Principais para Nossos Mercados
-
-### 🇵🇹 Portugal (Principal)
-```
-Número: 4000 0062 0000 0007
-Marca: Visa
-Mercado: Portugal
-CVC: Qualquer código de 3 dígitos
-Validade: Qualquer data futura
-```
-
-### 🇧🇷 Brasil (Secundário)
-```
-Número: 4000 0007 6000 0002
-Marca: Visa
-Mercado: Brasil
-CVC: Qualquer código de 3 dígitos
-Validade: Qualquer data futura
-```
-
-### 🌍 Internacional (Backup)
-```
-Número: 4242 4242 4242 4242
-Marca: Visa
-Mercado: Global
-CVC: Qualquer código de 3 dígitos
-Validade: Qualquer data futura
-```
-
-## 🔐 Cartões 3D Secure (Obrigatório para Europa)
-
-Na Europa (incluindo Portugal), a regulamentação Strong Customer Authentication (SCA) exige autenticação 3D Secure para pagamentos online.
-
-### ✅ Autenticação Bem-sucedida
-```
-Número: 4000 0027 6000 3184
-Status: Requer autenticação → Aprovado
-Uso: Testar fluxo completo de 3DS
-```
-
-### ❌ Autenticação Falhada
-```
-Número: 4000 0025 0000 3155
-Status: Requer autenticação → Recusado
-Uso: Testar falha de autenticação
-```
-
-### 🔄 3D Secure 2.0
-```
-Número: 4000 0000 0000 3220
-Status: Autenticação 3DS2
-Uso: Testar protocolo mais recente
-```
-
-## 🧪 Cenários de Teste Comuns
-
-### ✅ Pagamento Aprovado
-| Cartão | Resultado | Uso |
-|--------|-----------|-----|
-| `4242 4242 4242 4242` | Aprovado | Fluxo padrão bem-sucedido |
-| `4000 0062 0000 0007` | Aprovado | Cliente português |
-| `4000 0007 6000 0002` | Aprovado | Cliente brasileiro |
-
-### ❌ Pagamento Recusado
-| Cartão | Erro | Uso |
-|--------|------|-----|
-| `4000 0000 0000 0002` | Cartão recusado | Teste de falha genérica |
-| `4000 0000 0000 9995` | Fundos insuficientes | Saldo baixo |
-| `4000 0000 0000 0069` | Cartão expirado | Validade incorreta |
-| `4000 0000 0000 0127` | CVC incorreto | Código de segurança inválido |
-
-### 🚨 Prevenção de Fraude
-| Cartão | Resultado | Uso |
-|--------|-----------|-----|
-| `4100 0000 0000 0019` | Bloqueado por fraude | Sistema de prevenção |
-| `4000 0000 0000 9987` | Perdido/roubado | Cartão reportado |
-
-## 📋 Fluxo de Teste Recomendado
-
-### 1. Teste Básico (Cliente Português)
-1. Abrir checkout no site
-2. Usar `4000 0062 0000 0007`
-3. Inserir: CVC `123`, Validade `12/25`
-4. Completar processo de 3D Secure
-5. ✅ Confirmar pagamento aprovado
-
-### 2. Teste com Autenticação
-1. Usar `4000 0027 6000 3184`
-2. Seguir popup de autenticação 3DS
-3. ✅ Aprovar autenticação
-4. ✅ Confirmar pagamento
-
-### 3. Teste de Falha
-1. Usar `4000 0000 0000 0002`
-2. ❌ Verificar mensagem de erro adequada
-3. ✅ Permitir nova tentativa
-
-### 4. Teste Brasileiro
-1. Usar `4000 0007 6000 0002`
-2. ✅ Confirmar processamento para BR
-
-## 🔧 Configuração de Desenvolvimento
-
-### Variáveis de Ambiente Necessárias
-```bash
-# Desenvolvimento
-STRIPE_PUBLIC_KEY=pk_test_...
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-NODE_ENV=development
-```
-
-### ⚠️ Avisos Importantes
-- ❌ **NUNCA** usar cartões reais em teste
-- ✅ **SEMPRE** usar chaves de teste (pk_test_, sk_test_)
-- 🔒 **3D Secure obrigatório** para clientes europeus
-- 📱 Testar tanto desktop quanto mobile
-
-## 🛠 Debugging
-
-### Console do Navegador
-```javascript
-// Verificar se Stripe está carregado
-console.log(window.Stripe);
-
-// Status do Payment Element
-console.log('Stripe Elements initialized');
-```
-
-### Logs do Servidor
-- Verificar webhooks em `/netlify/functions/stripe-webhook`
-- Monitorar criação de Payment Intents
-- Validar assinaturas de webhook
-
-## 📞 Contatos para Problemas
-
-### Stripe Dashboard
-- **Teste**: https://dashboard.stripe.com/test/
-- **Logs**: Payments → Logs
-- **Webhooks**: Developers → Webhooks
-
-### Documentação
-- [Testing Stripe](https://docs.stripe.com/testing)
-- [3D Secure](https://docs.stripe.com/payments/3d-secure)
-- [Strong Customer Authentication](https://docs.stripe.com/strong-customer-authentication)
+> **Minimal, copy‑paste friendly.** Use these in **test mode** only. Pair with `PAYMENT_TESTING_SUMMARY.md` for the checklist and success criteria.
 
 ---
 
-💡 **Dica**: Mantenha esta página aberta durante testes para referência rápida dos cartões.
+## TL;DR (most used)
+
+* **Global success (Visa)**: `4242 4242 4242 4242`
+  Use any future expiry (e.g., `12/34`), any CVC (e.g., `123`).
+* **Portugal / EU — requires 3DS**: `4000 0062 0000 0007`
+  Triggers authentication challenge (3D Secure). Approve to simulate a real EU flow.
+* **Brazil success (Visa BR)**: `4000 0007 6000 0002`
+* **Decline (generic)**: `4000 0000 0000 0002`
+* **Decline (insufficient funds)**: `4000 0000 0000 9995`
+
+> These cover 95% of our tests: success + EU 3DS + BR + two failure paths.
+
+---
+
+## How to use (Payment Element)
+
+1. Open the checkout in **test mode**.
+2. Paste a number above, set a **future expiry** (`MM/YY`) and any **CVC** (`3 digits`).
+3. Complete the flow:
+
+   * For **3DS** cards, approve or cancel the challenge to test both outcomes.
+   * On success, ensure we push `payment_completed` to `dataLayer` (GTM maps to GA4 `purchase`).
+
+> Need the exact run‑sheet? See `docs/PAYMENT_TESTING_SUMMARY.md`.
+
+---
+
+## EU 3D Secure (Portugal)
+
+**Card**: `4000 0062 0000 0007`
+**Behavior**: Always requires a 3DS challenge.
+**What to verify**:
+
+* Challenge appears and completes; user returns to our page in a success state.
+* Cancel path shows a friendly, recoverable UI and allows retry.
+* On success only, `payment_completed` is pushed once.
+
+---
+
+## Brazil Flow (success)
+
+**Card**: `4000 0007 6000 0002`
+**Behavior**: Authorizes and captures without 3DS.
+**Verify**: Success UI, webhook `payment_intent.succeeded`, GA4 `purchase`.
+
+---
+
+## Global Success (no 3DS)
+
+**Card**: `4242 4242 4242 4242`
+**Behavior**: Straight success; useful for happy‑path regression.
+
+---
+
+## Common Fails (simulate error UI)
+
+* **Generic decline** → `4000 0000 0000 0002`
+  Expect a clear error message and a visible retry CTA.
+* **Insufficient funds** → `4000 0000 0000 9995`
+  Same handling as above; ensure analytics **does not** fire on failure.
+
+> Keep failure handling **polite** and **actionable**. Do not surface raw Stripe error codes to users.
+
+---
+
+## Notes
+
+* Use **future** expiry dates (e.g., `12/34`) and any 3‑digit CVC unless a scenario needs otherwise.
+* These numbers are **test only**; never use real card data during development.
+* For additional edge cases (incorrect CVC, processing error, etc.), extend locally as needed—avoid bloating this doc.
+
+---
+
+*Last updated: 2025‑08‑22*
