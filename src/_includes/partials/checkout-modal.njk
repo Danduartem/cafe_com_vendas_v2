@@ -1,0 +1,235 @@
+<!-- Checkout Modal Component -->
+<!-- Two-step modal checkout: Lead capture + Stripe payment -->
+
+<!-- CTA Button Example (can be used anywhere in templates) -->
+<!-- 
+<button data-checkout-trigger data-source="example" class="inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-white shadow-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl bg-burgundy-700"
+        data-analytics-event="checkout_opened">
+  {{ event.ctas.primary }}
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"/>
+  </svg>
+</button>
+-->
+
+<!-- Modal Root - Hidden by default -->
+<div id="checkoutModal" class="fixed inset-0 z-[1000] hidden">
+  <!-- Backdrop with blur effect -->
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300" aria-hidden="true"></div>
+
+  <!-- Modal Container - Responsive scrollable layout -->
+  <div class="flex min-h-screen py-4 px-4 sm:py-6 sm:px-6 lg:py-8 lg:px-8">
+    <!-- Modal Dialog -->
+    <div class="relative w-full max-w-lg max-h-[90vh] rounded-3xl bg-white shadow-2xl transform transition-all duration-300 scale-95 opacity-0 flex flex-col mx-auto my-auto" 
+         id="modalContent"
+         data-modal-content 
+         role="dialog" 
+         aria-modal="true" 
+         aria-labelledby="modalTitle">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-6 py-5 border-b border-neutral-300">
+        <div>
+          <p class="text-xs tracking-widest uppercase font-medium text-neutral-600">
+            Inscrição
+          </p>
+          <h3 id="modalTitle" 
+              class="font-lora text-xl lg:text-2xl leading-tight font-medium text-navy-800">
+            {{ event.name }}
+          </h3>
+        </div>
+        <button id="closeCheckout" 
+                type="button"
+                data-modal-close
+                aria-label="Fechar modal"
+                class="flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-200 hover:bg-gray-100">
+          <svg class="h-5 w-5 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="h-2 w-full bg-neutral-200">
+        <div id="progressBar" 
+             class="h-full w-1/2 rounded-r-full transition-all duration-500 ease-out bg-gradient-to-r from-burgundy-700 to-burgundy-600">
+        </div>
+      </div>
+
+      <!-- Modal Body - Scrollable container for payment forms -->
+      <div class="flex-1 overflow-y-auto px-6 py-6">
+
+
+        <!-- Step 1: Lead Form -->
+        <form id="leadForm" class="space-y-4" novalidate>
+          <div>
+            <label for="fullName" 
+                   class="block text-sm font-medium mb-1 text-navy-700">
+              Nome completo *
+            </label>
+            <input id="fullName" 
+                   name="fullName" 
+                   type="text"
+                   required 
+                   autocomplete="name"
+                   placeholder="Digite seu nome completo"
+                   class="w-full rounded-xl border border-neutral-300 px-4 py-3 text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700"/>
+          </div>
+          
+          <div>
+            <label for="email" 
+                   class="block text-sm font-medium mb-1 text-navy-700">
+              Email *
+            </label>
+            <input id="email" 
+                   name="email" 
+                   type="email" 
+                   required 
+                   autocomplete="email"
+                   placeholder="seu@email.com"
+                   class="w-full rounded-xl border border-neutral-300 px-4 py-3 text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700"/>
+          </div>
+          
+          <div>
+            <label for="phone" 
+                   class="block text-sm font-medium mb-1 text-navy-700">
+              Telefone/WhatsApp *
+            </label>
+            <div class="relative flex">
+              <select id="countryCode" 
+                      name="countryCode"
+                      class="rounded-l-xl border border-r-0 border-neutral-300 pl-3 pr-8 py-3 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700 bg-white focus:z-10">
+                <option value="+351" selected>🇵🇹 +351</option>
+                <option value="+55">🇧🇷 +55</option>
+                <option value="+34">🇪🇸 +34</option>
+                <option value="+33">🇫🇷 +33</option>
+                <option value="+44">🇬🇧 +44</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+49">🇩🇪 +49</option>
+                <option value="+39">🇮🇹 +39</option>
+              </select>
+              <input id="phone" 
+                     name="phone" 
+                     type="tel" 
+                     required 
+                     inputmode="tel" 
+                     pattern="[0-9\s\-]{6,}"
+                     placeholder="912 345 678"
+                     class="flex-1 rounded-r-xl border border-neutral-300 px-4 py-3 text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700 focus:z-10"/>
+            </div>
+            <p class="mt-1 text-xs text-neutral-500">
+              WhatsApp facilita nosso contato rápido após o evento.
+            </p>
+          </div>
+
+          <!-- Submit Button for Step 1 -->
+          <button id="leadSubmit" 
+                  type="submit" 
+                  class="w-full rounded-2xl px-6 py-3 text-white font-semibold shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-gradient-to-r from-burgundy-700 to-burgundy-600 focus:ring-burgundy-700">
+            <div class="inline-flex items-center justify-center gap-2 min-h-[1.5rem]">
+              <span id="leadSubmitText" class="transition-opacity duration-200">Garantir minha vaga</span>
+              <svg id="leadSubmitSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+          </button>
+
+          <!-- Error Message for Step 1 -->
+          <div id="leadError" 
+               class="hidden mt-2 p-3 rounded-xl text-sm bg-burgundy-50 text-burgundy-700 border border-burgundy-200">
+          </div>
+        </form>
+
+        <!-- Step 2: Payment -->
+        <div id="paymentStep" class="hidden space-y-4">
+          <!-- Security Badge -->
+          <div class="flex items-center justify-between mb-4 p-3 rounded-xl bg-neutral-50">
+            <div class="flex items-center gap-2">
+              <svg class="h-4 w-4 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+              <span class="text-sm font-medium text-neutral-700">
+                Pagamento 100% seguro
+              </span>
+            </div>
+            <span class="text-xs text-neutral-500 font-medium">Powered by Stripe</span>
+          </div>
+
+          <!-- Event Summary -->
+          <div class="mb-4 p-4 rounded-xl bg-green-50 border border-green-200">
+            <h4 class="font-medium text-base mb-2 text-navy-800">
+              {{ event.pricing.tiers[0].label }}
+            </h4>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-neutral-600">
+                {{ event.date.local }} • {{ event.location.city }}
+              </span>
+              <span class="font-semibold text-lg text-navy-800">
+                €{{ event.pricing.tiers[0].price }}
+              </span>
+            </div>
+            <p class="text-xs mt-1 text-green-700">
+              {{ event.pricing.tiers[0].notes }}
+            </p>
+          </div>
+
+          <!-- Stripe Payment Element Container -->
+          <div id="payment-element" class="mb-4">
+            <!-- Stripe Elements will mount here -->
+          </div>
+
+          <!-- Payment Submit Button -->
+          <button id="payBtn" 
+                  type="button"
+                  disabled
+                  class="w-full rounded-2xl px-6 py-3 text-white font-semibold shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none bg-navy-800 focus:ring-navy-700">
+            <div class="inline-flex items-center justify-center gap-2 min-h-[1.5rem]">
+              <span id="payBtnText" class="transition-opacity duration-200">Confirmar pagamento • €{{ event.pricing.tiers[0].price }}</span>
+              <svg id="payBtnSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+          </button>
+
+          <!-- Error Message for Step 2 -->
+          <div id="payError" 
+               class="hidden mt-2 p-3 rounded-xl text-sm bg-burgundy-50 text-burgundy-700 border border-burgundy-200">
+          </div>
+        </div>
+
+        <!-- Step Success: Payment Confirmed -->
+        <div id="paymentSuccess" class="hidden text-center space-y-4">
+          <div class="p-6 rounded-2xl bg-peach-50 border-2 border-peach-300">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-peach-200">
+              <svg class="w-8 h-8 text-burgundy-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <h4 class="text-xl font-semibold mb-2 text-navy-800">
+              Pagamento confirmado! 🎉
+            </h4>
+            <p class="text-base mb-4 text-neutral-700">
+              Sua vaga está garantida. Redirecionando para os detalhes...
+            </p>
+            <div class="animate-pulse">
+              <div class="h-2 rounded-full mx-auto w-24 bg-burgundy-300"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legal Notice -->
+        <div class="mt-6 pt-4 border-t border-neutral-200 text-center">
+          <p class="text-xs text-neutral-500">
+            Ao continuar, você concorda com nossos 
+            <a href="/termos-condicoes/" class="underline hover:no-underline">termos de serviço</a>.
+            <br>
+            {{ event.guarantee.policy }}
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
