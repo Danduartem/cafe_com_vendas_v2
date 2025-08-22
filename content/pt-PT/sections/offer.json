@@ -54,12 +54,6 @@
       "variant": "gradient"
     }
   },
-  "design": {
-    "theme": "light",
-    "accent": "burgundy-600",
-    "background": "gradient-to-br from-neutral-50 via-white to-neutral-100",
-    "layout": "pricing-card"
-  },
   "tracking": {
     "section_id": "offer",
     "impression_event": "offer_view",

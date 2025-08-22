@@ -78,12 +78,6 @@
     "founderName": "Juçanã Maximiliano",
     "founderTitle": "Business Mentor"
   },
-  "design": {
-    "theme": "dark",
-    "accent": "gold-400",
-    "background": "navy-900",
-    "layout": "full-footer"
-  },
   "tracking": {
     "section_id": "footer",
     "impression_event": "footer_view"

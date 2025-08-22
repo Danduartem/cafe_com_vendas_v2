@@ -31,12 +31,6 @@
       "url": "/politica-privacidade"
     }
   ],
-  "design": {
-    "theme": "light",
-    "accent": "gold-500",
-    "background": "neutral-50",
-    "layout": "accordion"
-  },
   "tracking": {
     "section_id": "faq",
     "impression_event": "faq_view"
@@ -55,9 +49,6 @@
         }
       },
       "analytics_event": "open_faq_business_type",
-      "icon_color": "burgundy",
-      "background_gradient": "from-peach-50/50 to-gold-50/30",
-      "border_color": "border-peach-200/30",
       "upvote_count": 15
     },
     {
@@ -80,9 +71,6 @@
         ]
       },
       "analytics_event": "open_faq_time_justification",
-      "icon_color": "gold",
-      "background_gradient": "from-gold-50/50 to-peach-50/30",
-      "border_color": "border-gold-200/30",
       "upvote_count": 22
     },
     {
@@ -111,9 +99,6 @@
         "legal_note": "Condições aplicáveis — <a href=\"/garantia-reembolso\" class=\"text-gold-700 hover:text-gold-800 underline font-medium\">ver termos completos</a>"
       },
       "analytics_event": "open_faq_guarantee",
-      "icon_color": "gold",
-      "background_gradient": "from-gold-50/70 to-peach-50/40",
-      "border_color": "border-gold-200/50",
       "is_special": true,
       "special_badge": "GARANTIA",
       "upvote_count": 31
@@ -130,9 +115,6 @@
         }
       },
       "analytics_event": "open_faq_about_jucana",
-      "icon_color": "navy",
-      "background_gradient": "from-navy-50/50 to-burgundy-50/30",
-      "border_color": "border-navy-200/30",
       "upvote_count": 18
     }
   ]

@@ -30,12 +30,6 @@
     "background": "pictures/cafe.jpg",
     "alt": "Café com Vendas em Lisboa"
   },
-  "design": {
-    "theme": "dark",
-    "accent": "burgundy-700",
-    "overlay": "navy-900/85",
-    "layout": "fullscreen"
-  },
   "tracking": {
     "section_id": "hero",
     "impression_event": "hero_view",

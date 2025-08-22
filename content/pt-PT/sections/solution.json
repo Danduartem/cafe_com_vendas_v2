@@ -60,12 +60,6 @@
       "Apenas 20 vagas"
     ]
   },
-  "design": {
-    "theme": "light",
-    "accent": "burgundy-700",
-    "background": "gradient-to-br from-neutral-50 via-white to-peach-100/30",
-    "layout": "pillars-grid"
-  },
   "tracking": {
     "section_id": "solution",
     "impression_event": "solution_view",

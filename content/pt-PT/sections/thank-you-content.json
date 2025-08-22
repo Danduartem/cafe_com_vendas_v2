@@ -73,12 +73,6 @@
       "important": "<span class=\"font-bold text-burgundy-700\">Importante:</span> Complete o formulário agora para garantir o seu lugar. Os detalhes do local serão enviados após o preenchimento."
     }
   },
-  "design": {
-    "theme": "light",
-    "accent": "burgundy-600",
-    "background": "gradient-to-b from-neutral-50 via-white to-neutral-50/30",
-    "layout": "centered"
-  },
   "tracking": {
     "section_id": "thankyou",
     "impression_event": "thankyou_view",

@@ -31,12 +31,6 @@
     "alt": "Juçanã Maximiliano — especialista em escalar negócios de empreendedoras",
     "aspect_ratio": "4/5"
   },
-  "design": {
-    "theme": "light",
-    "accent": "burgundy-600",
-    "background": "neutral-50",
-    "layout": "two-column"
-  },
   "tracking": {
     "section_id": "about",
     "impression_event": "about_view",

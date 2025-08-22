@@ -27,12 +27,6 @@
     "caption": "Empreendedora sobrecarregada trabalhando em excesso, simbolizando o problema de falta de tempo e excesso de tarefas.",
     "aspect_ratio": "1.618/1"
   },
-  "design": {
-    "theme": "light",
-    "accent": "burgundy-700",
-    "background": "gradient-to-b from-neutral-50 via-peach-100 to-neutral-50",
-    "layout": "two-column"
-  },
   "tracking": {
     "section_id": "problem",
     "impression_event": "problem_view",

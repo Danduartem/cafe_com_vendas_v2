@@ -11,12 +11,6 @@
       "variant": "small"
     }
   },
-  "design": {
-    "theme": "dark",
-    "accent": "gold-400",
-    "background": "navy-900",
-    "layout": "banner"
-  },
   "tracking": {
     "section_id": "top-banner",
     "impression_event": "banner_view",

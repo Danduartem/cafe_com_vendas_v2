@@ -9,6 +9,28 @@ import type {
   SectionValidationError
 } from './types.ts';
 
+// Load centralized design configurations
+let designConfigs: Record<string, unknown> | null = null;
+
+function loadDesignConfigs(): Record<string, unknown> {
+  if (designConfigs) return designConfigs;
+
+  const designPath = join(process.cwd(), 'design/components.json');
+  if (!existsSync(designPath)) {
+    console.warn('Design components configuration not found at design/components.json');
+    return {};
+  }
+
+  try {
+    const rawData = JSON.parse(readFileSync(designPath, 'utf-8'));
+    designConfigs = rawData;
+    return rawData;
+  } catch (error) {
+    console.error('Failed to load design configurations:', error);
+    return {};
+  }
+}
+
 // Section-specific validation functions
 function validateHeroSection(section: Record<string, unknown>): boolean {
   return !!(section.copy &&
@@ -125,7 +147,7 @@ function validateSection(data: unknown, slug: SectionSlug): data is Section {
 }
 
 /**
- * Loads section data from JSON file with validation
+ * Loads section data from JSON file with validation and merges design configurations
  */
 function loadSection(slug: SectionSlug, _variant?: string): Section {
   const sectionPath = join(process.cwd(), `content/pt-PT/sections/${slug}.json`);
@@ -140,14 +162,33 @@ function loadSection(slug: SectionSlug, _variant?: string): Section {
   try {
     const rawData = JSON.parse(readFileSync(sectionPath, 'utf-8'));
 
-    if (!validateSection(rawData, slug)) {
-      const error = new Error(`Invalid section data for ${slug}: ${JSON.stringify(rawData, null, 2)}`) as SectionValidationError;
+    // Load design configurations and merge them
+    const designData = loadDesignConfigs();
+    const mergedData = {
+      ...rawData,
+      design: designData.sections?.[slug] || {}
+    };
+
+    // For FAQ section, also merge individual item styles
+    if (slug === 'faq' && designData.faq && mergedData.items) {
+      mergedData.items = mergedData.items.map((item: Record<string, unknown>) => {
+        // Apply special styles based on item ID or use defaults
+        const specialStyles = designData.faq.special_item_styles?.[item.id] || designData.faq.default_item_styles || {};
+        return {
+          ...item,
+          ...specialStyles
+        };
+      });
+    }
+
+    if (!validateSection(mergedData, slug)) {
+      const error = new Error(`Invalid section data for ${slug}: ${JSON.stringify(mergedData, null, 2)}`) as SectionValidationError;
       error.sectionSlug = slug;
       error.filePath = sectionPath;
       throw error;
     }
 
-    return rawData;
+    return mergedData;
   } catch (parseError) {
     const error = new Error(`Failed to parse section file ${sectionPath}: ${parseError}`) as SectionValidationError;
     error.sectionSlug = slug;

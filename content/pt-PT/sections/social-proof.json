@@ -96,12 +96,6 @@
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
     }
   ],
-  "design": {
-    "theme": "light",
-    "accent": "gold-400",
-    "background": "gradient-to-br from-peach-50 to-neutral-100",
-    "layout": "carousel"
-  },
   "tracking": {
     "section_id": "social-proof",
     "impression_event": "social_proof_view",

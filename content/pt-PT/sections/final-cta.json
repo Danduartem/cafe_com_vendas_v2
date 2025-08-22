@@ -24,12 +24,6 @@
       "variant": "link"
     }
   },
-  "design": {
-    "theme": "dark",
-    "accent": "gold-400",
-    "background": "gradient-to-br from-navy-900 to-burgundy-900",
-    "layout": "centered"
-  },
   "tracking": {
     "section_id": "final-cta",
     "impression_event": "final_cta_view",
