@@ -5,6 +5,7 @@
 
 import { describe, test, expect, beforeEach } from 'vitest';
 import { JSDOM } from 'jsdom';
+import type { LoadedPageSection } from '../../_data/types.ts';
 
 describe('Landing Page Composition', () => {
   let dom: JSDOM;
@@ -29,11 +30,11 @@ describe('Landing Page Composition', () => {
     test('should have all required sections enabled', async () => {
       const { default: pageDataLoader } = await import('../../_data/page.ts');
       const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: { enabled: boolean; slug: string }) => s.enabled);
+      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
 
       // Should have at least hero, problem, solution, offer, and footer sections
       const requiredSections = ['hero', 'problem', 'solution', 'offer', 'footer'];
-      const enabledSlugs = enabledSections.map((s: { slug: string }) => s.slug);
+      const enabledSlugs = enabledSections.map((s: LoadedPageSection) => s.slug);
 
       requiredSections.forEach(required => {
         expect(enabledSlugs).toContain(required);
@@ -43,13 +44,13 @@ describe('Landing Page Composition', () => {
     test('should load section data for each enabled section', async () => {
       const { default: pageDataLoader } = await import('../../_data/page.ts');
       const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: { enabled: boolean; slug: string; data?: Record<string, unknown> }) => s.enabled);
+      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
 
-      enabledSections.forEach((section: { enabled: boolean; slug: string; data?: Record<string, unknown> }) => {
+      enabledSections.forEach((section: LoadedPageSection) => {
         expect(section.data).toBeDefined();
         expect(typeof section.data).toBe('object');
-        expect((section.data).id).toBe(section.slug);
-        expect((section.data).enabled).toBe(true);
+        expect(section.data.id).toBe(section.slug);
+        expect(section.data.enabled).toBe(true);
       });
     });
   });
@@ -58,8 +59,8 @@ describe('Landing Page Composition', () => {
     test('should maintain logical section order', async () => {
       const { default: pageDataLoader } = await import('../../_data/page.ts');
       const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: { enabled: boolean; slug: string }) => s.enabled);
-      const sectionOrder = enabledSections.map((s: { slug: string }) => s.slug);
+      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
+      const sectionOrder = enabledSections.map((s: LoadedPageSection) => s.slug);
 
       // Hero should be first after top-banner (if both enabled)
       if (sectionOrder.includes('hero')) {
@@ -87,11 +88,11 @@ describe('Landing Page Composition', () => {
     test('should have consistent section data structure', async () => {
       const { default: pageDataLoader } = await import('../../_data/page.ts');
       const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: { enabled: boolean; slug: string; data?: Record<string, unknown> }) => s.enabled);
+      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
 
-      enabledSections.forEach((section: { enabled: boolean; slug: string; data?: Record<string, unknown> }) => {
+      enabledSections.forEach((section: LoadedPageSection) => {
         const sectionData = section.data;
-        const tracking = sectionData.tracking as Record<string, unknown>;
+        const tracking = sectionData.tracking;
 
         // Each section should have required base properties
         expect(sectionData.id).toBeDefined();
@@ -111,16 +112,16 @@ describe('Landing Page Composition', () => {
     test('should create valid HTML structure for each section', async () => {
       const { default: pageDataLoader } = await import('../../_data/page.ts');
       const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: { enabled: boolean; slug: string; data?: Record<string, unknown> }) => s.enabled);
+      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
 
-      enabledSections.forEach((section: { enabled: boolean; slug: string; data?: Record<string, unknown> }) => {
+      enabledSections.forEach((section: LoadedPageSection) => {
         const sectionData = section.data;
-        const tracking = sectionData.tracking as Record<string, unknown>;
-        const copy = sectionData.copy as Record<string, unknown>;
+        const tracking = sectionData.tracking;
+        const copy = sectionData.copy;
 
         // Simulate section container creation
         const sectionElement = document.createElement('section');
-        sectionElement.id = tracking.section_id as string;
+        sectionElement.id = tracking.section_id;
         sectionElement.className = `section-${section.slug}`;
         sectionElement.setAttribute('data-section', section.slug);
 
@@ -130,7 +131,7 @@ describe('Landing Page Composition', () => {
 
         const content = document.createElement('div');
         content.className = 'content';
-        content.textContent = (copy.headline as string) || (copy.title as string) || 'Content';
+        content.textContent = copy.headline || (copy as any).title || 'Content';
 
         container.appendChild(content);
         sectionElement.appendChild(container);
@@ -147,17 +148,17 @@ describe('Landing Page Composition', () => {
     test('should handle section-specific content correctly', async () => {
       const { default: pageDataLoader } = await import('../../_data/page.ts');
       const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: { enabled: boolean; slug: string; data?: Record<string, unknown> }) => s.enabled);
+      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
 
-      enabledSections.forEach((section: { enabled: boolean; slug: string; data?: Record<string, unknown> }) => {
+      enabledSections.forEach((section: LoadedPageSection) => {
         const sectionData = section.data;
         const sectionElement = document.createElement('section');
 
         // Test section-specific content handling
         switch (section.slug) {
         case 'hero': {
-          const copy = sectionData.copy as Record<string, unknown>;
-          const badge = copy.badge as Record<string, unknown>;
+          const copy = sectionData.copy as any;
+          const badge = copy.badge;
           if (badge) {
             const badgeElement = document.createElement('div');
             badgeElement.className = 'badge';
@@ -169,8 +170,8 @@ describe('Landing Page Composition', () => {
         }
 
         case 'problem': {
-          const copy = sectionData.copy as Record<string, unknown>;
-          const painPoints = copy.pain_points as string[];
+          const copy = sectionData.copy as any;
+          const painPoints = copy.pain_points;
           if (painPoints) {
             const list = document.createElement('ul');
             painPoints.forEach((point: string) => {
@@ -185,15 +186,15 @@ describe('Landing Page Composition', () => {
         }
 
         case 'solution': {
-          const copy = sectionData.copy as Record<string, unknown>;
-          const pillars = copy.pillars as Record<string, unknown>[];
+          const copy = sectionData.copy as any;
+          const pillars = copy.pillars;
           if (pillars) {
             const pillarsContainer = document.createElement('div');
             pillarsContainer.className = 'pillars';
-            pillars.forEach((pillar: Record<string, unknown>) => {
+            pillars.forEach((pillar: any) => {
               const pillarElement = document.createElement('div');
               pillarElement.className = 'pillar';
-              pillarElement.textContent = pillar.title as string;
+              pillarElement.textContent = pillar.title;
               pillarsContainer.appendChild(pillarElement);
             });
             sectionElement.appendChild(pillarsContainer);
@@ -203,14 +204,14 @@ describe('Landing Page Composition', () => {
         }
 
         case 'social-proof': {
-          const testimonials = sectionData.testimonials as Record<string, unknown>[];
+          const testimonials = (sectionData as any).testimonials;
           if (testimonials) {
             const testimonialsContainer = document.createElement('div');
             testimonialsContainer.className = 'testimonials';
-            testimonials.forEach((testimonial: Record<string, unknown>) => {
+            testimonials.forEach((testimonial: any) => {
               const testimonialElement = document.createElement('div');
               testimonialElement.className = 'testimonial';
-              testimonialElement.textContent = testimonial.name as string;
+              testimonialElement.textContent = testimonial.name;
               testimonialsContainer.appendChild(testimonialElement);
             });
             sectionElement.appendChild(testimonialsContainer);
@@ -220,15 +221,15 @@ describe('Landing Page Composition', () => {
         }
 
         case 'faq': {
-          const items = sectionData.items as Record<string, unknown>[];
+          const items = (sectionData as any).items;
           if (items) {
             const faqContainer = document.createElement('div');
             faqContainer.className = 'faq-items';
-            items.forEach((item: Record<string, unknown>) => {
+            items.forEach((item: any) => {
               const faqElement = document.createElement('div');
               faqElement.className = 'faq-item';
-              faqElement.id = item.id as string;
-              faqElement.textContent = item.question as string;
+              faqElement.id = item.id;
+              faqElement.textContent = item.question;
               faqContainer.appendChild(faqElement);
             });
             sectionElement.appendChild(faqContainer);
@@ -247,28 +248,28 @@ describe('Landing Page Composition', () => {
     test('should simulate complete data flow from JSON to rendered content', async () => {
       const { default: pageDataLoader } = await import('../../_data/page.ts');
       const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: { enabled: boolean; slug: string; data?: Record<string, unknown> }) => s.enabled);
+      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
 
       // Simulate the complete page rendering
       const pageContainer = document.createElement('div');
       pageContainer.className = 'page-container';
       pageContainer.id = 'landing-page';
 
-      enabledSections.forEach((section: { enabled: boolean; slug: string; data?: Record<string, unknown> }, index: number) => {
+      enabledSections.forEach((section: LoadedPageSection, index: number) => {
         const sectionData = section.data;
-        const tracking = sectionData.tracking as Record<string, unknown>;
-        const design = sectionData.design as Record<string, unknown>;
+        const tracking = sectionData.tracking;
+        const design = sectionData.design;
 
         const sectionElement = document.createElement('section');
-        sectionElement.id = tracking.section_id as string;
+        sectionElement.id = tracking.section_id;
         sectionElement.className = `section section-${section.slug}`;
         sectionElement.setAttribute('data-order', index.toString());
-        sectionElement.setAttribute('data-variant', sectionData.variant as string);
-        sectionElement.setAttribute('data-theme', design.theme as string);
+        sectionElement.setAttribute('data-variant', sectionData.variant);
+        sectionElement.setAttribute('data-theme', design.theme);
 
         // Add analytics attributes
         sectionElement.setAttribute('data-analytics-section', section.slug);
-        sectionElement.setAttribute('data-analytics-impression', tracking.impression_event as string);
+        sectionElement.setAttribute('data-analytics-impression', tracking.impression_event);
 
         pageContainer.appendChild(sectionElement);
       });
@@ -297,13 +298,13 @@ describe('Landing Page Composition', () => {
     test('should validate all sections have required integration points', async () => {
       const { default: pageDataLoader } = await import('../../_data/page.ts');
       const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: { enabled: boolean; slug: string; data?: Record<string, unknown> }) => s.enabled);
+      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
 
-      enabledSections.forEach((section: { enabled: boolean; slug: string; data?: Record<string, unknown> }) => {
+      enabledSections.forEach((section: LoadedPageSection) => {
         const sectionData = section.data;
-        const tracking = sectionData.tracking as Record<string, unknown>;
-        const design = sectionData.design as Record<string, unknown>;
-        const copy = sectionData.copy as Record<string, unknown>;
+        const tracking = sectionData.tracking;
+        const design = sectionData.design;
+        const copy = sectionData.copy;
 
         // Each section should have analytics integration points
         expect(tracking.section_id).toBeDefined();
@@ -313,21 +314,20 @@ describe('Landing Page Composition', () => {
         expect(design.theme).toBeDefined();
         expect(design.layout).toBeDefined();
 
-        // Some sections have 'background', others have 'overlay'
-        const hasBackground = design.background !== undefined;
-        const hasOverlay = design.overlay !== undefined;
-        expect(hasBackground || hasOverlay).toBe(true);
+        // Section should have background or overlay
+        const hasBackgroundStyle = design.background !== undefined || (design as any).overlay !== undefined;
+        expect(hasBackgroundStyle).toBe(true);
 
         // Each section should have content integration points
         const hasContent = copy.headline ||
-                          copy.title ||
-                          copy.message ||
+                          (copy as any).title ||
+                          (copy as any).message ||
                           copy.eyebrow ||
-                          copy.stats ||
-                          copy.brand ||
-                          copy.items ||
-                          copy.pillars ||
-                          copy.testimonials;
+                          (copy as any).stats ||
+                          (copy as any).brand ||
+                          (copy as any).items ||
+                          (copy as any).pillars ||
+                          (copy as any).testimonials;
         expect(hasContent).toBeDefined();
       });
     });

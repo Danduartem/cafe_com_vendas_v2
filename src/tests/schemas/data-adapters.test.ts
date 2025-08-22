@@ -4,6 +4,7 @@
  */
 
 import { describe, test, expect } from 'vitest';
+import type { LoadedPageSection, GlobalStrings } from '../../_data/types.ts';
 
 describe('Data Adapter Layer', () => {
   describe('Site Data Adapter', async () => {
@@ -39,7 +40,7 @@ describe('Data Adapter Layer', () => {
     });
 
     test('should have required string categories', () => {
-      const requiredCategories = ['nav', 'common', 'legal', 'contact', 'event', 'currency', 'time'];
+      const requiredCategories: (keyof GlobalStrings)[] = ['nav', 'common', 'legal', 'contact', 'event', 'currency', 'time'];
       requiredCategories.forEach(category => {
         expect(globalData[category]).toBeDefined();
         expect(typeof globalData[category]).toBe('object');
@@ -112,11 +113,11 @@ describe('Data Adapter Layer', () => {
     });
 
     test('should have enabled sections in correct order', () => {
-      const enabledSections = pageData.sections.filter((s: { enabled: boolean; slug: string; data?: unknown }) => s.enabled);
+      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
       expect(enabledSections.length).toBeGreaterThan(0);
 
       // Check that each section has required properties
-      enabledSections.forEach((section: { enabled: boolean; slug: string; data?: unknown }) => {
+      enabledSections.forEach((section: LoadedPageSection) => {
         expect(typeof section.slug).toBe('string');
         expect(typeof section.enabled).toBe('boolean');
         expect(section.data).toBeDefined();
@@ -124,12 +125,12 @@ describe('Data Adapter Layer', () => {
     });
 
     test('should load section data for each enabled section', () => {
-      const enabledSections = pageData.sections.filter((s: { enabled: boolean; slug: string; data?: Record<string, unknown> }) => s.enabled);
+      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
 
-      enabledSections.forEach((section: { enabled: boolean; slug: string; data?: Record<string, unknown> }) => {
+      enabledSections.forEach((section: LoadedPageSection) => {
         expect(section.data).toBeDefined();
         expect(typeof section.data).toBe('object');
-        expect((section.data).id).toBe(section.slug);
+        expect(section.data.id).toBe(section.slug);
       });
     });
   });
