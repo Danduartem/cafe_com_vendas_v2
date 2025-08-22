@@ -3,45 +3,42 @@
  * Orchestrates all components and manages application lifecycle
  */
 
-import { CONFIG } from '@/config/constants.js';
-import { state, StateManager } from '@/core/state.js';
-import { Analytics } from '@/core/analytics.js';
-import { ScrollTracker } from '@/utils/scroll-tracker.js';
+import { CONFIG } from '@/config/constants.ts';
+import { state, StateManager } from '@/core/state.ts';
+import { Analytics } from '@/core/analytics.ts';
+import { ScrollTracker } from '../../platform/lib/utils/scroll-tracker.ts';
 import type {
   Component,
   ComponentRegistration,
   ComponentHealthStatus,
   ComponentStatus
-} from '@/types/component.js';
+} from '@/types/component.ts';
 import type {
   AppInitializedEvent,
   ComponentsInitializedEvent
-} from '@/types/analytics.js';
-import type { AppState } from '@/types/state.js';
-import type { Constants } from '@/types/config.js';
+} from '@/types/analytics.ts';
+import type { AppState } from '@/types/state.ts';
+import type { Constants } from '@/types/config.ts';
 
-// Import all components from centralized components directory
+// Import platform utility components
 import {
-  Banner,
-  YouTube,
-  FAQ,
-  FinalCTA,
-  Footer,
-  Testimonials,
-  ThankYou,
-  Checkout,
-  CloudinaryComponent,
-  GTM,
-  About,
-  Hero,
-  Offer
-} from './components/index.js';
+  PlatformYouTube,
+  PlatformThankYou,
+  PlatformGTM
+} from '../../platform/ui/components/index.ts';
+
+// Import co-located section components (new approach)
+import { Hero } from '../../_includes/sections/hero/index.ts';
+import { Offer } from '../../_includes/sections/offer/index.ts';
+import { FAQ } from '../../_includes/sections/faq/index.ts';
+import { SocialProof } from '../../_includes/sections/social-proof/index.ts';
+import { Checkout } from '../../_includes/sections/checkout/index.ts';
 
 /**
  * Main application interface
  */
 interface CafeComVendasInterface {
-  components?: ComponentRegistration[];
+  components: ComponentRegistration[] | undefined;
   init(): void;
   setupGlobalErrorHandling(): void;
   initializeComponents(): void;
@@ -56,12 +53,12 @@ interface CafeComVendasInterface {
  * Error context for analytics
  */
 interface ErrorContext {
-  message?: string;
-  stack?: string;
-  filename?: string;
-  lineno?: number;
-  colno?: number;
-  component_name?: string;
+  message: string | undefined;
+  stack: string | undefined;
+  filename: string | undefined;
+  lineno: number | undefined;
+  colno: number | undefined;
+  component_name: string | undefined;
   [key: string]: unknown;
 }
 
@@ -78,7 +75,7 @@ export const CafeComVendas: CafeComVendasInterface = {
     }
 
     try {
-      console.log('Initializing Café com Vendas landing page...');
+      // Initializing Café com Vendas landing page...
 
       // Set up global error handling
       this.setupGlobalErrorHandling();
@@ -95,7 +92,7 @@ export const CafeComVendas: CafeComVendasInterface = {
       this.initializeComponents();
 
       StateManager.setInitialized(true);
-      console.log('Café com Vendas initialized successfully');
+      // Café com Vendas initialized successfully
 
       // Track successful initialization
       const initEvent: AppInitializedEvent = {
@@ -119,7 +116,11 @@ export const CafeComVendas: CafeComVendasInterface = {
     window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent): void => {
       const errorContext: ErrorContext = {
         message: event.reason?.message ?? 'Unknown promise rejection',
-        stack: event.reason?.stack
+        stack: event.reason?.stack,
+        filename: undefined,
+        lineno: undefined,
+        colno: undefined,
+        component_name: undefined
       };
       Analytics.trackError('unhandled_promise_rejection', new Error(errorContext.message), errorContext);
     });
@@ -131,7 +132,8 @@ export const CafeComVendas: CafeComVendasInterface = {
         filename: event.filename,
         lineno: event.lineno,
         colno: event.colno,
-        stack: event.error?.stack
+        stack: event.error?.stack,
+        component_name: undefined
       };
       Analytics.trackError('global_javascript_error', event.error ?? new Error(event.message), errorContext);
     });
@@ -142,19 +144,17 @@ export const CafeComVendas: CafeComVendasInterface = {
    */
   initializeComponents(): void {
     const components: ComponentRegistration[] = [
-      { name: 'CloudinaryComponent', component: CloudinaryComponent },
-      { name: 'Checkout', component: Checkout },
+      // Platform utility components
+      { name: 'GTM', component: { init: () => PlatformGTM.init() } },
+      { name: 'YouTube', component: { init: () => PlatformYouTube.init() } },
+      { name: 'ThankYou', component: { init: () => PlatformThankYou.init() } },
+
+      // Co-located section components (new approach)
       { name: 'Hero', component: Hero as Component },
-      { name: 'Banner', component: Banner as Component },
-      { name: 'GTM', component: GTM as Component },
-      { name: 'YouTube', component: YouTube },
-      { name: 'About', component: About },
       { name: 'Offer', component: Offer as Component },
       { name: 'FAQ', component: FAQ as Component },
-      { name: 'FinalCTA', component: FinalCTA },
-      { name: 'Footer', component: Footer },
-      { name: 'Testimonials', component: Testimonials as Component },
-      { name: 'ThankYou', component: ThankYou }
+      { name: 'SocialProof', component: SocialProof as Component },
+      { name: 'Checkout', component: Checkout as Component }
     ];
 
     let successCount = 0;
@@ -164,9 +164,9 @@ export const CafeComVendas: CafeComVendasInterface = {
       try {
         if (component && typeof component.init === 'function') {
           component.init();
-          console.log(`✓ ${name} component initialized`);
+          // Component initialized: ${name}
           successCount++;
-          StateManager.setComponentStatus(name, true);
+          StateManager.setComponentStatus(name, true, undefined);
         } else {
           console.warn(`⚠ ${name} component missing or invalid init method`);
           failureCount++;

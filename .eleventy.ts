@@ -42,10 +42,10 @@ export default function(eleventyConfig: EleventyConfig) {
   // Enhanced watch options for better development experience
   eleventyConfig.setWatchThrottleWaitTime?.(100);
 
-  // Passthrough copy for static assets (css, fonts, pictures) - excluding js since Vite handles bundling
+  // Passthrough copy for static assets (css, fonts, images) - excluding js since Vite handles bundling
   eleventyConfig.addPassthroughCopy({ 'src/assets/css': 'assets/css' });
   eleventyConfig.addPassthroughCopy({ 'src/assets/fonts': 'assets/fonts' });
-  eleventyConfig.addPassthroughCopy({ 'src/assets/pictures': 'assets/pictures' });
+  eleventyConfig.addPassthroughCopy({ 'src/assets/images': 'assets/pictures' });
   // Public files to site root (favicons)
   eleventyConfig.addPassthroughCopy({ 'src/public': '/' });
 

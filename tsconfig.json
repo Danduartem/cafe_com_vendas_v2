@@ -12,16 +12,16 @@
     "isolatedModules": true,
     "noEmit": true,
 
-    // Type checking - gradually enabling strict mode
-    "strict": false,
-    "strictNullChecks": false, 
-    "noImplicitAny": false, // Keep this off for gradual migration
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    // Type checking - progressive strict mode
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "exactOptionalPropertyTypes": false,
-    "noImplicitReturns": false,
-    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false, // Too strict for current codebase
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": false, // Too strict for current codebase
     
     // API deprecation detection
     "types": ["node"],
@@ -34,15 +34,16 @@
       "@/*": ["src/*"],
       "@/assets/*": ["src/assets/*"],
       "@/js/*": ["src/assets/js/*"],
-      "@/components/*": ["src/assets/js/components/*"],
-      "@/utils/*": ["src/assets/js/utils/*"],
+      "@/components/*": ["src/platform/ui/components/*"],
+      "@/utils/*": ["src/platform/lib/utils/*"],
       "@/core/*": ["src/assets/js/core/*"],
       "@/config/*": ["src/assets/js/config/*"],
       "@/types/*": ["src/assets/js/types/*"],
       "@sections/*": ["src/_includes/sections/*"],
       "@partials/*": ["src/_includes/partials/*"],
       "@data/*": ["src/_data/*"],
-      "@platform/*": ["src/platform/*"]
+      "@platform/*": ["src/platform/*"],
+      "@content/*": ["content/*"]
     },
 
     // Advanced
@@ -58,19 +59,28 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.js",
+    "tests/**/*.ts",
     "netlify/functions/**/*.ts",
-    "scripts/**/*.ts",
+    "scripts/build-tokens.ts",
+    "scripts/dev-section.ts",
+    "scripts/find-section.ts",
+    "scripts/new-section.ts",
+    "scripts/playwright-universal-screenshot.ts",
+    "scripts/screenshot-cli.ts",
+    "scripts/test-apis.ts",
+    "scripts/universal-screenshot.ts",
+    "scripts/verify-apis.ts",
     "vite.config.ts",
+    "vitest.config.ts",
+    "playwright.config.ts",
     ".eleventy.ts",
     "eslint.config.ts",
-    "postcss.config.ts",
-    "debug-gtm.ts"
+    "postcss.config.ts"
   ],
   "exclude": [
     "node_modules",
     "_site",
     "dist",
-    "src/platform/**/*",
     "debug-gtm.ts"
   ]
 }

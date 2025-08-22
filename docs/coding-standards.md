@@ -11,10 +11,12 @@
 
 - ❌ **NEVER** create or modify `.js` files - TypeScript only (`.ts`)
 - ❌ **NEVER** use `any` type without explicit justification
-- ❌ **NEVER** bypass TypeScript compilation
+- ❌ **NEVER** bypass TypeScript compilation errors
+- ❌ **NEVER** use implicit `any` types - always declare types explicitly
 - ✅ **ALWAYS** use proper TypeScript interfaces and types
 - ✅ **ALWAYS** run `npm run type-check` before committing
 - ✅ **ALWAYS** import with `.js` extension (TypeScript/ESM convention)
+- ✅ **ALWAYS** handle potential `null` and `undefined` values
 
 ### Pure Tailwind CSS Enforcement
 **ABSOLUTE REQUIREMENT - NO EXCEPTIONS**
@@ -62,8 +64,11 @@ import type { Component } from '../../assets/js/types/component.js';
 export const MySection: Component = {
     init(): void {
         this.bindEvents();
-        // Make methods available globally for onclick handlers
-        (window as any).toggleMySection = this.toggle.bind(this);
+        // Make methods available globally for onclick handlers with proper typing
+        const global = window as typeof window & {
+            toggleMySection: (elementId: string) => void;
+        };
+        global.toggleMySection = this.toggle.bind(this);
     },
     
     bindEvents(): void {
@@ -82,9 +87,45 @@ export const MySection: Component = {
 };
 ```
 
+### Platform UI Components (New Pattern)
+```typescript
+// src/platform/ui/components/accordion.ts
+import type { UIComponent } from '../types/component.js';
+
+export class Accordion implements UIComponent {
+    private container: HTMLElement;
+    
+    constructor(container: HTMLElement) {
+        this.container = container;
+    }
+    
+    init(): void {
+        this.bindEvents();
+    }
+    
+    private bindEvents(): void {
+        // Type-safe event delegation
+        this.container.addEventListener('click', (e: Event) => {
+            const target = e.target as HTMLElement;
+            if (target.matches('[data-accordion-trigger]')) {
+                this.toggle(target);
+            }
+        });
+    }
+    
+    private toggle(trigger: HTMLElement): void {
+        // Pure Tailwind manipulation
+        const content = trigger.nextElementSibling as HTMLElement | null;
+        if (!content) return;
+        
+        content.classList.toggle('hidden');
+    }
+}
+```
+
 ### Legacy Component Structure
 ```typescript
-// src/assets/js/components/my-component.ts
+// src/platform/ui/components/my-component.ts
 import { safeQuery } from '../utils/index.js';
 import type { Component } from '../types/component.js';
 
@@ -161,6 +202,14 @@ function isHTMLElement(node: Node): node is HTMLElement {
     return node.nodeType === Node.ELEMENT_NODE;
 }
 
+// Type-safe DOM queries
+function safeQuerySelector<T extends HTMLElement>(
+    selector: string,
+    parent: ParentNode = document
+): T | null {
+    return parent.querySelector<T>(selector);
+}
+
 // Prefer early returns over nested conditions
 function processElement(id: string): void {
     const element = document.getElementById(id);
@@ -169,6 +218,14 @@ function processElement(id: string): void {
     if (!element.classList.contains('active')) return;
     
     // Process element
+}
+
+// Handle unknown errors properly
+try {
+    // risky operation
+} catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Operation failed:', message);
 }
 ```
 
@@ -257,12 +314,15 @@ const applyTheme = (element: HTMLElement): void => {
 ## 🔧 Development Workflow
 
 ### Pre-commit Checklist
-- [ ] `npm run type-check` passes
+- [ ] `npm run type-check` passes (or errors are documented)
 - [ ] `npm run lint` passes
 - [ ] No `style.` usage in TypeScript files
 - [ ] No hardcoded colors/values
 - [ ] All imports use `.js` extension
 - [ ] Design tokens used for styling
+- [ ] No implicit `any` types
+- [ ] All potential `null`/`undefined` handled
+- [ ] Error handling uses `unknown` type
 
 ### Code Review Standards
 1. **Type Safety**: All functions have proper type signatures
@@ -388,6 +448,6 @@ function createButton(config: ButtonConfig): HTMLButtonElement {
 
 ---
 
-**Last Updated**: August 2025  
-**Version**: 2.0 (TypeScript-First Architecture)  
+**Last Updated**: December 2024  
+**Version**: 2.1 (TypeScript-First Architecture with Platform UI)  
 **Maintainer**: Development Team

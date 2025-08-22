@@ -4,7 +4,7 @@
  * Handles interactive elements for the problem validation section.
  */
 
-import { safeQuery, safeQueryAll } from '@/utils/dom.js';
+import { safeQuery, safeQueryAll } from '@platform/lib/utils/dom.ts';
 
 export const problemSection = {
   /**
@@ -73,12 +73,15 @@ export const problemSection = {
    * Handle CTA button clicks
    */
   handleCtaClick(event: Event): void {
-    const _target = event.target as HTMLElement;
+    const target = event.target as HTMLElement;
 
     if (typeof gtag !== 'undefined') {
       gtag('event', 'click_problem_cta', {
         event_category: 'engagement',
-        event_label: 'problem_to_solution'
+        event_label: 'problem_to_solution',
+        custom_data: {
+          button_text: target.textContent?.trim() || 'CTA'
+        }
       });
     }
   },

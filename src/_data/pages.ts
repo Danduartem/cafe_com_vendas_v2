@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
-import type { PageComposition, PagesData } from './types.js';
+import type { PageComposition, PagesData } from './types.ts';
 
 export default function(): PagesData {
   const pagesDir = join(process.cwd(), 'content/pt-PT/pages');

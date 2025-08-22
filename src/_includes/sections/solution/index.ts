@@ -4,7 +4,7 @@
  * Handles pillar interactions and checkout triggers for the solution section.
  */
 
-import { safeQuery, safeQueryAll } from '@/utils/dom.js';
+import { safeQuery, safeQueryAll } from '@platform/lib/utils/dom.ts';
 
 export const solutionSection = {
   /**

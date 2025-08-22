@@ -4,6 +4,21 @@
  * Works alongside Formspree to ensure complete lead capture
  */
 
+import {
+  NetlifyEvent,
+  NetlifyContext,
+  NetlifyResponse,
+  NetlifyHandler,
+  ResponseHeaders,
+  MailerLiteLeadRequest,
+  MailerLiteSubscriberData,
+  MailerLiteResult,
+  ValidationResult,
+  RateLimitResult,
+  ValidationRules,
+  TimeoutPromise
+} from './types';
+
 // Timeout configuration
 const TIMEOUTS = {
   mailerlite_api: 15000,
@@ -14,10 +29,10 @@ const TIMEOUTS = {
 /**
  * Timeout wrapper for async operations
  */
-function withTimeout(promise, timeoutMs, operation = 'Operation') {
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Operation'): TimeoutPromise<T> {
   return Promise.race([
     promise,
-    new Promise((_, reject) => {
+    new Promise<T>((_, reject) => {
       setTimeout(() => {
         reject(new Error(`${operation} timed out after ${timeoutMs}ms`));
       }, timeoutMs);
@@ -32,15 +47,17 @@ const RATE_LIMIT_MAX_REQUESTS = 8; // Max 8 lead submissions per 10 minutes per 
 
 // MailerLite configuration
 const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
-const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID || 'cafe-com-vendas';
 
 // Validation schemas for lead data
-const VALIDATION_RULES = {
+const VALIDATION_RULES: ValidationRules = {
   required_fields: ['lead_id', 'full_name', 'email', 'phone'],
   email_regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   phone_regex: /^[\+]?[0-9][\d\s\-\(\)]{7,20}$/, 
   name_min_length: 2,
   name_max_length: 100,
+  amount_min: 50,
+  amount_max: 1000000,
+  currency_allowed: ['eur', 'usd', 'gbp'],
   utm_params: ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
 };
 
@@ -72,7 +89,7 @@ class CircuitBreaker {
     this.totalCalls++;
     
     if (this.state === 'OPEN') {
-      if (Date.now() - this.lastFailureTime < this.resetTimeout) {
+      if (this.lastFailureTime && Date.now() - this.lastFailureTime < this.resetTimeout) {
         throw new Error(`Circuit breaker is OPEN for ${this.name}`);
       } else {
         this.state = 'HALF_OPEN';
@@ -128,7 +145,7 @@ const mailerliteCircuitBreaker = new CircuitBreaker('mailerlite-lead-api');
 /**
  * Comprehensive input validation for lead data
  */
-function validateLeadRequest(requestBody) {
+function validateLeadRequest(requestBody: MailerLiteLeadRequest): ValidationResult {
   const errors = [];
   
   // Check required fields
@@ -204,7 +221,9 @@ function validateLeadRequest(requestBody) {
       lead_id: lead_id.trim(),
       full_name: cleanName,
       email: cleanEmail,
-      phone: phone.trim()
+      phone: phone.trim(),
+      amount: 18000,
+      currency: 'eur'
     }
   };
 }
@@ -212,7 +231,7 @@ function validateLeadRequest(requestBody) {
 /**
  * Rate limiting middleware for lead capture
  */
-function checkRateLimit(clientIP) {
+function checkRateLimit(clientIP: string): RateLimitResult {
   const now = Date.now();
   const key = `leadlimit:${clientIP}`;
   
@@ -225,7 +244,7 @@ function checkRateLimit(clientIP) {
     }
   }
   
-  const record = rateLimitStore.get(key);
+  const record = rateLimitStore.get(key) as { count: number; firstRequest: number; lastRequest: number } | undefined;
   
   if (!record) {
     rateLimitStore.set(key, {
@@ -261,28 +280,12 @@ function checkRateLimit(clientIP) {
   };
 }
 
-// MailerLite result types
-interface MailerLiteSuccess {
-  success: true;
-  action: 'created' | 'skipped';
-  subscriberId?: string;
-  reason?: string;
-}
-
-interface MailerLiteError {
-  success: false;
-  reason: string;
-  recoverable?: boolean;
-  action?: never;
-  subscriberId?: never;
-}
-
-type MailerLiteResult = MailerLiteSuccess | MailerLiteError;
+// MailerLite result types are now defined in types.ts
 
 /**
  * Add lead to MailerLite with comprehensive error handling
  */
-async function addLeadToMailerLite(leadData: any): Promise<MailerLiteResult> {
+async function addLeadToMailerLite(leadData: MailerLiteSubscriberData): Promise<MailerLiteResult> {
   if (!MAILERLITE_API_KEY) {
     console.warn('MailerLite API key not configured - skipping lead integration');
     return { success: false, reason: 'API key not configured' };
@@ -337,7 +340,7 @@ async function addLeadToMailerLite(leadData: any): Promise<MailerLiteResult> {
 
   } catch (error) {
     // Handle circuit breaker open state gracefully
-    if (error.message.includes('Circuit breaker is OPEN')) {
+    if (error instanceof Error && error.message.includes('Circuit breaker is OPEN')) {
       console.warn('MailerLite circuit breaker is open - skipping lead integration', {
         email: leadData.email,
         circuitBreakerStatus: mailerliteCircuitBreaker.getStatus()
@@ -346,15 +349,15 @@ async function addLeadToMailerLite(leadData: any): Promise<MailerLiteResult> {
     }
     
     console.error('MailerLite integration error', {
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       email: leadData.email,
       circuitBreakerStatus: mailerliteCircuitBreaker.getStatus()
     });
     
     return { 
       success: false, 
-      reason: error.message,
-      recoverable: !error.message.includes('API key') // API key errors are not recoverable
+      reason: error instanceof Error ? error.message : 'Unknown error',
+      recoverable: !(error instanceof Error && error.message.includes('API key')) // API key errors are not recoverable
     };
   }
 }
@@ -362,7 +365,7 @@ async function addLeadToMailerLite(leadData: any): Promise<MailerLiteResult> {
 /**
  * Main handler for lead capture requests
  */
-export const handler = async (event, context) => {
+export const handler: NetlifyHandler = async (event: NetlifyEvent, context: NetlifyContext): Promise<NetlifyResponse> => {
   // Set CORS headers with proper domain restrictions
   const allowedOrigins = [
     'https://cafecomvendas.com',
@@ -383,7 +386,7 @@ export const handler = async (event, context) => {
                    context.identity?.sourceIp ||
                    'unknown';
   
-  const headers = {
+  const headers: ResponseHeaders = {
     'Access-Control-Allow-Origin': isAllowedOrigin ? origin : 'https://cafecomvendas.com',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -418,7 +421,7 @@ export const handler = async (event, context) => {
   headers['X-RateLimit-Window'] = (RATE_LIMIT_WINDOW / 1000).toString();
   
   if (!rateLimitResult.allowed) {
-    headers['Retry-After'] = rateLimitResult.retryAfter.toString();
+    headers['Retry-After'] = rateLimitResult.retryAfter?.toString() || '60';
     return {
       statusCode: 429,
       headers,
@@ -432,9 +435,9 @@ export const handler = async (event, context) => {
 
   try {
     // Parse request body
-    let requestBody;
+    let requestBody: MailerLiteLeadRequest;
     try {
-      requestBody = JSON.parse(event.body);
+      requestBody = JSON.parse(event.body || '{}') as MailerLiteLeadRequest;
     } catch (error) {
       return {
         statusCode: 400,
@@ -458,7 +461,7 @@ export const handler = async (event, context) => {
     }
     
     // Use sanitized data
-    const { lead_id, full_name, email, phone } = validation.sanitized;
+    const { lead_id, full_name, email, phone } = validation.sanitized!;
 
     // Prepare lead data for MailerLite
     const leadData = {
@@ -474,7 +477,7 @@ export const handler = async (event, context) => {
         event_date: '2024-09-20',
         page: requestBody.page || 'unknown',
         user_agent: event.headers['user-agent']?.substring(0, 255) || 'unknown'
-      }
+      } as Record<string, string | number | null>
     };
     
     // Add validated UTM parameters
@@ -519,7 +522,7 @@ export const handler = async (event, context) => {
     console.error('Lead capture handler error:', error);
 
     // Handle timeout errors
-    if (error.message?.includes('timed out')) {
+    if (error instanceof Error && error.message?.includes('timed out')) {
       return {
         statusCode: 504,
         headers,

@@ -4,6 +4,18 @@
  */
 
 import Stripe from 'stripe';
+import {
+  NetlifyEvent,
+  NetlifyContext,
+  NetlifyResponse,
+  NetlifyHandler,
+  ResponseHeaders,
+  StripeWebhookEvent,
+  FulfillmentRecord,
+  CircuitBreakerStatus,
+  MailerLiteSubscriberData,
+  TimeoutPromise
+} from './types';
 
 // Initialize Stripe with secret key and timeout configuration
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -21,10 +33,10 @@ const TIMEOUTS = {
 /**
  * Timeout wrapper for async operations
  */
-function withTimeout(promise, timeoutMs, operation = 'Operation') {
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Operation'): TimeoutPromise<T> {
   return Promise.race([
     promise,
-    new Promise((_, reject) => {
+    new Promise<T>((_, reject) => {
       setTimeout(() => {
         reject(new Error(`${operation} timed out after ${timeoutMs}ms`));
       }, timeoutMs);
@@ -86,7 +98,7 @@ class CircuitBreaker {
     this.totalCalls++;
     
     if (this.state === 'OPEN') {
-      if (Date.now() - this.lastFailureTime < this.config.resetTimeout) {
+      if (this.lastFailureTime && Date.now() - this.lastFailureTime < this.config.resetTimeout) {
         throw new Error(`Circuit breaker is OPEN for ${this.name}`);
       } else {
         this.state = 'HALF_OPEN';
@@ -127,7 +139,7 @@ class CircuitBreaker {
     }
   }
   
-  getStatus(): { name: string; state: string; failureCount: number; successCount: number; totalCalls: number; lastFailureTime: number | null; } {
+  getStatus(): CircuitBreakerStatus {
     return {
       name: this.name,
       state: this.state,
@@ -142,7 +154,7 @@ class CircuitBreaker {
 /**
  * Get or create circuit breaker for a service
  */
-function getCircuitBreaker(serviceName) {
+function getCircuitBreaker(serviceName: string): CircuitBreaker {
   if (!circuitBreakers.has(serviceName)) {
     circuitBreakers.set(serviceName, new CircuitBreaker(serviceName));
   }
@@ -162,12 +174,12 @@ class FulfillmentTracker {
     }
   }
   
-  static isAlreadyFulfilled(key) {
+  static isAlreadyFulfilled(key: string): boolean {
     this.cleanExpiredEntries();
     return fulfillmentStore.has(key);
   }
   
-  static markAsFulfilled(key, metadata = {}) {
+  static markAsFulfilled(key: string, metadata: Partial<FulfillmentRecord> = {}): void {
     this.cleanExpiredEntries();
     fulfillmentStore.set(key, {
       timestamp: Date.now(),
@@ -176,7 +188,7 @@ class FulfillmentTracker {
     });
   }
   
-  static getFulfillmentInfo(key) {
+  static getFulfillmentInfo(key: string): FulfillmentRecord | undefined {
     this.cleanExpiredEntries();
     return fulfillmentStore.get(key);
   }
@@ -190,7 +202,7 @@ class FulfillmentTracker {
 }
 
 // Logging with correlation IDs
-function logWithCorrelation(level, message, data = {}, correlationId = null) {
+function logWithCorrelation(level: string, message: string, data: Record<string, unknown> = {}, correlationId: string | null = null): string {
   const logEntry = {
     timestamp: new Date().toISOString(),
     level,
@@ -202,13 +214,14 @@ function logWithCorrelation(level, message, data = {}, correlationId = null) {
   return logEntry.correlationId;
 }
 
-export const handler = async (event, context) => {
+export const handler: NetlifyHandler = async (event: NetlifyEvent, _context: NetlifyContext): Promise<NetlifyResponse> => {
   // Set CORS headers
-  const headers = {
+  const headers: ResponseHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Stripe-Signature',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Credentials': 'false'
   };
 
   // Handle preflight requests
@@ -229,7 +242,7 @@ export const handler = async (event, context) => {
     };
   }
 
-  let stripeEvent;
+  let stripeEvent: StripeWebhookEvent;
 
   try {
     // Validate environment variables
@@ -252,17 +265,17 @@ export const handler = async (event, context) => {
     if (!endpointSecret) {
       console.warn('Stripe webhook secret not configured - skipping signature verification');
       // Parse event without verification (development mode)
-      stripeEvent = JSON.parse(event.body);
+      stripeEvent = JSON.parse(event.body || '{}') as any;
     } else {
       // Verify webhook signature
       try {
         stripeEvent = stripe.webhooks.constructEvent(
-          event.body,
+          event.body || '',
           sig,
           endpointSecret
-        );
+        ) as any;
       } catch (err) {
-        console.error('Webhook signature verification failed:', err.message);
+        console.error('Webhook signature verification failed:', err instanceof Error ? err.message : 'Unknown error');
         return {
           statusCode: 400,
           headers,
@@ -363,13 +376,13 @@ export const handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Webhook handler error:', error);
+    console.error('Webhook handler error:', error instanceof Error ? error.message : 'Unknown error');
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
         error: 'Webhook handler failed',
-        message: error.message 
+        message: error instanceof Error ? error.message : 'Unknown error'
       })
     };
   }
@@ -378,7 +391,7 @@ export const handler = async (event, context) => {
 /**
  * Retry wrapper with exponential backoff
  */
-async function retryWithBackoff(fn, maxRetries = MAX_RETRIES, baseDelay = RETRY_DELAY_BASE) {
+async function retryWithBackoff<T>(fn: () => Promise<T>, maxRetries = MAX_RETRIES, baseDelay = RETRY_DELAY_BASE): Promise<T> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
@@ -387,7 +400,7 @@ async function retryWithBackoff(fn, maxRetries = MAX_RETRIES, baseDelay = RETRY_
       
       const delay = baseDelay * Math.pow(2, attempt - 1) + Math.random() * 1000;
       logWithCorrelation('warn', `Retry attempt ${attempt} failed, retrying in ${delay}ms`, {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         attempt,
         maxRetries
       });
@@ -395,12 +408,13 @@ async function retryWithBackoff(fn, maxRetries = MAX_RETRIES, baseDelay = RETRY_
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
+  throw new Error('Maximum retries exceeded');
 }
 
 /**
  * Handle successful payment
  */
-async function handlePaymentSuccess(paymentIntent, correlationId) {
+async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Payment succeeded: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id,
     amount: paymentIntent.amount,
@@ -439,7 +453,7 @@ async function handlePaymentSuccess(paymentIntent, correlationId) {
         name: customerName,
         phone: customerPhone,
         fields: {
-          lead_id: leadId,
+          lead_id: leadId || '',
           payment_status: 'paid',
           payment_intent_id: paymentIntent.id,
           amount_paid: paymentIntent.amount / 100, // Convert from cents
@@ -457,7 +471,7 @@ async function handlePaymentSuccess(paymentIntent, correlationId) {
     } catch (error) {
       // Log error but don't fail the webhook processing
       logWithCorrelation('error', 'Failed to add customer to MailerLite after retries', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         customerEmail,
         paymentIntentId: paymentIntent.id
       }, correlationId);
@@ -488,9 +502,9 @@ async function handlePaymentSuccess(paymentIntent, correlationId) {
 
   } catch (error) {
     logWithCorrelation('error', 'Error processing successful payment', {
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       paymentIntentId: paymentIntent.id,
-      stack: error.stack
+      stack: error instanceof Error ? error.stack : undefined
     }, correlationId);
     // Don't throw - we don't want to retry webhook
   }
@@ -499,7 +513,7 @@ async function handlePaymentSuccess(paymentIntent, correlationId) {
 /**
  * Handle payment processing (async payments like bank transfers)
  */
-async function handlePaymentProcessing(paymentIntent, correlationId) {
+async function handlePaymentProcessing(paymentIntent: Stripe.PaymentIntent, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Payment processing: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id
   }, correlationId);
@@ -518,7 +532,7 @@ async function handlePaymentProcessing(paymentIntent, correlationId) {
     
   } catch (error) {
     logWithCorrelation('error', 'Error processing payment processing event', {
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       paymentIntentId: paymentIntent.id
     }, correlationId);
   }
@@ -527,7 +541,7 @@ async function handlePaymentProcessing(paymentIntent, correlationId) {
 /**
  * Handle failed payment
  */
-async function handlePaymentFailed(paymentIntent, correlationId) {
+async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent, correlationId: string): Promise<void> {
   logWithCorrelation('warn', `Payment failed: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id,
     lastPaymentError: paymentIntent.last_payment_error
@@ -557,7 +571,7 @@ async function handlePaymentFailed(paymentIntent, correlationId) {
     
   } catch (error) {
     logWithCorrelation('error', 'Error processing payment failure', {
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       paymentIntentId: paymentIntent.id
     }, correlationId);
   }
@@ -566,7 +580,7 @@ async function handlePaymentFailed(paymentIntent, correlationId) {
 /**
  * Handle canceled payment
  */
-async function handlePaymentCanceled(paymentIntent, correlationId) {
+async function handlePaymentCanceled(paymentIntent: Stripe.PaymentIntent, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Payment canceled: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id
   }, correlationId);
@@ -586,7 +600,7 @@ async function handlePaymentCanceled(paymentIntent, correlationId) {
     
   } catch (error) {
     logWithCorrelation('error', 'Error processing payment cancellation', {
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       paymentIntentId: paymentIntent.id
     }, correlationId);
   }
@@ -595,7 +609,7 @@ async function handlePaymentCanceled(paymentIntent, correlationId) {
 /**
  * Handle payment that requires action (3D Secure, etc.)
  */
-async function handlePaymentRequiresAction(paymentIntent, correlationId) {
+async function handlePaymentRequiresAction(paymentIntent: Stripe.PaymentIntent, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Payment requires action: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id,
     nextAction: paymentIntent.next_action
@@ -615,7 +629,7 @@ async function handlePaymentRequiresAction(paymentIntent, correlationId) {
     
   } catch (error) {
     logWithCorrelation('error', 'Error processing payment requires action', {
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       paymentIntentId: paymentIntent.id
     }, correlationId);
   }
@@ -624,7 +638,7 @@ async function handlePaymentRequiresAction(paymentIntent, correlationId) {
 /**
  * Handle partially funded payment
  */
-async function handlePaymentPartiallyFunded(paymentIntent, correlationId) {
+async function handlePaymentPartiallyFunded(paymentIntent: Stripe.PaymentIntent, correlationId: string): Promise<void> {
   logWithCorrelation('warn', `Payment partially funded: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id,
     amountReceived: paymentIntent.amount_received
@@ -645,7 +659,7 @@ async function handlePaymentPartiallyFunded(paymentIntent, correlationId) {
     
   } catch (error) {
     logWithCorrelation('error', 'Error processing partial funding', {
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       paymentIntentId: paymentIntent.id
     }, correlationId);
   }
@@ -654,7 +668,7 @@ async function handlePaymentPartiallyFunded(paymentIntent, correlationId) {
 /**
  * Handle charge dispute
  */
-async function handleChargeDispute(dispute, correlationId) {
+async function handleChargeDispute(dispute: Stripe.Dispute, correlationId: string): Promise<void> {
   logWithCorrelation('error', `Charge dispute created: ${dispute.id}`, {
     disputeId: dispute.id,
     chargeId: dispute.charge,
@@ -675,7 +689,7 @@ async function handleChargeDispute(dispute, correlationId) {
     
   } catch (error) {
     logWithCorrelation('error', 'Error processing charge dispute', {
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       disputeId: dispute.id
     }, correlationId);
   }
@@ -684,17 +698,17 @@ async function handleChargeDispute(dispute, correlationId) {
 /**
  * Handle invoice payment succeeded
  */
-async function handleInvoicePaymentSucceeded(invoice, correlationId) {
+async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Invoice payment succeeded: ${invoice.id}`, {
     invoiceId: invoice.id,
-    subscriptionId: invoice.subscription
+    subscriptionId: (invoice as any).subscription
   }, correlationId);
 }
 
 /**
  * Handle subscription changes
  */
-async function handleSubscriptionChange(subscription, eventType, correlationId) {
+async function handleSubscriptionChange(subscription: Stripe.Subscription, eventType: string, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Subscription event: ${eventType}`, {
     subscriptionId: subscription.id,
     customerId: subscription.customer,
@@ -706,7 +720,7 @@ async function handleSubscriptionChange(subscription, eventType, correlationId) 
 /**
  * Handle successful async payments (delayed payment methods like Multibanco)
  */
-async function handleCheckoutSessionAsyncPaymentSucceeded(session, correlationId) {
+async function handleCheckoutSessionAsyncPaymentSucceeded(session: Stripe.Checkout.Session, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Async payment succeeded: ${session.id}`, {
     sessionId: session.id,
     paymentIntent: session.payment_intent,
@@ -735,13 +749,13 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session, correlationId
 
     // Check if this session has already been fulfilled to prevent duplicates
     const fulfillmentKey = `checkout_session_${fullSession.id}`;
-    const paymentIntentKey = fullSession.payment_intent?.id ? `payment_intent_${fullSession.payment_intent.id}` : null;
+    const paymentIntentKey = (typeof fullSession.payment_intent === 'object' && fullSession.payment_intent?.id) ? `payment_intent_${fullSession.payment_intent.id}` : null;
     
     // Check both session and payment intent fulfillment to handle edge cases
     if (FulfillmentTracker.isAlreadyFulfilled(fulfillmentKey) || 
         (paymentIntentKey && FulfillmentTracker.isAlreadyFulfilled(paymentIntentKey))) {
       const existingFulfillment = FulfillmentTracker.getFulfillmentInfo(fulfillmentKey) || 
-                                 FulfillmentTracker.getFulfillmentInfo(paymentIntentKey);
+                                 (paymentIntentKey ? FulfillmentTracker.getFulfillmentInfo(paymentIntentKey) : undefined);
       logWithCorrelation('info', `Session ${fullSession.id} already fulfilled`, {
         sessionId: fullSession.id,
         existingFulfillment,
@@ -754,7 +768,7 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session, correlationId
     logWithCorrelation('info', `Processing delayed payment fulfillment for session ${fullSession.id}`, {
       sessionId: fullSession.id,
       customerEmail,
-      paymentIntent: fullSession.payment_intent?.id || fullSession.payment_intent,
+      paymentIntent: typeof fullSession.payment_intent === 'object' ? (fullSession.payment_intent?.id || 'unknown') : (fullSession.payment_intent || 'unknown'),
       fulfillmentKey
     }, correlationId);
 
@@ -765,11 +779,11 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session, correlationId
         name: customerName,
         phone: customerPhone,
         fields: {
-          lead_id: leadId,
+          lead_id: leadId || '',
           payment_status: 'paid',
-          payment_intent_id: fullSession.payment_intent?.id || fullSession.payment_intent,
+          payment_intent_id: typeof fullSession.payment_intent === 'object' ? (fullSession.payment_intent?.id || 'unknown') : (fullSession.payment_intent || 'unknown'),
           session_id: fullSession.id,
-          amount_paid: fullSession.amount_total / 100, // Convert from cents
+          amount_paid: (fullSession.amount_total || 0) / 100, // Convert from cents
           currency: fullSession.currency?.toUpperCase() || 'EUR',
           event_name: fullSession.metadata?.event_name || 'Café com Vendas',
           event_date: fullSession.metadata?.event_date || '2024-09-20',
@@ -777,8 +791,8 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session, correlationId
           source: 'checkout_async_payment',
           payment_date: new Date().toISOString(),
           payment_method: 'delayed_notification', // Indicates Multibanco/delayed method
-          utm_source: fullSession.metadata?.utm_source || null,
-          utm_medium: fullSession.metadata?.utm_medium || null,
+          utm_source: fullSession.metadata?.utm_source ?? null,
+          utm_medium: fullSession.metadata?.utm_medium ?? null,
           utm_campaign: fullSession.metadata?.utm_campaign || null,
           fulfillment_trigger: 'async_payment_succeeded'
         }
@@ -786,7 +800,7 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session, correlationId
     } catch (error) {
       // Log error but don't fail the webhook processing
       logWithCorrelation('error', 'Failed to add customer to MailerLite after retries (async payment)', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         customerEmail,
         sessionId: fullSession.id
       }, correlationId);
@@ -795,7 +809,7 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session, correlationId
     // Send confirmation email (via MailerLite automation)
     await triggerConfirmationEmail(customerEmail, {
       name: customerName,
-      amount: fullSession.amount_total / 100,
+      amount: (fullSession.amount_total || 0) / 100,
       currency: fullSession.currency?.toUpperCase() || 'EUR',
       event_name: fullSession.metadata?.event_name || 'Café com Vendas',
       event_date: fullSession.metadata?.event_date || '20/09/2024',
@@ -806,17 +820,17 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session, correlationId
     FulfillmentTracker.markAsFulfilled(fulfillmentKey, {
       customerEmail,
       sessionId: fullSession.id,
-      paymentIntentId: fullSession.payment_intent?.id || fullSession.payment_intent,
+      paymentIntentId: typeof fullSession.payment_intent === 'object' ? (fullSession.payment_intent?.id || 'unknown') : (fullSession.payment_intent || 'unknown'),
       fulfillmentType: 'checkout_session_async_payment_succeeded',
       fulfilledAt: new Date().toISOString()
     });
     
     // Also mark payment intent to prevent duplicate processing from payment_intent.succeeded
-    if (paymentIntentKey) {
+    if (paymentIntentKey && typeof fullSession.payment_intent === 'object') {
       FulfillmentTracker.markAsFulfilled(paymentIntentKey, {
         customerEmail,
         sessionId: fullSession.id,
-        paymentIntentId: fullSession.payment_intent.id,
+        paymentIntentId: fullSession.payment_intent && typeof fullSession.payment_intent === 'object' ? fullSession.payment_intent.id || 'unknown' : 'unknown',
         fulfillmentType: 'async_payment_cross_reference',
         fulfilledAt: new Date().toISOString()
       });
@@ -825,16 +839,16 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session, correlationId
     logWithCorrelation('info', `Successfully processed async payment for ${customerEmail}`, {
       sessionId: fullSession.id,
       customerEmail,
-      paymentIntent: fullSession.payment_intent?.id || fullSession.payment_intent,
+      paymentIntent: typeof fullSession.payment_intent === 'object' ? (fullSession.payment_intent?.id || 'unknown') : (fullSession.payment_intent || 'unknown'),
       fulfillmentKey,
       paymentIntentKey
     }, correlationId);
 
   } catch (error) {
     logWithCorrelation('error', 'Error processing async payment success', {
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       sessionId: session.id,
-      stack: error.stack
+      stack: error instanceof Error ? error.stack : undefined
     }, correlationId);
     // Don't throw - we don't want to retry webhook
   }
@@ -843,7 +857,7 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session, correlationId
 /**
  * Handle failed async payments (delayed payment methods like Multibanco)
  */
-async function handleCheckoutSessionAsyncPaymentFailed(session, correlationId) {
+async function handleCheckoutSessionAsyncPaymentFailed(session: Stripe.Checkout.Session, correlationId: string): Promise<void> {
   logWithCorrelation('warn', `Async payment failed: ${session.id}`, {
     sessionId: session.id,
     paymentIntent: session.payment_intent,
@@ -875,7 +889,7 @@ async function handleCheckoutSessionAsyncPaymentFailed(session, correlationId) {
       // Trigger abandoned cart email sequence for failed async payment
       await retryWithBackoff(() => triggerAbandonedCartEmail(customerEmail, {
         name: customerName,
-        amount: fullSession.amount_total / 100,
+        amount: (fullSession.amount_total || 0) / 100,
         currency: fullSession.currency?.toUpperCase() || 'EUR',
         failure_reason: 'Payment expired or failed to complete',
         payment_method: 'Multibanco'
@@ -884,7 +898,7 @@ async function handleCheckoutSessionAsyncPaymentFailed(session, correlationId) {
     
   } catch (error) {
     logWithCorrelation('error', 'Error processing async payment failure', {
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       sessionId: session.id
     }, correlationId);
   }
@@ -893,7 +907,7 @@ async function handleCheckoutSessionAsyncPaymentFailed(session, correlationId) {
 /**
  * Add subscriber to MailerLite
  */
-async function addToMailerLite(subscriberData) {
+async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promise<any> {
   if (!MAILERLITE_API_KEY) {
     logWithCorrelation('warn', 'MailerLite API key not configured - skipping email integration');
     return;
@@ -939,7 +953,7 @@ async function addToMailerLite(subscriberData) {
 
   } catch (error) {
     // Handle circuit breaker open state gracefully
-    if (error.message.includes('Circuit breaker is OPEN')) {
+    if (error instanceof Error && error.message.includes('Circuit breaker is OPEN')) {
       logWithCorrelation('warn', 'MailerLite circuit breaker is open - skipping email integration', {
         email: subscriberData.email,
         circuitBreakerStatus: circuitBreaker.getStatus()
@@ -948,7 +962,7 @@ async function addToMailerLite(subscriberData) {
     }
     
     logWithCorrelation('error', 'MailerLite integration error', {
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       email: subscriberData.email,
       circuitBreakerStatus: circuitBreaker.getStatus()
     });
@@ -959,7 +973,7 @@ async function addToMailerLite(subscriberData) {
 /**
  * Update existing MailerLite subscriber
  */
-async function updateMailerLiteSubscriber(email, fields) {
+async function updateMailerLiteSubscriber(email: string, fields: Record<string, string | number>): Promise<void> {
   if (!MAILERLITE_API_KEY) {
     logWithCorrelation('warn', 'MailerLite API key not configured - skipping email integration');
     return;
@@ -1025,7 +1039,7 @@ async function updateMailerLiteSubscriber(email, fields) {
 
   } catch (error) {
     // Handle circuit breaker open state gracefully
-    if (error.message.includes('Circuit breaker is OPEN')) {
+    if (error instanceof Error && error.message.includes('Circuit breaker is OPEN')) {
       logWithCorrelation('warn', 'MailerLite circuit breaker is open - skipping subscriber update', {
         email,
         circuitBreakerStatus: circuitBreaker.getStatus()
@@ -1034,7 +1048,7 @@ async function updateMailerLiteSubscriber(email, fields) {
     }
     
     logWithCorrelation('error', 'Error updating MailerLite subscriber', {
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       email,
       circuitBreakerStatus: circuitBreaker.getStatus()
     });
@@ -1045,7 +1059,7 @@ async function updateMailerLiteSubscriber(email, fields) {
 /**
  * Trigger confirmation email automation
  */
-async function triggerConfirmationEmail(email, data) {
+async function triggerConfirmationEmail(email: string, data: Record<string, unknown>): Promise<void> {
   if (!MAILERLITE_API_KEY) {
     return;
   }
@@ -1067,7 +1081,7 @@ async function triggerConfirmationEmail(email, data) {
 /**
  * Trigger abandoned cart email sequence
  */
-async function triggerAbandonedCartEmail(email, data) {
+async function triggerAbandonedCartEmail(email: string, data: Record<string, unknown>): Promise<void> {
   if (!MAILERLITE_API_KEY) {
     return;
   }

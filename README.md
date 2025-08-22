@@ -5,14 +5,14 @@ Premium landing page for an intimate business transformation event in Lisbon, de
 ## 🎯 Project Overview
 
 **Event**: Café com Vendas - Business transformation workshop  
-**Date**: September 20, 2025  
+**Date**: February 15, 2025  
 **Location**: Lisbon, Portugal  
-**Audience**: Female entrepreneurs (8 exclusive spots)  
+**Audience**: Female entrepreneurs (20 exclusive spots)  
 **Language**: Portuguese (pt-PT)
 
 ## 🚨 Current Status
 
-✅ **TypeScript Migration Complete**: The codebase has achieved **100% TypeScript compliance** with zero type errors. All JavaScript files have been successfully migrated to TypeScript with comprehensive type definitions and compile-time validation.  
+✅ **TypeScript Migration Complete**: The codebase has been fully migrated to TypeScript with comprehensive type definitions. All type errors resolved, achieving complete type safety across the entire application.  
 
 ## 🛠 Tech Stack
 
@@ -26,6 +26,7 @@ Premium landing page for an intimate business transformation event in Lisbon, de
 - **Design System**: JSON tokens → CSS custom properties
 - **Fonts**: Local Lora (display) + Century Gothic (body)
 - **Architecture**: **TypeScript-first** modular architecture with **complete type safety**
+- **Testing**: [Playwright](https://playwright.dev/) 1.55.0 (End-to-end browser testing)
 - **Edge**: Netlify Edge Functions (TypeScript CSP header)
 
 ## 🚀 Quick Start
@@ -51,6 +52,15 @@ npm run lint
 
 # Clean build directory
 npm run clean
+
+# Run end-to-end tests (Playwright)
+npm run test:e2e
+
+# Run unit tests (Vitest)
+npm run test
+
+# Run visual regression tests
+npm run test:visual
 ```
 
 ## 📁 Project Structure
@@ -60,99 +70,180 @@ npm run clean
 │   └── pt-PT/                 # Portuguese content (primary language)
 │       ├── site.json          # Global site metadata & SEO
 │       ├── event.json         # Event data (prices, dates, logistics)
-│       ├── design_tokens.json # Unified design system
-│       └── *.json             # All content as structured data
+│       ├── pages/             # Page-specific content
+│       ├── sections/          # Section-specific content
+│       └── strings/           # Localized strings
+│
+├── design/                     # 🎨 Design System (Language-Agnostic)
+│   └── tokens.json            # Unified design tokens & CSS variables
+│
+├── tests/                      # 🧪 Test Suite (Top-Level Organization)
+│   ├── unit/                  # Unit tests (analytics, render)
+│   │   ├── analytics/         # Analytics contract testing
+│   │   └── render/            # Template rendering tests
+│   ├── visual/                # Visual regression tests (Playwright)
+│   │   ├── sections.spec.ts   # Playwright visual tests
+│   │   └── sections.spec.ts-snapshots/ # Visual baselines
+│   ├── schemas/               # Data validation tests
+│   ├── utils/                 # Test utilities and helpers
+│   └── setup.ts              # Test configuration
 │
 ├── src/
 │   ├── _includes/
-│   │   ├── layout.njk           # Base HTML template
-│   │   ├── sections/             # 🏗️ Co-located Sections (TypeScript)
-│   │   │   ├── hero/
-│   │   │   │   ├── index.njk    # Template
-│   │   │   │   └── index.ts     # Logic (TypeScript)
-│   │   │   └── offer/           # Same pattern
-│   │   └── components/*.njk     # Legacy components (templates only)
+│   │   ├── layout.njk         # Base HTML template
+│   │   ├── partials/          # Reusable template parts
+│   │   │   ├── legal-page.njk # Legal page template
+│   │   │   ├── whatsapp-button.njk
+│   │   │   └── *.njk          # Other partials
+│   │   └── sections/          # 🏗️ Co-located Sections (TypeScript)
+│   │       ├── hero/
+│   │       │   ├── index.njk  # Template
+│   │       │   ├── index.ts   # Logic (TypeScript)
+│   │       │   └── schema.ts  # Data validation
+│   │       ├── offer/         # Same pattern for all sections
+│   │       ├── problem/
+│   │       ├── solution/
+│   │       ├── about/
+│   │       ├── social-proof/
+│   │       ├── faq/
+│   │       ├── final-cta/
+│   │       ├── footer/
+│   │       ├── top-banner/
+│   │       ├── checkout/
+│   │       └── manifest.ts    # Section registry
 │   │
-│   ├── _data/                   # 🗃️ Data Adapters (TypeScript)
-│   │   ├── site.ts             # Loads content/pt-PT/site.json
-│   │   ├── event.ts            # Loads content/pt-PT/event.json
-│   │   ├── tokens.ts           # Loads content/pt-PT/design_tokens.json
-│   │   └── *.ts                # All data adapters in TypeScript
+│   ├── _data/                 # 🗃️ Data Adapters (TypeScript)
+│   │   ├── site.ts           # Loads content/pt-PT/site.json
+│   │   ├── event.ts          # Loads content/pt-PT/event.json
+│   │   ├── presenter.ts      # Presenter data
+│   │   ├── page.ts           # Page-specific data loader
+│   │   ├── pages.ts          # Multi-page data system
+│   │   ├── global.ts         # Global data aggregator
+│   │   └── types.ts          # Data type definitions
 │   │
-│   ├── index.njk               # Main landing page
-│   ├── politica-privacidade.njk # Privacy policy
-│   ├── termos-condicoes.njk    # Terms & conditions
+│   ├── pages/                 # 📄 Page Templates (Organized)
+│   │   ├── index.njk          # Main landing page
+│   │   ├── politica-privacidade.njk # Privacy policy
+│   │   ├── termos-condicoes.njk  # Terms & conditions
+│   │   ├── garantia-reembolso.njk # Guarantee & refund policy
+│   │   └── thank-you.njk      # Thank you page
 │   │
 │   ├── assets/
 │   │   ├── css/
-│   │   │   ├── main.css        # Tailwind + tokens entry
-│   │   │   └── _tokens.generated.css # Generated from design_tokens.json
+│   │   │   ├── main.css      # Tailwind + tokens entry
+│   │   │   └── _tokens.generated.css # Generated from design/tokens.json
 │   │   │
-│   │   ├── js/                 # ⚡ Complete TypeScript Architecture
-│   │   │   ├── main.ts         # Entry point (TypeScript)
-│   │   │   ├── app.ts          # Application controller (TypeScript)
-│   │   │   ├── types/          # 🏷️ TypeScript Definitions
-│   │   │   │   ├── global.ts    # Global types
+│   │   ├── js/               # ⚡ Complete TypeScript Architecture
+│   │   │   ├── main.ts       # Entry point (TypeScript)
+│   │   │   ├── app.ts        # Application controller (TypeScript)
+│   │   │   ├── types/        # 🏷️ TypeScript Definitions
+│   │   │   │   ├── global.ts  # Global types
 │   │   │   │   ├── component.ts # Component interfaces
-│   │   │   │   └── *.ts        # All type definitions
+│   │   │   │   ├── analytics.ts # Analytics types
+│   │   │   │   ├── config.ts   # Configuration types
+│   │   │   │   ├── state.ts    # State types
+│   │   │   │   └── window.d.ts # Window extensions
 │   │   │   ├── core/
 │   │   │   │   ├── analytics.ts # GTM/GA4 tracking (TypeScript)
 │   │   │   │   └── state.ts    # State management (TypeScript)
-│   │   │   ├── utils/
-│   │   │   │   ├── dom.ts      # DOM helpers (TypeScript)
-│   │   │   │   ├── animations.ts # Animation utilities (TypeScript)
-│   │   │   │   └── index.ts    # Utils barrel export (TypeScript)
-│   │   │   └── components/
-│   │   │       ├── banner.ts   # Top banner (TypeScript)
-│   │   │       ├── faq.ts      # FAQ accordion (TypeScript)
-│   │   │       ├── gtm.ts      # Google Tag Manager (TypeScript)
-│   │   │       └── *.ts        # All components in TypeScript
+│   │   │   └── config/
+│   │   │       ├── constants.ts # App constants
+│   │   │       └── environment.ts # Environment config
 │   │   │
-│   │   └── fonts/              # Local Lora & Century Gothic
+│   │   ├── fonts/            # Local Lora & Century Gothic
+│   │   │   ├── Lora/         # Lora font variants
+│   │   │   └── CenturyGothic/ # Century Gothic variants
+│   │   │
+│   │   └── images/           # Static images (Unified)
+│   │       ├── cafe.jpg
+│   │       ├── problem-overworked.jpg
+│   │       └── sobre3.jpeg
 │   │
-│   └── platform/               # 🏗️ Platform Foundation (TypeScript)
-│       ├── lib/utils/          # Shared utilities (TypeScript)
-│       └── analytics/core/     # Analytics abstraction (TypeScript)
+│   ├── platform/             # 🏗️ Platform Foundation (TypeScript)
+│   │   ├── lib/utils/        # Shared utilities (TypeScript)
+│   │   │   ├── animations.ts # Animation helpers
+│   │   │   ├── dom.ts        # DOM utilities
+│   │   │   ├── scroll-tracker.ts # Scroll tracking
+│   │   │   └── *.ts          # Other utilities
+│   │   └── ui/components/    # 🔧 UI Component Library (Consolidated)
+│   │       ├── analytics.ts  # Analytics tracking components
+│   │       ├── animations.ts # Animation components
+│   │       ├── accordion.ts  # Accordion UI pattern
+│   │       ├── gtm.ts        # GTM integration
+│   │       ├── modal.ts      # Modal UI pattern
+│   │       ├── thank-you.ts  # Thank you page components
+│   │       ├── youtube.ts    # YouTube integration
+│   │       └── index.ts      # Component registry
+│   │
+│   ├── public/               # Static assets
+│   │   ├── favicon.ico
+│   │   ├── favicon.svg
+│   │   └── _headers          # Netlify headers
 │
-├── netlify/                    # ☁️ Serverless Functions (TypeScript)
+├── netlify/                  # ☁️ Serverless Functions (TypeScript)
 │   ├── functions/
 │   │   ├── create-payment-intent.ts # Stripe payments (TypeScript)
 │   │   ├── stripe-webhook.ts        # Stripe webhooks (TypeScript)
-│   │   └── mailerlite-lead.ts       # Email integration (TypeScript)
+│   │   ├── mailerlite-lead.ts       # Email integration (TypeScript)
+│   │   └── types.ts                 # Shared function types
 │   └── edge-functions/
 │       └── csp.ts                   # Content Security Policy (TypeScript)
 │
-├── scripts/                    # 🔧 Build Tools (TypeScript)
-│   ├── build-tokens.ts         # Design tokens → CSS (TypeScript)
-│   ├── universal-screenshot.ts  # Screenshot system (TypeScript)
-│   └── *.ts                    # All build scripts in TypeScript
+├── scripts/                  # 🔧 Build Tools (TypeScript)
+│   ├── build-tokens.ts       # Design tokens → CSS (TypeScript)
+│   ├── universal-screenshot.ts # Screenshot system (TypeScript)
+│   ├── dev-section.ts        # Section development tools
+│   ├── new-section.ts        # Section scaffolding
+│   └── *.ts                  # Other build scripts in TypeScript
 │
-├── .eleventy.ts                # ⚙️ Eleventy config (TypeScript)
-├── vite.config.ts              # ⚙️ Vite bundler config (TypeScript)
-├── tsconfig.json               # ⚙️ TypeScript configuration
-├── eslint.config.ts            # ⚙️ ESLint config (TypeScript)
+├── docs/                     # 📖 Technical Documentation
+│   ├── architecture-overview.md
+│   ├── coding-standards.md
+│   ├── GTM_SETUP_GUIDE.md
+│   ├── STRIPE_TEST_CARDS.md
+│   └── *.md                  # Other documentation
 │
-├── info/                       # ❌ DEPRECATED - Old content structure
-│   └── *.json                  # Superseded by content/pt-PT/
-├── docs/                       # 📖 Technical documentation
-├── .claude/                    # 🤖 Custom Claude Code commands
-├── bizplan/                    # 📈 Business strategy artifacts
-├── copy-pick/                  # ✏️ Copy optimization experiments
-├── strategy/                   # 🎯 Strategic planning materials
-└── CLAUDE.md                   # 🤖 AI development guidelines
+├── reports/                  # 📊 Performance & Quality Reports
+│   ├── lighthouse-desktop.report.html
+│   ├── lighthouse-mobile.report.html
+│   └── lighthouse-*/         # Lighthouse report directories
+│
+├── _site/                    # 🏭 Generated Static Site (Build Output)
+│   ├── index.html            # Generated pages
+│   ├── assets/               # Optimized assets
+│   └── */                    # Other generated content
+│
+├── .eleventy.ts              # ⚙️ Eleventy config (TypeScript)
+├── vite.config.ts            # ⚙️ Vite bundler config (TypeScript)
+├── tsconfig.json             # ⚙️ TypeScript configuration
+├── eslint.config.ts          # ⚙️ ESLint config (TypeScript)
+├── playwright.config.ts      # ⚙️ Playwright test config (TypeScript)
+├── vitest.config.ts          # ⚙️ Vitest unit test config (TypeScript)
+├── postcss.config.ts         # ⚙️ PostCSS config (TypeScript)
+├── netlify.toml              # ⚙️ Netlify deployment config
+│
+└── CLAUDE.md                 # 🤖 AI development guidelines
 ```
 
 ### 🏗️ Architecture Highlights
 
-- **TypeScript Migration**: **Complete** - 100% type safety across entire codebase
-- **Co-located Sections**: Template + TypeScript logic in same folder for all 10 sections
+- **TypeScript Migration**: **100% Complete** - Full migration with comprehensive type safety
+- **Clean File Organization**: Restructured for maintainability and clarity
+  - Design tokens: Language-agnostic in `/design/tokens.json`
+  - Page templates: Organized in `src/pages/`
+  - Tests: Top-level `/tests/` with clear categorization
+  - Components: Consolidated in `src/platform/ui/components/`
+- **Co-located Sections**: Template + TypeScript logic in same folder for all sections
 - **i18n-Ready**: Content separated by language (`content/pt-PT/`)
-- **Platform Layer**: Shared utilities with comprehensive TypeScript interfaces
+- **Platform Layer**: Shared utilities, analytics, and UI components with TypeScript interfaces
 - **Type-Safe Data Flow**: `content/*.json` → `_data/*.ts` → templates with full type validation
+- **Unified Component Library**: Single source for reusable UI patterns in platform layer
+- **Quality Assurance**: Comprehensive testing with organized test structure
+- **Testing Architecture**: Unit, visual, schema, and E2E tests in dedicated directories
 
 ## 🎨 Design System (TypeScript-Powered)
 
-The design system is centralized in `content/pt-PT/design_tokens.json` and automatically converted to CSS custom properties via TypeScript:
+The design system is centralized in `design/tokens.json` and automatically converted to CSS custom properties via TypeScript:
 
 - **Colors**: Navy `#191F3A`, Burgundy `#81171F`, Neutral `#ECECEC`
 - **Typography**: Lora (headings), Century Gothic (body)
@@ -160,9 +251,36 @@ The design system is centralized in `content/pt-PT/design_tokens.json` and autom
 - **Build Process**: `npm run tokens:build` (TypeScript) generates type-safe CSS variables
 - **Type Safety**: All design tokens have comprehensive TypeScript definitions with full IDE support
 
+## 🧪 Testing Architecture
+
+### Comprehensive Test Suite
+- **Unit Tests**: Vitest for data adapters, utilities, and component logic
+- **Visual Regression**: Playwright visual testing with baseline screenshots  
+- **E2E Testing**: Full user journey testing with Playwright browser automation
+- **Schema Validation**: Type-safe content and data structure validation
+- **Analytics Testing**: GTM/GA4 event tracking validation
+
+### Test Categories
+```
+tests/                  # Top-level test organization
+├── unit/              # Unit tests
+│   ├── analytics/     # Analytics contract testing
+│   └── render/        # Template rendering tests  
+├── visual/            # Visual regression tests (Playwright)
+├── schemas/           # Data validation tests
+├── utils/             # Test utilities and helpers
+└── setup.ts          # Test configuration
+```
+
+### Quality Gates
+- **TypeScript**: Zero compilation errors enforced
+- **Visual Consistency**: Automated screenshot comparison
+- **User Experience**: End-to-end user flow validation
+- **Performance**: Core Web Vitals tracking in tests
+
 ## 📄 Landing Page Sections
 
-1. **Hero** - Hook + primary CTA
+1. **Hero** - Hook + primary CTA  
 2. **Problem** - Pain point validation
 3. **Solution** - 5-pillar transformation approach
 4. **Social Proof** - Customer testimonials
@@ -174,21 +292,22 @@ The design system is centralized in `content/pt-PT/design_tokens.json` and autom
 
 ### Code Standards (TypeScript-First)
 - **CSS**: Pure Tailwind utilities only (NO custom CSS)
-- **TypeScript**: Modular TypeScript components with complete type safety (NO JavaScript) - **Migration complete**
+- **TypeScript**: Modular TypeScript components with type safety (NO JavaScript files)
 - **Templates**: Semantic HTML with proper ARIA labels
 - **Performance**: WebP images, lazy loading, LCP optimization
 - **Type Safety**: All APIs (Stripe, Analytics, DOM) properly typed with comprehensive type definitions
+- **Component Architecture**: Platform UI library for reusable patterns
 
 ### TypeScript Build Process (Production Ready)
-1. **TypeScript Compilation**: All `.ts` files validated and compiled with type checking (**zero errors**)
-2. **Design Tokens**: `content/pt-PT/design_tokens.json` → CSS custom properties (TypeScript)
+1. **TypeScript Compilation**: All `.ts` files validated and compiled with type checking
+2. **Design Tokens**: `design/tokens.json` → CSS custom properties (TypeScript)
 3. **Content Loading**: TypeScript data adapters load from `content/pt-PT/` with type safety
 4. **Tailwind CSS**: v4 processes CSS via `@theme` block configuration
 5. **Vite Bundling**: TypeScript modules → optimized output with tree-shaking
 6. **Eleventy Generation**: Static HTML from templates using type-safe data
 7. **PostCSS Optimization**: Final CSS optimization and purging
 
-**Achieved Benefits**: Compile-time error detection, superior IDE support, type-safe refactoring, self-documenting code through comprehensive TypeScript interfaces.
+**Benefits**: Compile-time error detection, superior IDE support, type-safe refactoring, self-documenting code through comprehensive TypeScript interfaces.
 
 ### Critical Rules (TypeScript-First)
 - ❌ No `element.style.*` assignments
@@ -196,14 +315,14 @@ The design system is centralized in `content/pt-PT/design_tokens.json` and autom
 - ❌ No hardcoded colors/values (use design tokens)
 - ❌ No inline event handlers (`onclick=""`, `onsubmit=""`)
 - ❌ No inline JavaScript (`<script>` without src)
-- ❌ No JavaScript files (`.js`) - **TypeScript only** (`.ts`) - **Zero JS files remaining**
+- ❌ No JavaScript files (`.js`) - **TypeScript only** (`.ts`)
 - ✅ Only `element.classList` manipulation
 - ✅ Tailwind utilities for all styling
 - ✅ Design token CSS variables
 - ✅ Event handlers via `addEventListener()` only
 - ✅ ARIA roles for interactive elements
-- ✅ **Complete TypeScript interfaces for all APIs** (Stripe, Analytics, DOM)
-- ✅ **Fully type-safe data loading** from content files with compile-time validation
+- ✅ TypeScript interfaces for all APIs (Stripe, Analytics, DOM)
+- ✅ Type-safe data loading from content files
 
 ## 📊 Analytics & Conversion
 
@@ -227,7 +346,7 @@ VITE_GTM_CONTAINER_ID=GTM-T63QRLFT
 ```
 - Production: Configure in Netlify environment variables
 - Local: Add to `.env.local` for development testing
-- Implementation: `src/assets/js/components/gtm.js` with CSP-compliant loading
+- Implementation: `src/platform/ui/components/gtm.ts` with CSP-compliant loading
 - Complete guide: `docs/GTM_SETUP_GUIDE.md`
 
 ## 🔒 Security Features
@@ -292,10 +411,38 @@ Built static files are generated in `_site/` and deployed to Netlify with automa
 
 ## 🎯 Business Goals
 
-- **Target**: 8 exclusive event spots
+- **Target**: 20 exclusive event spots
 - **Conversion Focus**: Premium pricing with social proof
 - **User Experience**: Elegant, mobile-first, fast loading
 - **Trust Elements**: Testimonials, guarantee, secure payment
+
+## 📅 Recent Updates
+
+### August 2025
+- **🏗️ Complete File Structure Restructure**: Major reorganization for improved maintainability
+  - **Design tokens**: Moved from locale-specific to language-agnostic `/design/tokens.json`
+  - **Page templates**: Consolidated all pages in `src/pages/` directory
+  - **Tests**: Moved to top-level `/tests/` with organized subdirectories (`unit/`, `visual/`, `schemas/`)
+  - **Components**: Unified all UI components in `src/platform/ui/components/`
+  - **Static assets**: Consolidated images in `src/assets/images/`
+  - **Documentation**: Updated all references and import paths
+  - **Configuration**: Updated TypeScript, ESLint, Vitest, and Playwright configs
+  - **Quality**: All type-checking and linting passes after restructure
+- **Hero Scroll Arrow Fix**: Optimized scroll down functionality in hero section
+  - Removed non-existent `#inscricao` reference that caused unnecessary DOM queries
+  - Direct targeting of problem section (`#s-problem`) for improved performance
+  - Enhanced keyboard navigation with consistent scroll behavior
+  - Verified functionality with Playwright end-to-end testing
+- **Quality Assurance**: Integrated Playwright browser testing for UI validation
+- **Performance**: Eliminated redundant DOM queries for smoother user experience
+
+### December 2024
+- Migrated entire codebase to TypeScript (100% file coverage)
+- Implemented new platform UI component library
+- Consolidated data loaders into unified page system
+- Added comprehensive Portuguese content architecture
+- Enhanced checkout component functionality
+- Improved TypeScript type definitions across all modules
 
 ---
 

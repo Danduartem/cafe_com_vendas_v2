@@ -57,7 +57,10 @@
       "Bash(do)",
       "Bash(sed:*)",
       "Bash(npm update:*)",
-      "mcp__playwright-mcp__browser_wait_for"
+      "mcp__playwright-mcp__browser_wait_for",
+      "Bash(gtimeout:*)",
+      "Bash(tree:*)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,47 +1,47 @@
 /**
- * FAQ Section - Interactive Functionality
- *
- * Handles FAQ accordion interactions and analytics tracking.
+ * FAQ Section Component for Café com Vendas
+ * Co-located with template and schema
+ * Handles FAQ accordion interactions using platform components
  */
 
-import { safeQuery, safeQueryAll } from '@/utils/dom.js';
+import { PlatformAccordion, PlatformAnalytics } from '@platform/ui/components/index.ts';
+import { safeQuery } from '../../../platform/lib/utils/dom.ts';
+import type { Component } from '../../../assets/js/types/component.ts';
 
-export const faqSection = {
-  /**
-   * Initialize the FAQ section
-   */
+interface FAQSectionComponent extends Component {
+  initializeFAQ(): void;
+  setupSectionAnalytics(): void;
+}
+
+export const FAQ: FAQSectionComponent = {
   init(): void {
-    this.bindEvents();
-    this.setupAnalytics();
+    try {
+      this.initializeFAQ();
+      this.setupSectionAnalytics();
+    } catch (error) {
+      console.error('Error initializing FAQ section:', error);
+    }
   },
 
-  /**
-   * Bind event listeners
-   */
-  bindEvents(): void {
-    const section = safeQuery('#s-faq');
-    if (!section) return;
-
-    // Track FAQ item interactions
-    const faqItems = safeQueryAll('details[data-faq-item]', section);
-    faqItems.forEach(item => {
-      item.addEventListener('toggle', this.handleFaqToggle.bind(this));
+  initializeFAQ(): void {
+    PlatformAccordion.createFAQ({
+      containerSelector: '[data-faq-container]',
+      itemSelector: 'details[data-faq-item]',
+      revealAnimation: true,
+      trackAnalytics: true
     });
   },
 
-  /**
-   * Setup analytics tracking
-   */
-  setupAnalytics(): void {
+  setupSectionAnalytics(): void {
     const section = safeQuery('#s-faq');
     if (!section) return;
 
-    // Track section visibility
+    // Track section visibility using platform analytics
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            this.trackSectionView();
+            PlatformAnalytics.trackSectionEngagement('faq', 'section_view');
           }
         });
       },
@@ -49,33 +49,5 @@ export const faqSection = {
     );
 
     observer.observe(section);
-  },
-
-  /**
-   * Track section view
-   */
-  trackSectionView(): void {
-    if (typeof gtag !== 'undefined') {
-      gtag('event', 'faq_section_view', {
-        event_category: 'engagement',
-        event_label: 'faq'
-      });
-    }
-  },
-
-  /**
-   * Handle FAQ item toggle
-   */
-  handleFaqToggle(event: Event): void {
-    const target = event.target as HTMLDetailsElement;
-    const faqNumber = target.dataset.faqItem;
-    const analyticsEvent = target.dataset.analyticsEvent;
-
-    if (typeof gtag !== 'undefined') {
-      gtag('event', target.open ? 'faq_open' : 'faq_close', {
-        event_category: 'engagement',
-        event_label: analyticsEvent ?? `faq_${faqNumber}`
-      });
-    }
   }
 };

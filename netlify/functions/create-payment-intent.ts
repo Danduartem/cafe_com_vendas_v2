@@ -4,6 +4,19 @@
  */
 
 import Stripe from 'stripe';
+import {
+  NetlifyEvent,
+  NetlifyContext,
+  NetlifyResponse,
+  NetlifyHandler,
+  ResponseHeaders,
+  PaymentIntentRequest,
+  ValidationResult,
+  RateLimitResult,
+  ValidationRules,
+  TimeoutPromise,
+  PaymentIntentMetadata
+} from './types';
 
 // Initialize Stripe with secret key and timeout configuration
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -21,10 +34,10 @@ const TIMEOUTS = {
 /**
  * Timeout wrapper for async operations
  */
-function withTimeout(promise, timeoutMs, operation = 'Operation') {
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Operation'): TimeoutPromise<T> {
   return Promise.race([
     promise,
-    new Promise((_, reject) => {
+    new Promise<T>((_, reject) => {
       setTimeout(() => {
         reject(new Error(`${operation} timed out after ${timeoutMs}ms`));
       }, timeoutMs);
@@ -63,13 +76,13 @@ class CustomerCacheManager {
         .sort((a, b) => a[1].timestamp - b[1].timestamp);
       
       const toRemove = Math.floor(MAX_CACHE_SIZE * 0.1);
-      for (let i = 0; i < toRemove; i++) {
+      for (let i = 0; i < toRemove && i < entries.length; i++) {
         customerCache.delete(entries[i][0]);
       }
     }
   }
   
-  static get(email) {
+  static get(email: string): any | null {
     const entry = customerCache.get(email);
     if (!entry) return null;
     
@@ -84,7 +97,7 @@ class CustomerCacheManager {
     return entry.customer;
   }
   
-  static set(email, customer) {
+  static set(email: string, customer: any): void {
     this.cleanExpiredEntries();
     this.evictOldestIfNeeded();
     
@@ -95,7 +108,7 @@ class CustomerCacheManager {
     });
   }
   
-  static invalidate(email) {
+  static invalidate(email: string): void {
     customerCache.delete(email);
   }
   
@@ -109,7 +122,7 @@ class CustomerCacheManager {
 }
 
 // Validation schemas
-const VALIDATION_RULES = {
+const VALIDATION_RULES: ValidationRules = {
   required_fields: ['lead_id', 'full_name', 'email', 'phone'],
   email_regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   phone_regex: /^[\+]?[0-9][\d\s\-\(\)]{7,20}$/, // International format with spaces/dashes allowed
@@ -124,7 +137,7 @@ const VALIDATION_RULES = {
 /**
  * Comprehensive input validation middleware
  */
-function validatePaymentRequest(requestBody) {
+function validatePaymentRequest(requestBody: PaymentIntentRequest): ValidationResult {
   const errors = [];
   
   // Check required fields
@@ -177,7 +190,7 @@ function validatePaymentRequest(requestBody) {
   
   // Validate amount if provided
   if (amount !== undefined) {
-    const numAmount = parseInt(amount);
+    const numAmount = parseInt(amount.toString());
     if (isNaN(numAmount) || numAmount < VALIDATION_RULES.amount_min || numAmount > VALIDATION_RULES.amount_max) {
       errors.push(`Amount must be between ${VALIDATION_RULES.amount_min} and ${VALIDATION_RULES.amount_max} cents`);
     }
@@ -216,7 +229,7 @@ function validatePaymentRequest(requestBody) {
       full_name: cleanName,
       email: cleanEmail,
       phone: phone.trim(), // Keep original format for display
-      amount: amount ? parseInt(amount) : 18000,
+      amount: amount ? parseInt(amount.toString()) : 18000,
       currency: currency.toLowerCase()
     }
   };
@@ -225,7 +238,7 @@ function validatePaymentRequest(requestBody) {
 /**
  * Rate limiting middleware
  */
-function checkRateLimit(clientIP) {
+function checkRateLimit(clientIP: string): RateLimitResult {
   const now = Date.now();
   const key = `ratelimit:${clientIP}`;
   
@@ -238,7 +251,7 @@ function checkRateLimit(clientIP) {
     }
   }
   
-  const record = rateLimitStore.get(key);
+  const record = rateLimitStore.get(key) as { count: number; firstRequest: number; lastRequest: number } | undefined;
   
   if (!record) {
     rateLimitStore.set(key, {
@@ -274,7 +287,7 @@ function checkRateLimit(clientIP) {
   };
 }
 
-export const handler = async (event, context) => {
+export const handler: NetlifyHandler = async (event: NetlifyEvent, context: NetlifyContext): Promise<NetlifyResponse> => {
   // Set CORS headers with proper domain restrictions
   const allowedOrigins = [
     'https://cafecomvendas.com',
@@ -295,7 +308,7 @@ export const handler = async (event, context) => {
                    context.identity?.sourceIp ||
                    'unknown';
   
-  const headers = {
+  const headers: ResponseHeaders = {
     'Access-Control-Allow-Origin': isAllowedOrigin ? origin : 'https://cafecomvendas.com',
     'Access-Control-Allow-Headers': 'Content-Type, X-Idempotency-Key',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -330,7 +343,7 @@ export const handler = async (event, context) => {
   headers['X-RateLimit-Window'] = (RATE_LIMIT_WINDOW / 1000).toString();
   
   if (!rateLimitResult.allowed) {
-    headers['Retry-After'] = rateLimitResult.retryAfter.toString();
+    headers['Retry-After'] = rateLimitResult.retryAfter?.toString() || '60';
     return {
       statusCode: 429,
       headers,
@@ -349,9 +362,9 @@ export const handler = async (event, context) => {
     }
 
     // Parse request body
-    let requestBody;
+    let requestBody: PaymentIntentRequest;
     try {
-      requestBody = JSON.parse(event.body);
+      requestBody = JSON.parse(event.body || '{}') as PaymentIntentRequest;
     } catch (error) {
       return {
         statusCode: 400,
@@ -380,7 +393,7 @@ export const handler = async (event, context) => {
     }
     
     // Use sanitized data
-    const { lead_id, full_name, email, phone, amount: paymentAmount, currency } = validation.sanitized;
+    const { lead_id, full_name, email, phone, amount: paymentAmount, currency } = validation.sanitized!;
 
     // Create or retrieve customer with validated data
     const customerData = {
@@ -475,7 +488,7 @@ export const handler = async (event, context) => {
       console.error('Error managing customer:', error);
       
       // Handle timeout specifically
-      if (error.message.includes('timed out')) {
+      if (error instanceof Error && error.message.includes('timed out')) {
         return {
           statusCode: 504,
           headers,
@@ -496,7 +509,7 @@ export const handler = async (event, context) => {
     }
 
     // Prepare metadata for PaymentIntent with validated UTM parameters
-    const metadata = {
+    const metadata: PaymentIntentMetadata = {
       lead_id,
       customer_name: full_name,
       customer_email: email,
@@ -506,7 +519,8 @@ export const handler = async (event, context) => {
       spot_type: 'first_lot_early_bird',
       source: 'checkout_modal',
       created_at: new Date().toISOString(),
-      validation_version: '1.0'
+      validation_version: '1.0',
+      idempotency_key: idempotencyKey
     };
     
     // Add validated UTM parameters
@@ -571,7 +585,7 @@ export const handler = async (event, context) => {
     console.error('Error creating payment intent:', error);
 
     // Handle specific Stripe errors
-    if (error.type === 'StripeCardError') {
+    if (error instanceof Error && 'type' in error && (error as any).type === 'StripeCardError') {
       return {
         statusCode: 400,
         headers,
@@ -581,7 +595,7 @@ export const handler = async (event, context) => {
       };
     }
 
-    if (error.type === 'StripeRateLimitError') {
+    if (error instanceof Error && 'type' in error && (error as any).type === 'StripeRateLimitError') {
       return {
         statusCode: 429,
         headers,
@@ -591,9 +605,9 @@ export const handler = async (event, context) => {
       };
     }
 
-    if (error.type === 'StripeInvalidRequestError') {
+    if (error instanceof Error && 'type' in error && (error as any).type === 'StripeInvalidRequestError') {
       // Handle idempotency key conflicts specifically
-      if (error.message?.includes('idempotency')) {
+      if (error instanceof Error && error.message?.includes('idempotency')) {
         return {
           statusCode: 409,
           headers,
@@ -613,7 +627,7 @@ export const handler = async (event, context) => {
       };
     }
 
-    if (error.type === 'StripeAPIError') {
+    if (error instanceof Error && 'type' in error && (error as any).type === 'StripeAPIError') {
       return {
         statusCode: 500,
         headers,
@@ -623,7 +637,7 @@ export const handler = async (event, context) => {
       };
     }
 
-    if (error.type === 'StripeConnectionError') {
+    if (error instanceof Error && 'type' in error && (error as any).type === 'StripeConnectionError') {
       return {
         statusCode: 500,
         headers,
@@ -634,7 +648,7 @@ export const handler = async (event, context) => {
     }
 
     // Handle timeout errors
-    if (error.message?.includes('timed out')) {
+    if (error instanceof Error && error.message?.includes('timed out')) {
       return {
         statusCode: 504,
         headers,

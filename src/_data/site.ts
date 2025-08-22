@@ -1,4 +1,4 @@
-import type { SiteData } from './types.js';
+import type { SiteData } from './types.ts';
 
 /**
  * Load site data

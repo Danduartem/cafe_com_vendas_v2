@@ -5,7 +5,7 @@
 <section
   id="s-solution"
   data-section="solution"
-  aria-label="{{ pillars.title }} - 5 pilares para vender mais trabalhando menos"
+  aria-label="{{ currentSection.copy.headline }} - 5 pilares para vender mais trabalhando menos"
   data-analytics-section="solution"
   class="relative overflow-hidden py-12 scroll-mt-14"
   data-scroll-offset
@@ -28,14 +28,14 @@
       {# Small accent label #}
       <div class="inline-flex items-center gap-2 mb-8">
         <span class="w-12 h-[1px] bg-gradient-to-r from-transparent to-gold-500"></span>
-        <span class="font-century text-gold-500 text-sm font-medium tracking-[0.2em] uppercase">{{ pillars.subtitle }}</span>
+        <span class="font-century text-gold-500 text-sm font-medium tracking-[0.2em] uppercase">{{ currentSection.copy.eyebrow }}</span>
         <span class="w-12 h-[1px] bg-gradient-to-l from-transparent to-gold-500"></span>
       </div>
       
       <h2 class="font-lora font-bold mb-8 text-navy-800 text-[clamp(2.5rem,5vw,3.5rem)] leading-[1.1]">
         <span class="block">Apresentamos o</span>
         <span class="relative inline-block mt-2">
-          <span class="relative z-10 bg-gradient-to-r from-burgundy-700 via-gold-500 to-burgundy-700 bg-clip-text text-transparent">{{ pillars.title }}</span>
+          <span class="relative z-10 bg-gradient-to-r from-burgundy-700 via-gold-500 to-burgundy-700 bg-clip-text text-transparent">{{ currentSection.copy.headline }}</span>
           {# Decorative underline #}
           <svg class="absolute -bottom-2 left-0 w-full h-3 text-gold-500/20" preserveAspectRatio="none" viewBox="0 0 300 12">
             <path d="M0,6 Q75,0 150,6 T300,6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
@@ -44,7 +44,7 @@
       </h2>
       
       <p class="font-century text-navy-800/80 text-lg leading-[1.8] max-w-[75ch] mx-auto">
-        {{ pillars.description | safe }}
+        {{ currentSection.copy.description | safe }}
       </p>
     </div>
 
@@ -57,9 +57,9 @@
       
       {# First Row - 3 Pillars with staggered animation #}
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
-        {% for pillar in pillars.pillars %}
+        {% for pillar in currentSection.copy.pillars %}
         {% if loop.index <= 3 %}
-        <div class="{{ pillarClasses }} [animation-delay:{{ pillar.animationDelay }}]" data-analytics-event="{{ pillar.analyticsEvent }}">
+        <div class="{{ pillarClasses }} [animation-delay:{{ pillar.animation_delay }}]" data-analytics-event="{{ pillar.analytics_event }}">
           <div class="{{ cardClasses }}">
             {# Gradient border effect #}
             <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold-500/10 via-transparent to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -96,9 +96,9 @@
 
       {# Second Row - 2 Pillars centered with golden ratio spacing #}
       <div class="grid md:grid-cols-2 gap-8 max-w-[800px] mx-auto">
-        {% for pillar in pillars.pillars %}
+        {% for pillar in currentSection.copy.pillars %}
         {% if loop.index > 3 %}
-        <div class="{{ pillarClasses }} [animation-delay:{{ pillar.animationDelay }}]" data-analytics-event="{{ pillar.analyticsEvent }}">
+        <div class="{{ pillarClasses }} [animation-delay:{{ pillar.animation_delay }}]" data-analytics-event="{{ pillar.analytics_event }}">
           <div class="{{ cardClasses }}">
             {# Gradient border effect #}
             <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold-500/10 via-transparent to-burgundy-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>

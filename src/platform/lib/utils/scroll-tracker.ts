@@ -3,7 +3,7 @@
  * Tracks scroll depth at 10%, 25%, 50%, 75%, and 90% thresholds
  */
 
-import { throttle } from './throttle.js';
+import { throttle } from './throttle.ts';
 
 export const ScrollTracker = {
   // Track which thresholds have already fired
@@ -13,7 +13,7 @@ export const ScrollTracker = {
     50: false,
     75: false,
     90: false
-  },
+  } as Record<number, boolean>,
 
   /**
    * Initialize scroll depth tracking
@@ -79,7 +79,7 @@ export const ScrollTracker = {
    * Fire scroll depth event to GTM dataLayer
    * @param {number} threshold - The scroll percentage threshold reached
    */
-  fireScrollEvent(threshold) {
+  fireScrollEvent(threshold: number): void {
     const eventData = {
       event: 'scroll_depth',
       percent_scrolled: threshold,

@@ -4,10 +4,10 @@
  * Two-step modal checkout: Lead capture (Formspree) + Stripe Payment Elements
  */
 
-import { ENV } from '../../../assets/js/config/constants.js';
-import { safeQuery } from '../../../assets/js/utils/dom.js';
-import { PlatformModal, PlatformAnalytics } from '../../../platform/ui/components/index.js';
-import type { Component } from '../../../assets/js/types/component.js';
+import { ENV } from '@/config/constants.ts';
+import { safeQuery } from '@platform/lib/utils/dom.ts';
+import { PlatformModal, PlatformAnalytics } from '@platform/ui/components/index.ts';
+import type { Component } from '@/types/component.ts';
 
 // Stripe types (inline to avoid dependencies)
 interface StripeError {
@@ -24,6 +24,7 @@ interface StripeElements {
 interface StripeElement {
   mount: (selector: string) => void;
   on: (event: string, handler: (event: StripeElementChangeEvent) => void) => void;
+  destroy?: () => void;
 }
 
 interface StripeElementChangeEvent {
@@ -36,23 +37,6 @@ interface StripeInstance {
   confirmPayment: (options: Record<string, unknown>) => Promise<{ error?: StripeError }>;
 }
 
-interface _LeadData {
-  lead_id: string;
-  status: string;
-  full_name: string;
-  email: string;
-  phone: string;
-  page: string;
-  timestamp: string;
-  [key: string]: string | undefined; // For UTM params
-}
-
-interface _CheckoutFormData {
-  fullName: string;
-  email: string;
-  phone: string;
-  fullPhone: string;
-}
 
 interface CheckoutSectionComponent extends Component {
   modal: PlatformModal | null;
@@ -73,6 +57,9 @@ interface CheckoutSectionComponent extends Component {
   initializeStripe(): void;
   handleLeadSubmit(event: Event): Promise<void>;
   handlePayment(): Promise<void>;
+  handleOpenClick(event: Event): void;
+  getSourceSection(): string;
+  showError(elementId: string, message: string): void;
   setStep(step: number | string): void;
   resetForm(): void;
   generateUUID(): string;
@@ -250,8 +237,8 @@ export const Checkout: CheckoutSectionComponent = {
     try {
       // Show loading state
       const submitBtn = form.querySelector('#leadSubmit');
-      const submitText = submitBtn?.querySelector('#leadSubmitText');
-      const submitSpinner = submitBtn?.querySelector('#leadSubmitSpinner');
+      const submitText = submitBtn?.querySelector('#leadSubmitText') as HTMLElement | null;
+      const submitSpinner = submitBtn?.querySelector('#leadSubmitSpinner') as HTMLElement | null;
 
       if (submitBtn) (submitBtn as HTMLButtonElement).disabled = true;
       if (submitText) submitText.classList.add('opacity-0');
@@ -272,14 +259,14 @@ export const Checkout: CheckoutSectionComponent = {
       PlatformAnalytics.trackSectionEngagement('checkout', 'lead_submitted', {
         lead_id: this.leadId
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Lead submission error:', error);
       this.showError('leadError', 'Erro ao processar inscrição. Tente novamente.');
     } finally {
       // Reset loading state
       const submitBtn = form.querySelector('#leadSubmit');
-      const submitText = submitBtn?.querySelector('#leadSubmitText');
-      const submitSpinner = submitBtn?.querySelector('#leadSubmitSpinner');
+      const submitText = submitBtn?.querySelector('#leadSubmitText') as HTMLElement | null;
+      const submitSpinner = submitBtn?.querySelector('#leadSubmitSpinner') as HTMLElement | null;
 
       if (submitBtn) (submitBtn as HTMLButtonElement).disabled = false;
       if (submitText) submitText.classList.remove('opacity-0');
@@ -296,8 +283,8 @@ export const Checkout: CheckoutSectionComponent = {
     try {
       // Show loading state
       const payBtn = document.querySelector('#payBtn');
-      const payBtnText = payBtn?.querySelector('#payBtnText');
-      const payBtnSpinner = payBtn?.querySelector('#payBtnSpinner');
+      const payBtnText = payBtn?.querySelector('#payBtnText') as HTMLElement | null;
+      const payBtnSpinner = payBtn?.querySelector('#payBtnSpinner') as HTMLElement | null;
 
       if (payBtn) (payBtn as HTMLButtonElement).disabled = true;
       if (payBtnText) payBtnText.classList.add('opacity-0');
@@ -316,14 +303,14 @@ export const Checkout: CheckoutSectionComponent = {
       setTimeout(() => {
         window.location.href = '/thank-you';
       }, 3000);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Payment error:', error);
       this.showError('payError', 'Erro no processamento do pagamento. Tente novamente.');
     } finally {
       // Reset loading state
       const payBtn = document.querySelector('#payBtn');
-      const payBtnText = payBtn?.querySelector('#payBtnText');
-      const payBtnSpinner = payBtn?.querySelector('#payBtnSpinner');
+      const payBtnText = payBtn?.querySelector('#payBtnText') as HTMLElement | null;
+      const payBtnSpinner = payBtn?.querySelector('#payBtnSpinner') as HTMLElement | null;
 
       if (payBtn) (payBtn as HTMLButtonElement).disabled = false;
       if (payBtnText) payBtnText.classList.remove('opacity-0');
@@ -375,7 +362,7 @@ export const Checkout: CheckoutSectionComponent = {
     this.leadId = this.generateUUID();
     this.idempotencyKey = this.generateIdempotencyKey();
 
-    if (this.paymentElement) {
+    if (this.paymentElement?.destroy) {
       this.paymentElement.destroy();
       this.paymentElement = null;
     }

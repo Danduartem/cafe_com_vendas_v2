@@ -3,18 +3,23 @@
  * Provides reusable animation functions using pure Tailwind CSS classes
  */
 
+import { CONFIG } from '../../../assets/js/config/constants.ts';
+
 interface RevealConfig {
   hiddenClasses?: string[];
   transitionClasses?: string[];
   visibleClasses?: string[];
   stagger?: number;
+  staggerDelay?: number;
+  initialDelay?: number;
 }
 
 interface ObserverConfig {
-  callback: (entry: IntersectionObserverEntry, index: number) => void;
+  callback?: (entry: IntersectionObserverEntry, index?: number) => void;
   once?: boolean;
   threshold?: number;
   rootMargin?: string;
+  observer?: IntersectionObserver;
 }
 
 export const Animations = {
@@ -41,7 +46,7 @@ export const Animations = {
     const {
       visibleClasses = ['opacity-100', 'translate-y-0'],
       hiddenClasses = ['opacity-0', 'translate-y-4'],
-      staggerDelay = CONFIG.animations.stagger,
+      staggerDelay = CONFIG.animations.delay.normal,
       initialDelay = 0
     } = config;
 
@@ -58,7 +63,7 @@ export const Animations = {
   /**
      * Create intersection observer for animations
      */
-  createObserver(options = {}) {
+  createObserver(options: ObserverConfig = {}) {
     const defaultOptions = {
       threshold: 0.1,
       rootMargin: '0px 0px -50px 0px'
@@ -79,10 +84,10 @@ export const Animations = {
   /**
      * Add scale animation on click
      */
-  addClickFeedback(element, scaleClass = 'scale-95', duration = 100) {
+  addClickFeedback(element: Element | null, scaleClass: string = 'scale-95', duration: number = 100): void {
     if (!element) return;
 
-    element.addEventListener('click', function() {
+    element.addEventListener('click', function(this: Element) {
       this.classList.add(scaleClass);
       setTimeout(() => {
         this.classList.remove(scaleClass);

@@ -14,7 +14,8 @@ export default defineConfig({
       '@data': resolve(__dirname, 'src/_data'),
       '@platform': resolve(__dirname, 'src/platform'),
       '@assets': resolve(__dirname, 'src/assets'),
-      '@types': resolve(__dirname, 'src/assets/js/types')
+      '@types': resolve(__dirname, 'src/assets/js/types'),
+      '@content': resolve(__dirname, 'content')
     }
   },
   plugins: [

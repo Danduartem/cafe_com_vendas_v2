@@ -3,8 +3,8 @@
  * Defines all global variables and functions used throughout the application
  */
 
-import type { EnvironmentConfig } from '@/config/environment.js';
-import type { AnalyticsEventType } from '@/config/constants.js';
+import type { EnvironmentConfig } from '@/config/environment.ts';
+import type { AnalyticsEventType } from '@/config/constants.ts';
 
 declare global {
   interface Window {

@@ -4,7 +4,7 @@
  * Handles the sticky banner with urgency messaging and event countdown.
  */
 
-import { safeQuery } from '@/utils/dom.js';
+import { safeQuery } from '@platform/lib/utils/dom.ts';
 
 export const topBannerSection = {
   /**

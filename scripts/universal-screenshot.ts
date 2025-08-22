@@ -68,12 +68,13 @@ async function optimizePageForScreenshot(page: UniversalPage): Promise<void> {
           }
         };
 
-        images.forEach((img: HTMLImageElement) => {
-          if (img.complete) {
+        Array.from(images).forEach((img) => {
+          const imgElement = img as HTMLImageElement;
+          if (imgElement.complete) {
             checkComplete();
           } else {
-            img.onload = checkComplete;
-            img.onerror = checkComplete; // Don't hang on broken images
+            imgElement.onload = checkComplete;
+            imgElement.onerror = checkComplete; // Don't hang on broken images
           }
         });
 
@@ -83,7 +84,8 @@ async function optimizePageForScreenshot(page: UniversalPage): Promise<void> {
     });
 
     // Scroll to trigger any scroll-based lazy loading
-    const _totalHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+    // Removed unused variable
+    await page.evaluate(() => document.documentElement.scrollHeight);
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(500);
 
@@ -105,7 +107,7 @@ async function attemptFullPageScreenshot(
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       // Wait for network to be idle
-      if (waitForNetworkIdle) {
+      if (waitForNetworkIdle && page.waitForLoadState) {
         await page.waitForLoadState('networkidle', { timeout: 10000 });
       }
 
@@ -124,7 +126,7 @@ async function attemptFullPageScreenshot(
       return true;
 
     } catch (error) {
-      console.log(`⚠️ Full page attempt ${attempt} failed: ${error.message}`);
+      console.log(`⚠️ Full page attempt ${attempt} failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
 
       if (attempt === retries) {
         console.log(`❌ Full page screenshot failed after ${retries} attempts`);
@@ -178,7 +180,7 @@ async function takeSectionalScreenshots(
       // Ensure we don't scroll past the page
       const actualScrollY = Math.min(scrollY, totalHeight - viewportHeight);
 
-      await page.evaluate((y: number) => window.scrollTo(0, y), actualScrollY);
+      await page.evaluate((y: unknown) => window.scrollTo(0, y as number), actualScrollY);
       await page.waitForTimeout(500); // Let content settle
 
       const filename = baseFilename.replace(/\.png$/, `-section-${i + 1}.png`);
@@ -275,7 +277,7 @@ export async function takeUniversalScreenshot(
       success: false,
       type: 'fullpage',
       files: [],
-      error: error.message
+      error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 }
@@ -299,7 +301,7 @@ export async function takeScreenshotCLI(url: string, output: string, options: Sc
     console.log(`🌐 Navigating to: ${url}`);
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-    const result = await takeUniversalScreenshot(page, output, options);
+    const result = await takeUniversalScreenshot(page as UniversalPage, output, options);
 
     return result;
 

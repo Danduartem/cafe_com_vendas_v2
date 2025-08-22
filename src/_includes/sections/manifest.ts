@@ -15,7 +15,8 @@ export type SectionId =
   | 'offer'
   | 'faq'
   | 'final-cta'
-  | 'footer';
+  | 'footer'
+  | 'checkout';
 
 export interface SectionConfig {
   path: string;          // Folder path relative to src/_includes/sections
@@ -106,6 +107,14 @@ export const SECTIONS: Record<SectionId, SectionConfig> = {
     anchor: 's-footer',
     title: 'Footer',
     description: 'Footer links, legal information, and contact'
+  },
+  checkout: {
+    path: 'src/_includes/sections/checkout',
+    template: 'index.njk',
+    script: 'index.ts',
+    anchor: 's-checkout',
+    title: 'Checkout Modal',
+    description: 'Two-step checkout modal with lead capture and payment'
   }
 };
 

@@ -3,8 +3,8 @@
  * Centralized configuration for animations, breakpoints, and analytics
  */
 
-import ENV from './environment.js';
-import type { Constants as ConstantsType } from '@/types/config.js';
+import ENV from './environment.ts';
+import type { Constants as ConstantsType } from '@/types/config.ts';
 
 /**
  * Analytics event constants with type safety
@@ -58,6 +58,7 @@ export type AnalyticsEventType = typeof ANALYTICS_EVENTS[keyof typeof ANALYTICS_
 export const CONFIG: ConstantsType = {
   version: '2.0.0',
   buildDate: new Date().toISOString(),
+  isDevelopment: ENV.isDevelopment,
 
   animations: {
     duration: {

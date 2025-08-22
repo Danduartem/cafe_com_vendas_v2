@@ -92,7 +92,7 @@ After setup, the project will automatically:
 
 ### New Files:
 - `src/assets/js/utils/cloudinary.js` - Helper functions
-- `src/assets/js/components/cloudinary.js` - Dynamic URL management
+- `src/platform/ui/components/cloudinary.js` - Dynamic URL management
 - `docs/CLOUDINARY_SETUP.md` - This setup guide
 
 ## Testing

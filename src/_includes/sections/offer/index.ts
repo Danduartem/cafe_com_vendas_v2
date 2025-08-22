@@ -3,9 +3,9 @@
  * Handles MBWay toggle and deliverable animations
  */
 
-import { CONFIG } from '../../../assets/js/config/constants.js';
-import { Analytics } from '../../../assets/js/core/analytics.js';
-import { safeQuery, safeQueryAll, Animations } from '../../../assets/js/utils/index.js';
+import { CONFIG } from '@/config/constants.ts';
+import { Analytics } from '@/core/analytics.ts';
+import { safeQuery, safeQueryAll, Animations } from '@platform/lib/utils/index.ts';
 
 export const Offer = {
   init() {
@@ -63,7 +63,7 @@ export const Offer = {
   },
 
   initDeliverableAnimations() {
-    const deliverableItems = safeQueryAll('.deliverable-item');
+    const deliverableItems = Array.from(safeQueryAll('.deliverable-item'));
     if (!deliverableItems.length) return;
 
     Animations.prepareRevealElements(deliverableItems, {

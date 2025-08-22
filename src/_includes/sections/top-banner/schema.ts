@@ -4,8 +4,8 @@
  * Type-safe contracts and runtime validation for the top banner section
  */
 
-import type { TopBannerSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types.js';
-import { validateSectionBase, assertSectionBase } from '../../../_data/types.js';
+import type { TopBannerSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types.ts';
+import { validateSectionBase, assertSectionBase } from '../../../_data/types.ts';
 
 // Extend the existing TopBannerSection interface for strict validation
 export interface TopBannerProps extends TopBannerSection {

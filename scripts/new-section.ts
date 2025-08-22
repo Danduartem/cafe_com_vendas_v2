@@ -281,7 +281,7 @@ http://localhost:8080#${anchor}
 - Include accessibility attributes
 - Add analytics tracking to interactive elements
 - Follow responsive design patterns
-- Use design tokens from \`DATA_design_tokens.json\`
+- Use design tokens from \`design/tokens.json\`
 
 ## Pitfalls & Notes
 - [Document any gotchas or important considerations]

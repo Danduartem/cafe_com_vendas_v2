@@ -3,7 +3,7 @@
  */
 
 // Global types
-export * from './global.js';
+export * from './global.ts';
 
 // Component types
 export type {
@@ -12,7 +12,7 @@ export type {
   ComponentRegistration,
   ComponentStatus,
   ComponentHealthStatus
-} from './component.js';
+} from './component.ts';
 
 // Analytics types
 export type {
@@ -27,7 +27,7 @@ export type {
   AppInitializedEvent,
   ComponentsInitializedEvent,
   GTMEventPayload
-} from './analytics.js';
+} from './analytics.ts';
 
 // DOM types
 export type {
@@ -48,7 +48,7 @@ export type {
   ScrollConfig,
   Breakpoints,
   SlideCalculation
-} from './dom.js';
+} from './dom.ts';
 
 // Configuration types
 export type {
@@ -59,7 +59,7 @@ export type {
   AnalyticsConfig,
   AppConfig,
   Constants
-} from './config.js';
+} from './config.ts';
 
 // State types
 export type {
@@ -67,4 +67,4 @@ export type {
   StateManager,
   StateChangeEvent,
   ViewportChangeEvent
-} from './state.js';
+} from './state.ts';

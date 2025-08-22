@@ -4,26 +4,27 @@
   "enabled": true,
   "copy": {
     "stats": [
-    {
-      "value": 8,
-      "label": "Vagas Limitadas",
-      "counter": true
-    },
-    {
-      "value": 8,
-      "label": "Horas Intensivas",
-      "counter": true
-    },
-    {
-      "value": "20 Set",
-      "label": "Lisboa",
-      "counter": false
-    }
-  ],
+      {
+        "value": 20,
+        "label": "Vagas Limitadas",
+        "counter": true
+      },
+      {
+        "value": 8,
+        "label": "Horas Intensivas",
+        "counter": true
+      },
+      {
+        "value": "15 Fev",
+        "label": "Lisboa",
+        "counter": false
+      }
+    ]
+  },
   "brand": {
     "name": "Café com Vendas",
     "tagline": "Método prático para empreendedoras",
-    "description": "Transforme seu negócio em 20 de Setembro no evento mais exclusivo de Lisboa. Menos esforço, mais resultado — com método comprovado.",
+    "description": "Transforme seu negócio em 15 de Fevereiro no evento mais exclusivo de Lisboa. Menos esforço, mais resultado — com método comprovado.",
     "guarantee": "Garantia 90 dias"
   },
   "navigation": {
@@ -76,7 +77,6 @@
     "country": "Portugal",
     "founderName": "Juçanã Maximiliano",
     "founderTitle": "Business Mentor"
-  }
   },
   "design": {
     "theme": "dark",

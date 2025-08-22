@@ -9,7 +9,7 @@ export default [
 
   {
     // Global ignores
-    ignores: ['debug-gtm.ts']
+    ignores: ['debug-gtm.ts', 'scripts/debug-gtm.ts']
   },
 
   {
@@ -83,8 +83,8 @@ export default [
 
   {
     // Configuration for TypeScript files
-    files: ['src/**/*.ts', 'scripts/**/*.ts', '*.ts', 'vite.config.ts'],
-    ignores: ['debug-gtm.ts'],
+    files: ['src/**/*.ts', 'scripts/**/*.ts', 'tests/**/*.ts', '*.ts', 'vite.config.ts'],
+    ignores: ['debug-gtm.ts', 'scripts/debug-gtm.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -176,7 +176,6 @@ export default [
       'dist/**',
       '*.min.js',
       'src/assets/css/**', // CSS files handled by PostCSS/Tailwind
-      'src/platform/**', // Platform files excluded from TypeScript project
       'netlify/**', // Netlify functions and generated files
       '.netlify/**', // Netlify dev files
       '**/*.d.ts' // TypeScript declaration files

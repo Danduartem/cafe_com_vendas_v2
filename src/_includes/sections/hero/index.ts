@@ -3,8 +3,9 @@
  * Handles hero section animations, interactions, and scroll indicator
  */
 
-import { CONFIG } from '../../../assets/js/config/constants.js';
-import { safeQuery, Animations, normalizeEventPayload } from '../../../assets/js/utils/index.js';
+import { CONFIG } from '../../../assets/js/config/constants.ts';
+import { safeQuery } from '../../../platform/lib/utils/dom.ts';
+import { PlatformAnimations, PlatformAnalytics } from '@platform/ui/components/index.ts';
 // Inline minimal smooth scroll to avoid importing removed navigation module
 
 export const Hero = {
@@ -34,11 +35,11 @@ export const Hero = {
       heroSection.querySelector('.hero-scroll-indicator')
     ].filter(Boolean);
 
-    Animations.prepareRevealElements(animatableElements);
+    PlatformAnimations.prepareRevealElements(animatableElements);
 
-    const observer = Animations.createObserver({
+    const observer = PlatformAnimations.createObserver({
       callback: () => {
-        Animations.revealElements(animatableElements, {
+        PlatformAnimations.revealElements(animatableElements, {
           initialDelay: 300
         });
       },
@@ -66,11 +67,14 @@ export const Hero = {
     window.addEventListener('resize', checkViewportHeight);
 
     scrollIndicatorBtn.addEventListener('click', () => {
-      const explicitNext = safeQuery('#inscricao');
-      if (explicitNext) {
-        explicitNext.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Scroll directly to the problem section (next section after hero)
+      const problemSection = safeQuery('#s-problem');
+      if (problemSection) {
+        problemSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         return;
       }
+
+      // Fallback: find next sibling section
       const heroSection = safeQuery('#hero');
       const nextSection = heroSection?.nextElementSibling;
       if (nextSection) {
@@ -101,11 +105,20 @@ export const Hero = {
     scrollIndicatorBtn.addEventListener('keydown', function(this: HTMLElement, e: Event) {
       if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
         e.preventDefault();
-        const heroSection = safeQuery('#hero');
-        const nextSection = heroSection?.nextElementSibling;
-        if (nextSection) {
-          nextSection.scrollIntoView({ behavior: 'smooth' });
+
+        // Scroll directly to the problem section (next section after hero)
+        const problemSection = safeQuery('#s-problem');
+        if (problemSection) {
+          problemSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          // Fallback: find next sibling section
+          const heroSection = safeQuery('#hero');
+          const nextSection = heroSection?.nextElementSibling;
+          if (nextSection) {
+            nextSection.scrollIntoView({ behavior: 'smooth' });
+          }
         }
+
         this.classList.add('scale-110');
         setTimeout(() => this.classList.remove('scale-110'), CONFIG.animations.duration.fast);
       }
@@ -126,12 +139,12 @@ export const Hero = {
     });
 
     // Click feedback
-    Animations.addClickFeedback(heroCtaButton);
+    PlatformAnimations.addClickFeedback(heroCtaButton);
 
     // Keyboard feedback
     heroCtaButton.addEventListener('keydown', function(this: HTMLElement, e: Event) {
       if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
-        Animations.addClickFeedback(this);
+        PlatformAnimations.addClickFeedback(this);
       }
     });
   },
@@ -146,22 +159,10 @@ export const Hero = {
       whatsappButton.classList.add('opacity-100', 'translate-y-0');
     }, 500);
 
-    // Add WhatsApp click tracking
-    const whatsappLink = whatsappButton.querySelector('a[href*="wa.me"]');
-    if (whatsappLink && !whatsappLink.hasAttribute('data-gtm-tracked')) {
-      whatsappLink.setAttribute('data-gtm-tracked', 'true'); // Prevent duplicate listeners
-
-      whatsappLink.addEventListener('click', function(this: HTMLAnchorElement) {
-        // Push WhatsApp click event to dataLayer
-        window.dataLayer = window.dataLayer || [];
-        const whatsappPayload = normalizeEventPayload({
-          event: 'whatsapp_click',
-          link_url: this.href, // Will be normalized
-          link_text: this.textContent?.trim() || 'WhatsApp', // Will be normalized to 50 chars
-          location: 'floating_button' // Will be normalized
-        });
-        window.dataLayer.push(whatsappPayload);
-      });
+    // Add WhatsApp click tracking using platform analytics
+    const whatsappLink = whatsappButton.querySelector('a[href*="wa.me"]') as HTMLAnchorElement;
+    if (whatsappLink) {
+      PlatformAnalytics.trackWhatsAppClick(whatsappLink, 'floating_button');
     }
   }
 };

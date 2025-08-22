@@ -1,7 +1,7 @@
-<section id="offer" aria-label="Oferta e Preço" class="relative py-24 md:py-32 overflow-hidden" data-reveal>
+<section id="offer" aria-label="Oferta e Preço" class="relative py-24 md:py-32 overflow-hidden" data-reveal data-analytics-section="offer">
   
   {# Premium Background Layer - Optimized #}
-  <div class="absolute inset-0 before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-neutral-50 before:via-white before:to-neutral-100 after:content-[''] after:absolute after:inset-0 after:[background:radial-gradient(16rem_16rem_at_80%_12%,theme(colors.burgundy.100/.2),transparent_60%),radial-gradient(12rem_12rem_at_15%_85%,theme(colors.navy.100/.15),transparent_60%)]"></div>
+  <div class="absolute inset-0 before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-neutral-50 before:via-white before:to-neutral-100 after:content-[''] after:absolute after:inset-0 after:[background:radial-gradient(16rem_16rem_at_80%_12%,theme(colors.burgundy.100/.2),transparent_60%),radial-gradient(12rem_12rem_at_15%_85%,theme(colors.navy.100/.15),transparent_60%)]" data-analytics-section="offer"></div>
 
   <!-- Main Content Container -->
   <div class="relative container mx-auto px-6 md:px-8 max-w-7xl">
@@ -24,7 +24,7 @@
           Um dia inteiro de imersão estratégica, material de apoio prático, almoço de networking 
           e acesso a um plano de ação de 90 dias. Ambiente exclusivo para apenas 
           <span class="inline-flex items-center px-3 py-1 bg-burgundy-100 text-burgundy-700 rounded-full font-semibold text-sm">
-            {{ event.capacity.totalCapacity }} empreendedoras
+            20 empreendedoras
           </span>
         </p>
       </div>
@@ -57,7 +57,7 @@
             <div class="price-container mb-4">
               <div class="text-7xl md:text-8xl font-serif font-bold">
                 <span class="bg-gradient-to-br from-burgundy-700 to-burgundy-800 bg-clip-text text-transparent">
-                  {{ event.pricing.tiers[0].price }}
+                  {{ currentSection.copy.pricing.first_lot.discounted_price }}
                 </span>
                 <span class="text-burgundy-700">€</span>
               </div>
@@ -88,23 +88,7 @@
             </h3>
 
             <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {% for item in event.deliverables %}
-              <li class="deliverable-item relative pl-9 py-3 rounded-xl bg-white/60 border border-neutral-200/30 transition-all duration-300 hover:bg-white/80 hover:shadow-lg">
-                <svg class="absolute left-3 top-3 w-5 h-5 text-burgundy-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                </svg>
-                <span class="text-navy-700 leading-relaxed">{{ item }}</span>
-              </li>
-              {% endfor %}
-              {% for item in event.benefits %}
-              <li class="deliverable-item relative pl-9 py-3 rounded-xl bg-white/60 border border-neutral-200/30 transition-all duration-300 hover:bg-white/80 hover:shadow-lg">
-                <svg class="absolute left-3 top-3 w-5 h-5 text-burgundy-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                </svg>
-                <span class="text-navy-700 leading-relaxed">{{ item }}</span>
-              </li>
-              {% endfor %}
-              {% for item in event.hospitality %}
+              {% for item in currentSection.copy.includes %}
               <li class="deliverable-item relative pl-9 py-3 rounded-xl bg-white/60 border border-neutral-200/30 transition-all duration-300 hover:bg-white/80 hover:shadow-lg">
                 <svg class="absolute left-3 top-3 w-5 h-5 text-burgundy-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
@@ -171,7 +155,7 @@
                       data-source="offer"
                       class="primary-cta-button block w-full py-6 px-8 bg-gradient-to-r from-burgundy-600 via-burgundy-700 to-burgundy-600 hover:from-burgundy-700 hover:via-burgundy-800 hover:to-burgundy-700 text-white font-bold rounded-2xl text-center shadow-2xl hover:shadow-burgundy-500/25 transform hover:-translate-y-1 transition-all duration-300 group focus:outline-none focus:ring-4 focus:ring-burgundy-400 focus:ring-offset-2"
                       data-analytics-event="click_to_checkout"
-                      aria-label="Garantir vaga via Stripe - {{ event.pricing.tiers[0].price }}€">
+                      aria-label="Garantir vaga via Stripe - {{ currentSection.copy.pricing.first_lot.discounted_price }}€">
                 
                 <span class="text-xl mb-2 block">Sim — quero garantir a minha vaga agora!</span>
                 <span class="text-sm opacity-90 flex items-center justify-center">

@@ -3,8 +3,8 @@
  * Centralized state for the entire application
  */
 
-import { normalizeEventPayload } from '@/utils/gtm-normalizer.js';
-import type { AppState, StateManager as StateManagerInterface } from '@/types/state.js';
+import { normalizeEventPayload } from '@platform/lib/utils/gtm-normalizer.ts';
+import type { AppState, StateManager as StateManagerInterface } from '@/types/state.ts';
 
 /**
  * FAQ open times tracking
@@ -19,7 +19,7 @@ interface FAQOpenTimes {
 interface ComponentStatuses {
   [componentName: string]: {
     initialized: boolean;
-    error?: Error;
+    error: Error | undefined;
   };
 }
 
@@ -153,7 +153,7 @@ export const StateManager: StateManagerInterface = {
   /**
    * Set component initialization status
    */
-  setComponentStatus(name: string, initialized: boolean, error?: Error): void {
+  setComponentStatus(name: string, initialized: boolean, error: Error | undefined = undefined): void {
     state.components[name] = {
       initialized,
       error

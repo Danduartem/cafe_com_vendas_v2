@@ -17,7 +17,7 @@
  * @param {string} fallback - Fallback value (default: 'other')
  * @returns {string} Normalized string value
  */
-export function normalizeString(value, maxLength = 50, fallback = 'other') {
+export function normalizeString(value: unknown, maxLength: number = 50, fallback: string = 'other'): string {
   // Handle null/undefined/empty
   if (value == null || value === '') {
     return fallback;
@@ -47,13 +47,13 @@ export function normalizeString(value, maxLength = 50, fallback = 'other') {
  * @param {any} id - The ID to normalize
  * @returns {string} Normalized ID
  */
-export function normalizeId(id) {
+export function normalizeId(id: unknown): string {
   if (!id) return 'unknown_id';
 
   // Keep alphanumeric, dash, underscore (common in IDs)
   return String(id)
     .toLowerCase()
-    .replace(/[^a-z0-9_\-]+/g, '_')
+    .replace(/[^a-z0-9_-]+/g, '_')
     .slice(0, 100); // IDs can be longer
 }
 
@@ -62,7 +62,7 @@ export function normalizeId(id) {
  * @param {any} section - The section name
  * @returns {string} Normalized section name
  */
-export function normalizeSection(section) {
+export function normalizeSection(section: unknown): string {
   const knownSections = [
     'hero',
     'problem',
@@ -94,7 +94,7 @@ export function normalizeSection(section) {
  * @param {any} url - The URL to normalize
  * @returns {string} Normalized URL
  */
-export function normalizeUrl(url) {
+export function normalizeUrl(url: unknown): string {
   if (!url) return 'no_url';
 
   try {
@@ -112,7 +112,7 @@ export function normalizeUrl(url) {
  * @param {any} action - The action value
  * @returns {string} Normalized action
  */
-export function normalizeAction(action) {
+export function normalizeAction(action: unknown): string {
   const validActions = ['open', 'close', 'click', 'submit', 'view', 'play', 'pause', 'complete'];
   const normalized = normalizeString(action, 20, 'unknown');
 
@@ -125,7 +125,7 @@ export function normalizeAction(action) {
  * @param {any} tier - The pricing tier
  * @returns {string} Normalized tier
  */
-export function normalizePricingTier(tier) {
+export function normalizePricingTier(tier: unknown): string {
   const validTiers = ['early_bird', 'regular', 'last_minute', 'vip', 'standard'];
   const normalized = normalizeString(tier, 30, 'standard');
 
@@ -137,7 +137,7 @@ export function normalizePricingTier(tier) {
  * @param {any} question - The question text
  * @returns {string} Normalized question
  */
-export function normalizeQuestion(question) {
+export function normalizeQuestion(question: unknown): string {
   // Questions can be longer but still need limits
   return normalizeString(question, 100, 'faq_question');
 }
@@ -147,7 +147,7 @@ export function normalizeQuestion(question) {
  * @param {any} location - The form location
  * @returns {string} Normalized location
  */
-export function normalizeFormLocation(location) {
+export function normalizeFormLocation(location: unknown): string {
   const validLocations = [
     'checkout_modal',
     'footer_form',
@@ -167,7 +167,7 @@ export function normalizeFormLocation(location) {
  * @param {any} value - The parameter value
  * @returns {any} Normalized value (keeps numbers as numbers)
  */
-export function normalizeParameter(key, value) {
+export function normalizeParameter(key: string, value: unknown): unknown {
   // Don't normalize numbers
   if (typeof value === 'number') {
     return value;
@@ -228,8 +228,8 @@ export function normalizeParameter(key, value) {
  * @param {object} payload - The event payload
  * @returns {object} Normalized payload
  */
-export function normalizeEventPayload(payload) {
-  const normalized = {};
+export function normalizeEventPayload(payload: Record<string, unknown>): Record<string, unknown> {
+  const normalized: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(payload)) {
     // Skip 'event' key itself (don't normalize event names)

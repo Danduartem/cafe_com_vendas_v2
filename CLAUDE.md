@@ -84,7 +84,7 @@ Before using any API:
 
 ## 7) File Placement
 
-- New UI behavior → `src/assets/js/components/*` (+ types)  
+- New UI behavior → `src/platform/ui/components/*` (+ types)  
 - New section → `src/_includes/sections/<name>/{index.njk,index.ts}`  
 - Data → `src/_data/*.ts` (fed by `content/pt-PT/*.json`)  
 - Long docs/examples → `/docs/*.md` (link from here, don’t inline)  

@@ -12,8 +12,8 @@
     "clean": "node -e \"const fs=require('fs'); fs.rmSync('_site', {recursive:true, force:true})\"",
     "tokens:build": "tsx scripts/build-tokens.ts",
     "build:css": "postcss ./src/assets/css/main.css -o ./_site/tailwind.css",
-    "build:js": "cross-env NODE_ENV=production vite build",
-    "build:js:dev": "cross-env NODE_ENV=development vite build",
+    "build:js": "NODE_ENV=production vite build",
+    "build:js:dev": "NODE_ENV=development vite build",
     "type-check": "tsc --noEmit",
     "type-check:watch": "tsc --noEmit --watch",
     "eleventy": "eleventy --config=.eleventy.ts",
@@ -38,7 +38,19 @@
     "screenshot:local": "npm run screenshot -- --url=http://localhost:8080",
     "find:section": "tsx scripts/find-section.ts",
     "dev:section": "tsx scripts/dev-section.ts",
-    "new:section": "tsx scripts/new-section.ts"
+    "new:section": "tsx scripts/new-section.ts",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest --watch",
+    "test:schemas": "vitest run src/tests/schemas",
+    "test:render": "vitest run src/tests/render",
+    "test:analytics": "vitest run src/tests/analytics",
+    "test:visual": "playwright test",
+    "test:visual:ui": "playwright test --ui",
+    "test:visual:headed": "playwright test --headed",
+    "test:all": "npm run test:run && npm run test:visual"
   },
   "keywords": [
     "landing-page",
@@ -51,7 +63,6 @@
   "author": "Café com Vendas",
   "license": "ISC",
   "dependencies": {
-    "@fontsource/lora": "^5.2.6",
     "dotenv": "^17.2.1",
     "stripe": "^18.4.0"
   },
@@ -60,13 +71,16 @@
     "@eslint/js": "^9.33.0",
     "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4.1.11",
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^24.3.0",
     "@typescript-eslint/eslint-plugin": "^8.40.0",
     "@typescript-eslint/parser": "^8.40.0",
+    "@vitest/ui": "^3.2.4",
     "autoprefixer": "^10.4.21",
-    "cross-env": "^10.0.0",
     "eslint": "^9.33.0",
     "globals": "^16.3.0",
+    "happy-dom": "^18.0.1",
+    "jsdom": "^26.1.0",
     "postcss": "^8.5.6",
     "postcss-cli": "^11.0.1",
     "tailwindcss": "^4.1.11",
@@ -74,6 +88,7 @@
     "tsx": "^4.20.4",
     "typescript": "^5.9.2",
     "vite": "^7.1.2",
-    "vite-plugin-compression": "^0.5.1"
+    "vite-plugin-compression": "^0.5.1",
+    "vitest": "^3.2.4"
   }
 }

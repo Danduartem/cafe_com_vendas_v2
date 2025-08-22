@@ -76,4 +76,5 @@ export interface AppConfig {
 export interface Constants extends AppConfig {
   version: string;
   buildDate: string;
+  isDevelopment: boolean;
 }

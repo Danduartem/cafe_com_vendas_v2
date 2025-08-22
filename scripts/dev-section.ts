@@ -161,7 +161,7 @@ console.log(`   1. Template must have: id="${section.anchor}" data-section="${se
 console.log('   2. Use only Tailwind utilities (no inline styles)');
 console.log('   3. Add data-analytics-event for tracking');
 console.log('   4. Include accessibility attributes (aria-label, etc.)');
-console.log('   5. Use design tokens from DATA_design_tokens.json');
+console.log('   5. Use design tokens from design/tokens.json');
 
 if (!existsSync(templatePath) || !existsSync(scriptPath)) {
   console.log('\n⚠️  Missing files detected. Run to scaffold:');

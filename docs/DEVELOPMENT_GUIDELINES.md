@@ -45,7 +45,7 @@ Comprehensive development patterns and code examples following security best pra
 </section>
 ```
 
-### **2. JavaScript Component** (`src/assets/js/components/my-component.js`)
+### **2. JavaScript Component** (`src/platform/ui/components/my-component.js`)
 ```javascript
 /**
  * My Component for Café com Vendas

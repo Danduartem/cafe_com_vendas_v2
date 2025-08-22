@@ -5,9 +5,9 @@
  * Modular ES6 architecture with pure Tailwind CSS styling
  */
 
-import { CafeComVendas } from './app.js';
-import { ENV } from '@/config/constants.js';
-import '@/types/global.js'; // Import global types
+import { CafeComVendas } from './app.ts';
+import { ENV } from '@/config/constants.ts';
+import '@/types/global.ts'; // Import global types
 
 // Set global Cloudinary configuration
 window.CLOUDINARY_CLOUD_NAME = ENV.cloudinary.cloudName;

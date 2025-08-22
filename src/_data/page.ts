@@ -7,7 +7,7 @@ import type {
   Section,
   SectionSlug,
   SectionValidationError
-} from './types.js';
+} from './types.ts';
 
 // Section-specific validation functions
 function validateHeroSection(section: Record<string, unknown>): boolean {

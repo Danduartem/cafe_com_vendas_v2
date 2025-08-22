@@ -4,8 +4,8 @@
  * Type-safe contracts and runtime validation for the about section
  */
 
-import type { AboutSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types.js';
-import { validateSectionBase, assertSectionBase } from '../../../_data/types.js';
+import type { AboutSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types.ts';
+import { validateSectionBase, assertSectionBase } from '../../../_data/types.ts';
 
 // Extend the existing AboutSection interface for strict validation
 export interface AboutProps extends AboutSection {

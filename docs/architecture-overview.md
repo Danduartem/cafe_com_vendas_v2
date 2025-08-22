@@ -12,10 +12,11 @@
 **Goal**: High-converting, elegant design with proven conversion principles  
 
 ### Key Metrics
-- **TypeScript Coverage**: 100% (zero JavaScript files)
+- **TypeScript Coverage**: 100% file coverage (45 type errors being resolved)
 - **Performance Target**: Lighthouse >90
 - **Accessibility Target**: WCAG 2.1 AA compliance (>95)
 - **Bundle Size**: <100KB JavaScript gzipped, <50KB CSS
+- **Component Architecture**: Platform UI library with reusable patterns
 
 ## 🏗️ High-Level Architecture
 
@@ -94,7 +95,8 @@ graph TB
 │
 ├── 🏗️ src/platform/           # Platform Foundation
 │   ├── lib/utils/             # Shared utilities
-│   └── analytics/core/        # Analytics abstraction
+│   ├── analytics/core/        # Analytics abstraction
+│   └── ui/components/         # UI component library
 │
 ├── ☁️ netlify/                # Serverless Functions
 │   ├── functions/
@@ -171,6 +173,26 @@ sequenceDiagram
 
 ## 🧩 Component Architecture
 
+### Platform UI Components (New Pattern)
+```typescript
+// src/platform/ui/components/accordion.ts
+export class Accordion implements UIComponent {
+    private container: HTMLElement;
+    
+    constructor(container: HTMLElement) {
+        this.container = container;
+    }
+    
+    init(): void {
+        this.bindEvents();
+    }
+    
+    private bindEvents(): void {
+        // Type-safe event delegation
+    }
+}
+```
+
 ### Co-located Sections (Modern Pattern)
 ```typescript
 // src/_includes/sections/hero/index.ts
@@ -178,7 +200,10 @@ export const HeroSection: Component = {
     init(): void {
         this.bindEvents();
         // Make methods globally available for onclick handlers
-        (window as any).scrollToOffer = this.scrollToOffer.bind(this);
+        const global = window as typeof window & {
+            scrollToOffer: () => void;
+        };
+        global.scrollToOffer = this.scrollToOffer.bind(this);
     },
     
     bindEvents(): void {
@@ -193,7 +218,7 @@ export const HeroSection: Component = {
 
 ### Legacy Components (Transitional Pattern)
 ```typescript
-// src/assets/js/components/faq.ts
+// src/platform/ui/components/faq.ts
 import type { Component } from '../types/component.js';
 
 export const FAQ: Component = {
@@ -218,7 +243,7 @@ export const FAQ: Component = {
 
 ### Design Token System
 ```json
-// content/pt-PT/design_tokens.json
+// design/tokens.json
 {
   "colors": {
     "navy": {
@@ -394,10 +419,11 @@ const testConfig: ComponentConfig = {
 ```
 
 ### Quality Gates
-- **TypeScript Compilation**: Zero errors required
+- **TypeScript Compilation**: Working towards zero errors (45 remaining)
 - **ESLint**: Code quality and consistency
 - **Lighthouse**: Performance and accessibility metrics
 - **Build Validation**: Successful production build
+- **Type Coverage**: 100% file coverage, resolving edge cases
 
 ## 📱 Responsive Architecture
 
@@ -463,9 +489,18 @@ npm run outdated     # Check for updates
 - **API Changes**: Breaking change documentation
 - **Migration Guides**: Version upgrade instructions
 
+## 🆕 Recent Architecture Changes
+
+### December 2024 Updates
+- **Platform UI Library**: Added `src/platform/ui/components/` for reusable UI patterns
+- **TypeScript Migration**: Achieved 100% file coverage, resolving remaining type errors
+- **Data Consolidation**: Unified data loaders into cohesive page system
+- **Component Architecture**: Enhanced separation between platform and application components
+- **Type Safety**: Improved error handling with `unknown` types and proper null checks
+
 ---
 
-**Last Updated**: August 2025  
-**Architecture Version**: 2.0 (TypeScript-First)  
+**Last Updated**: December 2024  
+**Architecture Version**: 2.1 (TypeScript-First with Platform UI)  
 **Maintainer**: Development Team  
-**Next Review**: September 2025
+**Next Review**: January 2025

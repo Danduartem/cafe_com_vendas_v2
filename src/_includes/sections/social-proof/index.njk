@@ -4,7 +4,7 @@
   role="region"
   aria-label="Testemunhos em vídeo do Café com Vendas"
   data-reveal
->
+ data-analytics-section="social-proof">
   <!-- Decorative background consolidated via ::before -->
   <div class="absolute inset-0 overflow-hidden" aria-hidden="true"></div>
   <div class="pointer-events-none absolute inset-0 before:content-[''] before:absolute before:top-10 before:right-10 before:w-32 before:h-32 before:rounded-full before:blur-3xl before:bg-gradient-to-r before:from-peach-200/20 before:to-gold-200/20" aria-hidden="true"></div>
@@ -28,10 +28,10 @@
       <div class="testimonials-carousel overflow-x-auto overflow-y-hidden scrollbar-hide">
         <div class="testimonials-track flex gap-6 pb-12" data-carousel-track>
           
-          {% for video in testimonials.videos %}
+          {% for video in currentSection.testimonials %}
           <article class="carousel-slide flex-shrink-0 w-full sm:w-80 lg:w-96">
             <div class="video-card group overflow-hidden rounded-2xl border border-white/50 bg-white/90 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_16px_48px_rgba(0,0,0,0.12)]" data-video-card>
-              <div class="relative aspect-video youtube-embed bg-gradient-to-br from-navy-800 to-burgundy-700" data-video-id="{{ video.videoId }}">
+              <div class="relative aspect-video youtube-embed bg-gradient-to-br from-navy-800 to-burgundy-700" data-video-id="{{ video.video_id }}">
                 <img 
                   src="{{ video.thumbnail }}" 
                   alt="Testemunho de {{ video.name }}, {{ video.profession }} de {{ video.location }}"
