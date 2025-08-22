@@ -10,19 +10,20 @@ Deploy to Netlify production.
 ```
 
 ## What it does
-1. Runs production build
-2. Runs quality checks
-3. Tests payment integration
-4. Deploys to Netlify
-5. Shows deployment URL
-6. Monitors for errors
+1. **Build Verification**: `npm run build` - ensures clean production build
+2. **Quality Gates**: `npm run type-check && npm run lint && npm run test`
+3. **Performance Check**: Quick lighthouse audit
+4. **Environment Check**: Validates required Netlify environment variables
+5. **Deploy**: Uses Netlify CLI or git push for automatic deployment
+6. **Verification**: Shows deployment URL and monitors initial response
 
-## Pre-deployment Checks
-- ✓ Build successful
-- ✓ Tests passing
-- ✓ Lighthouse >90
-- ✓ Payment working
-- ✓ Environment vars set
+## Pre-deployment Checklist
+- ✓ TypeScript compilation successful
+- ✓ ESLint validation passed  
+- ✓ Unit and visual tests passing
+- ✓ Lighthouse performance >90 (mobile)
+- ✓ Stripe payment integration working
+- ✓ Environment variables set (VITE_STRIPE_PUBLIC_KEY, VITE_GTM_CONTAINER_ID)
 
 ## Netlify Features
 - Automatic SSL

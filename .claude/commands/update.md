@@ -13,14 +13,14 @@ Update dependencies and refactor code to use latest features.
 ## What it does
 
 ### Dependency Updates (default)
-1. Runs `/version-check` first to understand current state
-2. Checks outdated packages with `npm outdated`
-3. Fetches documentation via Context7 for new versions
-4. Updates to latest minor/patch versions
-5. Runs TypeScript validation with `npm run type-check`
-6. Runs API verification with `npm run verify-apis`
-7. Runs build to verify compatibility
-8. Shows changelog summary with breaking changes
+1. **Version Check**: Runs `/project:version-check` to establish baseline
+2. **Outdated Analysis**: `npm run outdated` to identify update candidates
+3. **Documentation Sync**: Context7 fetches exact-version docs for major dependencies
+4. **Safe Updates**: `npm run update` for minor/patch versions only
+5. **API Validation**: `npm run verify-apis` to catch deprecated patterns
+6. **Quality Gates**: `npm run type-check && npm run lint && npm run test`
+7. **Build Verification**: `npm run build` to ensure production compatibility
+8. **Change Summary**: Documents what was updated and any breaking changes
 
 ### Code Refactoring
 1. Scans for deprecated API patterns

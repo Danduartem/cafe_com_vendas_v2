@@ -12,10 +12,12 @@ Simple, practical commands for everyday development tasks. Each command runs in 
 | `/commit` | Smart git commit | `/commit` | 5s |
 | `/push` | Safe git push | `/push` | 5s |
 | `/update` | Update dependencies | `/update` | 20s |
-| `/perf` | Performance audit | `/perf` | 20s |
+| `/lighthouse` | Full web audit | `/lighthouse` | 20s |
 | `/test-payment` | Test Stripe | `/test-payment` | 10s |
-| `/audit` | Conversion audit | `/audit` | 15s |
-| `/sync` | Sync documentation | `/sync` | 10s |
+| `/lint` | TypeScript linting | `/lint` | 5s |
+| `/type-check` | Type validation | `/type-check` | 5s |
+| `/test` | Run all tests | `/test` | 15s |
+| `/project:plan-then-apply` | Plan changes | Plan-first workflow | 5s |
 
 ## Daily Workflow
 
@@ -32,8 +34,10 @@ Simple, practical commands for everyday development tasks. Each command runs in 
 
 ### After Changes
 ```bash
+/type-check       # Validate TypeScript
+/lint             # Check code quality
 /build            # Test production build
-/perf --quick     # Check performance
+/lighthouse --quick # Check performance
 ```
 
 ### End of Day
@@ -86,24 +90,39 @@ Pushes with safety checks.
 
 ### 🔍 Quality Checks
 
-#### `/perf` - Performance Audit
-Runs Lighthouse performance audit.
+#### `/type-check` - TypeScript Validation
+Validates TypeScript without emitting files.
 ```bash
-/perf           # Full audit
-/perf --mobile  # Mobile only
+/type-check       # Check all types
+/type-check --watch # Continuous checking
 ```
 
-#### `/audit` - Conversion Audit
-Checks conversion optimization.
+#### `/lint` - Code Quality
+ESLint validation with auto-fix.
 ```bash
-/audit          # Full audit
-/audit --mobile # Mobile focus
+/lint             # Check code style
+/lint --fix       # Auto-fix issues
 ```
 
-#### `/test-payment` - Test Payments
+#### `/test` - Test Suite
+Unified testing with Vitest and Playwright.
+```bash
+/test             # Unit tests
+/test --visual    # Playwright tests
+/test --all       # Everything
+```
+
+#### `/lighthouse` - Web Audit
+Complete Lighthouse audit (performance, SEO, accessibility).
+```bash
+/lighthouse       # Full audit
+/lighthouse --mobile # Mobile only
+```
+
+#### `/test-payment` - Payment Testing
 Tests Stripe integration.
 ```bash
-/test-payment   # Basic test
+/test-payment     # Basic test
 /test-payment --full # All scenarios
 ```
 
@@ -116,11 +135,10 @@ Updates packages safely.
 /update --major # Include majors
 ```
 
-#### `/sync` - Sync Documentation
-Updates docs to match code.
+#### `/project:plan-then-apply` - Plan-First Workflow
+Core command for minimal, type-safe changes.
 ```bash
-/sync           # Update all docs
-/sync --check   # Check only
+/project:plan-then-apply "add feature X"
 ```
 
 ## Common Scenarios
@@ -129,56 +147,62 @@ Updates docs to match code.
 ```bash
 /dev                    # Start working
 # Make changes...
+/type-check             # Validate types
+/lint                   # Check code quality
+/test                   # Run tests
 /commit                 # Save progress
 /build                  # Verify build
-/perf --quick          # Check performance
-/push --pr             # Create PR
+/lighthouse --quick     # Check performance
+/push --pr              # Create PR
 ```
 
 ### Bug Fix
 ```bash
-/dev                    # Reproduce issue
-# Fix bug...
-/test-payment          # Verify fix
-/commit                # Commit fix
-/push                  # Push changes
-/deploy --preview      # Test in preview
+/project:plan-then-apply "fix: resolve payment issue"
+# Apply the fix...
+/type-check && /lint && /test  # Quality gates
+/test-payment           # Verify fix
+/commit                 # Commit fix
+/push                   # Push changes
 ```
 
 ### Performance Optimization
 ```bash
-/perf                  # Baseline metrics
+/lighthouse             # Baseline metrics
 # Make optimizations...
-/build                 # Production build
-/perf                  # Compare metrics
-/commit               # Save improvements
+/build                  # Production build
+/lighthouse             # Compare metrics
+/commit                 # Save improvements
 ```
 
-### Dependency Updates
+### TypeScript-First Development
 ```bash
-/update               # Update packages
-/build                # Verify build
-/test-payment         # Test payments
-/perf                 # Check performance
-/commit               # Commit updates
+/type-check --watch     # Continuous type checking
+# Code with full type safety...
+/lint --fix             # Auto-fix style issues
+/test --watch           # Live testing
+/commit                 # Quality-assured commit
 ```
 
 ## Tips & Tricks
 
 ### Speed Tips
 - Use `/dev` for daily development (fastest)
-- Run `/perf --quick` for quick checks
+- Run `/lighthouse --quick` for quick performance checks
+- Use `/type-check --watch` for continuous validation
 - Use `/commit` without staging (auto-stages all)
 
 ### Safety Tips
+- Always run quality gates: `/type-check && /lint && /test`
 - Always `/build` before `/deploy`
 - Use `/push --pr` for important changes
 - Run `/test-payment` after Stripe updates
 
 ### Quality Tips
-- Run `/audit` weekly
-- Check `/perf` after major changes
-- Use `/sync` to keep docs current
+- Use `/project:plan-then-apply` for all changes (TypeScript-first)
+- Run `/lighthouse` after major changes
+- Use `/lint --fix` to auto-resolve style issues
+- Keep `/type-check --watch` running while coding
 
 ## Environment Variables
 
@@ -199,10 +223,13 @@ NETLIFY_SITE_ID=...
 | Issue | Solution |
 |-------|----------|
 | `/dev` port in use | Kill process: `lsof -ti:8080 \| xargs kill` |
-| `/build` fails | Check Node version (needs 22+) |
-| `/deploy` fails | Verify Netlify token |
-| `/test-payment` fails | Check Stripe keys |
-| `/perf` timeout | Use `--quick` flag |
+| `/type-check` fails | Run `npm run type-check` to see detailed errors |
+| `/lint` fails | Use `/lint --fix` to auto-resolve issues |
+| `/build` fails | Check Node version (needs 22+), run quality gates first |
+| `/test` fails | Check unit tests vs visual tests separately |
+| `/deploy` fails | Verify Netlify token and environment variables |
+| `/test-payment` fails | Check Stripe keys in environment |
+| `/lighthouse` timeout | Use `--quick` flag for performance only |
 
 ## Command Options
 
@@ -214,16 +241,23 @@ Most commands support options:
 
 Example:
 ```bash
-/deploy --dry-run   # Preview what would deploy
-/update --verbose   # Show all package changes
-/perf --quiet      # Just show scores
+/deploy --dry-run     # Preview what would deploy
+/update --verbose     # Show all package changes
+/lighthouse --quiet   # Just show scores
+/lint --fix           # Auto-fix style issues
+/type-check --watch   # Continuous type checking
 ```
 
 ---
 
-**Pro tip**: Commands are designed to be chainable:
+**Pro tip**: Commands are designed to be chainable following TypeScript-first quality gates:
 ```bash
-/build && /perf && /deploy
+/type-check && /lint && /test && /build && /lighthouse && /deploy
+```
+
+**Core Quality Pipeline**: Always run these three together:
+```bash
+/type-check && /lint && /test
 ```
 
 **Need help?** Each command shows help with:

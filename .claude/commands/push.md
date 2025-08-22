@@ -10,18 +10,19 @@ Safe git push with automatic upstream and optional PR creation.
 ```
 
 ## What it does
-1. Checks for clean working tree
-2. Fetches latest from remote
-3. Sets upstream if needed
-4. Pushes changes safely
-5. Shows Netlify preview URL
-6. Optionally creates PR
+1. **Clean Check**: Ensures working tree is clean (no uncommitted changes)
+2. **Remote Sync**: Fetches latest from remote to check for conflicts
+3. **Upstream Setup**: Sets tracking branch if needed for new branches
+4. **Safe Push**: Pushes with --force-with-lease for safety
+5. **Preview Detection**: Automatically detects and shows Netlify preview URL
+6. **PR Creation**: Optionally creates GitHub PR with Netlify preview link
 
 ## Safety Features
-- Never force pushes to main/master
-- Uses --force-with-lease for safety
-- Warns about uncommitted changes
-- Shows what will be pushed
+- **Protected Branches**: Never allows force push to main/master
+- **Conflict Detection**: Checks for remote changes before pushing
+- **Lease Safety**: Uses --force-with-lease instead of dangerous --force
+- **Change Preview**: Shows exactly what commits will be pushed
+- **Branch Suggestions**: Recommends meaningful branch names
 
 ## Examples
 ```bash

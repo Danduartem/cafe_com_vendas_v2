@@ -9,11 +9,12 @@ Smart git commit with conventional format and automatic staging.
 ```
 
 ## What it does
-1. Runs `npm run build` to verify build (unless --no-verify)
-2. Checks staged files with `git status`
-3. If nothing staged, adds all changes with `git add .`
-4. Analyzes changes to create smart commit message
-5. Commits with conventional format
+1. **Quality Gates**: Runs `npm run type-check && npm run lint` (unless --no-verify)
+2. **Staging Check**: Reviews staged files with `git status`
+3. **Auto-stage**: If nothing staged, adds all changes with `git add .`
+4. **Smart Analysis**: Analyzes file changes to create intelligent commit message
+5. **Conventional Format**: Commits with emoji + conventional format
+6. **Split Detection**: Suggests separate commits for unrelated changes
 
 ## Commit Format
 ```
