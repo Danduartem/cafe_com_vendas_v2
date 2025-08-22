@@ -5,7 +5,7 @@
 
 export { PlatformAnimations } from './animations.ts';
 export { PlatformAnalytics } from './analytics.ts';
-export { PlatformModal, PlatformModalUtils } from './modal.ts';
+export { PlatformModal } from './modal.ts';
 export { PlatformAccordion } from './accordion.ts';
 export { PlatformYouTube } from './youtube.ts';
 export { PlatformThankYou } from './thank-you.ts';

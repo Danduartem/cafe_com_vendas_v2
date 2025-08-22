@@ -74,7 +74,5 @@ export interface AppConfig {
  * Build-time constants
  */
 export interface Constants extends AppConfig {
-  version: string;
-  buildDate: string;
   isDevelopment: boolean;
 }

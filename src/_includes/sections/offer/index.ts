@@ -5,7 +5,8 @@
 
 import { CONFIG } from '@/config/constants.ts';
 import { Analytics } from '@/core/analytics.ts';
-import { safeQuery, safeQueryAll, Animations } from '@platform/lib/utils/index.ts';
+import { safeQuery, safeQueryAll } from '@platform/lib/utils/index.ts';
+import { PlatformAnimations } from '@platform/ui/components/index.ts';
 
 export const Offer = {
   init() {
@@ -66,12 +67,12 @@ export const Offer = {
     const deliverableItems = Array.from(safeQueryAll('.deliverable-item'));
     if (!deliverableItems.length) return;
 
-    Animations.prepareRevealElements(deliverableItems, {
+    PlatformAnimations.prepareRevealElements(deliverableItems, {
       hiddenClasses: ['opacity-0', 'translate-y-2'],
       transitionClasses: ['transition-all', 'duration-400', 'ease-out']
     });
 
-    const observer = Animations.createObserver({
+    const observer = PlatformAnimations.createObserver({
       callback: (entry) => {
         if (entry.target.classList.contains('deliverable-item')) {
           entry.target.classList.remove('opacity-0', 'translate-y-2');

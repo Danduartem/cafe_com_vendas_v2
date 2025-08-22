@@ -4,8 +4,7 @@
  */
 
 export { throttle, debounce } from './throttle.ts';
-export { safeQuery, safeQueryAll, calculateSlidesPerView, generateId } from './dom.ts';
-export { Animations } from './animations.ts';
+export { safeQuery, safeQueryAll } from './dom.ts';
 export { ScrollTracker } from './scroll-tracker.ts';
 export { GTMNormalizer, normalizeEventPayload } from './gtm-normalizer.ts';
 // Cloudinary helpers are currently unused; export can be restored if needed

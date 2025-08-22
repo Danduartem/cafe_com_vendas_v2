@@ -1,0 +1,82 @@
+/* Generated from design/tokens.json. Do not edit directly. */
+/* Generated: 2025-08-22T15:34:16.350Z */
+
+:root {
+  /* Color Palette */
+  --color-navy-50: #F3F4F5;
+  --color-navy-100: #E8E9EB;
+  --color-navy-200: #BABBC4;
+  --color-navy-300: #8C8F9C;
+  --color-navy-400: #757989;
+  --color-navy-500: #5E6275;
+  --color-navy-600: #474C61;
+  --color-navy-700: #30354E;
+  --color-navy-800: #191F3A;
+  --color-navy-900: #121629;
+  --color-burgundy-50: #FCF9F9;
+  --color-burgundy-100: #F9F3F4;
+  --color-burgundy-200: #F2E8E9;
+  --color-burgundy-300: #D9B9BC;
+  --color-burgundy-400: #C08B8F;
+  --color-burgundy-500: #B37479;
+  --color-burgundy-600: #9A454C;
+  --color-burgundy-700: #81171F;
+  --color-burgundy-800: #671219;
+  --color-burgundy-900: #5A1016;
+  --color-neutral-50: #F9F9F9;
+  --color-neutral-100: #F6F6F6;
+  --color-neutral-200: #ECECEC;
+  --color-neutral-300: #D4D4D4;
+  --color-neutral-400: #BDBDBD;
+  --color-neutral-500: #A5A5A5;
+  --color-neutral-600: #8E8E8E;
+  --color-neutral-700: #767676;
+  --color-neutral-800: #474747;
+  --color-neutral-900: #181818;
+  --color-gold-50: #fdf8f0;
+  --color-gold-100: #fbeecb;
+  --color-gold-200: #f8e2a0;
+  --color-gold-300: #f3d375;
+  --color-gold-400: #eec454;
+  --color-gold-500: #C89A3A;
+  --color-gold-600: #b78431;
+  --color-gold-700: #986829;
+  --color-gold-800: #7c5324;
+  --color-gold-900: #654320;
+  --color-peach-50: #fef9f7;
+  --color-peach-100: #fdeee7;
+  --color-peach-200: #f9d8c9;
+  --color-peach-300: #F1C6B4;
+  --color-peach-400: #ecae98;
+  --color-peach-500: #e59074;
+  --color-peach-600: #d76f4f;
+  --color-peach-700: #b3563b;
+  --color-peach-800: #914633;
+  --color-peach-900: #753b2d;
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+
+  /* Typography */
+  --font-family-display: 'Lora', serif;
+  --font-family-body: 'CenturyGothic', sans-serif;
+  --text-hero: clamp(2.25rem, 6.5vw, 3rem);
+  --text-h2: clamp(1.5rem, 3.5vw, 2rem);
+  --text-lead: 1.125rem;
+  --text-body: 1rem;
+  --text-caption: 0.875rem;
+  --leading-tight: 1.06;
+  --leading-heading: 1.12;
+  --leading-base: 1.55;
+  --leading-relaxed: 1.6;
+  --tracking-tight: -0.01em;
+  --tracking-wide: 0.06em;
+
+  /* Semantic Tokens */
+  --color-text-primary: var(--color-navy-800);
+  --color-text-secondary: var(--color-navy-600);
+  --color-text-subtle: var(--color-neutral-500);
+  --color-surface-main: var(--color-white);
+  --color-surface-subtle: var(--color-neutral-100);
+  --color-cta-primary: var(--color-burgundy-700);
+  --color-cta-primary-hover: var(--color-burgundy-800);
+}

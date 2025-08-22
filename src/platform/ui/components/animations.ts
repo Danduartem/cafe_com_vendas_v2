@@ -4,9 +4,7 @@
  * Used across multiple sections for consistent animations
  */
 
-import { CONFIG } from '@/config/constants.ts';
 import type {
-  AnimationConfig,
   RevealConfig,
   ObserverConfig,
   SafeElement
@@ -111,61 +109,6 @@ export const PlatformAnimations = {
       setTimeout(() => {
         this.classList.remove(scaleClass);
       }, duration);
-    });
-  },
-
-  /**
-   * Animate element entry with specified config
-   */
-  animateEntry(
-    element: SafeElement,
-    config: AnimationConfig = {}
-  ): void {
-    if (!element) return;
-
-    const {
-      duration = CONFIG.animations.duration.normal,
-      delay = 0,
-      easing = 'ease-out'
-    } = config;
-
-    // Apply initial state
-    element.classList.add('opacity-0', 'translate-y-4', 'transition-all');
-    (element as HTMLElement).style.transitionDuration = `${duration}ms`;
-    (element as HTMLElement).style.transitionTimingFunction = easing;
-
-    // Animate to final state
-    setTimeout(() => {
-      element.classList.remove('opacity-0', 'translate-y-4');
-      element.classList.add('opacity-100', 'translate-y-0');
-    }, delay);
-  },
-
-  /**
-   * Animate element exit
-   */
-  animateExit(
-    element: SafeElement,
-    config: AnimationConfig = {}
-  ): Promise<void> {
-    return new Promise((resolve) => {
-      if (!element) {
-        resolve();
-        return;
-      }
-
-      const {
-        duration = CONFIG.animations.duration.normal,
-        easing = 'ease-out'
-      } = config;
-
-      (element as HTMLElement).style.transitionDuration = `${duration}ms`;
-      (element as HTMLElement).style.transitionTimingFunction = easing;
-
-      element.classList.remove('opacity-100', 'translate-y-0');
-      element.classList.add('opacity-0', 'translate-y-4');
-
-      setTimeout(() => resolve(), duration);
     });
   }
 };

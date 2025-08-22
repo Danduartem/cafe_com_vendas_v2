@@ -49,12 +49,7 @@ export interface EnvironmentConfig {
   cloudinary: {
     cloudName: string;
   };
-  api: {
-    spotsRemaining: string;
-    webhook: {
-      formspree: string;
-    };
-  };
+  // Note: API endpoints can be added here when needed
   urls: {
     base: string;
     thankYou: string;
@@ -93,13 +88,7 @@ const config: EnvironmentConfig = {
     cloudName: import.meta.env?.VITE_CLOUDINARY_CLOUD_NAME ?? 'ds4dhbneq'
   },
 
-  // API Endpoints (Client-side safe endpoints only)
-  api: {
-    spotsRemaining: '/api/spots-remaining',
-    webhook: {
-      formspree: '/.netlify/functions/formspree-webhook'
-    }
-  },
+  // Note: API endpoints can be added here when needed
 
   // URLs and Tracking
   urls: {

@@ -11,9 +11,6 @@ import type { Constants as ConstantsType } from '@/types/config.ts';
  */
 export const ANALYTICS_EVENTS = {
   // Performance events
-  PERFORMANCE_LCP: 'performance_lcp',
-  PERFORMANCE_CLS: 'performance_cls',
-  PERFORMANCE_FID: 'performance_fid',
   PAGE_LOAD_PERFORMANCE: 'page_load_performance',
 
   // Engagement events
@@ -24,12 +21,9 @@ export const ANALYTICS_EVENTS = {
 
   // Navigation events
   WHATSAPP_CLICK: 'whatsapp_click',
-  SCROLL_INDICATOR: 'scroll_indicator_click',
 
   // Form events
   FORM_SUBMIT: 'form_submit',
-  FORM_START: 'form_start',
-  FORM_ABANDON: 'form_abandon',
 
   // Page events
   PAGE_VIEW_ENHANCED: 'page_view_enhanced',
@@ -43,8 +37,7 @@ export const ANALYTICS_EVENTS = {
   PURCHASE_COMPLETED: 'purchase_completed',
 
   // Error events
-  PAYMENT_FAILED: 'payment_failed',
-  JAVASCRIPT_ERROR: 'javascript_error'
+  PAYMENT_FAILED: 'payment_failed'
 } as const;
 
 /**
@@ -56,8 +49,6 @@ export type AnalyticsEventType = typeof ANALYTICS_EVENTS[keyof typeof ANALYTICS_
  * Main application configuration with strict typing
  */
 export const CONFIG: ConstantsType = {
-  version: '2.0.0',
-  buildDate: new Date().toISOString(),
   isDevelopment: ENV.isDevelopment,
 
   animations: {

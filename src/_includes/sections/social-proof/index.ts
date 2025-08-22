@@ -247,7 +247,7 @@ export const SocialProof: SocialProofComponent = {
       threshold: 0.3
     });
 
-    const socialProofSection = safeQuery('#social-proof');
+    const socialProofSection = safeQuery('#s-social-proof');
     if (socialProofSection) {
       observer.observe(socialProofSection);
     }

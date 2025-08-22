@@ -31,19 +31,22 @@
     // Module resolution
     "baseUrl": ".",
     "paths": {
+      "@content/*": ["content/*"],
+      "@design/*": ["design/*"],
+      "@data/*": ["src/_data/*"],
+      "@sections/*": ["src/_includes/sections/*"],
+      "@partials/*": ["src/_includes/partials/*"],
+      "@platform/*": ["src/platform/*"],
+      "@assets/*": ["src/assets/*"],
+      "@pages/*": ["src/pages/*"],
+      "@tests/*": ["tests/*"],
       "@/*": ["src/*"],
-      "@/assets/*": ["src/assets/*"],
       "@/js/*": ["src/assets/js/*"],
       "@/components/*": ["src/platform/ui/components/*"],
       "@/utils/*": ["src/platform/lib/utils/*"],
       "@/core/*": ["src/assets/js/core/*"],
       "@/config/*": ["src/assets/js/config/*"],
-      "@/types/*": ["src/assets/js/types/*"],
-      "@sections/*": ["src/_includes/sections/*"],
-      "@partials/*": ["src/_includes/partials/*"],
-      "@data/*": ["src/_data/*"],
-      "@platform/*": ["src/platform/*"],
-      "@content/*": ["content/*"]
+      "@/types/*": ["src/assets/js/types/*"]
     },
 
     // Advanced
@@ -65,10 +68,9 @@
     "scripts/dev-section.ts",
     "scripts/find-section.ts",
     "scripts/new-section.ts",
-    "scripts/playwright-universal-screenshot.ts",
     "scripts/screenshot-cli.ts",
-    "scripts/test-apis.ts",
     "scripts/universal-screenshot.ts",
+    "scripts/validate-content.ts",
     "scripts/verify-apis.ts",
     "vite.config.ts",
     "vitest.config.ts",

@@ -21,7 +21,7 @@ export const Hero = {
   },
 
   initAnimations() {
-    const heroSection = safeQuery('#hero');
+    const heroSection = safeQuery('#s-hero');
     if (!heroSection) return;
 
     const animatableElements = [
@@ -75,7 +75,7 @@ export const Hero = {
       }
 
       // Fallback: find next sibling section
-      const heroSection = safeQuery('#hero');
+      const heroSection = safeQuery('#s-hero');
       const nextSection = heroSection?.nextElementSibling;
       if (nextSection) {
         nextSection.scrollIntoView({ behavior: 'smooth' });
@@ -112,7 +112,7 @@ export const Hero = {
           problemSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
           // Fallback: find next sibling section
-          const heroSection = safeQuery('#hero');
+          const heroSection = safeQuery('#s-hero');
           const nextSection = heroSection?.nextElementSibling;
           if (nextSection) {
             nextSection.scrollIntoView({ behavior: 'smooth' });

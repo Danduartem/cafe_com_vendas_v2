@@ -4,7 +4,7 @@ html, body {
   overflow-x: hidden !important; 
 }
 /* Import generated tokens first */
-@import "./_tokens.generated.css";
+@import "./tokens.generated.css";
 @import "tailwindcss";
 
 /* Tailwind v4 Configuration - Both :root and @theme needed for complete functionality */

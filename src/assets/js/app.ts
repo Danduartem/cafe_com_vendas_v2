@@ -8,7 +8,6 @@ import { state, StateManager } from '@/core/state.ts';
 import { Analytics } from '@/core/analytics.ts';
 import { ScrollTracker } from '../../platform/lib/utils/scroll-tracker.ts';
 import type {
-  Component,
   ComponentRegistration,
   ComponentHealthStatus,
   ComponentStatus
@@ -29,9 +28,15 @@ import {
 
 // Import co-located section components (new approach)
 import { Hero } from '../../_includes/sections/hero/index.ts';
+import { Problem } from '../../_includes/sections/problem/index.ts';
+import { Solution } from '../../_includes/sections/solution/index.ts';
+import { About } from '../../_includes/sections/about/index.ts';
+import { SocialProof } from '../../_includes/sections/social-proof/index.ts';
 import { Offer } from '../../_includes/sections/offer/index.ts';
 import { FAQ } from '../../_includes/sections/faq/index.ts';
-import { SocialProof } from '../../_includes/sections/social-proof/index.ts';
+import { FinalCTA } from '../../_includes/sections/final-cta/index.ts';
+import { Footer } from '../../_includes/sections/footer/index.ts';
+import { TopBanner } from '../../_includes/sections/top-banner/index.ts';
 import { Checkout } from '../../_includes/sections/checkout/index.ts';
 
 /**
@@ -150,11 +155,17 @@ export const CafeComVendas: CafeComVendasInterface = {
       { name: 'ThankYou', component: { init: () => PlatformThankYou.init() } },
 
       // Co-located section components (new approach)
-      { name: 'Hero', component: Hero as Component },
-      { name: 'Offer', component: Offer as Component },
-      { name: 'FAQ', component: FAQ as Component },
-      { name: 'SocialProof', component: SocialProof as Component },
-      { name: 'Checkout', component: Checkout as Component }
+      { name: 'TopBanner', component: TopBanner },
+      { name: 'Hero', component: Hero },
+      { name: 'Problem', component: Problem },
+      { name: 'Solution', component: Solution },
+      { name: 'About', component: About },
+      { name: 'SocialProof', component: SocialProof },
+      { name: 'Offer', component: Offer },
+      { name: 'FAQ', component: FAQ },
+      { name: 'FinalCTA', component: FinalCTA },
+      { name: 'Footer', component: Footer },
+      { name: 'Checkout', component: Checkout }
     ];
 
     let successCount = 0;
