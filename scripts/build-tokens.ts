@@ -4,8 +4,8 @@ import path from 'path';
 
 const root = process.cwd();
 const tokensPath = path.join(root, 'design', 'tokens.json');
-const outDir = path.join(root, 'src', 'assets', 'css');
-const outFile = path.join(outDir, 'tokens.generated.css');
+const outDir = path.join(root, 'src', 'assets', 'css', 'generated');
+const outFile = path.join(outDir, 'tokens.css');
 
 interface CSSVariables {
   [key: string]: string;
