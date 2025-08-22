@@ -1,50 +1,50 @@
+/commit (lightweight)
+---
+description: Fast, staged-only conventional commit with optional verification.
+argument-hint: [message] [--full|--no-verify]
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git add:*), Bash(git restore:*), Bash(git commit:*), Bash(npm run *), Bash(node .claude/scripts/*)
+model: claude-3-7-sonnet
+---
+
 # /commit
 
-Smart git commit with conventional format and automatic staging.
+Create a smart conventional commit from **staged changes**.
+Defaults to **fast mode** (no full typecheck). Use `--full` for CI-grade checks or `--no-verify` to skip checks.
 
 ## Usage
-```
-/commit
-/commit --no-verify  # Skip pre-commit checks
-```
+/commit                      # staged-only, fast verify
+/commit "msg"                # force description
+/commit --full               # run typed ESLint + tsc (slower)
+/commit --no-verify          # skip all gates
 
-## What it does
-1. **Quality Gates**: Runs `npm run type-check && npm run lint` (unless --no-verify)
-2. **Staging Check**: Reviews staged files with `git status`
-3. **Auto-stage**: If nothing staged, adds all changes with `git add .`
-4. **Smart Analysis**: Analyzes file changes to create intelligent commit message
-5. **Conventional Format**: Commits with emoji + conventional format
-6. **Split Detection**: Suggests separate commits for unrelated changes
+## Context (small + staged-only)
+- Branch: !`git branch --show-current`
+- Staged files: !`git diff --name-only --cached`
+- Staged summary: !`git diff --cached --stat`
 
-## Commit Format
-```
-<emoji> <type>: <description>
+## Your task
+1) If nothing is staged:
+   - Stage only tracked changes in src/config by default: `git add -u src config || true`.
+   - Re-print staged files and continue.
 
-[optional body]
-```
+2) Quick gates (FAST by default):
+   - Compute the staged file list: `git diff --name-only --cached --diff-filter=ACMR`.
+   - If the list contains any `.(ts|tsx|js|mjs|cjs)` files, run **staged-only ESLint with cache**:
+     ```
+     FILES=$(git diff --name-only --cached --diff-filter=ACMR | grep -E '\.(ts|tsx|js|mjs|cjs) || true)
+     [ -n "$FILES" ] && npm run lint:staged -- $FILES
+     ```
+   - Skip type-check unless `--full` is present *or* staged TS files touch `src/` boundaries.
 
-## Types & Emojis
-- ✨ `feat`: New feature
-- 🐛 `fix`: Bug fix  
-- 📝 `docs`: Documentation
-- 🎨 `style`: UI/styling changes
-- ♻️ `refactor`: Code refactoring
-- ⚡ `perf`: Performance improvement
-- 🧪 `test`: Tests
-- 🔧 `chore`: Maintenance
-- 💳 `stripe`: Payment updates
-- 🌍 `i18n`: Portuguese content
-- 📊 `analytics`: Tracking changes
-- ♿ `a11y`: Accessibility
+3) If `--full` is passed:
+   - Run `npm run type-check` (incremental) and `npm run lint:typed` (src only, cache).
 
-## Examples
-```
-✨ feat: add testimonials carousel
-🐛 fix: resolve mobile layout issue  
-🎨 style: improve CTA button contrast
-⚡ perf: optimize image loading
-🌍 i18n: update event pricing
-```
+4) Generate a **conventional + emoji** commit message from the staged diff and file paths.
+   - Keep subject ≤ 72 chars, body as bullets when helpful.
+   - If unrelated changes are detected, propose split commits (but proceed with the best single split if trivial).
 
-## Auto-splitting
-If multiple unrelated changes detected, suggests splitting into separate commits for better history.
+5) Commit:
+   - `git commit -m "<emoji> <type>: <description>" -m "<body if any>"`
+
+## Rules for message type
+- ✨ feat | 🐛 fix | 📝 docs | 🎨 style | ♻️ refactor | ⚡ perf | 🧪 test | 🔧 chore | 💳 stripe | 🌍 i18n | 📊 analytics | ♿ a11y
