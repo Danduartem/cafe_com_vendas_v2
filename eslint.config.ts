@@ -8,11 +8,6 @@ export default [
   js.configs.recommended,
 
   {
-    // Global ignores
-    ignores: ['debug-gtm.ts', 'scripts/debug-gtm.ts']
-  },
-
-  {
     // Configuration for JavaScript files
     files: ['src/**/*.js', 'scripts/**/*.js', '*.js', '.eleventy.js'],
     languageOptions: {
@@ -84,7 +79,6 @@ export default [
   {
     // Configuration for TypeScript files
     files: ['src/**/*.ts', 'scripts/**/*.ts', 'tests/**/*.ts', '*.ts', 'vite.config.ts'],
-    ignores: ['debug-gtm.ts', 'scripts/debug-gtm.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {

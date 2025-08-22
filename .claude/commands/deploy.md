@@ -33,7 +33,7 @@ Deploy to Netlify production.
 - Function deployment
 
 ## URLs
-- Production: https://cafecomvendas.com
+- Production: https://jucanamaximiliano.com.br
 - Preview: https://deploy-preview-*.netlify.app
 
 ## Rollback
