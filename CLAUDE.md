@@ -1,111 +1,61 @@
 # CLAUDE.md — Café com Vendas (Agentic Coding Guide)
 
-You are operating in this repo as an engineer. Follow the Default Playbook and Critical Rules.  
-Keep changes **small, verifiable, and type-safe**. Use `/project:*` commands whenever possible.
+Act as an engineer in this repo. Favor **small, verifiable, type-safe** diffs. Use `/project:*` commands.
 
----
+## 0) Start-Here Checklist (always run)
+1. `npm run versions` → show installed packages
+2. `npm run outdated` → check for updates
+3. `npm run type-check` and `npm run lint`
+4. Skim `/docs/coding-standards.md` and `/docs/architecture-overview.md`
+5. `/project:version-check` (Context7: fetch exact-version docs)
+**STOP** → propose a minimal plan before edits.
 
-## 0) Session Bootstrap (ALWAYS RUN FIRST)
+## 1) Default Workflow (plan → apply → verify)
+- **Plan:** `/project:plan-then-apply "<one small change>"`
+- **Apply:** Make the minimal diff only after approval.
+- **Verify:** `npm run type-check && npm run lint && npm run test`
+- **Commit:** Conventional message; split unrelated changes.
 
-1. `npm run versions` → show installed packages  
-2. `npm run outdated` → check for updates  
-3. `npm run type-check` → validate TypeScript  
-4. `npm run lint` → check linting  
-5. Skim `/docs/coding-standards.md` (style rules)  
-6. Skim `/docs/architecture-overview.md` (file map)  
-7. Run `/project:version-check` before writing code  
+## 2) Guardrails (Allowed / Ask / Deny)
+- **Allowed:** `Edit`, `Bash(npm run *)`, `Bash(git status|diff|add|commit)`
+- **Ask first:** `git push*`, dependency changes, anything destructive
+- **Deny:** `sudo *`, `rm -rf *`, editing secrets/env
 
-**STOP** after this. Wait for plan approval before edits.
-
----
-
-## 1) Default Playbook (Explore → Plan → Code → Commit)
-
-- **Explore** → find relevant files, confirm versions/APIs (Context7 MCP).  
-- **Plan** → propose a minimal diff (`/project:plan-then-apply`).  
-- **STOP** → wait for approval before coding.  
-- **Code** → apply SMALL changes, run type-check, lint, and minimal tests after each.  
-- **Commit** → conventional commit message. Split unrelated concerns. Optionally run `/project:pr-polish`.  
-
----
-
-## 2) Tools & Permissions
-
-- **Allowed**: `Edit`, `Bash(npm run *)`, `Bash(git status|diff|add|commit)`  
-- **Ask First**: `git push*`, dependency installs/updates, destructive commands  
-- **Deny**: `sudo *`, `rm -rf *`, editing secrets/env files  
-
-Use MCP servers from `.mcp.json` (Context7, Playwright, etc.) for docs and testing.  
-If missing, propose adding them.
-
----
-
-## 3) Critical Rules (TypeScript-First, Tailwind-Only)
-
-- **TypeScript only**: no `.js` files, no `any` unless justified.  
-- **ESM imports**: always `export default`, proper extensions.  
-- **Tailwind v4 only**: no inline styles, no custom CSS outside tokens.  
-- **Design tokens only**: never hardcode colors, spacing, or fonts.  
-- **Analytics**: use typed helpers, never inline snippets.  
-
----
+## 3) Critical Rules
+- **TypeScript-only** (no `.js`, no `any` unless justified)
+- **ESM** with explicit extensions
+- **Tailwind v4 only** (no inline styles/custom CSS outside tokens)
+- **Design tokens only** (no hardcoded colors/spacing/fonts)
+- **Analytics** via typed helpers (no inline snippets)
 
 ## 4) Version Awareness
+Before any API use:
+- Run `/project:version-check` (Context7 docs for installed versions)
+- Avoid known deprecations:
+  - Vite: `import.meta.glob({ eager: true })`
+  - Eleventy: `export default` in `.eleventy.ts`
+  - Tailwind v4: CSS `@theme` (no `tailwind.config.js`)
+  - Stripe: Payment Intents + Payment Methods
 
-Before using any API:  
-1. Run `/project:version-check`  
-2. Fetch docs with Context7 for the installed version  
-3. Check against known deprecations:  
-   - Vite → use `import.meta.glob({ eager: true })` (not `globEager`)  
-   - Eleventy → use `.eleventy.js` with `export default`  
-   - Tailwind v4 → `@theme` config, no `tailwind.config.js`  
-   - Stripe → Payment Intents + Methods only  
+## 5) File Placement
+- New section → `src/_includes/sections/<name>/{index.njk,index.ts}`
+- New UI behavior → `src/platform/ui/components/*`
+- Data adapters → `src/_data/*.ts`
+- Long explanations → `/docs/*.md` (link, don’t inline)
 
----
+## 6) Quality Gates (must pass)
+- `npm run type-check` → 0 errors
+- `npm run lint` → 0 errors
+- UI changed → note or test
+- Perf-critical → run Lighthouse locally
 
-## 5) Project Commands
-
-- `/project:version-check` → probe versions, fetch docs, run TS checks  
-- `/project:plan-then-apply` → propose minimal diff, wait for approval  
-- `/project:bugfix <desc>` → reproduce, plan, fix with test  
-- `/project:update-libs` → safe dependency updates + refactors  
-- `/project:pr-polish` → refine diffs, commits, and docs  
-
----
-
-## 6) Quality Gates (MUST PASS before commit)
-
-- ✅ `npm run type-check` → 0 errors  
-- ✅ `npm run lint` → 0 errors  
-- ✅ If UI changed → add/update minimal test or visual QA note  
-- ✅ For perf-critical code → run Lighthouse locally  
-
----
-
-## 7) File Placement
-
-- New UI behavior → `src/platform/ui/components/*` (+ types)  
-- New section → `src/_includes/sections/<name>/{index.njk,index.ts}`  
-- Data → `src/_data/*.ts` (fed by `content/pt-PT/*.json`)  
-- Long docs/examples → `/docs/*.md` (link from here, don’t inline)  
-
----
+## 7) Common Recipes
+- **Bugfix:** `/project:bugfix "<symptom>"` → reproduce → tiny diff → verify
+- **Update libs:** `/project:update-libs` → run version-check → refactor → verify
+- **Add section:** scaffold minimal files → verify strictly typed
 
 ## 8) CI / Headless
-
-- Use Claude headless:
-  ```bash
-  claude -p "/project:version-check" --output-format stream-json
-  ```
-- Run in CI as reviewer/linter.
-- Keep prompts short and command-based.
-
----
-
-## 9) Troubleshooting (Fast Path)
-
-- **Build fails** → `npm run clean && npm ci` + re-check Node version
-- **Tailwind v4 issues** → regenerate tokens, check `@theme`
-- **Stripe errors** → verify env vars + webhook only server-side
-
-Full details → `/docs/troubleshooting.md`
+Use Claude headless for non-interactive checks:
+```bash
+claude -p "/project:version-check" --output-format stream-json
+claude -p "/project:plan-then-apply 'small fix: …'" --dry-run
