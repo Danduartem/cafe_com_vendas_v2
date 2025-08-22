@@ -172,7 +172,9 @@ export default [
       'src/assets/css/**', // CSS files handled by PostCSS/Tailwind
       'netlify/**', // Netlify functions and generated files
       '.netlify/**', // Netlify dev files
-      '**/*.d.ts' // TypeScript declaration files
+      '**/*.d.ts', // TypeScript declaration files
+      'node_modules/.cache/**', // ESLint and other tool caches
+      '.cache/**' // Additional cache directories
     ]
   }
 ];
