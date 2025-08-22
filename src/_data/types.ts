@@ -393,6 +393,56 @@ export interface TopBannerSection extends BaseSection {
   };
 }
 
+export interface ThankYouContentSection extends BaseSection {
+  id: 'thank-you-content';
+  copy: SectionCopy & {
+    badge: {
+      text: string;
+    };
+    header: {
+      title: string;
+      subtitle: string;
+    };
+    progress: {
+      label: string;
+      percentage: string;
+      value: number;
+      message: string;
+    };
+    mainAction: {
+      stepNumber: string;
+      title: string;
+      description: string;
+      button: {
+        text: string;
+        url: string;
+        analytics: string;
+      };
+    };
+    steps: Array<{
+      number: string;
+      color: string;
+      title: string;
+      description: string;
+      button?: {
+        text: string;
+        url: string;
+        classes: string;
+        analytics: string;
+        target?: string;
+        rel?: string;
+        icon: string;
+      };
+    }>;
+    eventSummary: {
+      title: string;
+      subtitle: string;
+      features: string[];
+      important: string;
+    };
+  };
+}
+
 // Union type for all sections
 export type Section =
   | HeroSection
@@ -404,12 +454,14 @@ export type Section =
   | FAQSection
   | FinalCTASection
   | FooterSection
-  | TopBannerSection;
+  | TopBannerSection
+  | ThankYouContentSection;
 
 // Section Contract System
 export type SectionSlug =
   | 'top-banner' | 'hero' | 'problem' | 'solution' | 'about'
-  | 'social-proof' | 'offer' | 'faq' | 'final-cta' | 'footer';
+  | 'social-proof' | 'offer' | 'faq' | 'final-cta' | 'footer'
+  | 'thank-you-content';
 
 export interface SectionPropsBase extends Record<string, unknown> {
   id: SectionSlug;
@@ -421,7 +473,8 @@ export interface SectionPropsBase extends Record<string, unknown> {
 export function isValidSectionSlug(value: unknown): value is SectionSlug {
   const validSlugs: SectionSlug[] = [
     'top-banner', 'hero', 'problem', 'solution', 'about',
-    'social-proof', 'offer', 'faq', 'final-cta', 'footer'
+    'social-proof', 'offer', 'faq', 'final-cta', 'footer',
+    'thank-you-content'
   ];
   return typeof value === 'string' && validSlugs.includes(value as SectionSlug);
 }

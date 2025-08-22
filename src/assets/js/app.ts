@@ -37,6 +37,7 @@ import { FAQ } from '../../_includes/sections/faq/index.ts';
 import { FinalCTA } from '../../_includes/sections/final-cta/index.ts';
 import { Footer } from '../../_includes/sections/footer/index.ts';
 import { TopBanner } from '../../_includes/sections/top-banner/index.ts';
+import { ThankYou } from '../../_includes/sections/thank-you/index.ts';
 import { Checkout } from '../../_includes/sections/checkout/index.ts';
 
 /**
@@ -165,6 +166,7 @@ export const CafeComVendas: CafeComVendasInterface = {
       { name: 'FAQ', component: FAQ },
       { name: 'FinalCTA', component: FinalCTA },
       { name: 'Footer', component: Footer },
+      { name: 'ThankYouSection', component: ThankYou },
       { name: 'Checkout', component: Checkout }
     ];
 

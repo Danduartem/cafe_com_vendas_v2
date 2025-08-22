@@ -21,7 +21,7 @@ Premium landing page for an intimate business transformation event in Lisbon, de
 - **Templating**: Nunjucks (.njk files)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) 4.1.12 + PostCSS 8.5.6 (pure CSS-based configuration)
 - **Build Tool**: [Vite](https://vite.dev/) 7.1.3 (TypeScript modules → optimized bundle)
-- **Runtime**: Node.js (LTS) + npm
+- **Runtime**: Node.js >=22.17.1 + npm >=10.0.0
 - **Payments**: Stripe 18.4.0 (Node.js SDK) - TypeScript
 - **Design System**: JSON tokens → CSS custom properties
 - **Fonts**: Local Lora (display) + Century Gothic (body)
@@ -53,14 +53,29 @@ npm run lint
 # Clean build directory
 npm run clean
 
-# Run end-to-end tests (Playwright)
-npm run test:e2e
+# Run visual regression tests (Playwright)
+npm run test:visual
 
 # Run unit tests (Vitest)
 npm run test
 
 # Run visual regression tests
 npm run test:visual
+
+# Run visual tests with UI
+npm run test:visual:ui
+
+# Run visual tests headed (browser visible)
+npm run test:visual:headed
+
+# Run all tests (unit + visual)
+npm run test:all
+
+# Validate content structure
+npm run validate:content
+
+# Verify API configurations
+npm run verify-apis
 ```
 
 ## 📁 Project Structure
@@ -82,6 +97,7 @@ npm run test:visual
 │   │   ├── analytics/         # Analytics contract testing
 │   │   └── render/            # Template rendering tests
 │   ├── visual/                # Visual regression tests (Playwright)
+│   │   ├── global-setup.ts   # Playwright global configuration
 │   │   ├── sections.spec.ts   # Playwright visual tests
 │   │   └── sections.spec.ts-snapshots/ # Visual baselines
 │   ├── schemas/               # Data validation tests
@@ -156,8 +172,7 @@ npm run test:visual
 │   │   │
 │   │   └── images/           # Static images (Unified)
 │   │       ├── cafe.jpg
-│   │       ├── problem-overworked.jpg
-│   │       └── sobre3.jpeg
+│   │       └── problem-overworked.jpg
 │   │
 │   ├── platform/             # 🏗️ Platform Foundation (TypeScript)
 │   │   ├── lib/utils/        # Shared utilities (TypeScript)
@@ -191,10 +206,13 @@ npm run test:visual
 │
 ├── scripts/                  # 🔧 Build Tools (TypeScript)
 │   ├── build-tokens.ts       # Design tokens → CSS (TypeScript)
+│   ├── screenshot-cli.ts     # CLI screenshot system (TypeScript)
 │   ├── universal-screenshot.ts # Screenshot system (TypeScript)
 │   ├── dev-section.ts        # Section development tools
+│   ├── find-section.ts       # Section finder utility
 │   ├── new-section.ts        # Section scaffolding
-│   └── *.ts                  # Other build scripts in TypeScript
+│   ├── validate-content.ts   # Content validation
+│   └── verify-apis.ts        # API configuration verification
 │
 ├── docs/                     # 📖 Technical Documentation
 │   ├── architecture-overview.md
@@ -256,7 +274,7 @@ The design system is centralized in `design/tokens.json` and automatically conve
 ### Comprehensive Test Suite
 - **Unit Tests**: Vitest for data adapters, utilities, and component logic
 - **Visual Regression**: Playwright visual testing with baseline screenshots  
-- **E2E Testing**: Full user journey testing with Playwright browser automation
+- **Visual Regression Testing**: Playwright screenshot comparison and browser automation
 - **Schema Validation**: Type-safe content and data structure validation
 - **Analytics Testing**: GTM/GA4 event tracking validation
 
@@ -275,7 +293,7 @@ tests/                  # Top-level test organization
 ### Quality Gates
 - **TypeScript**: Zero compilation errors enforced
 - **Visual Consistency**: Automated screenshot comparison
-- **User Experience**: End-to-end user flow validation
+- **User Experience**: Visual regression and component validation
 - **Performance**: Core Web Vitals tracking in tests
 
 ## 📄 Landing Page Sections

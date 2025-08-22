@@ -72,6 +72,15 @@ function validateTopBannerSection(section: Record<string, unknown>): boolean {
            typeof section.copy === 'object');
 }
 
+function validateThankYouContentSection(section: Record<string, unknown>): boolean {
+  return !!(section.copy &&
+           typeof section.copy === 'object' &&
+           section.design &&
+           typeof section.design === 'object' &&
+           section.tracking &&
+           typeof section.tracking === 'object');
+}
+
 /**
  * Validates section data against known section types
  */
@@ -107,6 +116,8 @@ function validateSection(data: unknown, slug: SectionSlug): data is Section {
     return validateFooterSection(section);
   case 'top-banner':
     return validateTopBannerSection(section);
+  case 'thank-you-content':
+    return validateThankYouContentSection(section);
   default:
     console.warn(`Unknown section slug: ${slug}`);
     return false;
@@ -155,6 +166,7 @@ function getPageKey(context?: { page?: { url?: string } }): string {
   const urlMap: Record<string, string> = {
     '/': 'landing',
     '/thank-you/': 'thank-you',
+    '/thank-you/index.html': 'thank-you',
     '/legal/privacy/': 'legal-privacy'
   };
 
