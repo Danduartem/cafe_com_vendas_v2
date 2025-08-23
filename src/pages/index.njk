@@ -12,25 +12,25 @@ description: "Chega de usar o burnout como medalha de honra. O evento presencial
     {# Set section data for template access #}
     {% set currentSection = section.data %}
     {% if section.slug == "top-banner" %}
-      {% include "sections/top-banner/index.njk" %}
+      {% include "../components/sections/top-banner/index.njk" %}
     {% elif section.slug == "hero" %}
-      {% include "sections/hero/index.njk" %}
+      {% include "../components/sections/hero/index.njk" %}
     {% elif section.slug == "problem" %}
-      {% include "sections/problem/index.njk" %}
+      {% include "../components/sections/problem/index.njk" %}
     {% elif section.slug == "solution" %}
-      {% include "sections/solution/index.njk" %}
+      {% include "../components/sections/solution/index.njk" %}
     {% elif section.slug == "about" %}
-      {% include "sections/about/index.njk" %}
+      {% include "../components/sections/about/index.njk" %}
     {% elif section.slug == "social-proof" %}
-      {% include "sections/social-proof/index.njk" %}
+      {% include "../components/sections/social-proof/index.njk" %}
     {% elif section.slug == "offer" %}
-      {% include "sections/offer/index.njk" %}
+      {% include "../components/sections/offer/index.njk" %}
     {% elif section.slug == "faq" %}
-      {% include "sections/faq/index.njk" %}
+      {% include "../components/sections/faq/index.njk" %}
     {% elif section.slug == "final-cta" %}
-      {% include "sections/final-cta/index.njk" %}
+      {% include "../components/sections/final-cta/index.njk" %}
     {% elif section.slug == "footer" %}
-      {% include "sections/footer/index.njk" %}
+      {% include "../components/sections/footer/index.njk" %}
     {% endif %}
   {% endif %}
 {% endfor %}

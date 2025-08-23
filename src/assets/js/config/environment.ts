@@ -20,14 +20,20 @@ declare global {
   }
 }
 
-// Detect environment
-const isDevelopment = window.location.hostname === 'localhost' ||
-                     window.location.hostname === '127.0.0.1' ||
-                     window.location.hostname.includes('netlify.app') ||
-                     window.location.port === '8889' || // Netlify unified dev server (legacy)
-                     window.location.port === '8888'; // Eleventy frontend dev server
+// Detect environment - safe for both Node.js (SSR) and browser contexts
+const isBrowser = typeof window !== 'undefined';
 
-const isProduction = window.location.hostname === 'cafecomvendas.com';
+const isDevelopment = isBrowser ? (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname.includes('netlify.app') ||
+  window.location.port === '8889' || // Netlify unified dev server (legacy)
+  window.location.port === '8888'    // Eleventy frontend dev server
+) : (process.env.NODE_ENV !== 'production'); // Node.js fallback
+
+const isProduction = isBrowser ? 
+  (window.location.hostname === 'cafecomvendas.com') : 
+  (process.env.NODE_ENV === 'production'); // Node.js fallback
 
 /**
  * Environment configuration interface
@@ -93,10 +99,13 @@ const config: EnvironmentConfig = {
   // URLs and Tracking
   urls: {
     // Base URL for API calls (functions/backend)
-    base: isProduction ? 'https://cafecomvendas.com' :
-      window.location.port === '8888' ? 'http://localhost:3000' : // Frontend on 8888, backend on 3000
+    base: isProduction ? 'https://cafecomvendas.com' : (
+      isBrowser ? (
+        window.location.port === '8888' ? 'http://localhost:3000' : // Frontend on 8888, backend on 3000
         window.location.port === '8889' ? `http://${window.location.hostname}:${window.location.port}` : // Legacy unified server
-          `http://${window.location.hostname}:${window.location.port}`,
+        `http://${window.location.hostname}:${window.location.port}`
+      ) : 'http://localhost:3000' // Node.js fallback
+    ),
     thankYou: '/obrigado',
     instagram: '/instagram',
     linkedin: '/linkedin'
@@ -112,7 +121,7 @@ export default config;
 // Global types are now centralized in types/global.ts
 
 // Also make available globally for debugging (development only)
-if (isDevelopment) {
+if (isDevelopment && isBrowser) {
   window.CONFIG = config;
   console.log('🔧 Environment config loaded:', config.environment);
 }

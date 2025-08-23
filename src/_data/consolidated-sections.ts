@@ -11,7 +11,7 @@ import type {
   FinalCTASection,
   FooterSection,
   ThankYouContentSection
-} from './types.js';
+} from '../types/sections';
 
 /**
  * Design configurations for all sections

@@ -1,4 +1,4 @@
-import type { PresenterData } from './types.js';
+import type { PresenterData } from '../types/data/presenter';
 
 /**
  * Presenter data - consolidated from external JSON

@@ -1,7 +1,7 @@
 import type {
   LoadedPageSection,
   SectionSlug
-} from './types.js';
+} from '../types/sections/pages';
 import { getSection } from './consolidated-sections.js';
 
 /**

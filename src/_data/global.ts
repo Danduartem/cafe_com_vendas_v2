@@ -1,4 +1,4 @@
-import type { GlobalStrings } from './types.js';
+import type { GlobalStrings } from '../types/data/content';
 
 /**
  * Global strings for the site - consolidated from external JSON

@@ -98,6 +98,6 @@ export { ENV };
 // Global types are now centralized in types/global.ts
 
 // Make analytics events available globally for debugging (development only)
-if (ENV.isDevelopment) {
+if (ENV.isDevelopment && typeof window !== 'undefined') {
   window.ANALYTICS_EVENTS = ANALYTICS_EVENTS;
 }

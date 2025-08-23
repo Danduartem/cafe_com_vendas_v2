@@ -27,18 +27,18 @@ import {
 } from '@/components/index';
 
 // Import co-located section components (new approach)
-import { Hero } from '../../_includes/sections/hero/index';
-import { Problem } from '../../_includes/sections/problem/index';
-import { Solution } from '../../_includes/sections/solution/index';
-import { About } from '../../_includes/sections/about/index';
-import { SocialProof } from '../../_includes/sections/social-proof/index';
-import { Offer } from '../../_includes/sections/offer/index';
-import { FAQ } from '../../_includes/sections/faq/index';
-import { FinalCTA } from '../../_includes/sections/final-cta/index';
-import { Footer } from '../../_includes/sections/footer/index';
-import { TopBanner } from '../../_includes/sections/top-banner/index';
-import { ThankYou } from '../../_includes/sections/thank-you/index';
-import { Checkout } from '../../_includes/sections/checkout/index';
+import { Hero } from '../../components/sections/hero/index';
+import { Problem } from '../../components/sections/problem/index';
+import { Solution } from '../../components/sections/solution/index';
+import { About } from '../../components/sections/about/index';
+import { SocialProof } from '../../components/sections/social-proof/index';
+import { Offer } from '../../components/sections/offer/index';
+import { FAQ } from '../../components/sections/faq/index';
+import { FinalCTA } from '../../components/sections/final-cta/index';
+import { Footer } from '../../components/sections/footer/index';
+import { TopBanner } from '../../components/sections/top-banner/index';
+import { ThankYou } from '../../components/sections/thank-you/index';
+import { Checkout } from '../../components/sections/checkout/index';
 
 /**
  * Main application interface

@@ -56,11 +56,11 @@ export const state: InternalState = {
   currentSection: null,
   scrollDepth: 0,
   viewport: {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    isMobile: window.innerWidth < 768,
-    isTablet: window.innerWidth >= 768 && window.innerWidth < 1024,
-    isDesktop: window.innerWidth >= 1024
+    width: typeof window !== 'undefined' ? window.innerWidth : 1024,
+    height: typeof window !== 'undefined' ? window.innerHeight : 768,
+    isMobile: typeof window !== 'undefined' ? window.innerWidth < 768 : false,
+    isTablet: typeof window !== 'undefined' ? (window.innerWidth >= 768 && window.innerWidth < 1024) : false,
+    isDesktop: typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
   },
   components: {}
 };
@@ -190,22 +190,26 @@ export const StateManager: StateManagerInterface = {
 };
 
 /**
- * Initialize viewport tracking
+ * Initialize viewport tracking (browser only)
  */
-window.addEventListener('resize', () => {
-  StateManager.updateViewport(window.innerWidth, window.innerHeight);
-});
+if (typeof window !== 'undefined') {
+  window.addEventListener('resize', () => {
+    StateManager.updateViewport(window.innerWidth, window.innerHeight);
+  });
+}
 
 /**
- * Initialize scroll tracking
+ * Initialize scroll tracking (browser only)
  */
-window.addEventListener('scroll', () => {
-  const windowHeight = window.innerHeight;
-  const documentHeight = document.documentElement.scrollHeight;
-  const scrollTop = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+if (typeof window !== 'undefined') {
+  window.addEventListener('scroll', () => {
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    const scrollTop = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
 
-  if (documentHeight > windowHeight) {
-    const scrollPercent = Math.round(((scrollTop + windowHeight) / documentHeight) * 100);
-    StateManager.setScrollDepth(scrollPercent);
-  }
-}, { passive: true });
+    if (documentHeight > windowHeight) {
+      const scrollPercent = Math.round(((scrollTop + windowHeight) / documentHeight) * 100);
+      StateManager.setScrollDepth(scrollPercent);
+    }
+  }, { passive: true });
+}

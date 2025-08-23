@@ -1,4 +1,4 @@
-import type { EventData } from './types.js';
+import type { EventData } from '../types/data/event';
 
 /**
  * Event data - consolidated from external JSON
