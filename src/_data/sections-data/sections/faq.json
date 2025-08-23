@@ -1,0 +1,106 @@
+{
+  "id": "faq",
+  "variant": "accordion",
+  "enabled": true,
+  "copy": {
+    "eyebrow": "Tire suas dúvidas",
+    "headline": "Perguntas Frequentes",
+    "subhead": "Todas as dúvidas que você pode ter sobre esta experiência transformadora"
+  },
+  "design": {
+    "theme": "light",
+    "accent": "gold-500",
+    "background": "neutral-50",
+    "layout": "accordion"
+  },
+  "contact": {
+    "whatsapp_url": "https://wa.me/5547991253299",
+    "whatsapp_name": "Lari",
+    "whatsapp_phone": "+55 47 99125-3299",
+    "response_time": "Resposta em até 2 horas"
+  },
+  "legal_links": [
+    {
+      "text": "Termos da Garantia",
+      "url": "/garantia-reembolso"
+    },
+    {
+      "text": "Política de Reembolso",
+      "url": "/garantia-reembolso"
+    },
+    {
+      "text": "Privacidade",
+      "url": "/politica-privacidade"
+    }
+  ],
+  "tracking": {
+    "section_id": "faq",
+    "impression_event": "faq_view"
+  },
+  "items": [
+    {
+      "id": "business-type",
+      "question": "Para que tipo de negócio é este evento?",
+      "answer": {
+        "main_text": "Para empreendedoras com produto/serviço validado que querem estruturar oferta, melhorar margens e automatizar vendas.",
+        "highlight": "Ideal para: Negócios de serviços, cursos e produtos digitais com foco em escala sustentável"
+      },
+      "analytics_event": "open_faq_business_type",
+      "upvote_count": 15
+    },
+    {
+      "id": "time-justification",
+      "question": "Não tenho mesmo tempo. Como justificar um dia fora?",
+      "answer": {
+        "main_text": "O investimento de um dia traz frameworks accionáveis que devolvem horas semanais e aumentam receita.",
+        "highlights": [
+          "Templates prontos e plano de 90 dias",
+          "Recupere horas semanais + aumente receita"
+        ]
+      },
+      "analytics_event": "open_faq_time_justification",
+      "upvote_count": 22
+    },
+    {
+      "id": "guarantee",
+      "question": "E se eu não gostar ou não tiver resultados?",
+      "answer": {
+        "main_text": "A nossa Garantia de Resultados cobre o seu investimento: aplique o método e, se em 90 dias não houver <strong>+20% nas vendas</strong>, devolvemos o valor.",
+        "features": [
+          "90 dias para aplicar e ver resultados",
+          "Reembolso total se não aumentar 20% nas vendas",
+          "Processo simples com condições claras e justas"
+        ]
+      },
+      "analytics_event": "open_faq_guarantee",
+      "is_special": true,
+      "special_badge": "GARANTIA",
+      "upvote_count": 31
+    },
+    {
+      "id": "about-jucana",
+      "question": "Quem é a Juçanã Maximiliano?",
+      "answer": {
+        "main_text": "Especialista em scaling para empreendedoras, coach de negócios e fundadora do método prático que já transformou centenas de negócios."
+      },
+      "analytics_event": "open_faq_about_jucana",
+      "upvote_count": 18
+    },
+    {
+      "id": "what-included",
+      "question": "O que exatamente está incluído no evento?",
+      "answer": {
+        "main_text": "Um dia completo de conteúdo prático, material de apoio, networking e follow-up de 90 dias.",
+        "highlights": [
+          "7 horas de imersão estratégica",
+          "Plano de ação personalizado de 90 dias",
+          "Acesso a templates e ferramentas",
+          "Almoço e networking com outras empreendedoras",
+          "Suporte via WhatsApp após o evento"
+        ]
+      },
+      "analytics_event": "open_faq_included",
+      "upvote_count": 25
+    }
+  ]
+}
