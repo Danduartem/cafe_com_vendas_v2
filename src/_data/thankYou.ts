@@ -9,7 +9,7 @@ import { join } from 'path';
 // Load section data from JSON files
 function loadSection(slug: string): Section | null {
   try {
-    const sectionPath = join(process.cwd(), 'src/_data/sections-data/sections', `${slug}.json`);
+    const sectionPath = join(process.cwd(), 'src/_data/sections', `${slug}.json`);
     const sectionContent = readFileSync(sectionPath, 'utf-8');
     return JSON.parse(sectionContent);
   } catch (error) {

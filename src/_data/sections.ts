@@ -1,6 +1,12 @@
-import type { SectionSlug } from '../types/sections/pages';
+import type {
+  Section,
+  SectionSlug,
+  LoadedPageSection,
+} from '../types/sections/pages';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
-// Simple page configuration for component-driven sections
+// Page configuration for section organization
 const pageConfigurations = {
   'landing': [
     'top-banner',
@@ -22,15 +28,39 @@ const pageConfigurations = {
   ]
 } as const;
 
-/**
- * Simplified sections data loader for component-driven architecture
- * Returns section slugs for template iteration - data is co-located in components
- */
-export default function(): SectionSlug[] {
+// Load section data from clean JSON files
+function loadSection(slug: string): Section | null {
   try {
-    // Return simple array of section slugs for template rendering
-    // Each section manages its own data and logic in its directory
-    return pageConfigurations.landing.map(slug => slug as SectionSlug);
+    const sectionPath = join(process.cwd(), 'src/_data/sections', `${slug}.json`);
+    const sectionContent = readFileSync(sectionPath, 'utf-8');
+    return JSON.parse(sectionContent) as Section;
+  } catch {
+    console.warn(`Section ${slug} not found, skipping`);
+    return null;
+  }
+}
+
+/**
+ * Clean sections data loader following Eleventy 2025 best practices
+ * Uses JSON files for static content as recommended by official docs
+ */
+export default function(): LoadedPageSection[] {
+  try {
+    const sections: LoadedPageSection[] = [];
+    
+    for (const slug of pageConfigurations.landing) {
+      const sectionData = loadSection(slug);
+      if (sectionData) {
+        sections.push({
+          slug: slug as SectionSlug,
+          variant: 'default',
+          enabled: true,
+          data: sectionData
+        });
+      }
+    }
+    
+    return sections;
 
   } catch (error) {
     console.error('Sections data loader failed:', error);

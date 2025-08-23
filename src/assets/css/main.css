@@ -215,12 +215,36 @@ html, body {
 
 /* Design tokens are now managed natively via Tailwind v4 @theme directive above. */
 /* Tailwind v4 Enhanced Font Loading - integrated with theme system */
-/* Lora: semibold (600) and bold (700) - primary display font */
+/* Lora: complete weight and style variants - primary display font */
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/Lora-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/Lora-400-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
 @font-face {
   font-family: 'Lora';
   src: url('/fonts/Lora/Lora-600.woff2') format('woff2');
   font-weight: 600;
   font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/Lora-600-Italic.woff2') format('woff2');
+  font-weight: 600;
+  font-style: italic;
   font-display: swap;
 }
 
@@ -232,7 +256,15 @@ html, body {
   font-display: swap;
 }
 
-/* CenturyGothic: regular (400) and bold (700) - body and UI text */
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/Lora-700-Italic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* CenturyGothic: complete weight and style variants - body and UI text */
 @font-face {
   font-family: 'CenturyGothic';
   src: url('/fonts/CenturyGothic/CenturyGothic-Regular.woff') format('woff');
@@ -243,9 +275,25 @@ html, body {
 
 @font-face {
   font-family: 'CenturyGothic';
+  src: url('/fonts/CenturyGothic/CenturyGothic-Italic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CenturyGothic';
   src: url('/fonts/CenturyGothic/CenturyGothic-Bold.woff') format('woff');
   font-weight: 700;
   font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CenturyGothic';
+  src: url('/fonts/CenturyGothic/CenturyGothic-BoldItalic.woff') format('woff');
+  font-weight: 700;
+  font-style: italic;
   font-display: swap;
 }
 
