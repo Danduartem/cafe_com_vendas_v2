@@ -4,7 +4,7 @@
  */
 
 import { safeQuery } from '../../../assets/js/utils/dom';
-import { Animations } from '@/components/index';
+import { Animations } from '../../../components/ui';
 
 export const ThankYou = {
   init() {
@@ -74,7 +74,7 @@ export const ThankYou = {
 
       calendarButton.addEventListener('click', () => {
         // Track calendar download
-        import('@/components/analytics').then(({ PlatformAnalytics }) => {
+        import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
           PlatformAnalytics.track('ui_interaction', {
             interaction: 'calendar_download',
             location: 'thank_you_page',
@@ -90,7 +90,7 @@ export const ThankYou = {
     const whatsappButton = safeQuery('[data-analytics-click="contact_whatsapp"]') as HTMLAnchorElement;
     if (whatsappButton) {
       Animations.addClickFeedback(whatsappButton);
-      import('@/components/analytics').then(({ PlatformAnalytics }) => {
+      import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
         PlatformAnalytics.trackClick(whatsappButton, 'whatsapp_click', 'thank_you_page');
       }).catch(() => {
         console.debug('WhatsApp analytics tracking unavailable');

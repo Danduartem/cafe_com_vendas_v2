@@ -30,6 +30,7 @@
     "paths": {
       "@content/*": ["content/*"],
       "@sections/*": ["src/_includes/sections/*"],
+      "@components/*": ["src/components/*"],
       "@assets/*": ["src/assets/*"],
       "@types/*": ["src/types/*"],
       "@/*": ["src/assets/js/*"]

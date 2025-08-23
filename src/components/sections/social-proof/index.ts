@@ -5,7 +5,7 @@
  */
 
 import { safeQuery, safeQueryAll } from '@/utils/dom';
-import { Animations } from '@/components/index';
+import { Animations } from '../../../components/ui';
 import { debounce } from '@/utils/throttle';
 import type { Component } from '@/types/component';
 
@@ -202,7 +202,7 @@ export const SocialProof: SocialProofComponent = {
     const testimonialId = this.carouselElements.slides[this.currentIndex]?.getAttribute('data-testimonial-id') ??
                          `tst_${String(this.currentIndex + 1).padStart(2, '0')}`;
 
-    import('@/components/analytics').then(({ PlatformAnalytics }) => {
+    import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
       PlatformAnalytics.track('section_engagement', {
         section: 'testimonials',
         action: 'slide_view',
@@ -247,7 +247,7 @@ export const SocialProof: SocialProofComponent = {
   trackSectionView(): void {
     const observer = Animations.createObserver({
       callback: () => {
-        import('@/components/analytics').then(({ PlatformAnalytics }) => {
+        import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
           PlatformAnalytics.track('section_engagement', {
             section: 'testimonials',
             action: 'section_view'

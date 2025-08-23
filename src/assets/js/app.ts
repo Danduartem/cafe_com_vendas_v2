@@ -24,7 +24,7 @@ import {
   PlatformYouTube,
   PlatformThankYou,
   PlatformGTM
-} from '@/components/index';
+} from '@components/ui';
 
 // Import co-located section components (new approach)
 import { Hero } from '../../components/sections/hero/index';

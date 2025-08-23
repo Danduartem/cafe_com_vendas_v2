@@ -71,9 +71,8 @@ graph TB
 │  │  ├─ css/               # Tailwind v4 CSS-first with @theme tokens
 │  │  ├─ images/            # Optimized images
 │  │  └─ js/                # TS modules (main.ts, app.ts, config/, core/, types/)
-│  ├─ platform/             # Platform foundation
-│  │  ├─ lib/utils/         # Core utilities (DOM, GTM, scroll, throttle)
-│  │  └─ ui/components/     # Reusable UI components (accordion, modal, analytics)
+│  ├─ components/           # Component foundation
+│  │  └─ ui/                # Reusable UI components (accordion, modal, analytics)
 │  ├─ pages/                # Page templates (index, legal, thank‑you)
 │  └─ public/               # Static assets (fonts, favicons, headers)
 ├─ netlify/
@@ -149,7 +148,7 @@ sequenceDiagram
 ### Platform UI Components (example, TS)
 
 ```ts
-// src/platform/ui/components/accordion.ts
+// src/components/ui/accordion/index.ts
 export const PlatformAccordion = {
   initializeNative(config: AccordionConfig): void {
     const container = safeQuery(config.containerSelector);

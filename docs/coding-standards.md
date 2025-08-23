@@ -27,9 +27,9 @@
 * **ESM imports**: use **`.js`** in specifiers with path aliases where configured.
 
   ```ts
-  import { safeQuery } from '@platform/lib/utils/dom.ts';
+  import { safeQuery } from '@/utils/dom';
   import type { AnalyticsEvent } from '@types/analytics.ts';
-  import { PlatformAnalytics } from '@platform/ui/components/analytics.ts';
+  import { PlatformAnalytics } from '@components/ui/analytics';
   ```
 * **Exports**: Named exports for utilities; default export for configs only.
 * **Type imports**: `import type` for types.
@@ -117,8 +117,8 @@ el.classList.remove('scale-105');
 
 ```ts
 // src/_includes/sections/hero/index.ts
-import { safeQuery } from '@platform/lib/utils/dom.ts';
-import { PlatformAnimations } from '@platform/ui/components/index.ts';
+import { safeQuery } from '@/utils/dom';
+import { PlatformAnimations } from '@components/ui';
 
 export const Hero = {
   init() {
@@ -148,7 +148,7 @@ export const Hero = {
 
 ```ts
 // src/platform/ui/components/accordion.ts
-import { safeQuery, safeQueryAll } from '@platform/lib/utils/dom.ts';
+import { safeQuery, safeQueryAll } from '@/utils/dom';
 
 export const PlatformAccordion = {
   initializeNative(config: AccordionConfig): void {
@@ -192,7 +192,7 @@ export const PlatformAccordion = {
 
 ```ts
 // src/platform/ui/components/analytics.ts
-import { normalizeEventPayload } from '@platform/lib/utils/gtm-normalizer.ts';
+import { normalizeEventPayload } from '@/utils/gtm-normalizer';
 
 export const PlatformAnalytics = {
   trackClick(element: HTMLElement, eventType: string, location: string): void {

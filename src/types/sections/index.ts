@@ -12,4 +12,3 @@ export * from './footer';
 export * from './top-banner';
 export * from './thank-you';
 export * from './pages';
-export * from './footer-legacy';

@@ -5,7 +5,7 @@
 
 import { CONFIG } from '../../../assets/js/config/constants';
 import { safeQuery } from '../../../assets/js/utils/dom';
-import { Animations } from '../../../assets/js/components/index';
+import { Animations } from '../../../components/ui/index';
 // Inline minimal smooth scroll to avoid importing removed navigation module
 
 export const Hero = {
@@ -162,7 +162,7 @@ export const Hero = {
     // Add WhatsApp click tracking using platform analytics
     const whatsappLink = whatsappButton.querySelector('a[href*="wa.me"]') as HTMLAnchorElement;
     if (whatsappLink) {
-      import('../../../assets/js/components/analytics').then(({ PlatformAnalytics }) => {
+      import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
         PlatformAnalytics.trackClick(whatsappLink, 'whatsapp_click', 'floating_button');
       }).catch(() => {
         console.debug('WhatsApp analytics tracking unavailable');

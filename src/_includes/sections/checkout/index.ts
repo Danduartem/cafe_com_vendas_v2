@@ -186,7 +186,7 @@ export const Checkout: CheckoutSectionComponent = {
     this.modal.showModal();
 
     // Track checkout opened using platform analytics
-    import('@/components/analytics').then(({ PlatformAnalytics }) => {
+    import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
       PlatformAnalytics.track('section_engagement', {
         section: 'checkout',
         action: 'modal_opened',
@@ -520,7 +520,7 @@ export const Checkout: CheckoutSectionComponent = {
       await this.initializePaymentElement();
 
       // Track lead conversion
-      import('@/components/analytics').then(({ PlatformAnalytics }) => {
+      import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
         PlatformAnalytics.track('section_engagement', {
           section: 'checkout',
           action: 'lead_submitted',
@@ -564,7 +564,7 @@ export const Checkout: CheckoutSectionComponent = {
         this.setStep('success');
 
         // Track payment success
-        import('@/components/analytics').then(({ PlatformAnalytics }) => {
+        import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
           PlatformAnalytics.trackConversion('payment_completed', {
             transaction_id: `mock_${  Date.now()}`,
             value: 180,
@@ -626,7 +626,7 @@ export const Checkout: CheckoutSectionComponent = {
         this.showError('payError', errorMessage);
 
         // Track payment error
-        import('@/components/analytics').then(({ PlatformAnalytics }) => {
+        import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
           PlatformAnalytics.track('section_engagement', {
             section: 'checkout',
             action: 'payment_error',
@@ -641,7 +641,7 @@ export const Checkout: CheckoutSectionComponent = {
         this.setStep('success');
 
         // Track payment success
-        import('@/components/analytics').then(({ PlatformAnalytics }) => {
+        import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
           PlatformAnalytics.trackConversion('payment_completed', {
             transaction_id: this.clientSecret?.split('_secret')[0],
             value: 47,
