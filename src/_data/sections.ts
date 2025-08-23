@@ -1,20 +1,11 @@
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
 import type {
   Section,
   SectionSlug,
   LoadedPageSection,
-} from './types';
+} from './types.js';
+import { getSection } from './consolidated-sections.js';
 
-// Design configuration interfaces
-interface DesignConfig {
-  sections?: Record<string, Record<string, unknown>>;
-  faq?: {
-    special_item_styles?: Record<string, Record<string, unknown>>;
-    default_item_styles?: Record<string, unknown>;
-  };
-}
-
+// Page configuration interfaces
 interface PageConfig {
   sections: Array<{
     slug: string;
@@ -23,113 +14,89 @@ interface PageConfig {
   }>;
 }
 
-// Load centralized design configurations
-let designConfigs: DesignConfig | null = null;
-
-function loadDesignConfigs(): DesignConfig {
-  if (designConfigs) return designConfigs;
-
-  const designPath = join(process.cwd(), 'design/components.json');
-  if (!existsSync(designPath)) {
-    console.warn('Design components configuration not found at design/components.json');
-    return {};
+// Static page configurations (consolidated from external JSON files)
+const pageConfigurations: Record<string, PageConfig> = {
+  'landing': {
+    sections: [
+      { slug: 'top-banner', variant: 'default', enabled: true },
+      { slug: 'hero', variant: 'default', enabled: true },
+      { slug: 'problem', variant: 'default', enabled: true },
+      { slug: 'solution', variant: 'default', enabled: true },
+      { slug: 'about', variant: 'default', enabled: true },
+      { slug: 'social-proof', variant: 'video-testimonials', enabled: true },
+      { slug: 'offer', variant: 'pricing', enabled: true },
+      { slug: 'faq', variant: 'accordion', enabled: true },
+      { slug: 'final-cta', variant: 'urgency', enabled: true },
+      { slug: 'footer', variant: 'full', enabled: true }
+    ]
+  },
+  'thank-you': {
+    sections: [
+      { slug: 'thank-you-content', variant: 'default', enabled: true }
+    ]
+  },
+  'legal-privacy': {
+    sections: [
+      { slug: 'footer', variant: 'minimal', enabled: true }
+    ]
   }
-
-  try {
-    const rawData = JSON.parse(readFileSync(designPath, 'utf-8')) as DesignConfig;
-    designConfigs = rawData;
-    return rawData;
-  } catch (error) {
-    console.error('Failed to load design configurations:', error);
-    return {};
-  }
-}
+};
 
 // Basic validation function
 function validateSection(data: unknown, slug: string): data is Section {
   if (!data || typeof data !== 'object') return false;
   const section = data as Record<string, unknown>;
   if (section.id !== slug) return false;
-  return true; // Simplified validation for now
+  return true;
 }
 
-// Load section data from JSON file
+// Load section data from consolidated data
 function loadSection(slug: string, _variant?: string): Section | null {
-  const sectionPath = join(process.cwd(), `content/pt-PT/sections/${slug}.json`);
-
-  if (!existsSync(sectionPath)) {
-    console.error(`Section file not found: ${sectionPath}`);
+  const sectionData = getSection(slug);
+  
+  if (!sectionData) {
+    console.error(`Section not found: ${slug}`);
     return null;
   }
 
-  try {
-    const rawData = JSON.parse(readFileSync(sectionPath, 'utf-8')) as Record<string, unknown>;
-
-    // Load design configurations and merge them
-    const designData = loadDesignConfigs();
-    const mergedData = {
-      ...rawData,
-      design: designData.sections?.[slug] ?? {}
-    };
-
-    if (!validateSection(mergedData, slug)) {
-      console.warn(`Section validation failed for ${slug}, but continuing build`);
-      return null;
-    }
-
-    return mergedData;
-  } catch (parseError) {
-    console.error(`Failed to parse section file ${sectionPath}:`, parseError);
+  if (!validateSection(sectionData, slug)) {
+    console.warn(`Section validation failed for ${slug}, but continuing build`);
     return null;
   }
+
+  return sectionData;
 }
 
 // Load all page configurations and their sections
 function loadAllPageSections(): Record<string, LoadedPageSection[]> {
   const pagesData: Record<string, LoadedPageSection[]> = {};
-  const pageKeys = ['landing', 'thank-you', 'legal-privacy'];
 
-  for (const pageKey of pageKeys) {
-    const pagePath = join(process.cwd(), `content/pt-PT/pages/${pageKey}.json`);
-    
-    if (!existsSync(pagePath)) {
-      pagesData[pageKey] = [];
-      continue;
-    }
+  for (const [pageKey, pageConfig] of Object.entries(pageConfigurations)) {
+    const sections: LoadedPageSection[] = [];
 
-    try {
-      // Load page configuration
-      const pageConfig = JSON.parse(readFileSync(pagePath, 'utf-8')) as PageConfig;
-      const sections: LoadedPageSection[] = [];
-
-      for (const sectionConfig of pageConfig.sections) {
-        if (!sectionConfig.enabled) {
-          continue; // Skip disabled sections
-        }
-
-        try {
-          const sectionData = loadSection(sectionConfig.slug, sectionConfig.variant);
-
-          if (sectionData) { // Only push if section data is valid
-            sections.push({
-              slug: sectionConfig.slug as SectionSlug,
-              variant: sectionConfig.variant,
-              enabled: sectionConfig.enabled,
-              data: sectionData
-            });
-          }
-
-        } catch (sectionError) {
-          console.error(`Failed to load section ${sectionConfig.slug} for page ${pageKey}:`, sectionError);
-        }
+    for (const sectionConfig of pageConfig.sections) {
+      if (!sectionConfig.enabled) {
+        continue; // Skip disabled sections
       }
-      
-      pagesData[pageKey] = sections;
 
-    } catch (error) {
-      console.error(`Page loader failed for ${pageKey}:`, error);
-      pagesData[pageKey] = [];
+      try {
+        const sectionData = loadSection(sectionConfig.slug, sectionConfig.variant);
+
+        if (sectionData) {
+          sections.push({
+            slug: sectionConfig.slug as SectionSlug,
+            variant: sectionConfig.variant,
+            enabled: sectionConfig.enabled,
+            data: sectionData
+          });
+        }
+
+      } catch (sectionError) {
+        console.error(`Failed to load section ${sectionConfig.slug} for page ${pageKey}:`, sectionError);
+      }
     }
+    
+    pagesData[pageKey] = sections;
   }
 
   return pagesData;

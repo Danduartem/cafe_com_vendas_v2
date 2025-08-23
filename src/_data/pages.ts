@@ -1,26 +1,49 @@
-import { readFileSync, readdirSync } from 'fs';
-import { join } from 'path';
-import type { PageComposition, PagesData } from './types';
+import type { PagesData } from './types.js';
 
+/**
+ * Page compositions - consolidated from external JSON files
+ * @returns Page configuration data
+ */
 export default function(): PagesData {
-  const pagesDir = join(process.cwd(), 'content/pt-PT/pages');
-  const pages: PagesData = {};
-
-  try {
-    const files = readdirSync(pagesDir).filter(file => file.endsWith('.json'));
-
-    for (const file of files) {
-      const filePath = join(pagesDir, file);
-      const content = readFileSync(filePath, 'utf8');
-      const pageData: PageComposition = JSON.parse(content);
-
-      // Use filename without extension as key
-      const key = file.replace('.json', '');
-      pages[key] = pageData;
+  return {
+    'landing': {
+      route: '/',
+      title: 'Café com Vendas - Evento para Empreendedoras em Portugal',
+      description: 'Chega de usar o burnout como medalha de honra. O evento presencial e intimista que lhe dará o mapa para trocar o "trabalhar duro" pelo "trabalhar com inteligência".',
+      layout: 'layout.njk',
+      permalink: '/',
+      sections: [
+        { slug: 'top-banner', variant: 'default', enabled: true },
+        { slug: 'hero', variant: 'default', enabled: true },
+        { slug: 'problem', variant: 'default', enabled: true },
+        { slug: 'solution', variant: 'default', enabled: true },
+        { slug: 'about', variant: 'default', enabled: true },
+        { slug: 'social-proof', variant: 'video-testimonials', enabled: true },
+        { slug: 'offer', variant: 'pricing', enabled: true },
+        { slug: 'faq', variant: 'accordion', enabled: true },
+        { slug: 'final-cta', variant: 'urgency', enabled: true },
+        { slug: 'footer', variant: 'full', enabled: true }
+      ]
+    },
+    'thank-you': {
+      route: '/thank-you',
+      title: 'Obrigada pela sua inscrição - Café com Vendas',
+      description: 'Confirmação da sua participação no Café com Vendas',
+      layout: 'layout.njk',
+      permalink: '/thank-you/',
+      sections: [
+        { slug: 'thank-you-content', variant: 'default', enabled: true }
+      ]
+    },
+    'legal-privacy': {
+      route: '/politica-privacidade',
+      title: 'Política de Privacidade - Café com Vendas',
+      description: 'Política de privacidade do site Café com Vendas',
+      layout: 'layout.njk',
+      permalink: '/politica-privacidade/',
+      sections: [
+        { slug: 'footer', variant: 'minimal', enabled: true }
+      ]
     }
-  } catch (error) {
-    console.warn('Could not load page compositions:', error);
-  }
-
-  return pages;
+  };
 }

@@ -15,6 +15,18 @@ export interface EventData {
   location: string;
   price?: number;
   description?: string;
+  payments?: {
+    alternative?: {
+      mbway?: {
+        phone: string;
+        instruction: string;
+      };
+    };
+  };
+  capacity?: {
+    firstLot: number;
+    totalCapacity: number;
+  };
   [key: string]: unknown;
 }
 
@@ -60,11 +72,24 @@ export interface PillarsData {
 
 // Site configuration
 export interface SiteData {
+  name?: string;
   title: string;
   description: string;
   url: string;
   baseUrl: string;
+  lang?: string;
+  locale?: string;
+  meta?: {
+    author: string;
+    keywords: string;
+    twitterCard: string;
+  };
+  contact?: {
+    whatsapp: string;
+    email: string;
+  };
   analytics: AnalyticsConfig;
+  cloudinaryCloudName?: string;
 }
 
 // Footer structure
@@ -215,6 +240,10 @@ export interface BaseSection {
 export interface HeroSection extends BaseSection {
   id: 'hero';
   copy: SectionCopy & {
+    cta?: {
+      primary?: SectionCTA;
+      secondary?: SectionCTA;
+    } | SectionCTA;
     badge?: {
       date: string;
       location: string;
