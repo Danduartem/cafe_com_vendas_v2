@@ -1,0 +1,59 @@
+{
+  "id": "thank-you-content",
+  "enabled": true,
+  "copy": {
+    "badge": {
+      "text": "Pagamento confirmado"
+    },
+    "header": {
+      "title": "Falta só <em class=\"italic text-burgundy-600 font-black\">um</em> passo<br class=\"hidden sm:block\"/>\\n        <span class=\"text-navy-700\">para garantir a sua experiência</span>",
+      "subtitle": "Agora precisamos de algumas informações rápidas para personalizar a sua participação.\\n        <span class=\"font-semibold text-navy-700\">Você receberá um email com todos os detalhes em minutos.</span>"
+    },
+    "progress": {
+      "label": "Progresso",
+      "percentage": "80%",
+      "value": 80,
+      "message": "Quase lá — complete o formulário em apenas 2 minutos"
+    },
+    "mainAction": {
+      "stepNumber": "1",
+      "title": "Complete o formulário complementar",
+      "description": "Precisamos confirmar detalhes práticos (contatos, restrições e preferências) para preparar tudo para você.",
+      "button": {
+        "text": "Completar formulário agora",
+        "url": "https://formspree.io/f/xanbnrvp",
+        "analytics": "cta_complete_form"
+      }
+    },
+    "steps": [
+      {
+        "number": "2",
+        "color": "burgundy",
+        "title": "Verifique o seu email",
+        "description": "Enviámos a confirmação com detalhes do evento e próximos passos. Verifique também \"Promoções\" ou \"Spam\" se não encontrar em 5 minutos."
+      },
+      {
+        "number": "3",
+        "color": "burgundy",
+        "title": "Adicione ao calendário",
+        "description": "Garanta que não vai esquecer — salve a data agora.",
+        "button": {
+          "text": "Adicionar ao calendário",
+          "url": "/assets/evento.ics",
+          "classes": "inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-burgundy-700 bg-burgundy-50 hover:bg-burgundy-100 rounded-xl transition-colors duration-200",
+          "analytics": "add_to_calendar"
+        }
+      }
+    ],
+    "eventSummary": {
+      "title": "Café com Vendas",
+      "subtitle": "Edição Portugal • 15 Fevereiro",
+      "features": [
+        "<span class=\"font-semibold\">Ambiente intimista</span> com conteúdo prático para vender mais trabalhando melhor",
+        "<span class=\"font-semibold\">Email confirmado</span> com instruções completas em minutos",
+        "<span class=\"font-semibold\">Suporte dedicado</span> via WhatsApp para qualquer dúvida"
+      ],
+      "important": "<span class=\"font-bold text-burgundy-700\">Importante:</span> Complete o formulário agora para garantir o seu lugar. Os detalhes do local serão enviados após o preenchimento."
+    }
+  }
+}
