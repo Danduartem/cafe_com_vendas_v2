@@ -45,7 +45,7 @@ export interface Testimonial {
   name: string;
   role?: string;
   company?: string;
-  content: string;
+  message: string;
   rating?: number;
   image?: string;
   verified?: boolean;

@@ -3,7 +3,8 @@ import type {
   SectionSlug,
   LoadedPageSection,
 } from '../types/sections/pages';
-import { getSection } from './consolidated-sections.js';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 // Page configuration interfaces
 interface PageConfig {
@@ -50,21 +51,23 @@ function validateSection(data: unknown, slug: string): data is Section {
   return true;
 }
 
-// Load section data from consolidated data
+// Load section data from JSON files
 function loadSection(slug: string, _variant?: string): Section | null {
-  const sectionData = getSection(slug);
-  
-  if (!sectionData) {
-    console.error(`Section not found: ${slug}`);
+  try {
+    const sectionPath = join(process.cwd(), 'src/_data/sections-data/sections', `${slug}.json`);
+    const sectionContent = readFileSync(sectionPath, 'utf-8');
+    const sectionData = JSON.parse(sectionContent);
+    
+    if (!validateSection(sectionData, slug)) {
+      console.warn(`Section validation failed for ${slug}, but continuing build`);
+      return null;
+    }
+
+    return sectionData;
+  } catch (error) {
+    console.error(`Failed to load section ${slug}:`, error);
     return null;
   }
-
-  if (!validateSection(sectionData, slug)) {
-    console.warn(`Section validation failed for ${slug}, but continuing build`);
-    return null;
-  }
-
-  return sectionData;
 }
 
 // Load all page configurations and their sections

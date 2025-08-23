@@ -1,11 +1,25 @@
 import type {
   LoadedPageSection,
-  SectionSlug
+  SectionSlug,
+  Section
 } from '../types/sections/pages';
-import { getSection } from './consolidated-sections.js';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+// Load section data from JSON files
+function loadSection(slug: string): Section | null {
+  try {
+    const sectionPath = join(process.cwd(), 'src/_data/sections-data/sections', `${slug}.json`);
+    const sectionContent = readFileSync(sectionPath, 'utf-8');
+    return JSON.parse(sectionContent);
+  } catch (error) {
+    console.error(`Failed to load section ${slug}:`, error);
+    return null;
+  }
+}
 
 /**
- * Thank You Page Data Loader - integrated with consolidated sections
+ * Thank You Page Data Loader - loads from JSON content files
  * @returns Thank you page sections
  */
 export default function(): { sections: LoadedPageSection[] } {
@@ -22,7 +36,7 @@ export default function(): { sections: LoadedPageSection[] } {
     }
 
     try {
-      const sectionData = getSection(sectionConfig.slug);
+      const sectionData = loadSection(sectionConfig.slug);
 
       if (sectionData) {
         sections.push({
