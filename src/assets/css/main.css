@@ -63,10 +63,33 @@ html, body {
   --color-peach-900: #753b2d;
   --color-white: #FFFFFF;
   --color-black: #000000;
+  
+  /* Enhanced v4 shadow definitions */
+  --shadow-2xs: 0 1px rgb(0 0 0 / 0.05);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
 
-  /* Typography */
-  --font-family-display: 'Lora', serif;
-  --font-family-body: 'CenturyGothic', sans-serif;
+  /* Typography - Enhanced v4 font configuration */
+  --font-display: 'Lora', serif;
+  --font-body: 'CenturyGothic', sans-serif;
+  
+  /* Font utility generation - v4 pattern for utility class creation */
+  --font-lora: 'Lora', serif;
+  --font-century: 'CenturyGothic', sans-serif;
+  
+  /* Font feature settings for enhanced typography */
+  --font-display--font-feature-settings: "kern", "liga";
+  --font-body--font-feature-settings: "kern", "liga";
+  
+  /* Font weight definitions for better semantic naming */
+  --font-weight-book: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
   --text-hero: clamp(2.25rem, 6.5vw, 3rem);
   --text-h2: clamp(1.5rem, 3.5vw, 2rem);
   --text-lead: 1.125rem;
@@ -78,22 +101,46 @@ html, body {
   --leading-relaxed: 1.6;
   --tracking-tight: -0.01em;
   --tracking-wide: 0.06em;
+  
+  /* Enhanced v4 spacing system */
+  --spacing-0_5: 0.125rem;
+  --spacing-1_5: 0.375rem;
+  --spacing-2_5: 0.625rem;
+  --spacing-3_5: 0.875rem;
+  
+  /* Enhanced v4 breakpoint system */
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
 
-  /* Semantic Tokens */
+  /* Enhanced v4 Semantic Tokens */
   --color-text-primary: var(--color-navy-800);
   --color-text-secondary: var(--color-navy-600);
-  --color-text-subtle: var(--color-neutral-500);
-  --color-surface-main: var(--color-white);
-  --color-surface-subtle: var(--color-neutral-100);
-  --color-cta-primary: var(--color-burgundy-700);
-  --color-cta-primary-hover: var(--color-burgundy-800);
+  --color-text-muted: var(--color-neutral-500);
+  --color-surface-primary: var(--color-white);
+  --color-surface-secondary: var(--color-neutral-100);
+  --color-accent-primary: var(--color-burgundy-700);
+  --color-accent-primary-hover: var(--color-burgundy-800);
   
-  /* Animation delays for better control */
+  /* Additional v4 semantic colors */
+  --color-border-default: var(--color-neutral-300);
+  --color-border-muted: var(--color-neutral-200);
+  --color-focus-ring: var(--color-burgundy-500);
+  
+  /* Animation system - Enhanced v4 configuration */
   --animate-delay-200: 200ms;
   --animate-delay-500: 500ms;
   --animate-delay-1000: 1000ms;
   --animate-delay-2000: 2000ms;
   --animate-delay-3000: 3000ms;
+  
+  /* Custom animation definitions */
+  --animate-fade-in-up: fadeInUp 0.8s ease-out;
+  --animate-slide-in-right: slideInRight 0.6s ease-out;
+  --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
 }
 
 /* Tailwind v4 Advanced Features - Custom Utilities and Variants */
@@ -121,6 +168,7 @@ html, body {
   /* Group hover/focus combination */
 }
 
+/* Tailwind v4 Enhanced Animation Keyframes */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -152,78 +200,116 @@ html, body {
   }
 }
 
+/* Animation Utilities - v4 Style */
+@utility animate-fade-in-up {
+  animation: var(--animate-fade-in-up);
+}
+
+@utility animate-slide-in-right {
+  animation: var(--animate-slide-in-right);
+}
+
+@utility animate-pulse-soft {
+  animation: var(--animate-pulse-soft);
+}
+
 /* Design tokens are now managed natively via Tailwind v4 @theme directive above. */
-/* Optimized font loading - only weights actually used in the project */
+/* Tailwind v4 Enhanced Font Loading - integrated with theme system */
 /* Lora: semibold (600) and bold (700) - primary display font */
-@font-face { font-family: 'Lora'; src: url('/fonts/Lora/Lora-600.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/fonts/Lora/Lora-700.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/Lora-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora/Lora-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* CenturyGothic: regular (400) and bold (700) - body and UI text */
-@font-face { font-family: 'CenturyGothic'; src: url('/fonts/CenturyGothic/CenturyGothic-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: 'CenturyGothic'; src: url('/fonts/CenturyGothic/CenturyGothic-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face {
+  font-family: 'CenturyGothic';
+  src: url('/fonts/CenturyGothic/CenturyGothic-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CenturyGothic';
+  src: url('/fonts/CenturyGothic/CenturyGothic-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 
 /* Font utility classes now handled by Tailwind config (font-century, font-lora) */
 /* Unused animation keyframes removed */
 
-/* Smooth scroll behavior */
-html {
+/* Tailwind v4 Smooth Scroll Utility */
+@utility scroll-smooth {
   scroll-behavior: smooth;
+}
+
+/* Apply smooth scrolling globally */
+html {
+  @apply scroll-smooth;
 }
 
 /* Scrollbar hiding is now handled by @utility scrollbar-hide above */
 
 
-/* SVG gradient stops */
-.gradient-stop-navy-start {
-  stop-color: #191F3A;
+/* Tailwind v4 Utility-First SVG Gradient Stops */
+@utility gradient-stop-navy-start {
+  stop-color: var(--color-navy-800);
   stop-opacity: 1;
 }
 
-.gradient-stop-burgundy-middle {
-  stop-color: #81171F;
+@utility gradient-stop-burgundy-middle {
+  stop-color: var(--color-burgundy-700);
   stop-opacity: 0.8;
 }
 
-.gradient-stop-navy-end {
-  stop-color: #191F3A;
+@utility gradient-stop-navy-end {
+  stop-color: var(--color-navy-800);
   stop-opacity: 1;
 }
 
 /* Removed unused confetti-bg */
 
-/* Hero background - optimized Cloudinary WebP/AVIF with automatic format detection */
-/* Base mobile version (default) - portrait orientation optimized */
-.hero-bg {
+/* Tailwind v4 Responsive Hero Background Utility */
+@utility hero-bg {
+  /* Base mobile version - portrait orientation optimized */
   background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,h_1136,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz');
-}
-
-/* Tablet and small desktop */
-@media (min-width: 640px) {
-  .hero-bg {
+  
+  /* Tablet and small desktop */
+  @media (min-width: 640px) {
     background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1024,h_768,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz');
   }
-}
-
-/* Large desktop */
-@media (min-width: 1024px) {
-  .hero-bg {
+  
+  /* Large desktop */
+  @media (min-width: 1024px) {
     background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz');
   }
 }
 
-/* Native HTML5 Dialog Enhancement */
-dialog {
+/* Tailwind v4 Enhanced Dialog Utilities */
+@utility dialog-base {
   /* Base state - prevent layout interference when closed */
   border: none;
   padding: 0;
   margin: 0;
-  
-  /* Hide completely when closed to prevent layout issues */
   display: none;
 }
 
-dialog[open] {
+@utility dialog-open {
   /* Open state - full dialog styling */
   display: flex;
   flex-direction: column;
@@ -234,8 +320,8 @@ dialog[open] {
   width: calc(100vw - 2rem);
   max-height: 90vh;
   margin: auto;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  background: white;
+  box-shadow: var(--shadow-2xl);
+  background: var(--color-white);
   
   /* Smooth transitions when dialog opens */
   transition: opacity 0.2s ease-out, transform 0.2s ease-out;
@@ -243,12 +329,23 @@ dialog[open] {
   transform: scale(1);
 }
 
-dialog::backdrop {
+@utility dialog-backdrop {
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
-  
-  /* Smooth backdrop transition */
   transition: opacity 0.2s ease-out, backdrop-filter 0.2s ease-out;
+}
+
+/* Apply utilities to dialog elements */
+dialog {
+  @apply dialog-base;
+}
+
+dialog[open] {
+  @apply dialog-open;
+}
+
+dialog::backdrop {
+  @apply dialog-backdrop;
 }
 
 /* Accessibility - respect user's motion preferences */
