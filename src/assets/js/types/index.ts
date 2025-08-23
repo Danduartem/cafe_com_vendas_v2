@@ -3,7 +3,7 @@
  */
 
 // Global types
-export * from './global.ts';
+export * from './global';
 
 // Component types
 export type {
@@ -12,7 +12,7 @@ export type {
   ComponentRegistration,
   ComponentStatus,
   ComponentHealthStatus
-} from './component.ts';
+} from './component';
 
 // Analytics types
 export type {
@@ -27,28 +27,17 @@ export type {
   AppInitializedEvent,
   ComponentsInitializedEvent,
   GTMEventPayload
-} from './analytics.ts';
+} from './analytics';
 
 // DOM types
 export type {
   SafeElement,
   SafeElements,
   SafeHTMLElement,
-  SafeButton,
-  SafeInput,
-  SafeForm,
-  SafeAnchor,
-  SafeImage,
-  SafeVideo,
-  SafeDiv,
-  SafeSection,
   AnimationConfig,
   RevealConfig,
-  ObserverConfig,
-  ScrollConfig,
-  Breakpoints,
-  SlideCalculation
-} from './dom.ts';
+  ObserverConfig
+} from './dom';
 
 // Configuration types
 export type {
@@ -59,7 +48,7 @@ export type {
   AnalyticsConfig,
   AppConfig,
   Constants
-} from './config.ts';
+} from './config';
 
 // State types
 export type {
@@ -67,4 +56,4 @@ export type {
   StateManager,
   StateChangeEvent,
   ViewportChangeEvent
-} from './state.ts';
+} from './state';

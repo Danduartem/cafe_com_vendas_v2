@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import type { PresenterData } from './types.ts';
+import type { PresenterData } from './types';
 
 /**
  * Load presenter data from JSON file

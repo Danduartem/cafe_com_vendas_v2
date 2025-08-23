@@ -1,187 +1,89 @@
-# 🏷️ GTM Setup Guide — Café com Vendas (Unified with `payment_completed`)
+# 🏷️ GTM Setup Guide — Café com Vendas
 
-> **Container ID**: `GTM-T63QRLFT`
-> **Env Var**: `VITE_GTM_CONTAINER_ID`
-> **Updated**: 2025‑08‑22
-> **Change**: Standardizes the dataLayer payment event to **`payment_completed`** (mapped to GA4 **`purchase`**). All previous references to `purchase_completed` are removed.
+> **Container ID**: `GTM-T63QRLFT` • **Env**: `VITE_GTM_CONTAINER_ID`
 
 ---
 
-## 🚀 Quick Start (5 minutes)
+## Quick Setup
 
 ### 1) Environment
-
-Create/update `.env.local`:
-
 ```bash
+# .env.local
 VITE_GTM_CONTAINER_ID=GTM-T63QRLFT
 ```
 
-### 2) Access GTM
+### 2) GTM Access
+1. **tagmanager.google.com** → container **GTM‑T63QRLFT**
+2. Enable built-in variables: Event, Page URL/Title, Click Element/Text
 
-1. Open **tagmanager.google.com**
-2. Select container **GTM‑T63QRLFT**
-3. Create/choose workspace: *Café com Vendas Setup*
-
-### 3) Enable Built‑in Variables
-
-**Variables → Built‑In → Configure**
-
-* Event
-* Page URL, Page Title, Page Path
-* Click Element, Click Text, Click Classes
-* Form Element, Form ID, Form Classes
-
-### 4) Local Test
-
+### 3) Test Locally
 ```bash
 npm run dev
-# Visit http://localhost:8081 and open DevTools console
-window.dataLayer;            // inspect events
-console.table(window.dataLayer);
+# DevTools: window.dataLayer or console.table(window.dataLayer)
 ```
 
 ---
 
-## 📋 Phase 1 — Core Data Layer Variables (Required)
+## Required Data Layer Variables
 
-Create these **Data Layer Variables** in GTM (Name → DL key):
+Create in GTM **Variables → Data Layer Variables**:
 
-| Variable Name             | Data Layer Variable Name |
-| ------------------------- | ------------------------ |
-| **DL - Source**           | `source`                 |
-| **DL - Amount**           | `amount`                 |
-| **DL - Value**            | `value`                  |
-| **DL - Currency**         | `currency`               |
-| **DL - Pricing Tier**     | `pricing_tier`           |
-| **DL - Items**            | `items`                  |
-| **DL - Lead ID**          | `lead_id`                |
-| **DL - Transaction ID**   | `transaction_id`         |
-| **DL - Percent Scrolled** | `percent_scrolled`       |
-| **DL - Section**          | `section`                |
-| **DL - FAQ Action**       | `action`                 |
-| **DL - FAQ Question**     | `question`               |
-| **DL - Engagement Type**  | `engagement_type`        |
-| **DL - Toggle Count**     | `toggle_count`           |
-
-> Optional: create **Custom JS** normalizers (e.g., `JS - Normalize String`, `JS - Normalize Section`) to lower cardinality if your inputs vary.
+| Variable Name | Data Layer Key |
+|---------------|---------------|
+| DL - Value | `value` |
+| DL - Currency | `currency` |
+| DL - Transaction ID | `transaction_id` |
+| DL - Items | `items` |
+| DL - Lead ID | `lead_id` |
+| DL - FAQ Action | `action` |
+| DL - FAQ Question | `question` |
+| DL - Video Title | `video_title` |
+| DL - Testimonial ID | `testimonial_id` |
 
 ---
 
-## 🔔 Phase 2 — Essential Triggers (Required)
+## Core Triggers
 
-Create **Custom Event** triggers for these dataLayer events:
+Create **Custom Event** triggers:
 
-### A) GTM Init (GA4 boot)
-
-* **Type**: Custom Event
-* **Event name**: `gtm_init`
-
-### B) Checkout Opened
-
-* **Type**: Custom Event
-* **Event name**: `checkout_opened`
-
-### C) **Payment Completed** (Unified)
-
-* **Type**: Custom Event
-* **Event name**: `payment_completed`
-
-### D) Engagement
-
-* **Type**: Custom Event
-* **Event names**: `scroll_depth`, `faq_meaningful_engagement`
+* `gtm_init` (GA4 config)
+* `checkout_opened` 
+* `payment_completed` (maps to GA4 `purchase`)
+* `lead_form_submitted`
+* `faq_toggle` + `faq_meaningful_engagement`
+* `video_play`
+* `view_testimonial_slide` + `view_testimonials_section`
 
 ---
 
-## 📈 Phase 3 — GA4 Tagging (Required)
+## GA4 Tags
 
-### 1) GA4 Configuration Tag
-
-* **Type**: *Google Analytics: GA4 Configuration*
-* **Measurement ID**: your GA4 ID (e.g., `G‑XXXXXXXXXX`)
+### 1) GA4 Configuration
 * **Trigger**: `gtm_init`
-* **Parameters** (recommended):
+* **Measurement ID**: Your GA4 property ID
 
-  * `page_location`: {{Page URL}}
-  * `page_title`: {{Page Title}}
-  * `cafe_com_vendas_version`: `v2025` (optional)
-
-### 2) GA4 — Checkout Opened (Custom Event)
-
-* **Type**: *GA4 Event*
-* **Event Name**: `checkout_opened`
-* **Configuration Tag**: GA4 Config (above)
-* **Parameters** (as needed):
-
-  * `source`: {{DL - Source}}
-  * `amount`: {{DL - Amount}} *or* {{DL - Value}}
-  * `currency`: `EUR`
-  * `pricing_tier`: {{DL - Pricing Tier}}
-  * `items`: {{DL - Items}}
-* **Trigger**: `checkout_opened`
-
-### 3) **GA4 — Purchase (Maps from `payment_completed`)**
-
-* **Type**: *GA4 Event*
+### 2) Purchase Event (Key)
 * **Event Name**: `purchase`
-* **Configuration Tag**: GA4 Config (above)
-* **Parameters**:
-
-  * `transaction_id`: {{DL - Transaction ID}}
-  * `value`: {{DL - Value}} (or {{DL - Amount}})
-  * `currency`: `EUR`
-  * `items`: {{DL - Items}}
-  * `pricing_tier`: {{DL - Pricing Tier}} *(optional custom dimension)*
 * **Trigger**: `payment_completed`
+* **Parameters**: `transaction_id`, `value`, `currency`, `items`
+
+### 3) All Other Events
+Map dataLayer events to GA4 with relevant parameters from data layer variables.
 
 ---
 
-## 🧪 Testing & Validation
+## Testing
 
-### GTM Preview
-
-1. **Preview** → enter site URL (e.g., `http://localhost:8081`)
-2. Interact with the page
-3. Confirm triggers fire: `gtm_init`, `checkout_opened`, `payment_completed`, plus engagement events
-
-### GA4 Real‑time
-
-* Open **Google Analytics → Realtime**
-* Confirm receipt of `checkout_opened` and **`purchase`** (from `payment_completed`)
-
-### Console Debug
-
-```js
-window.dataLayer
-console.table(window.dataLayer)
-```
+1. **GTM Preview** → test all event triggers
+2. **GA4 Realtime** → confirm `purchase` and custom events
+3. **Console**: Verify `window.dataLayer` populates correctly
 
 ---
 
-## 📦 Reference — Minimal dataLayer Examples
-
-### Checkout Opened
+## Key dataLayer Examples
 
 ```js
-window.dataLayer.push({
-  event: 'checkout_opened',
-  value: 180,
-  currency: 'EUR',
-  pricing_tier: 'early_bird',
-  items: [{
-    item_id: 'SKU_CCV_PT_2025',
-    item_name: 'Café com Vendas – Portugal 2025',
-    price: 180,
-    quantity: 1,
-    item_category: 'Event'
-  }]
-});
-```
-
-### Payment Completed (Unified)
-
-```js
+// Purchase (most important)
 window.dataLayer.push({
   event: 'payment_completed',
   transaction_id: 'pi_1abc2def3ghi',
@@ -191,41 +93,16 @@ window.dataLayer.push({
     item_id: 'SKU_CCV_PT_2025',
     item_name: 'Café com Vendas – Portugal 2025',
     price: 180,
-    quantity: 1,
-    item_category: 'Event'
-  }],
-  pricing_tier: 'early_bird'
+    quantity: 1
+  }]
+});
+
+// Lead generation
+window.dataLayer.push({
+  event: 'lead_form_submitted',
+  lead_id: 'lead_123',
+  form_location: 'checkout_modal'
 });
 ```
 
----
-
-## 🚨 Common Issues & Fixes
-
-**Purchase not visible in GA4**
-
-* Ensure **trigger** exists for `payment_completed` and fires
-* GA4 event name must be **`purchase`** (not `payment_completed`)
-* Verify `transaction_id` and `items` are sent
-
-**GTM Assistant shows PNG icon**
-
-* Ensure `VITE_GTM_CONTAINER_ID` is set and container is published
-
-**Events not appearing in Preview**
-
-* Check DevTools console for JS errors
-* Verify event names match **exactly**
-* Confirm triggers are **not paused**
-
----
-
-## 🔁 Migration Note
-
-* **Rename** any existing `purchase_completed` triggers/events to **`payment_completed`**.
-* Keep GA4 event name as **`purchase`**.
-* Re‑publish container after changes.
-
----
-
-*End of file — save as `/docs/GTM_SETUP_GUIDE.md`.*
+**Migration**: Replace any `purchase_completed` events with `payment_completed`.

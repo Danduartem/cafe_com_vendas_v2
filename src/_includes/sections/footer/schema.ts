@@ -4,8 +4,8 @@
  * Type-safe contracts and runtime validation for the footer section
  */
 
-import type { FooterSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types.ts';
-import { validateSectionBase, assertSectionBase } from '../../../_data/types.ts';
+import type { FooterSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types';
+import { validateSectionBase, assertSectionBase } from '../../../_data/types';
 
 // Extend the existing FooterSection interface for strict validation
 export interface FooterProps extends FooterSection {

@@ -21,11 +21,12 @@
 
 ### Core Principles
 
-* **TS‑only**: no `.js` sources; **imports use `.js` extensions** (ESM TS emit)
+* **TS‑first**: primarily `.ts` sources; **imports use `.js` extensions** (ESM TS emit)
 * **Tailwind v4 only**: CSS‑first `@theme`; no `tailwind.config.js`; no inline styles
-* **Design Tokens**: JSON → build → CSS custom properties
-* **Security**: strict CSP; no inline scripts/handlers; typed analytics helpers
-* **Performance**: lazy‑load third‑party (e.g., Stripe), small bundles, optimized images
+* **Design Tokens**: embedded in CSS `@theme` block (no JSON build pipeline)
+* **Security**: strict CSP via edge functions; no inline scripts/handlers; typed analytics
+* **Performance**: lazy‑load third‑party (Stripe), Vite 7.x optimizations, modern targets
+* **Testing**: unit (Vitest), visual (Playwright), schema validation
 * **Analytics**: normalized dataLayer; **`payment_completed` → GA4 `purchase`** (see GTM docs)
 
 ---
@@ -60,20 +61,26 @@ graph TB
 ```
 📦 Project Root
 ├─ content/pt-PT/           # i18n content (site, event, pages, sections, strings)
-│  └─ design_tokens.json
-├─ design/tokens.json       # Design tokens (source of truth)
+├─ design/components.json   # Design component definitions
 ├─ src/
-│  ├─ _data/                # Type‑safe data adapters (TS)
+│  ├─ _data/                # Type‑safe data adapters (TS + .js for complex queries)
 │  ├─ _includes/            # Nunjucks templates + sections (co‑located {index.njk,index.ts})
+│  │  ├─ partials/          # Reusable template components
+│  │  └─ sections/          # Page sections with schema (some with schema.ts)
 │  ├─ assets/
-│  │  ├─ css/               # Tailwind + generated tokens CSS
-│  │  └─ js/                # TS entry + core + types + config
-│  ├─ platform/             # Platform foundation (utils, UI components)
-│  └─ pages/                # Page templates (index, legal, thank‑you)
+│  │  ├─ css/               # Tailwind v4 CSS-first with @theme tokens
+│  │  ├─ images/            # Optimized images
+│  │  └─ js/                # TS modules (main.ts, app.ts, config/, core/, types/)
+│  ├─ platform/             # Platform foundation
+│  │  ├─ lib/utils/         # Core utilities (DOM, GTM, scroll, throttle)
+│  │  └─ ui/components/     # Reusable UI components (accordion, modal, analytics)
+│  ├─ pages/                # Page templates (index, legal, thank‑you)
+│  └─ public/               # Static assets (fonts, favicons, headers)
 ├─ netlify/
-│  ├─ functions/            # Stripe, MailerLite, webhooks (TS)
-│  └─ edge-functions/       # CSP headers (TS)
-├─ scripts/                 # Build tools (tokens, scaffolds) (TS)
+│  ├─ functions/            # Serverless functions (Stripe, MailerLite, webhooks)
+│  └─ edge-functions/       # Edge functions (CSP headers)
+├─ scripts/                 # Build and utility scripts (validation, screenshots)
+├─ tests/                   # Test suites (unit, visual, schemas)
 ├─ docs/                    # Architecture, standards, setup guides
 └─ config files             # .eleventy.ts, vite.config.ts, tsconfig.json, etc.
 ```
@@ -105,32 +112,34 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  participant Tokens as design/tokens.json
-  participant Builder as scripts/build-tokens.ts
-  participant CSS as _tokens.generated.css
-  participant Tailwind as Tailwind v4
+  participant Design as design/components.json
+  participant CSS as src/assets/css/main.css
+  participant Tailwind as Tailwind v4 @theme
+  participant Vite as Vite Build
   participant Browser as Browser
 
-  Tokens->>Builder: Load definitions
-  Builder->>CSS: Emit CSS custom properties
-  CSS->>Tailwind: Utility composition
-  Tailwind->>Browser: Optimized styles
+  Design->>CSS: Manual token integration
+  CSS->>Tailwind: @theme definitions + @source scanning
+  Tailwind->>Vite: Utility generation + optimization
+  Vite->>Browser: Optimized CSS bundle
 ```
 
 ### Build & Runtime
 
 ```mermaid
 sequenceDiagram
-  participant TS as TypeScript
-  participant Vite as Vite
-  participant Bundle as Optimized Bundle
-  participant Edge as Netlify
+  participant TS as TypeScript 5.9+
+  participant Vite as Vite 7.1+
+  participant Eleventy as Eleventy 3.1+
+  participant Bundle as Optimized Assets
+  participant Netlify as Netlify CDN
   participant Browser as Browser
 
-  TS->>Vite: Compile + type‑check
-  Vite->>Bundle: Tree‑shake + minify
-  Bundle->>Edge: Deploy to CDN/Edge
-  Edge->>Browser: Cached assets + pages
+  TS->>Vite: Compile TS modules + type‑check
+  TS->>Eleventy: Generate static HTML pages
+  Vite->>Bundle: Tree‑shake, minify, split chunks
+  Bundle->>Netlify: Deploy assets + functions + edge
+  Netlify->>Browser: Serve optimized site + CDN
 ```
 
 ---
@@ -141,33 +150,53 @@ sequenceDiagram
 
 ```ts
 // src/platform/ui/components/accordion.ts
-export class Accordion {
-  constructor(private container: HTMLElement) {}
-  init(): void {
-    this.container.addEventListener('click', (e: Event) => {
-      const t = e.target as HTMLElement;
-      if (t?.matches('[data-accordion-trigger]')) this.toggle(t);
+export const PlatformAccordion = {
+  initializeNative(config: AccordionConfig): void {
+    const container = safeQuery(config.containerSelector);
+    const items = safeQueryAll(config.itemSelector) as NodeListOf<HTMLDetailsElement>;
+
+    // Setup native <details> accordion behavior with animations
+    items.forEach((item) => {
+      item.addEventListener('toggle', () => {
+        const isOpen = item.open;
+        
+        // Close others if not allowing multiple
+        if (isOpen && !config.allowMultiple) {
+          items.forEach((other) => {
+            if (other !== item && other.open) other.open = false;
+          });
+        }
+        
+        // Call custom toggle handler (e.g., analytics)
+        config.onToggle?.(item, isOpen);
+      }, { passive: true });
     });
   }
-  private toggle(trigger: HTMLElement): void {
-    const content = trigger.nextElementSibling as HTMLElement | null;
-    content?.classList.toggle('hidden'); // Tailwind‑only state change
-  }
-}
+};
 ```
 
 ### Co‑located Sections (modern pattern)
 
 ```ts
 // src/_includes/sections/hero/index.ts
-export const HeroSection = {
-  init(): void {
-    (window as typeof window & { scrollToOffer: () => void }).scrollToOffer =
-      this.scrollToOffer.bind(this);
+export const Hero = {
+  init() {
+    this.initAnimations();
+    this.initInteractions();
+    this.initScrollIndicator();
+    this.initWhatsAppButton();
   },
-  scrollToOffer(): void {
-    // Type‑safe DOM ops, Tailwind classes only
-    document.getElementById('offer')?.scrollIntoView({ behavior: 'smooth' });
+  
+  initAnimations() {
+    const heroSection = safeQuery('#s-hero');
+    const elements = [/* hero elements */].filter(Boolean);
+    
+    PlatformAnimations.prepareRevealElements(elements);
+    const observer = PlatformAnimations.createObserver({
+      callback: () => PlatformAnimations.revealElements(elements),
+      once: true
+    });
+    observer.observe(heroSection);
   }
 };
 ```
@@ -176,10 +205,11 @@ export const HeroSection = {
 
 ## 🎨 Styling
 
-* **Tailwind v4** (CSS‑first): tokens → generated CSS → utilities
+* **Tailwind v4** (CSS‑first): `@theme` tokens embedded in main.css → utilities
 * **No inline styles**; mutate state via classList only
-* **Fonts**: self‑hosted; `font-display: swap`
-* **Critical CSS**: above‑the‑fold inlined by build where applicable
+* **Fonts**: self‑hosted in src/public/fonts/; `font-display: swap`
+* **Design tokens**: manually integrated into CSS `@theme` block (no JSON pipeline)
+* **Source scanning**: `@source` directive tells Tailwind where to find utility usage
 
 ---
 
@@ -201,10 +231,11 @@ export const HeroSection = {
 
 ## ✅ Quality Gates (must pass before merge)
 
-* `npm run type-check` → **0 errors**
-* `npm run lint` → **0 errors**
-* Tests (unit/e2e/visual) green when applicable
-* Lighthouse: Perf ≥ 90, A11y ≥ 95, Best‑Practices 100 on key pages
+* `npm run type-check` → **0 errors** (TypeScript 5.9+)
+* `npm run lint` → **0 errors** (ESLint 9+ with flat config)
+* `npm run test:all` → all tests pass (Vitest unit + Playwright visual)
+* Lighthouse: Perf ≥ 90 (mobile), A11y ≥ 95, Best‑Practices 100 on key pages
+* Functions deploy successfully (Netlify dev + build)
 
 ---
 
@@ -219,4 +250,4 @@ export const HeroSection = {
 
 ---
 
-*Last updated: 2025‑08‑22*
+*Last updated: 2025‑08‑23*

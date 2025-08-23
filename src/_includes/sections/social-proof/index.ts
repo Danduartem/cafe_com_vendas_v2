@@ -4,10 +4,10 @@
  * Handles testimonials carousel and video functionality
  */
 
-import { safeQuery, safeQueryAll } from '@platform/lib/utils/dom.ts';
-import { PlatformAnimations, PlatformAnalytics } from '@platform/ui/components/index.ts';
-import { debounce } from '@platform/lib/utils/throttle.ts';
-import type { Component } from '@/types/component.ts';
+import { safeQuery, safeQueryAll } from '@/utils/dom';
+import { Animations } from '@/components/index';
+import { debounce } from '@/utils/throttle';
+import type { Component } from '@/types/component';
 
 // Constants for carousel layout
 const CAROUSEL_GAP_DEFAULT = 24;
@@ -202,9 +202,15 @@ export const SocialProof: SocialProofComponent = {
     const testimonialId = this.carouselElements.slides[this.currentIndex]?.getAttribute('data-testimonial-id') ??
                          `tst_${String(this.currentIndex + 1).padStart(2, '0')}`;
 
-    PlatformAnalytics.trackSectionEngagement('testimonials', 'slide_view', {
-      testimonial_id: testimonialId,
-      position: this.currentIndex + 1
+    import('@/components/analytics').then(({ PlatformAnalytics }) => {
+      PlatformAnalytics.track('section_engagement', {
+        section: 'testimonials',
+        action: 'slide_view',
+        testimonial_id: testimonialId,
+        position: this.currentIndex + 1
+      });
+    }).catch(() => {
+      console.debug('Testimonial analytics tracking unavailable');
     });
   },
 
@@ -226,7 +232,7 @@ export const SocialProof: SocialProofComponent = {
 
     videoCards.forEach(card => {
       // Add hover effects with platform animations
-      PlatformAnimations.addClickFeedback(card, 'scale-105');
+      Animations.addClickFeedback(card, 'scale-105');
 
       card.addEventListener('mouseenter', function(this: HTMLElement) {
         this.classList.add('-translate-y-1');
@@ -239,9 +245,16 @@ export const SocialProof: SocialProofComponent = {
   },
 
   trackSectionView(): void {
-    const observer = PlatformAnimations.createObserver({
+    const observer = Animations.createObserver({
       callback: () => {
-        PlatformAnalytics.trackSectionEngagement('testimonials', 'section_view');
+        import('@/components/analytics').then(({ PlatformAnalytics }) => {
+          PlatformAnalytics.track('section_engagement', {
+            section: 'testimonials',
+            action: 'section_view'
+          });
+        }).catch(() => {
+          console.debug('Section view analytics tracking unavailable');
+        });
       },
       once: true,
       threshold: 0.3

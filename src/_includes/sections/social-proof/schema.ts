@@ -4,8 +4,8 @@
  * Type-safe contracts and runtime validation for the social proof section
  */
 
-import type { SocialProofSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types.ts';
-import { validateSectionBase, assertSectionBase } from '../../../_data/types.ts';
+import type { SocialProofSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types';
+import { validateSectionBase, assertSectionBase } from '../../../_data/types';
 
 // Extend the existing SocialProofSection interface for strict validation
 export interface SocialProofProps extends SocialProofSection {

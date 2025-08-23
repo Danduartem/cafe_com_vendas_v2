@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import type { EventData } from './types.ts';
+import type { EventData } from './types';
 
 /**
  * Load event data from JSON file

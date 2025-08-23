@@ -3,8 +3,8 @@
  * Handles thank-you page animations, progress bar, and celebration effects
  */
 
-import { safeQuery } from '../../../platform/lib/utils/dom.ts';
-import { PlatformAnimations, PlatformAnalytics } from '@platform/ui/components/index.ts';
+import { safeQuery } from '../../../assets/js/utils/dom';
+import { Animations } from '@/components/index';
 
 export const ThankYou = {
   init() {
@@ -24,11 +24,11 @@ export const ThankYou = {
 
     const revealElements = thankYouSection.querySelectorAll('[data-reveal]');
 
-    PlatformAnimations.prepareRevealElements(Array.from(revealElements));
+    Animations.prepareRevealElements(Array.from(revealElements));
 
-    const observer = PlatformAnimations.createObserver({
+    const observer = Animations.createObserver({
       callback: () => {
-        PlatformAnimations.revealElements(Array.from(revealElements), {
+        Animations.revealElements(Array.from(revealElements), {
           initialDelay: 200
         });
       },
@@ -56,7 +56,7 @@ export const ThankYou = {
     // Main CTA button
     const mainCtaButton = safeQuery('[data-analytics-click="cta_complete_form"]');
     if (mainCtaButton) {
-      PlatformAnimations.addClickFeedback(mainCtaButton);
+      Animations.addClickFeedback(mainCtaButton);
 
       mainCtaButton.addEventListener('mouseenter', function(this: HTMLElement) {
         this.classList.add('scale-[1.02]');
@@ -70,13 +70,18 @@ export const ThankYou = {
     // Calendar download button
     const calendarButton = safeQuery('[data-analytics-click="add_to_calendar"]');
     if (calendarButton) {
-      PlatformAnimations.addClickFeedback(calendarButton);
+      Animations.addClickFeedback(calendarButton);
 
       calendarButton.addEventListener('click', () => {
         // Track calendar download
-        PlatformAnalytics.trackUIInteraction('calendar_download', {
-          location: 'thank_you_page',
-          file_type: 'ics'
+        import('@/components/analytics').then(({ PlatformAnalytics }) => {
+          PlatformAnalytics.track('ui_interaction', {
+            interaction: 'calendar_download',
+            location: 'thank_you_page',
+            file_type: 'ics'
+          });
+        }).catch(() => {
+          console.debug('Calendar download analytics tracking unavailable');
         });
       });
     }
@@ -84,8 +89,12 @@ export const ThankYou = {
     // WhatsApp contact button
     const whatsappButton = safeQuery('[data-analytics-click="contact_whatsapp"]') as HTMLAnchorElement;
     if (whatsappButton) {
-      PlatformAnimations.addClickFeedback(whatsappButton);
-      PlatformAnalytics.trackWhatsAppClick(whatsappButton, 'thank_you_page');
+      Animations.addClickFeedback(whatsappButton);
+      import('@/components/analytics').then(({ PlatformAnalytics }) => {
+        PlatformAnalytics.trackClick(whatsappButton, 'whatsapp_click', 'thank_you_page');
+      }).catch(() => {
+        console.debug('WhatsApp analytics tracking unavailable');
+      });
     }
 
     // Add hover effects to step cards

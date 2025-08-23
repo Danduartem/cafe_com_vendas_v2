@@ -9,17 +9,9 @@ export type SafeElement<T extends Element = Element> = T | null;
 export type SafeElements<T extends Element = Element> = T[];
 
 /**
- * Common HTML elements with proper typing
+ * Common HTML element type for type safety
  */
 export type SafeHTMLElement = SafeElement<HTMLElement>;
-export type SafeButton = SafeElement<HTMLButtonElement>;
-export type SafeInput = SafeElement<HTMLInputElement>;
-export type SafeForm = SafeElement<HTMLFormElement>;
-export type SafeAnchor = SafeElement<HTMLAnchorElement>;
-export type SafeImage = SafeElement<HTMLImageElement>;
-export type SafeVideo = SafeElement<HTMLVideoElement>;
-export type SafeDiv = SafeElement<HTMLDivElement>;
-export type SafeSection = SafeElement<HTMLElement>;
 
 /**
  * Animation configuration
@@ -49,29 +41,3 @@ export interface ObserverConfig {
   threshold?: number | number[];
 }
 
-/**
- * Scroll configuration
- */
-export interface ScrollConfig {
-  behavior?: 'smooth' | 'auto';
-  block?: 'start' | 'center' | 'end' | 'nearest';
-  inline?: 'start' | 'center' | 'end' | 'nearest';
-}
-
-/**
- * Breakpoint values for responsive design
- */
-export interface Breakpoints {
-  mobile: number;
-  tablet: number;
-  desktop: number;
-  xl: number;
-}
-
-/**
- * Carousel slide calculation result
- */
-export interface SlideCalculation {
-  slidesPerView: number;
-  containerWidth: number;
-}

@@ -4,7 +4,7 @@
  */
 
 import type { Component } from '../../../assets/js/types/component.js';
-import { safeQuery } from '../../../platform/lib/utils/dom.js';
+import { safeQuery } from '../../../assets/js/utils/dom.js';
 import { Analytics } from '../../../assets/js/core/analytics.js';
 
 interface ProblemComponent extends Component {

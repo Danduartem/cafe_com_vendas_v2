@@ -1,9 +1,10 @@
 /**
  * Test utility for loading and validating section data
+ * Uses production data loading logic to ensure tests validate actual runtime behavior
  */
 
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync, existsSync } from 'fs';
+import { resolve, join } from 'path';
 import type {
   SectionSlug,
   HeroSection,
@@ -18,14 +19,62 @@ import type {
   TopBannerSection
 } from '../../src/_data/types.ts';
 
+// Load centralized design configurations (same as production)
+let designConfigs: Record<string, unknown> | null = null;
+
+function loadDesignConfigs(): Record<string, unknown> {
+  if (designConfigs) return designConfigs;
+
+  const designPath = join(process.cwd(), 'design/components.json');
+  if (!existsSync(designPath)) {
+    console.warn('Design components configuration not found at design/components.json');
+    return {};
+  }
+
+  try {
+    const rawData = JSON.parse(readFileSync(designPath, 'utf-8'));
+    designConfigs = rawData;
+    return rawData;
+  } catch (error) {
+    console.error('Failed to load design configurations:', error);
+    return {};
+  }
+}
+
 /**
- * Load section JSON data from content directory
+ * Load section JSON data from content directory with design configurations merged
+ * This mirrors the production loadSection() function in src/_data/page.ts
  */
 export function loadSectionData(sectionSlug: SectionSlug): unknown {
-  const filePath = resolve(process.cwd(), `content/pt-PT/sections/${sectionSlug}.json`);
+  const sectionPath = resolve(process.cwd(), `content/pt-PT/sections/${sectionSlug}.json`);
+
+  if (!existsSync(sectionPath)) {
+    throw new Error(`Section file not found: ${sectionPath}`);
+  }
+
   try {
-    const content = readFileSync(filePath, 'utf8');
-    return JSON.parse(content);
+    const rawData = JSON.parse(readFileSync(sectionPath, 'utf-8'));
+
+    // Load design configurations and merge them (production behavior)
+    const designData = loadDesignConfigs();
+    const mergedData = {
+      ...rawData,
+      design: designData.sections?.[sectionSlug] || {}
+    };
+
+    // For FAQ section, also merge individual item styles (production behavior)
+    if (sectionSlug === 'faq' && designData.faq && mergedData.items) {
+      mergedData.items = mergedData.items.map((item: Record<string, unknown>) => {
+        // Apply special styles based on item ID or use defaults
+        const specialStyles = designData.faq?.special_item_styles?.[item.id as string] || designData.faq?.default_item_styles || {};
+        return {
+          ...item,
+          ...specialStyles
+        };
+      });
+    }
+
+    return mergedData;
   } catch (error) {
     throw new Error(`Failed to load section data for ${sectionSlug}: ${error}`);
   }

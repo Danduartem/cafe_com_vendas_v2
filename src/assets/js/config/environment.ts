@@ -24,7 +24,8 @@ declare global {
 const isDevelopment = window.location.hostname === 'localhost' ||
                      window.location.hostname === '127.0.0.1' ||
                      window.location.hostname.includes('netlify.app') ||
-                     window.location.port === '8888'; // Netlify dev default port
+                     window.location.port === '8889' || // Netlify unified dev server (legacy)
+                     window.location.port === '8888'; // Eleventy frontend dev server
 
 const isProduction = window.location.hostname === 'cafecomvendas.com';
 
@@ -73,8 +74,7 @@ const config: EnvironmentConfig = {
 
   // Stripe Configuration (Publishable keys only - Safe to expose)
   stripe: {
-    publishableKey: import.meta.env?.VITE_STRIPE_PUBLIC_KEY ??
-      (isDevelopment ? 'pk_test_51QxTrfF2Zw0dHOvZoUHGr5nR068f9iuyuLrR86WW9gztjOkoRWgv1Q8cscSURSn45r1wX5qT2KKrj6sE2mD3a7CT009nkU8Wey' : '')
+    publishableKey: import.meta.env?.VITE_STRIPE_PUBLIC_KEY ?? ''
   },
 
   // Contact Information (Public)
@@ -92,8 +92,11 @@ const config: EnvironmentConfig = {
 
   // URLs and Tracking
   urls: {
+    // Base URL for API calls (functions/backend)
     base: isProduction ? 'https://cafecomvendas.com' :
-      (window.location.port === '8888' ? 'http://localhost:8888' : 'http://localhost:8080'),
+      window.location.port === '8888' ? 'http://localhost:3000' : // Frontend on 8888, backend on 3000
+        window.location.port === '8889' ? `http://${window.location.hostname}:${window.location.port}` : // Legacy unified server
+          `http://${window.location.hostname}:${window.location.port}`,
     thankYou: '/obrigado',
     instagram: '/instagram',
     linkedin: '/linkedin'

@@ -3,42 +3,42 @@
  * Orchestrates all components and manages application lifecycle
  */
 
-import { CONFIG } from '@/config/constants.ts';
-import { state, StateManager } from '@/core/state.ts';
-import { Analytics } from '@/core/analytics.ts';
-import { ScrollTracker } from '../../platform/lib/utils/scroll-tracker.ts';
+import { CONFIG } from '@/config/constants';
+import { state, StateManager } from '@/core/state';
+import { Analytics } from '@/core/analytics';
+import { ScrollTracker } from '@/utils/scroll-tracker';
 import type {
   ComponentRegistration,
   ComponentHealthStatus,
   ComponentStatus
-} from '@/types/component.ts';
+} from '@/types/component';
 import type {
   AppInitializedEvent,
   ComponentsInitializedEvent
-} from '@/types/analytics.ts';
-import type { AppState } from '@/types/state.ts';
-import type { Constants } from '@/types/config.ts';
+} from '@/types/analytics';
+import type { AppState } from '@/types/state';
+import type { Constants } from '@/types/config';
 
-// Import platform utility components
+// Import utility components
 import {
   PlatformYouTube,
   PlatformThankYou,
   PlatformGTM
-} from '../../platform/ui/components/index.ts';
+} from '@/components/index';
 
 // Import co-located section components (new approach)
-import { Hero } from '../../_includes/sections/hero/index.ts';
-import { Problem } from '../../_includes/sections/problem/index.ts';
-import { Solution } from '../../_includes/sections/solution/index.ts';
-import { About } from '../../_includes/sections/about/index.ts';
-import { SocialProof } from '../../_includes/sections/social-proof/index.ts';
-import { Offer } from '../../_includes/sections/offer/index.ts';
-import { FAQ } from '../../_includes/sections/faq/index.ts';
-import { FinalCTA } from '../../_includes/sections/final-cta/index.ts';
-import { Footer } from '../../_includes/sections/footer/index.ts';
-import { TopBanner } from '../../_includes/sections/top-banner/index.ts';
-import { ThankYou } from '../../_includes/sections/thank-you/index.ts';
-import { Checkout } from '../../_includes/sections/checkout/index.ts';
+import { Hero } from '../../_includes/sections/hero/index';
+import { Problem } from '../../_includes/sections/problem/index';
+import { Solution } from '../../_includes/sections/solution/index';
+import { About } from '../../_includes/sections/about/index';
+import { SocialProof } from '../../_includes/sections/social-proof/index';
+import { Offer } from '../../_includes/sections/offer/index';
+import { FAQ } from '../../_includes/sections/faq/index';
+import { FinalCTA } from '../../_includes/sections/final-cta/index';
+import { Footer } from '../../_includes/sections/footer/index';
+import { TopBanner } from '../../_includes/sections/top-banner/index';
+import { ThankYou } from '../../_includes/sections/thank-you/index';
+import { Checkout } from '../../_includes/sections/checkout/index';
 
 /**
  * Main application interface
@@ -150,7 +150,7 @@ export const CafeComVendas: CafeComVendasInterface = {
    */
   initializeComponents(): void {
     const components: ComponentRegistration[] = [
-      // Platform utility components
+      // Utility components
       { name: 'GTM', component: { init: () => PlatformGTM.init() } },
       { name: 'YouTube', component: { init: () => PlatformYouTube.init() } },
       { name: 'ThankYou', component: { init: () => PlatformThankYou.init() } },

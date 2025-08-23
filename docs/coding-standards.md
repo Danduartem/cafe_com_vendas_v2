@@ -1,6 +1,6 @@
 # Coding Standards — Café com Vendas
 
-> **Canonical rules** for this repo. Keep it **simple, strict, TypeScript‑first, Tailwind‑only**. Examples below reflect our ESM rule: **import specifiers use `.js` extensions**, even though we write `.ts` files.
+> **Canonical rules** for this repo. Keep it **simple, strict, TypeScript‑first, Tailwind‑only**. Examples reflect current patterns: **safe DOM utilities**, **platform organization**, and **ESM imports with `.js` extensions**.
 
 ---
 
@@ -14,37 +14,49 @@
 
 ## 1) Zero‑Tolerance Rules
 
-* **TypeScript‑only**: no `.js` sources. Do not commit generated JS.
+* **TypeScript‑first**: primarily `.ts` sources with some `.js` for complex data (e.g., sections.js).
 * **No `any`** (incl. implicit). Justify rare exceptions with a comment.
 * **No inline styles or HTML event handlers** (e.g., `style=""`, `onclick=""`).
-* **No hardcoded design values** (colors/spacing/fonts). Use tokens + Tailwind.
+* **No hardcoded design values** (colors/spacing/fonts). Use `@theme` tokens + Tailwind.
 * **No direct `innerHTML` with untrusted data**. Prefer `textContent`. If HTML is required, sanitize via an allowlist utility.
 
 ---
 
 ## 2) TypeScript Standards
 
-* **ESM imports**: use **`.js`** in specifiers.
+* **ESM imports**: use **`.js`** in specifiers with path aliases where configured.
 
   ```ts
-  import { safeQuery } from '../lib/utils/dom.js';
-  import type { AnalyticsPayload } from '../assets/js/types/analytics.js';
+  import { safeQuery } from '@platform/lib/utils/dom.ts';
+  import type { AnalyticsEvent } from '@types/analytics.ts';
+  import { PlatformAnalytics } from '@platform/ui/components/analytics.ts';
   ```
-* **Exports**: Named exports for utilities; default export for one‑class modules if it improves DX.
+* **Exports**: Named exports for utilities; default export for configs only.
 * **Type imports**: `import type` for types.
 * **Null safety**: handle `null|undefined` explicitly; prefer early returns.
 * **Readonly**: prefer `readonly` props & arrays when appropriate.
 * **Enums**: avoid unless you need runtime enums; use union types for simple cases.
 
-**Type‑safe DOM helpers**
+**Safe DOM helpers (current pattern)**
 
 ```ts
-// lib/utils/dom.ts
-export function q<T extends HTMLElement>(sel: string, root: ParentNode = document): T | null {
-  return root.querySelector<T>(sel);
+// src/platform/lib/utils/dom.ts
+export function safeQuery(selector: string, context: Document | Element = document): Element | null {
+  try {
+    return context.querySelector(selector);
+  } catch (error) {
+    console.warn(`Invalid selector: ${selector}`, error);
+    return null;
+  }
 }
-export function qa<T extends HTMLElement>(sel: string, root: ParentNode = document): T[] {
-  return Array.from(root.querySelectorAll<T>(sel));
+
+export function safeQueryAll(selector: string, context: Document | Element = document): NodeListOf<Element> {
+  try {
+    return context.querySelectorAll(selector);
+  } catch (error) {
+    console.warn(`Invalid selector: ${selector}`, error);
+    return document.createDocumentFragment().querySelectorAll(selector);
+  }
 }
 ```
 
@@ -68,9 +80,11 @@ declare global {
 files: kebab-case.ts         (e.g., scroll-tracker.ts)
 classes/interfaces: PascalCase
 constants: UPPER_SNAKE_CASE
-sections: src/_includes/sections/<section>/{index.njk,index.ts}
+sections: src/_includes/sections/<section>/{index.njk,index.ts,schema.ts?}
 platform ui: src/platform/ui/components/<component>.ts
-adapters: src/_data/*.ts
+adapters: src/_data/*.ts (some .js for complex data like sections.js)
+utilities: src/platform/lib/utils/<util>.ts
+types: src/assets/js/types/<category>.ts
 ```
 
 ---
@@ -79,51 +93,81 @@ adapters: src/_data/*.ts
 
 * **Tailwind v4 only** (CSS‑first, `@theme`). No `tailwind.config.js`.
 * **Zero inline CSS**. Visual/state changes via class toggles.
-* **Design tokens** → generated CSS variables → Tailwind utilities.
+* **Design tokens**: embedded in `src/assets/css/main.css` `@theme` block.
+* **Source scanning**: `@source` directive tells Tailwind where to find classes.
 * **Motion**: add `motion-reduce:*` fallbacks.
 
 **State via classes (never inline styles)**
 
 ```ts
+// Hide/show elements
 el.classList.add('opacity-0', 'pointer-events-none');
 el.classList.remove('opacity-0');
+
+// Animations and transforms
+el.classList.add('scale-105', 'transition-transform', 'duration-300');
+el.classList.remove('scale-105');
 ```
 
 ---
 
 ## 5) Components
 
-### Co‑located Sections
+### Co‑located Sections (current pattern)
 
 ```ts
-// _includes/sections/hero/index.ts
-export const HeroSection = {
-  init(): void {
-    (window as Window & { scrollToOffer: () => void }).scrollToOffer = this.scrollToOffer.bind(this);
+// src/_includes/sections/hero/index.ts
+import { safeQuery } from '@platform/lib/utils/dom.ts';
+import { PlatformAnimations } from '@platform/ui/components/index.ts';
+
+export const Hero = {
+  init() {
+    this.initAnimations();
+    this.initInteractions();
+    this.initScrollIndicator();
+    this.initWhatsAppButton();
   },
-  scrollToOffer(): void {
-    document.getElementById('offer')?.scrollIntoView({ behavior: 'smooth' });
+
+  initAnimations() {
+    const heroSection = safeQuery('#s-hero');
+    if (!heroSection) return;
+
+    const elements = [
+      heroSection.querySelector('.hero-accent'),
+      heroSection.querySelector('h1'),
+      heroSection.querySelector('.hero-cta-primary')
+    ].filter(Boolean);
+
+    PlatformAnimations.prepareRevealElements(elements);
+    // ... animation logic
   }
 };
 ```
 
-### Platform UI Components
+### Platform UI Components (current pattern)
 
 ```ts
-// platform/ui/components/accordion.ts
-export class Accordion {
-  constructor(private root: HTMLElement) {}
-  init(): void {
-    this.root.addEventListener('click', (e: Event) => {
-      const t = e.target as HTMLElement;
-      if (t?.matches('[data-accordion-trigger]')) this.toggle(t);
+// src/platform/ui/components/accordion.ts
+import { safeQuery, safeQueryAll } from '@platform/lib/utils/dom.ts';
+
+export const PlatformAccordion = {
+  initializeNative(config: AccordionConfig): void {
+    const container = safeQuery(config.containerSelector);
+    const items = safeQueryAll(config.itemSelector) as NodeListOf<HTMLDetailsElement>;
+
+    if (!container || !items.length) {
+      console.warn(`Accordion elements not found for ${config.containerSelector}`);
+      return;
+    }
+
+    items.forEach((item) => {
+      item.addEventListener('toggle', () => {
+        const isOpen = item.open;
+        config.onToggle?.(item, isOpen);
+      }, { passive: true });
     });
   }
-  private toggle(trigger: HTMLElement): void {
-    const panel = trigger.nextElementSibling as HTMLElement | null;
-    panel?.classList.toggle('hidden');
-  }
-}
+};
 ```
 
 ---
@@ -140,40 +184,55 @@ export class Accordion {
 
 ## 7) Analytics (typed, normalized)
 
-* Use the typed Analytics helper; do **not** inline GA/gtag snippets in templates.
+* Use **PlatformAnalytics** for simple tracking or **Analytics** for comprehensive tracking.
 * **Event canon**: `payment_completed` in `dataLayer` → GA4 `purchase`.
-* Normalize strings (lowercase, stripped accents, bounded length) before pushing.
+* Auto-normalize strings via `gtm-normalizer` utility.
+
+**Simple tracking (current pattern)**
 
 ```ts
-// assets/js/core/analytics.ts
-export type EventName =
-  | 'gtm_init'
-  | 'checkout_opened'
-  | 'payment_completed'
-  | 'lead_form_submitted'
-  | 'scroll_depth'
-  | 'faq_toggle'
-  | 'faq_meaningful_engagement'
-  | 'video_play';
+// src/platform/ui/components/analytics.ts
+import { normalizeEventPayload } from '@platform/lib/utils/gtm-normalizer.ts';
 
-export function track(name: EventName, payload: Record<string, unknown> = {}): void {
-  const data = normalize(payload);
-  (window as any).dataLayer = (window as any).dataLayer || [];
-  (window as any).dataLayer.push({ event: name, ...data });
-}
+export const PlatformAnalytics = {
+  trackClick(element: HTMLElement, eventType: string, location: string): void {
+    if (!element || element.hasAttribute('data-tracked')) return;
+    
+    element.setAttribute('data-tracked', 'true');
+    element.addEventListener('click', function(this: HTMLElement) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(normalizeEventPayload({
+        event: eventType,
+        location,
+        text: this.textContent?.trim() || 'Click'
+      }));
+    });
+  },
 
-function normalize(obj: Record<string, unknown>): Record<string, unknown> {
-  const clean = (v: unknown) =>
-    typeof v === 'string'
-      ? v
-          .toLowerCase()
-          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-z0-9_\- ]+/g, '')
-          .slice(0, 50)
-          .trim() || 'other'
-      : v;
-  return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, clean(v)]));
-}
+  track(eventName: string, data?: Record<string, unknown>): void {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(normalizeEventPayload({
+      event: eventName,
+      ...data
+    }));
+  }
+};
+```
+
+**Comprehensive tracking with types**
+
+```ts
+// src/assets/js/core/analytics.ts
+export const Analytics: AnalyticsInterface = {
+  track<T extends AnalyticsEvent>(eventName: T['event'], parameters: Omit<T, 'event'> = {}): void {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: eventName,
+      timestamp: new Date().toISOString(),
+      ...parameters
+    });
+  }
+};
 ```
 
 ---
@@ -198,10 +257,11 @@ function normalize(obj: Record<string, unknown>): Record<string, unknown> {
 
 ## 10) Quality Gates (must pass before commit)
 
-* `npm run type-check` → **0 errors**
-* `npm run lint` → **0 errors**
-* Add/update tests when behavior changes (unit/e2e/visual as appropriate)
+* `npm run type-check` → **0 errors** (TypeScript 5.9+)
+* `npm run lint` → **0 errors** (ESLint 9+ flat config)
+* `npm run test:all` → all tests pass (Vitest + Playwright)
 * For UI/perf changes, run Lighthouse locally (aim: Perf ≥ 90, A11y ≥ 95)
+* Functions deploy successfully: `npm run dev:backend` works
 
 ---
 

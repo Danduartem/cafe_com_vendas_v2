@@ -4,8 +4,8 @@
  * Type-safe contracts and runtime validation for the FAQ section
  */
 
-import type { FAQSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types.ts';
-import { validateSectionBase, assertSectionBase } from '../../../_data/types.ts';
+import type { FAQSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types';
+import { validateSectionBase, assertSectionBase } from '../../../_data/types';
 
 // Extend the existing FAQSection interface for strict validation
 export interface FAQProps extends FAQSection {

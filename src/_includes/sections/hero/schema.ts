@@ -4,8 +4,8 @@
  * Type-safe contracts and runtime validation for the hero section
  */
 
-import type { HeroSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types.ts';
-import { validateSectionBase, assertSectionBase } from '../../../_data/types.ts';
+import type { HeroSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types';
+import { validateSectionBase, assertSectionBase } from '../../../_data/types';
 
 // Extend the existing HeroSection interface for strict validation
 export interface HeroProps extends Omit<HeroSection, 'copy'> {

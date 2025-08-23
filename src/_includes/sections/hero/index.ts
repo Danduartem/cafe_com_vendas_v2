@@ -3,9 +3,9 @@
  * Handles hero section animations, interactions, and scroll indicator
  */
 
-import { CONFIG } from '../../../assets/js/config/constants.ts';
-import { safeQuery } from '../../../platform/lib/utils/dom.ts';
-import { PlatformAnimations, PlatformAnalytics } from '@platform/ui/components/index.ts';
+import { CONFIG } from '../../../assets/js/config/constants';
+import { safeQuery } from '../../../assets/js/utils/dom';
+import { Animations } from '../../../assets/js/components/index';
 // Inline minimal smooth scroll to avoid importing removed navigation module
 
 export const Hero = {
@@ -35,11 +35,11 @@ export const Hero = {
       heroSection.querySelector('.hero-scroll-indicator')
     ].filter(Boolean);
 
-    PlatformAnimations.prepareRevealElements(animatableElements);
+    Animations.prepareRevealElements(animatableElements);
 
-    const observer = PlatformAnimations.createObserver({
+    const observer = Animations.createObserver({
       callback: () => {
-        PlatformAnimations.revealElements(animatableElements, {
+        Animations.revealElements(animatableElements, {
           initialDelay: 300
         });
       },
@@ -139,12 +139,12 @@ export const Hero = {
     });
 
     // Click feedback
-    PlatformAnimations.addClickFeedback(heroCtaButton);
+    Animations.addClickFeedback(heroCtaButton);
 
     // Keyboard feedback
     heroCtaButton.addEventListener('keydown', function(this: HTMLElement, e: Event) {
       if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
-        PlatformAnimations.addClickFeedback(this);
+        Animations.addClickFeedback(this);
       }
     });
   },
@@ -162,7 +162,11 @@ export const Hero = {
     // Add WhatsApp click tracking using platform analytics
     const whatsappLink = whatsappButton.querySelector('a[href*="wa.me"]') as HTMLAnchorElement;
     if (whatsappLink) {
-      PlatformAnalytics.trackWhatsAppClick(whatsappLink, 'floating_button');
+      import('../../../assets/js/components/analytics').then(({ PlatformAnalytics }) => {
+        PlatformAnalytics.trackClick(whatsappLink, 'whatsapp_click', 'floating_button');
+      }).catch(() => {
+        console.debug('WhatsApp analytics tracking unavailable');
+      });
     }
   }
 };

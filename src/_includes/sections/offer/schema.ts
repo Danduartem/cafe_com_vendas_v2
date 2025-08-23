@@ -4,8 +4,8 @@
  * Type-safe contracts and runtime validation for the offer section
  */
 
-import type { OfferSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types.ts';
-import { validateSectionBase, assertSectionBase } from '../../../_data/types.ts';
+import type { OfferSection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types';
+import { validateSectionBase, assertSectionBase } from '../../../_data/types';
 
 // Extend the existing OfferSection interface for strict validation
 export interface OfferProps extends OfferSection {

@@ -12,9 +12,10 @@
     
     <!-- Critical Resource Preloading (Lighthouse Performance Optimization) -->
     <!-- Preload critical fonts to prevent FOUT and improve LCP -->
-    <link rel="preload" href="/assets/fonts/Lora/Lora-400.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="/assets/fonts/Lora/Lora-700.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="/assets/fonts/CenturyGothic/CenturyGothic-Regular.woff" as="font" type="font/woff" crossorigin>
+    <link rel="preload" href="/fonts/Lora/Lora-600.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/Lora/Lora-700.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/CenturyGothic/CenturyGothic-Regular.woff" as="font" type="font/woff" crossorigin>
+    <link rel="preload" href="/fonts/CenturyGothic/CenturyGothic-Bold.woff" as="font" type="font/woff" crossorigin>
     
     <!-- Preconnect to external domains for faster third-party loading -->
     <link rel="preconnect" href="https://js.stripe.com">
@@ -57,8 +58,8 @@
       @media(min-width:1024px){.hero-bg{background-image:url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz')}}
     </style>
     
-    <!-- Main CSS loaded directly for reliable styling -->
-    <link rel="stylesheet" href="/tailwind.css" id="tailwind-css">
+    <!-- Main CSS processed by Vite with Tailwind v4 -->
+    <link rel="stylesheet" href="/assets/css/styles.css" id="main-css">
     
     <!-- Fonts are served locally via @font-face in /assets/css/main.css -->
     
@@ -95,9 +96,9 @@
     
     <!-- Optimized Script Loading (Performance Critical) -->
     <!-- Preload critical JavaScript to start download early -->
-    <link rel="preload" href="/assets/js/main.js" as="script">
+    <link rel="preload" href="/assets/js/main.js" as="script" crossorigin="anonymous">
     
     <!-- Main application script with defer for optimal loading -->
-    <script src="/assets/js/main.js" defer></script>
+    <script src="/assets/js/main.js" type="module" defer></script>
 </body>
 </html>

@@ -4,8 +4,8 @@
  * Type-safe contracts and runtime validation for the final CTA section
  */
 
-import type { FinalCTASection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types.ts';
-import { validateSectionBase, assertSectionBase } from '../../../_data/types.ts';
+import type { FinalCTASection, SectionCTA, SectionMedia, SectionDesign, SectionTracking } from '../../../_data/types';
+import { validateSectionBase, assertSectionBase } from '../../../_data/types';
 
 // Extend the existing FinalCTASection interface for strict validation
 export interface FinalCTAProps extends FinalCTASection {

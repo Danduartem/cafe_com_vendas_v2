@@ -6,38 +6,19 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: true,
     setupFiles: ['./tests/setup.ts'],
-    include: ['tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    include: ['tests/**/*.{test,spec}.{js,ts}'],
     exclude: [
       '**/node_modules/**',
-      '**/dist/**',
-      '**/.{idea,git,cache,output,temp}/**',
-      '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
       '_site/**',
-      'netlify/**',
       'tests/visual/**'
-    ],
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      exclude: [
-        'coverage/**',
-        'dist/**',
-        '**/node_modules/**',
-        '**/*.d.ts',
-        '**/*.config.*',
-        '_site/**',
-        'netlify/**'
-      ]
-    }
+    ]
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
-      '@content': resolve(__dirname, './content'),
-      '@types': resolve(__dirname, './src/_data/types.ts')
+      '@': resolve(__dirname, './src')
     }
   },
   esbuild: {
-    target: 'node22'
+    target: 'es2022'
   }
 });

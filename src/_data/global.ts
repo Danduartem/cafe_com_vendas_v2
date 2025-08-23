@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import type { GlobalStrings } from './types.ts';
+import type { GlobalStrings } from './types';
 
 /**
  * Load global strings from JSON file

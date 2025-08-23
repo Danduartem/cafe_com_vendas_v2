@@ -11,7 +11,7 @@ Complete web audit using Google Lighthouse - performance, SEO, accessibility, an
 ```
 
 ## What it does
-1. Starts dev server if needed (http://localhost:8080)
+1. Starts dev server if needed (http://localhost:8888)
 2. Runs Google Lighthouse audit using your npm scripts
 3. Generates HTML and JSON reports
 4. Shows comprehensive scores across all categories

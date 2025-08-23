@@ -205,7 +205,6 @@ npm run verify-apis
 │       └── csp.ts                   # Content Security Policy (TypeScript)
 │
 ├── scripts/                  # 🔧 Build Tools (TypeScript)
-│   ├── build-tokens.ts       # Design tokens → CSS (TypeScript)
 │   ├── screenshot-cli.ts     # CLI screenshot system (TypeScript)
 │   ├── universal-screenshot.ts # Screenshot system (TypeScript)
 │   ├── dev-section.ts        # Section development tools
@@ -237,7 +236,6 @@ npm run verify-apis
 ├── eslint.config.ts          # ⚙️ ESLint config (TypeScript)
 ├── playwright.config.ts      # ⚙️ Playwright test config (TypeScript)
 ├── vitest.config.ts          # ⚙️ Vitest unit test config (TypeScript)
-├── postcss.config.ts         # ⚙️ PostCSS config (TypeScript)
 ├── netlify.toml              # ⚙️ Netlify deployment config
 │
 └── CLAUDE.md                 # 🤖 AI development guidelines

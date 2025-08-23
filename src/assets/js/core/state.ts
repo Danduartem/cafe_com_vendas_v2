@@ -3,8 +3,8 @@
  * Centralized state for the entire application
  */
 
-import { normalizeEventPayload } from '@platform/lib/utils/gtm-normalizer.ts';
-import type { AppState, StateManager as StateManagerInterface } from '@/types/state.ts';
+import { normalizeEventPayload } from '@/utils/gtm-normalizer';
+import type { AppState, StateManager as StateManagerInterface } from '@/types/state';
 
 /**
  * FAQ open times tracking

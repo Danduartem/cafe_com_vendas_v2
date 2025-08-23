@@ -1,6 +1,55 @@
 <!-- Checkout Modal Component -->
 <!-- Two-step modal checkout: Lead capture + Stripe payment -->
 
+<!-- Standards-compliant dialog CSS -->
+<style>
+#checkoutModal {
+  /* Remove browser defaults */
+  border: none;
+  padding: 0;
+  
+  /* Standards-compliant sizing */
+  max-inline-size: min(90vw, 32rem);
+  max-block-size: min(90vh, 90dvh);
+  
+  /* Universal styling */
+  border-radius: 1.5rem;
+  background: white;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+#checkoutModal::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+/* Content wrapper for proper layout */
+#checkoutModal > article {
+  display: grid;
+  max-block-size: 100%;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  justify-items: stretch;
+}
+
+/* Header with flexbox for proper alignment */
+#checkoutModal header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgb(209 213 219);
+}
+
+/* Modal body content */
+#checkoutModal main {
+  padding: 1.5rem;
+  flex-grow: 1;
+}
+</style>
+
 <!-- CTA Button Example (can be used anywhere in templates) -->
 <!-- 
 <button data-checkout-trigger data-source="example" class="inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-white shadow-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl bg-burgundy-700"
@@ -12,23 +61,11 @@
 </button>
 -->
 
-<!-- Modal Root - Hidden by default -->
-<div id="checkoutModal" class="fixed inset-0 z-[1000] hidden">
-  <!-- Backdrop with blur effect -->
-  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300" aria-hidden="true"></div>
-
-  <!-- Modal Container - Responsive scrollable layout -->
-  <div class="flex min-h-screen py-4 px-4 sm:py-6 sm:px-6 lg:py-8 lg:px-8">
-    <!-- Modal Dialog -->
-    <div class="relative w-full max-w-lg max-h-[90vh] rounded-3xl bg-white shadow-2xl transform transition-all duration-300 scale-95 opacity-0 flex flex-col mx-auto my-auto" 
-         id="modalContent"
-         data-modal-content 
-         role="dialog" 
-         aria-modal="true" 
-         aria-labelledby="modalTitle">
-      
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between px-6 py-5 border-b border-neutral-300">
+<!-- Modal Root - HTML5 Dialog Element -->
+<dialog id="checkoutModal" aria-labelledby="modalTitle">
+  <article>
+    <!-- Modal Header -->
+    <header>
         <div>
           <p class="text-xs tracking-widest uppercase font-medium text-neutral-600">
             Inscrição
@@ -47,17 +84,17 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
-      </div>
+    </header>
 
-      <!-- Progress Bar -->
-      <div class="h-2 w-full bg-neutral-200">
-        <div id="progressBar" 
-             class="h-full w-1/2 rounded-r-full transition-all duration-500 ease-out bg-gradient-to-r from-burgundy-700 to-burgundy-600">
-        </div>
+    <!-- Progress Bar -->
+    <div class="h-2 w-full bg-neutral-200">
+      <div id="progressBar" 
+           class="h-full w-1/2 rounded-r-full transition-all duration-500 ease-out bg-gradient-to-r from-burgundy-700 to-burgundy-600">
       </div>
+    </div>
 
-      <!-- Modal Body - Scrollable container for payment forms -->
-      <div class="flex-1 overflow-y-auto px-6 py-6">
+    <!-- Modal Body - Main content area -->
+    <main>
 
 
         <!-- Step 1: Lead Form -->
@@ -113,7 +150,8 @@
                      type="tel" 
                      required 
                      inputmode="tel" 
-                     pattern="[0-9\s\-]{6,}"
+                     pattern="[0-9\s\-\(\)]{7,15}"
+                     title="Apenas números, espaços, traços e parênteses (7-15 dígitos)"
                      placeholder="912 345 678"
                      class="flex-1 rounded-r-xl border border-neutral-300 px-4 py-3 text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700 focus:z-10"/>
             </div>
@@ -229,7 +267,6 @@
           </p>
         </div>
 
-      </div>
-    </div>
-  </div>
-</div>
+    </main>
+  </article>
+</dialog>

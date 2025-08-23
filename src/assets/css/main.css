@@ -3,13 +3,14 @@ html, body {
   padding: 0; 
   overflow-x: hidden !important; 
 }
-/* Import generated tokens first */
-@import "./generated/tokens.css";
 @import "tailwindcss";
 
-/* Tailwind v4 Configuration - Both :root and @theme needed for complete functionality */
+/* Tailwind v4 source scanning - tells Tailwind where to look for utility classes */
+@source "../../../src/**/*.{html,njk,md,js,ts}";
+
+/* Tailwind v4 Complete Design System - All tokens in one place */
 @theme {
-  /* Custom colors from design tokens - Required for Tailwind utility generation */
+  /* Color Palette */
   --color-navy-50: #F3F4F5;
   --color-navy-100: #E8E9EB;
   --color-navy-200: #BABBC4;
@@ -60,14 +61,34 @@ html, body {
   --color-peach-700: #b3563b;
   --color-peach-800: #914633;
   --color-peach-900: #753b2d;
+  --color-white: #FFFFFF;
+  --color-black: #000000;
 
-  /* Font families for Tailwind (complementing generated tokens) */
-  --font-lora: 'Lora', serif;
-  --font-century: 'CenturyGothic', sans-serif;
+  /* Typography */
+  --font-family-display: 'Lora', serif;
+  --font-family-body: 'CenturyGothic', sans-serif;
+  --text-hero: clamp(2.25rem, 6.5vw, 3rem);
+  --text-h2: clamp(1.5rem, 3.5vw, 2rem);
+  --text-lead: 1.125rem;
+  --text-body: 1rem;
+  --text-caption: 0.875rem;
+  --leading-tight: 1.06;
+  --leading-heading: 1.12;
+  --leading-base: 1.55;
+  --leading-relaxed: 1.6;
+  --tracking-tight: -0.01em;
+  --tracking-wide: 0.06em;
 
-  /* Animation utility vars removed (unused) */
+  /* Semantic Tokens */
+  --color-text-primary: var(--color-navy-800);
+  --color-text-secondary: var(--color-navy-600);
+  --color-text-subtle: var(--color-neutral-500);
+  --color-surface-main: var(--color-white);
+  --color-surface-subtle: var(--color-neutral-100);
+  --color-cta-primary: var(--color-burgundy-700);
+  --color-cta-primary-hover: var(--color-burgundy-800);
   
-  /* New animation delays for better control */
+  /* Animation delays for better control */
   --animate-delay-200: 200ms;
   --animate-delay-500: 500ms;
   --animate-delay-1000: 1000ms;
@@ -75,48 +96,82 @@ html, body {
   --animate-delay-3000: 3000ms;
 }
 
+/* Tailwind v4 Advanced Features - Custom Utilities and Variants */
+@utility text-balance {
+  text-wrap: balance;
+}
 
-/* Tokens are generated from JSON at build time and concatenated before this file. */
-/* Lora font-face (regular + bold only; italic via browser synthesis) */
-/* Prefer woff2 if available (lighter); keep woff as fallback if needed */
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-400.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-400-Italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-500.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-500-Italic.woff2') format('woff2'); font-weight: 500; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-600.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-600-Italic.woff2') format('woff2'); font-weight: 600; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-700.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Lora'; src: url('/assets/fonts/Lora/Lora-700-Italic.woff2') format('woff2'); font-weight: 700; font-style: italic; font-display: swap; }
+@utility text-pretty {
+  text-wrap: pretty;
+}
 
-/* Local font-face for Century Gothic */
-@font-face { font-family: 'CenturyGothic'; src: url('/assets/fonts/CenturyGothic/CenturyGothic-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: 'CenturyGothic'; src: url('/assets/fonts/CenturyGothic/CenturyGothic-Italic.woff') format('woff'); font-weight: 400; font-style: italic; font-display: swap; }
-@font-face { font-family: 'CenturyGothic'; src: url('/assets/fonts/CenturyGothic/CenturyGothic-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
-@font-face { font-family: 'CenturyGothic'; src: url('/assets/fonts/CenturyGothic/CenturyGothic-BoldItalic.woff') format('woff'); font-weight: 700; font-style: italic; font-display: swap; }
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@variant hocus (&:hover, &:focus) {
+  /* Combined hover and focus states for better accessibility */
+}
+
+@variant group-hocus (.group:hover &, .group:focus &) {
+  /* Group hover/focus combination */
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Design tokens are now managed natively via Tailwind v4 @theme directive above. */
+/* Optimized font loading - only weights actually used in the project */
+/* Lora: semibold (600) and bold (700) - primary display font */
+@font-face { font-family: 'Lora'; src: url('/fonts/Lora/Lora-600.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Lora'; src: url('/fonts/Lora/Lora-700.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+
+/* CenturyGothic: regular (400) and bold (700) - body and UI text */
+@font-face { font-family: 'CenturyGothic'; src: url('/fonts/CenturyGothic/CenturyGothic-Regular.woff') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'CenturyGothic'; src: url('/fonts/CenturyGothic/CenturyGothic-Bold.woff') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
 
 
 /* Font utility classes now handled by Tailwind config (font-century, font-lora) */
 /* Unused animation keyframes removed */
-
-
-
-
-
-
 
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
 }
 
-/* Hide scrollbar for carousel */
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
-}
+/* Scrollbar hiding is now handled by @utility scrollbar-hide above */
 
 
 /* SVG gradient stops */
@@ -155,6 +210,45 @@ html {
   .hero-bg {
     background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz');
   }
+}
+
+/* Native HTML5 Dialog Enhancement */
+dialog {
+  /* Base state - prevent layout interference when closed */
+  border: none;
+  padding: 0;
+  margin: 0;
+  
+  /* Hide completely when closed to prevent layout issues */
+  display: none;
+}
+
+dialog[open] {
+  /* Open state - full dialog styling */
+  display: flex;
+  flex-direction: column;
+  border: none;
+  border-radius: 1.5rem;
+  padding: 0;
+  max-width: 32rem;
+  width: calc(100vw - 2rem);
+  max-height: 90vh;
+  margin: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  background: white;
+  
+  /* Smooth transitions when dialog opens */
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  opacity: 1;
+  transform: scale(1);
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  
+  /* Smooth backdrop transition */
+  transition: opacity 0.2s ease-out, backdrop-filter 0.2s ease-out;
 }
 
 /* Accessibility - respect user's motion preferences */

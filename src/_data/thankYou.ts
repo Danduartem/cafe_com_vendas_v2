@@ -11,12 +11,17 @@ import type {
   Section,
   SectionSlug,
   SectionValidationError
-} from './types.ts';
+} from './types';
 
 // Load centralized design configurations
-let designConfigs: Record<string, unknown> | null = null;
+interface DesignConfig {
+  sections?: Record<string, unknown>;
+  [key: string]: unknown;
+}
 
-function loadDesignConfigs(): Record<string, unknown> {
+let designConfigs: DesignConfig | null = null;
+
+function loadDesignConfigs(): DesignConfig {
   if (designConfigs) return designConfigs;
 
   const designPath = join(process.cwd(), 'design/components.json');
@@ -26,7 +31,7 @@ function loadDesignConfigs(): Record<string, unknown> {
   }
 
   try {
-    const rawData = JSON.parse(readFileSync(designPath, 'utf-8'));
+    const rawData = JSON.parse(readFileSync(designPath, 'utf-8')) as DesignConfig;
     designConfigs = rawData;
     return rawData;
   } catch (error) {

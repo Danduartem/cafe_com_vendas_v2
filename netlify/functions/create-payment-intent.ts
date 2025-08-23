@@ -4,11 +4,8 @@
  */
 
 import Stripe from 'stripe';
+import type { Handler, HandlerEvent, HandlerContext, HandlerResponse } from '@netlify/functions';
 import {
-  NetlifyEvent,
-  NetlifyContext,
-  NetlifyResponse,
-  NetlifyHandler,
   ResponseHeaders,
   PaymentIntentRequest,
   ValidationResult,
@@ -48,8 +45,28 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Ope
 // Simple in-memory rate limiting store
 // In production, consider using Redis or another persistent store
 const rateLimitStore = new Map();
-const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
-const RATE_LIMIT_MAX_REQUESTS = 5; // Max 5 payment attempts per 15 minutes per IP
+
+// Rate limiting configuration - different for development vs production
+const PRODUCTION_RATE_LIMIT = {
+  window: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 5 // Max 5 payment attempts per 15 minutes per IP
+};
+
+const DEVELOPMENT_RATE_LIMIT = {
+  window: 5 * 60 * 1000, // 5 minutes
+  maxRequests: 20 // Max 20 payment attempts per 5 minutes per IP for testing
+};
+
+// Helper function to determine if request is from development environment
+function isDevelopmentRequest(origin: string | undefined): boolean {
+  if (!origin) return false;
+  return origin.includes('localhost') || origin.includes('127.0.0.1');
+}
+
+// Get rate limit configuration based on environment
+function getRateLimitConfig(origin: string | undefined) {
+  return isDevelopmentRequest(origin) ? DEVELOPMENT_RATE_LIMIT : PRODUCTION_RATE_LIMIT;
+}
 
 // Customer caching to reduce Stripe API calls
 const customerCache = new Map();
@@ -236,16 +253,18 @@ function validatePaymentRequest(requestBody: PaymentIntentRequest): ValidationRe
 }
 
 /**
- * Rate limiting middleware
+ * Rate limiting middleware with environment-aware configuration
  */
-function checkRateLimit(clientIP: string): RateLimitResult {
+function checkRateLimit(clientIP: string, origin: string | undefined): RateLimitResult {
   const now = Date.now();
   const key = `ratelimit:${clientIP}`;
+  const rateLimitConfig = getRateLimitConfig(origin);
+  const isDev = isDevelopmentRequest(origin);
   
   // Clean up old entries
   if (rateLimitStore.size > 1000) {
     for (const [k, v] of rateLimitStore.entries()) {
-      if (now - v.firstRequest > RATE_LIMIT_WINDOW) {
+      if (now - v.firstRequest > rateLimitConfig.window) {
         rateLimitStore.delete(k);
       }
     }
@@ -259,17 +278,28 @@ function checkRateLimit(clientIP: string): RateLimitResult {
       firstRequest: now,
       lastRequest: now
     });
-    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - 1 };
+    
+    // Log rate limit info for development
+    if (isDev) {
+      console.log(`[DEV] Rate limit initialized for ${clientIP}: ${rateLimitConfig.maxRequests} requests per ${rateLimitConfig.window / 60000} minutes`);
+    }
+    
+    return { allowed: true, remaining: rateLimitConfig.maxRequests - 1 };
   }
   
   // Reset if window has passed
-  if (now - record.firstRequest > RATE_LIMIT_WINDOW) {
+  if (now - record.firstRequest > rateLimitConfig.window) {
     rateLimitStore.set(key, {
       count: 1,
       firstRequest: now,
       lastRequest: now
     });
-    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - 1 };
+    
+    if (isDev) {
+      console.log(`[DEV] Rate limit window reset for ${clientIP}`);
+    }
+    
+    return { allowed: true, remaining: rateLimitConfig.maxRequests - 1 };
   }
   
   // Increment counter
@@ -277,17 +307,22 @@ function checkRateLimit(clientIP: string): RateLimitResult {
   record.lastRequest = now;
   rateLimitStore.set(key, record);
   
-  const remaining = Math.max(0, RATE_LIMIT_MAX_REQUESTS - record.count);
-  const allowed = record.count <= RATE_LIMIT_MAX_REQUESTS;
+  const remaining = Math.max(0, rateLimitConfig.maxRequests - record.count);
+  const allowed = record.count <= rateLimitConfig.maxRequests;
+  
+  // Log rate limit status for development
+  if (isDev) {
+    console.log(`[DEV] Rate limit check for ${clientIP}: ${record.count}/${rateLimitConfig.maxRequests}, remaining: ${remaining}, allowed: ${allowed}`);
+  }
   
   return { 
     allowed, 
     remaining,
-    retryAfter: allowed ? null : Math.ceil((record.firstRequest + RATE_LIMIT_WINDOW - now) / 1000)
+    retryAfter: allowed ? null : Math.ceil((record.firstRequest + rateLimitConfig.window - now) / 1000)
   };
 }
 
-export const handler: NetlifyHandler = async (event: NetlifyEvent, context: NetlifyContext): Promise<NetlifyResponse> => {
+export const handler: Handler = async (event: HandlerEvent, context: HandlerContext): Promise<HandlerResponse> => {
   // Set CORS headers with proper domain restrictions
   const allowedOrigins = [
     'https://cafecomvendas.com',
@@ -334,13 +369,15 @@ export const handler: NetlifyHandler = async (event: NetlifyEvent, context: Netl
     };
   }
   
-  // Check rate limit
-  const rateLimitResult = checkRateLimit(clientIP);
+  // Check rate limit with environment-aware configuration
+  const rateLimitResult = checkRateLimit(clientIP, origin);
+  const rateLimitConfig = getRateLimitConfig(origin);
   
   // Add rate limit headers
-  headers['X-RateLimit-Limit'] = RATE_LIMIT_MAX_REQUESTS.toString();
+  headers['X-RateLimit-Limit'] = rateLimitConfig.maxRequests.toString();
   headers['X-RateLimit-Remaining'] = rateLimitResult.remaining.toString();
-  headers['X-RateLimit-Window'] = (RATE_LIMIT_WINDOW / 1000).toString();
+  headers['X-RateLimit-Window'] = (rateLimitConfig.window / 1000).toString();
+  headers['X-RateLimit-Environment'] = isDevelopmentRequest(origin) ? 'development' : 'production';
   
   if (!rateLimitResult.allowed) {
     headers['Retry-After'] = rateLimitResult.retryAfter?.toString() || '60';
@@ -350,7 +387,8 @@ export const handler: NetlifyHandler = async (event: NetlifyEvent, context: Netl
       body: JSON.stringify({ 
         error: 'Rate limit exceeded. Too many payment attempts.',
         retryAfter: rateLimitResult.retryAfter,
-        message: `Maximum ${RATE_LIMIT_MAX_REQUESTS} payment attempts per ${RATE_LIMIT_WINDOW / 60000} minutes.`
+        message: `Maximum ${rateLimitConfig.maxRequests} payment attempts per ${rateLimitConfig.window / 60000} minutes.`,
+        environment: isDevelopmentRequest(origin) ? 'development' : 'production'
       })
     };
   }
@@ -540,16 +578,27 @@ export const handler: NetlifyHandler = async (event: NetlifyEvent, context: Netl
           enabled: true,
           allow_redirects: 'always'
         },
+        // Payment method configuration for European market
+        payment_method_configuration: undefined, // Use account default configuration
         metadata: {
           ...metadata,
           idempotency_key: idempotencyKey
         },
         description: `Café com Vendas - Lisboa: ${full_name}`,
         receipt_email: email,
-        // Enable Smart Retries for failed payments
+        // Payment method options for different payment types
         payment_method_options: {
           card: {
             request_three_d_secure: 'automatic',
+            setup_future_usage: 'off_session'
+          },
+          sepa_debit: {
+            setup_future_usage: 'off_session'
+          },
+          ideal: {
+            setup_future_usage: 'off_session'
+          },
+          bancontact: {
             setup_future_usage: 'off_session'
           }
         }

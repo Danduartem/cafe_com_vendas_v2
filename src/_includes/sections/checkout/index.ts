@@ -4,10 +4,9 @@
  * Two-step modal checkout: Lead capture (Formspree) + Stripe Payment Elements
  */
 
-import { ENV } from '@/config/constants.ts';
-import { safeQuery } from '@platform/lib/utils/dom.ts';
-import { PlatformModal, PlatformAnalytics } from '@platform/ui/components/index.ts';
-import type { Component } from '@/types/component.ts';
+import { ENV } from '@/config/constants';
+import { safeQuery } from '@/utils/dom';
+import type { Component } from '@/types/component';
 
 // Stripe types (inline to avoid dependencies)
 interface StripeError {
@@ -39,32 +38,39 @@ interface StripeInstance {
 
 
 interface CheckoutSectionComponent extends Component {
-  modal: PlatformModal | null;
+  modal: HTMLDialogElement | null;
   stripe: StripeInstance | null;
   elements: StripeElements | null;
   paymentElement: StripeElement | null;
   clientSecret: string | null;
   leadId: string | null;
+  leadData: { fullName: string; email: string; countryCode: string; phone: string } | null;
   currentStep: number | string;
   idempotencyKey: string | null;
   stripeLoaded: boolean;
   stripeLoadPromise: Promise<void> | null;
 
   initializeCheckout(): void;
+  performInitialization(): void;
   setupCheckoutTriggers(): void;
   setupModalBehavior(): void;
   loadStripeScript(): Promise<void>;
   initializeStripe(): void;
+  initializePaymentElement(): Promise<void>;
   handleLeadSubmit(event: Event): Promise<void>;
   handlePayment(): Promise<void>;
   handleOpenClick(event: Event): void;
+  handleModalClose(): void;
+  handleBackdropClick(event: Event): void;
   getSourceSection(): string;
   showError(elementId: string, message: string): void;
   setStep(step: number | string): void;
   resetForm(): void;
+  resetModalState(): void;
   generateUUID(): string;
   generateIdempotencyKey(): string;
   isValidEmail(email: string): boolean;
+  isValidPhone(phone: string): boolean;
   getUTMParams(): Record<string, string>;
   translateStripeError(message: string): string;
 }
@@ -76,34 +82,51 @@ export const Checkout: CheckoutSectionComponent = {
   paymentElement: null,
   clientSecret: null,
   leadId: null,
+  leadData: null, // Store lead form data for payment intent
   currentStep: 1,
   idempotencyKey: null,
   stripeLoaded: false,
   stripeLoadPromise: null,
 
   init(): void {
+    const self = this;
     try {
-      this.initializeCheckout();
-      this.setupCheckoutTriggers();
-      this.setupModalBehavior();
+      // Ensure DOM is fully loaded before initialization
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          self.performInitialization();
+        });
+      } else {
+        self.performInitialization();
+      }
     } catch (error) {
       console.error('Error initializing Checkout section:', error);
     }
   },
 
-  initializeCheckout(): void {
-    // Initialize modal using platform component
-    this.modal = new PlatformModal({
-      modalId: 'checkoutModal',
-      lockScroll: true,
-      focusFirstInput: true,
-      animationDuration: 300
-    });
+  performInitialization(): void {
+    this.initializeCheckout();
+    this.setupCheckoutTriggers();
+    this.setupModalBehavior();
+  },
 
-    // Set initial state
-    this.setStep(1);
+  initializeCheckout(): void {
+    // Get dialog element for native HTML5 dialog API
+    this.modal = safeQuery('#checkoutModal') as HTMLDialogElement;
+
+    if (!this.modal) {
+      console.error('Modal element not found');
+      return;
+    }
+
+    // Initialize application state
+    this.currentStep = 1;
+    this.clientSecret = null;
     this.leadId = this.generateUUID();
     this.idempotencyKey = this.generateIdempotencyKey();
+
+    // Set initial UI state
+    this.setStep(1);
   },
 
   setupCheckoutTriggers(): void {
@@ -118,13 +141,37 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   setupModalBehavior(): void {
+    if (!this.modal) return;
+
     // Lead form submission
     const leadForm = safeQuery('#leadForm');
-    leadForm?.addEventListener('submit', this.handleLeadSubmit.bind(this));
+    leadForm?.addEventListener('submit', (event: Event) => {
+      this.handleLeadSubmit(event).catch(error => {
+        console.error('Error handling lead submit:', error);
+      });
+    });
 
     // Payment button
     const payButton = safeQuery('#payBtn');
-    payButton?.addEventListener('click', this.handlePayment.bind(this));
+    payButton?.addEventListener('click', () => {
+      this.handlePayment().catch(error => {
+        console.error('Error handling payment:', error);
+      });
+    });
+
+    // Use native dialog close event instead of manual handling
+    this.modal.addEventListener('close', () => {
+      this.handleModalClose();
+    });
+
+    // Manual close button
+    const closeButton = safeQuery('#closeCheckout');
+    closeButton?.addEventListener('click', () => {
+      this.modal?.close();
+    });
+
+    // Close on backdrop click (native dialog behavior)
+    this.modal.addEventListener('click', this.handleBackdropClick.bind(this));
   },
 
   handleOpenClick(event: Event): void {
@@ -135,11 +182,18 @@ export const Checkout: CheckoutSectionComponent = {
       return;
     }
 
-    this.modal.open();
+    // Use standard dialog API
+    this.modal.showModal();
 
     // Track checkout opened using platform analytics
-    PlatformAnalytics.trackSectionEngagement('checkout', 'modal_opened', {
-      trigger_location: this.getSourceSection()
+    import('@/components/analytics').then(({ PlatformAnalytics }) => {
+      PlatformAnalytics.track('section_engagement', {
+        section: 'checkout',
+        action: 'modal_opened',
+        trigger_location: this.getSourceSection()
+      });
+    }).catch(() => {
+      console.debug('Checkout modal analytics tracking unavailable');
     });
   },
 
@@ -152,6 +206,19 @@ export const Checkout: CheckoutSectionComponent = {
       }
     }
     return 'unknown';
+  },
+
+  handleModalClose(): void {
+    // Clean application state when modal closes (via any method)
+    this.resetForm();
+    this.resetModalState();
+  },
+
+  handleBackdropClick(event: Event): void {
+    // Only close if clicking directly on the dialog element (backdrop)
+    if (event.target === this.modal) {
+      this.modal?.close();
+    }
   },
 
   async loadStripeScript(): Promise<void> {
@@ -211,6 +278,191 @@ export const Checkout: CheckoutSectionComponent = {
     }
   },
 
+  async initializePaymentElement(): Promise<void> {
+    if (!this.stripe) {
+      throw new Error('Stripe not initialized');
+    }
+
+    try {
+      // Ensure we have lead data
+      if (!this.leadData) {
+        throw new Error('Lead data not available');
+      }
+
+      // Prepare request payload
+      const requestPayload = {
+        // Required fields for Netlify Function
+        lead_id: this.leadId,
+        full_name: this.leadData.fullName,
+        email: this.leadData.email,
+        phone: `${this.leadData.countryCode}${this.leadData.phone}`,
+        amount: 18000, // €180.00 in cents
+        currency: 'eur',
+        idempotency_key: this.idempotencyKey
+      };
+
+
+      // Prepare headers with proper type handling
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      };
+
+      if (this.idempotencyKey) {
+        headers['X-Idempotency-Key'] = this.idempotencyKey;
+      }
+
+      // Always attempt to create a proper PaymentIntent
+      const response = await fetch(`${ENV.urls.base}/.netlify/functions/create-payment-intent`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(requestPayload)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Network error' }));
+
+        // If validation failed, show specific validation errors to user
+        if (errorData.error === 'Validation failed' && errorData.details) {
+          console.error('Validation errors:', errorData.details);
+        }
+
+        throw new Error(`Payment service error: ${errorData.error || response.statusText}`);
+      }
+
+      const data = await response.json();
+      this.clientSecret = data.clientSecret;
+
+      // Create Elements instance with proper Dashboard integration
+      this.elements = this.stripe.elements({
+        clientSecret: this.clientSecret,
+        locale: 'pt', // Portuguese locale for Portugal market
+        appearance: {
+          theme: 'stripe',
+          variables: {
+            colorPrimary: '#7f1d1d', // burgundy-700 to match brand
+            colorBackground: '#ffffff',
+            colorText: '#1e293b', // navy-800
+            colorDanger: '#dc2626',
+            fontFamily: 'Inter, system-ui, sans-serif',
+            spacingUnit: '4px',
+            borderRadius: '12px', // Matching rounded-xl
+            fontSizeBase: '16px'
+          },
+          rules: {
+            '.Tab': {
+              border: '1px solid #e5e7eb',
+              boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 6px rgba(18, 42, 66, 0.02)'
+            },
+            '.Tab:hover': {
+              color: '#7f1d1d'
+            },
+            '.Tab--selected': {
+              borderColor: '#7f1d1d',
+              boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 6px rgba(18, 42, 66, 0.02), 0 0 0 2px #fef2f2'
+            },
+            '.Input': {
+              borderRadius: '12px'
+            }
+          }
+        }
+      });
+
+      // Create Payment Element with Dashboard control enabled
+      // This will automatically show payment methods configured in Stripe Dashboard
+      this.paymentElement = this.elements.create('payment', {
+        layout: {
+          type: 'tabs', // Shows payment methods as tabs (card, SEPA, iDEAL, MB Way, etc.)
+          defaultCollapsed: false,
+          radios: false,
+          spacedAccordionItems: false
+        },
+        defaultValues: {
+          billingDetails: {
+            email: this.leadData.email,
+            name: this.leadData.fullName
+          }
+        },
+        fields: {
+          billingDetails: {
+            email: 'never', // We already have it from lead form
+            phone: 'never',  // We already have it from lead form
+            name: 'never'    // We already have it from lead form
+          }
+        },
+        business: {
+          name: 'Café com Vendas'
+        },
+        // Enable all automatic payment methods from Dashboard
+        paymentMethodCreation: 'manual',
+        // Terms acceptance for SEPA and other European payment methods
+        terms: {
+          bancontact: 'always',
+          card: 'never',
+          ideal: 'always',
+          sepaDebit: 'always',
+          sofort: 'always'
+        }
+      });
+
+      // Mount the Payment Element to the container
+      const paymentElementContainer = document.querySelector('#payment-element');
+      if (paymentElementContainer) {
+        this.paymentElement.mount('#payment-element');
+
+        // Listen for changes to enable/disable pay button
+        this.paymentElement.on('change', (event: StripeElementChangeEvent) => {
+          const payBtn = document.querySelector('#payBtn') as HTMLButtonElement;
+          if (payBtn) {
+            payBtn.disabled = !event.complete;
+          }
+
+          // Clear any previous errors when user starts typing/selecting
+          if (event.complete) {
+            const payError = document.querySelector('#payError');
+            if (payError) {
+              payError.classList.add('hidden');
+            }
+          }
+        });
+
+        // Handle ready event to show payment methods loaded
+        this.paymentElement.on('ready', () => {
+          console.log('Payment Element ready - payment methods loaded from Dashboard');
+        });
+
+        // Handle focus events
+        this.paymentElement.on('focus', () => {
+          // Clear errors when user focuses on payment form
+          const payError = document.querySelector('#payError');
+          if (payError) {
+            payError.classList.add('hidden');
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error initializing payment element:', error);
+
+      // Show specific error messages based on the type of error
+      let errorMessage = 'Erro ao carregar formulário de pagamento.';
+
+      if (error instanceof Error) {
+        if (error.message.includes('Network') || error.message.includes('fetch')) {
+          errorMessage = 'Problema de conexão. Verifique sua internet e tente novamente.';
+        } else if (error.message.includes('Payment service')) {
+          errorMessage = 'Serviço de pagamento temporariamente indisponível. Tente novamente em instantes.';
+        }
+      }
+
+      this.showError('payError', errorMessage);
+
+      // Disable the payment button
+      const payBtn = document.querySelector('#payBtn') as HTMLButtonElement;
+      if (payBtn) {
+        payBtn.disabled = true;
+      }
+    }
+  },
+
   async handleLeadSubmit(event: Event): Promise<void> {
     event.preventDefault();
 
@@ -223,6 +475,10 @@ export const Checkout: CheckoutSectionComponent = {
       phone: formData.get('phone') as string
     };
 
+
+    // Store lead data for use in payment intent creation
+    this.leadData = leadData;
+
     // Basic validation
     if (!leadData.fullName || !leadData.email || !leadData.phone) {
       this.showError('leadError', 'Por favor, preencha todos os campos obrigatórios.');
@@ -231,6 +487,11 @@ export const Checkout: CheckoutSectionComponent = {
 
     if (!this.isValidEmail(leadData.email)) {
       this.showError('leadError', 'Por favor, insira um email válido.');
+      return;
+    }
+
+    if (!this.isValidPhone(leadData.phone)) {
+      this.showError('leadError', 'Por favor, insira um número de telefone válido (apenas números, espaços e traços).');
       return;
     }
 
@@ -255,9 +516,18 @@ export const Checkout: CheckoutSectionComponent = {
         await this.loadStripeScript();
       }
 
+      // Initialize Stripe Elements for payment form
+      await this.initializePaymentElement();
+
       // Track lead conversion
-      PlatformAnalytics.trackSectionEngagement('checkout', 'lead_submitted', {
-        lead_id: this.leadId
+      import('@/components/analytics').then(({ PlatformAnalytics }) => {
+        PlatformAnalytics.track('section_engagement', {
+          section: 'checkout',
+          action: 'lead_submitted',
+          lead_id: this.leadId
+        });
+      }).catch(() => {
+        console.debug('Lead submission analytics tracking unavailable');
       });
     } catch (error: unknown) {
       console.error('Lead submission error:', error);
@@ -275,7 +545,50 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   async handlePayment(): Promise<void> {
-    if (!this.stripe || !this.elements) {
+    // Check if we're in development mode with mock payment
+    if (this.clientSecret === 'mock_payment_intent_development') {
+      // Mock payment processing for development
+      try {
+        const payBtn = document.querySelector('#payBtn');
+        const payBtnText = payBtn?.querySelector('#payBtnText') as HTMLElement | null;
+        const payBtnSpinner = payBtn?.querySelector('#payBtnSpinner') as HTMLElement | null;
+
+        if (payBtn) (payBtn as HTMLButtonElement).disabled = true;
+        if (payBtnText) payBtnText.classList.add('opacity-0');
+        if (payBtnSpinner) payBtnSpinner.classList.remove('hidden');
+
+        // Simulate payment processing
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Show success
+        this.setStep('success');
+
+        // Track payment success
+        import('@/components/analytics').then(({ PlatformAnalytics }) => {
+          PlatformAnalytics.trackConversion('payment_completed', {
+            transaction_id: `mock_${  Date.now()}`,
+            value: 180,
+            currency: 'EUR',
+            items: [{ name: 'Café com Vendas Lisboa', quantity: 1, price: 180 }],
+            pricing_tier: 'early_bird'
+          });
+        }).catch(() => {
+          console.debug('Payment completion analytics tracking unavailable');
+        });
+
+        // Auto-redirect after success
+        setTimeout(() => {
+          window.location.href = '/thank-you';
+        }, 3000);
+
+        return;
+      } catch (error) {
+        console.error('Mock payment error:', error);
+        this.showError('payError', 'Erro no processamento do pagamento. Tente novamente.');
+      }
+    }
+
+    if (!this.stripe || !this.elements || !this.clientSecret) {
       this.showError('payError', 'Erro no sistema de pagamento. Recarregue a página.');
       return;
     }
@@ -290,19 +603,61 @@ export const Checkout: CheckoutSectionComponent = {
       if (payBtnText) payBtnText.classList.add('opacity-0');
       if (payBtnSpinner) payBtnSpinner.classList.remove('hidden');
 
-      // TODO: Implement actual Stripe payment processing
-      // For now, we'll simulate a successful payment
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Confirm the payment with Stripe using the Payment Element
+      // This handles all payment methods configured in Dashboard (cards, SEPA, iDEAL, MB Way, etc.)
+      const { error } = await this.stripe.confirmPayment({
+        elements: this.elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/thank-you`,
+          payment_method_data: {
+            billing_details: {
+              name: this.leadData!.fullName,
+              email: this.leadData!.email,
+              phone: `${this.leadData!.countryCode}${this.leadData!.phone}`
+            }
+          }
+        },
+        redirect: 'if_required' // Stay on page if possible, redirect if required (e.g., for SEPA)
+      });
 
-      this.setStep('success');
+      if (error) {
+        // Show localized error message
+        const errorMessage = this.translateStripeError(error.message || 'Erro no pagamento');
+        this.showError('payError', errorMessage);
 
-      // Track payment success
-      PlatformAnalytics.trackSectionEngagement('checkout', 'payment_completed');
+        // Track payment error
+        import('@/components/analytics').then(({ PlatformAnalytics }) => {
+          PlatformAnalytics.track('section_engagement', {
+            section: 'checkout',
+            action: 'payment_error',
+            error_type: error.type,
+            error_code: error.code
+          });
+        }).catch(() => {
+          console.debug('Payment error analytics tracking unavailable');
+        });
+      } else {
+        // Payment succeeded
+        this.setStep('success');
 
-      // Auto-redirect after success
-      setTimeout(() => {
-        window.location.href = '/thank-you';
-      }, 3000);
+        // Track payment success
+        import('@/components/analytics').then(({ PlatformAnalytics }) => {
+          PlatformAnalytics.trackConversion('payment_completed', {
+            transaction_id: this.clientSecret?.split('_secret')[0],
+            value: 47,
+            currency: 'EUR',
+            items: [{ name: 'Café com Vendas Lisboa', quantity: 1, price: 47 }],
+            pricing_tier: 'early_bird'
+          });
+        }).catch(() => {
+          console.debug('Payment completion analytics tracking unavailable');
+        });
+
+        // Auto-redirect after success
+        setTimeout(() => {
+          window.location.href = '/thank-you';
+        }, 3000);
+      }
     } catch (error: unknown) {
       console.error('Payment error:', error);
       this.showError('payError', 'Erro no processamento do pagamento. Tente novamente.');
@@ -354,28 +709,48 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   resetForm(): void {
+    // Reset form inputs
     const form = safeQuery('#leadForm');
     (form as HTMLFormElement)?.reset();
 
-    this.currentStep = 1;
-    this.clientSecret = null;
-    this.leadId = this.generateUUID();
-    this.idempotencyKey = this.generateIdempotencyKey();
+    // Hide all error messages
+    const leadError = safeQuery('#leadError');
+    const payError = safeQuery('#payError');
 
-    if (this.paymentElement?.destroy) {
-      this.paymentElement.destroy();
-      this.paymentElement = null;
-    }
+    leadError?.classList.add('hidden');
+    payError?.classList.add('hidden');
 
-    if (this.elements) {
-      this.elements = null;
-    }
+    // Reset all button states
+    const leadSubmit = safeQuery('#leadSubmit');
+    const leadSubmitText = safeQuery('#leadSubmitText');
+    const leadSubmitSpinner = safeQuery('#leadSubmitSpinner');
+
+    if (leadSubmit) (leadSubmit as HTMLButtonElement).disabled = false;
+    if (leadSubmitText) leadSubmitText.classList.remove('opacity-0');
+    if (leadSubmitSpinner) leadSubmitSpinner.classList.add('hidden');
+
+    const payBtn = safeQuery('#payBtn');
+    const payBtnText = safeQuery('#payBtnText');
+    const payBtnSpinner = safeQuery('#payBtnSpinner');
+
+    if (payBtn) (payBtn as HTMLButtonElement).disabled = true;
+    if (payBtnText) payBtnText.classList.remove('opacity-0');
+    if (payBtnSpinner) payBtnSpinner.classList.add('hidden');
   },
 
   generateUUID(): string {
-    return crypto?.randomUUID ?
-      crypto.randomUUID() :
-      `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    if (crypto?.randomUUID) {
+      // Use native crypto.randomUUID() which produces format: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      // Backend accepts [a-zA-Z0-9\-_]{8,} so this should pass validation
+      return crypto.randomUUID();
+    }
+
+    // Fallback: create UUID-like string with only valid characters [a-zA-Z0-9\-_]
+    // Generate a longer string to ensure it's unique and matches backend validation
+    const timestamp = Date.now().toString(36); // Base36 encoding of timestamp
+    const random1 = Math.random().toString(36).substr(2, 8); // 8 random chars
+    const random2 = Math.random().toString(36).substr(2, 8); // 8 more random chars
+    return `lead-${timestamp}-${random1}-${random2}`;
   },
 
   generateIdempotencyKey(): string {
@@ -385,6 +760,23 @@ export const Checkout: CheckoutSectionComponent = {
   isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  },
+
+  isValidPhone(phone: string): boolean {
+    if (!phone || typeof phone !== 'string') return false;
+
+    // Clean the phone number by removing spaces, dashes, and parentheses
+    const cleanPhone = phone.replace(/[\s\-()]/g, '');
+
+    // Check if it has only digits (optionally starting with +)
+    // Must be between 7 and 15 digits (international standard)
+    if (cleanPhone.length < 7 || cleanPhone.length > 15) {
+      return false;
+    }
+
+    // Must contain only digits (and optional + at start)
+    const phoneRegex = /^[+]?[0-9]+$/;
+    return phoneRegex.test(cleanPhone);
   },
 
   getUTMParams(): Record<string, string> {
@@ -397,6 +789,27 @@ export const Checkout: CheckoutSectionComponent = {
     });
 
     return utm;
+  },
+
+  resetModalState(): void {
+    // Reset application state only - let browser handle dialog visibility
+    this.currentStep = 1;
+    this.clientSecret = null;
+    this.leadData = null; // Clear lead data
+    this.leadId = this.generateUUID();
+    this.idempotencyKey = this.generateIdempotencyKey();
+
+    // Clean up Stripe elements
+    if (this.paymentElement?.destroy) {
+      this.paymentElement.destroy();
+      this.paymentElement = null;
+    }
+    if (this.elements) {
+      this.elements = null;
+    }
+
+    // Reset UI to step 1
+    this.setStep(1);
   },
 
   translateStripeError(message: string): string {

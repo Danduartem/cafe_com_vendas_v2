@@ -4,11 +4,8 @@
  */
 
 import Stripe from 'stripe';
-import {
-  NetlifyEvent,
-  NetlifyContext,
-  NetlifyResponse,
-  NetlifyHandler,
+import type { Handler, HandlerEvent, HandlerContext, HandlerResponse } from '@netlify/functions';
+import type {
   ResponseHeaders,
   StripeWebhookEvent,
   FulfillmentRecord,
@@ -214,7 +211,7 @@ function logWithCorrelation(level: string, message: string, data: Record<string,
   return logEntry.correlationId;
 }
 
-export const handler: NetlifyHandler = async (event: NetlifyEvent, _context: NetlifyContext): Promise<NetlifyResponse> => {
+export const handler: Handler = async (event: HandlerEvent, _context: HandlerContext): Promise<HandlerResponse> => {
   // Set CORS headers
   const headers: ResponseHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -267,20 +264,27 @@ export const handler: NetlifyHandler = async (event: NetlifyEvent, _context: Net
       // Parse event without verification (development mode)
       stripeEvent = JSON.parse(event.body || '{}') as any;
     } else {
-      // Verify webhook signature
+      // Verify webhook signature using latest async pattern
       try {
-        stripeEvent = stripe.webhooks.constructEvent(
+        stripeEvent = await stripe.webhooks.constructEventAsync(
           event.body || '',
           sig,
           endpointSecret
         ) as any;
       } catch (err) {
-        console.error('Webhook signature verification failed:', err instanceof Error ? err.message : 'Unknown error');
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: 'Invalid signature' })
-        };
+        // Handle StripeSignatureVerificationError specifically
+        if (err instanceof Error && err.name === 'StripeSignatureVerificationError') {
+          logWithCorrelation('error', 'Stripe signature verification failed', {
+            error: err.message,
+            signature: sig?.substring(0, 20) + '...' // Log partial signature for debugging
+          });
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Invalid signature' })
+          };
+        }
+        throw err; // Re-throw other errors
       }
     }
 

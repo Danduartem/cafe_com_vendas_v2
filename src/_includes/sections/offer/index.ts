@@ -3,10 +3,10 @@
  * Handles MBWay toggle and deliverable animations
  */
 
-import { CONFIG } from '@/config/constants.ts';
-import { Analytics } from '@/core/analytics.ts';
-import { safeQuery, safeQueryAll } from '@platform/lib/utils/index.ts';
-import { PlatformAnimations } from '@platform/ui/components/index.ts';
+import { CONFIG } from '@/config/constants';
+import { Analytics } from '@/core/analytics';
+import { safeQuery, safeQueryAll } from '@/utils/index';
+import { Animations } from '@/components/index';
 
 export const Offer = {
   init() {
@@ -67,12 +67,12 @@ export const Offer = {
     const deliverableItems = Array.from(safeQueryAll('.deliverable-item'));
     if (!deliverableItems.length) return;
 
-    PlatformAnimations.prepareRevealElements(deliverableItems, {
+    Animations.prepareRevealElements(deliverableItems, {
       hiddenClasses: ['opacity-0', 'translate-y-2'],
       transitionClasses: ['transition-all', 'duration-400', 'ease-out']
     });
 
-    const observer = PlatformAnimations.createObserver({
+    const observer = Animations.createObserver({
       callback: (entry) => {
         if (entry.target.classList.contains('deliverable-item')) {
           entry.target.classList.remove('opacity-0', 'translate-y-2');

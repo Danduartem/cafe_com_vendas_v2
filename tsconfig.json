@@ -1,27 +1,24 @@
 {
   "compilerOptions": {
     // Language and environment
-    "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ES2022",
     "moduleResolution": "bundler",
 
     // Bundler mode
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "noEmit": true,
+    "verbatimModuleSyntax": true,
 
-    // Type checking - progressive strict mode
+    // Essential type checking
     "strict": true,
-    "strictNullChecks": true,
-    "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "exactOptionalPropertyTypes": false, // Too strict for current codebase
     "noImplicitReturns": true,
-    "noUncheckedIndexedAccess": false, // Too strict for current codebase
     
     // API deprecation detection
     "types": ["node"],
@@ -32,21 +29,9 @@
     "baseUrl": ".",
     "paths": {
       "@content/*": ["content/*"],
-      "@design/*": ["design/*"],
-      "@data/*": ["src/_data/*"],
       "@sections/*": ["src/_includes/sections/*"],
-      "@partials/*": ["src/_includes/partials/*"],
-      "@platform/*": ["src/platform/*"],
       "@assets/*": ["src/assets/*"],
-      "@pages/*": ["src/pages/*"],
-      "@tests/*": ["tests/*"],
-      "@/*": ["src/*"],
-      "@/js/*": ["src/assets/js/*"],
-      "@/components/*": ["src/platform/ui/components/*"],
-      "@/utils/*": ["src/platform/lib/utils/*"],
-      "@/core/*": ["src/assets/js/core/*"],
-      "@/config/*": ["src/assets/js/config/*"],
-      "@/types/*": ["src/assets/js/types/*"]
+      "@/*": ["src/assets/js/*"]
     },
 
     // Advanced
@@ -64,20 +49,12 @@
     "src/**/*.js",
     "tests/**/*.ts",
     "netlify/functions/**/*.ts",
-    "scripts/build-tokens.ts",
-    "scripts/dev-section.ts",
-    "scripts/find-section.ts",
-    "scripts/new-section.ts",
-    "scripts/screenshot-cli.ts",
-    "scripts/universal-screenshot.ts",
-    "scripts/validate-content.ts",
     "scripts/verify-apis.ts",
     "vite.config.ts",
     "vitest.config.ts",
-    "playwright.config.ts",
     ".eleventy.ts",
     "eslint.config.ts",
-    "postcss.config.ts"
+    "types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules",

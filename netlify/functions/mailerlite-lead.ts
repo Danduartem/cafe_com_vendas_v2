@@ -4,11 +4,8 @@
  * Works alongside Formspree to ensure complete lead capture
  */
 
-import {
-  NetlifyEvent,
-  NetlifyContext,
-  NetlifyResponse,
-  NetlifyHandler,
+import type { Handler, HandlerEvent, HandlerContext, HandlerResponse } from '@netlify/functions';
+import type {
   ResponseHeaders,
   MailerLiteLeadRequest,
   MailerLiteSubscriberData,
@@ -365,7 +362,7 @@ async function addLeadToMailerLite(leadData: MailerLiteSubscriberData): Promise<
 /**
  * Main handler for lead capture requests
  */
-export const handler: NetlifyHandler = async (event: NetlifyEvent, context: NetlifyContext): Promise<NetlifyResponse> => {
+export const handler: Handler = async (event: HandlerEvent, context: HandlerContext): Promise<HandlerResponse> => {
   // Set CORS headers with proper domain restrictions
   const allowedOrigins = [
     'https://cafecomvendas.com',

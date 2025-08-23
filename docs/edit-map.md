@@ -103,7 +103,6 @@ Quick reference for the 20+ most common content and configuration edits in the C
 ### Build Configuration
 - **Vite Config**: `vite.config.ts`
 - **Eleventy Config**: `.eleventy.ts`
-- **PostCSS Config**: `postcss.config.ts`
 - **TypeScript Config**: `tsconfig.json`
 
 ### Environment Variables

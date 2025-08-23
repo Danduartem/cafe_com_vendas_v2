@@ -3,8 +3,8 @@
  * Centralized configuration for animations, breakpoints, and analytics
  */
 
-import ENV from './environment.ts';
-import type { Constants as ConstantsType } from '@/types/config.ts';
+import ENV from './environment';
+import type { Constants as ConstantsType } from '@/types/config';
 
 /**
  * Analytics event constants with type safety
