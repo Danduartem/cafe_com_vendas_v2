@@ -1,0 +1,2 @@
+// Global utility types
+export {};
