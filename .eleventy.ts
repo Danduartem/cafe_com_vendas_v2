@@ -1,11 +1,11 @@
 import 'dotenv/config';
-import { HtmlBasePlugin, RenderPlugin, InputPathToUrlTransformPlugin, type UserConfig } from '@11ty/eleventy';
+import { HtmlBasePlugin, RenderPlugin, InputPathToUrlPlugin, type UserConfig } from '@11ty/eleventy';
 
 export default function(eleventyConfig: UserConfig) {
   // Add essential Eleventy 3.x plugins
   eleventyConfig.addPlugin(HtmlBasePlugin);
   eleventyConfig.addPlugin(RenderPlugin);
-  eleventyConfig.addPlugin(InputPathToUrlTransformPlugin);
+  eleventyConfig.addPlugin(InputPathToUrlPlugin);
 
   // Development server configuration
   eleventyConfig.setServerOptions({
@@ -29,12 +29,12 @@ export default function(eleventyConfig: UserConfig) {
   eleventyConfig.addPassthroughCopy({ 'src/public': '/' });
 
   // Build events for development feedback
-  eleventyConfig.on('eleventy.before', async ({ runMode }: { runMode: string }) => {
-    console.log(`🚀 Starting Eleventy build in ${runMode} mode...`);
+  eleventyConfig.on('eleventy.before', async () => {
+    console.log('🚀 Starting Eleventy build...');
   });
 
-  eleventyConfig.on('eleventy.after', async ({ runMode }: { runMode: string }) => {
-    console.log(`✅ Eleventy build completed in ${runMode} mode!`);
+  eleventyConfig.on('eleventy.after', async () => {
+    console.log('✅ Eleventy build completed!');
   });
 
   return {
