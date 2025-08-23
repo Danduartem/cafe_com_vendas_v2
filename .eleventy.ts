@@ -16,9 +16,18 @@ export default function(eleventyConfig: UserConfig) {
   // Note: Some modern API methods may not be available in current TypeScript definitions
 
   // Utility filters
-  eleventyConfig.addFilter('jsonifyArray', (array: unknown[]) => JSON.stringify(array));
-  eleventyConfig.addFilter('keys', (obj: Record<string, unknown>) => Object.keys(obj));
-  eleventyConfig.addFilter('values', (obj: Record<string, unknown>) => Object.values(obj));
+  eleventyConfig.addFilter('jsonifyArray', (...args: unknown[]) => {
+    const array = args[0] as unknown[];
+    return JSON.stringify(array);
+  });
+  eleventyConfig.addFilter('keys', (...args: unknown[]) => {
+    const obj = args[0] as Record<string, unknown>;
+    return Object.keys(obj);
+  });
+  eleventyConfig.addFilter('values', (...args: unknown[]) => {
+    const obj = args[0] as Record<string, unknown>;
+    return Object.values(obj);
+  });
 
   // TypeScript data file support - explicit configuration for Eleventy 3.x
   eleventyConfig.addDataExtension("ts", {
@@ -45,7 +54,7 @@ export default function(eleventyConfig: UserConfig) {
 
   // Static asset handling
   eleventyConfig.addPassthroughCopy({ 'src/assets/css': 'assets/css' });
-  eleventyConfig.addPassthroughCopy({ 'src/assets/images': 'assets/pictures' });
+  eleventyConfig.addPassthroughCopy({ 'src/assets/static/images': 'assets/pictures' });
   eleventyConfig.addPassthroughCopy({ 'src/public': '/' });
 
   // Build events for development feedback

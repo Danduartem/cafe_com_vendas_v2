@@ -10,6 +10,7 @@ export default defineConfig({
       '@': resolve(__dirname, 'src/assets/js'),
       '@sections': resolve(__dirname, 'src/_includes/sections'),
       '@assets': resolve(__dirname, 'src/assets'),
+      '@static': resolve(__dirname, 'src/assets/static'),
       '@content': resolve(__dirname, 'content')
     }
   },

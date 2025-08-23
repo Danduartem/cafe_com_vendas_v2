@@ -12,7 +12,7 @@ description: "Página de confirmação do pagamento - próximos passos para o ev
     {# Set section data for template access #}
     {% set currentSection = section.data %}
     {% if section.slug == "thank-you-content" %}
-      {% include "sections/thank-you/index.njk" %}
+      {% include "../components/sections/thank-you/index.njk" %}
     {% endif %}
   {% endif %}
 {% endfor %}
