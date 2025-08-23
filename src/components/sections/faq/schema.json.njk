@@ -1,0 +1,36 @@
+---
+permalink: /sections/faq/schema.json
+eleventyExcludeFromCollections: true
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "name": "{{ faq.meta.title }}",
+  "description": "{{ faq.meta.description }}",
+  "url": "{{ site.url }}#faq",
+  "mainEntity": [
+    {% for item in faq.items %}
+    {
+      "@type": "Question",
+      "name": "{{ item.question }}",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "{{ item.answer.main_text | striptags }}{% if item.answer.highlight %}. {{ item.answer.highlight.label }}: {{ item.answer.highlight.text }}{% endif %}{% if item.answer.highlights %}{% for highlight in item.answer.highlights %}. {{ highlight.label }}: {{ highlight.text }}{% endfor %}{% endif %}{% if item.answer.features %}{% for feature in item.answer.features %}. {{ feature.label }}: {{ feature.text }}{% endfor %}{% endif %}",
+        "upvoteCount": {{ item.upvote_count }}
+      }
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+  "author": {
+    "@type": "Organization",
+    "name": "Café com Vendas",
+    "url": "{{ site.url }}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Café com Vendas",
+    "url": "{{ site.url }}"
+  }
+}
+
+

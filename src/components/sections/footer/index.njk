@@ -1,0 +1,205 @@
+{# footer.njk - Premium Footer with Golden Ratio Design #}
+
+<!-- Footer Section Start -->
+<footer 
+  id="s-footer" 
+  data-section="footer"
+  data-analytics-section="footer"
+  class="relative w-full overflow-hidden bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900"
+  aria-label="Rodapé do site"
+  role="contentinfo"
+  data-reveal
+>
+  {# Background Layers #}
+  <div class="absolute inset-0 bg-gradient-to-t from-burgundy-900/10 via-transparent to-transparent"></div>
+  
+  {# Floating Geometric Patterns #}
+  <div class="absolute inset-0 opacity-5">
+    <div class="absolute top-16 left-8 w-32 h-32 border border-gold-400/20 rounded-full animate-pulse"></div>
+    <div class="absolute top-32 right-16 w-16 h-16 bg-burgundy-700/10 rounded-lg rotate-12 animate-bounce"></div>
+    <div class="absolute bottom-24 left-32 w-24 h-24 border-2 border-peach-400/10 rotate-45"></div>
+    <div class="absolute bottom-16 right-8 w-20 h-20 bg-gradient-to-r from-gold-500/10 to-burgundy-600/10 rounded-full blur-sm animate-pulse"></div>
+  </div>
+
+  {# Top Stats Section #}
+  <div class="relative py-8 border-b border-white/10" data-reveal>
+    <div class="container mx-auto px-8 md:px-12 max-w-7xl">
+      <div class="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16">
+        {% for stat in currentSection.copy.stats %}
+        <div class="text-center">
+          <div class="text-3xl font-lora font-bold text-gold-400 mb-1">{{ stat.value }}</div>
+          <div class="text-sm font-century text-neutral-300">{{ stat.label }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {# Main Footer Content #}
+  <div class="relative py-16" data-reveal>
+    <div class="container mx-auto px-8 md:px-12 max-w-7xl">
+      
+      {# Premium 3-Column Layout with Balanced Distribution #}
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-start">
+        
+        {# Brand Column - Main column on mobile, first on desktop #}
+        <div class="md:col-span-2 order-1 md:order-1">
+          <div class="space-y-8">
+            
+            {# Premium Brand Logo & Tagline #}
+            <div class="space-y-4">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-gold-500 to-burgundy-600 rounded-xl flex items-center justify-center">
+                  <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-2xl font-lora font-bold bg-gradient-to-r from-white to-gold-200 bg-clip-text text-transparent">
+                    {{ currentSection.copy.brand.name }}
+                  </div>
+                  <div class="text-sm font-century text-neutral-200 mt-1">
+                    {{ currentSection.copy.brand.tagline }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {# Premium Description #}
+            <div class="space-y-4">
+              <p class="text-neutral-200 font-century leading-relaxed max-w-lg">
+                {{ currentSection.copy.brand.description }}
+              </p>
+              
+              {# Guarantee Badge with Pulse Animation #}
+              <div class="inline-flex items-center space-x-3 bg-gradient-to-r from-gold-500/20 to-burgundy-600/20 backdrop-blur-sm border border-gold-400/30 rounded-full px-6 py-3">
+                <div class="w-6 h-6 bg-gold-500 rounded-full flex items-center justify-center">
+                  <svg class="w-4 h-4 text-navy-900" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+                <span class="text-sm font-century text-gold-300 font-medium">{{ currentSection.copy.brand.guarantee }}</span>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+        
+        {# Navigation Column #}
+        <div class="md:col-span-1 order-2 md:order-2">
+          <div class="space-y-6">
+            
+            <h3 class="text-lg font-lora font-semibold text-white mb-4">Links</h3>
+            
+            {# Glassmorphism Navigation Card #}
+            <div class="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all duration-500">
+              <nav aria-label="Links legais" class="space-y-6">
+                {% for link in currentSection.copy.navigation.legal %}
+                <a 
+                  href="{{ link.url }}" 
+                  class="group flex items-center justify-between font-century text-neutral-200 hover:text-gold-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-400/50 focus:ring-offset-2 focus:ring-offset-transparent rounded-lg p-2 hover:bg-white/5"
+                  data-analytics-event="click_footer_legal"
+                >
+                  <span>{{ link.label }}</span>
+                  <svg class="w-4 h-4 opacity-100 transform translate-x-0 group-hover:translate-x-1 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </a>
+                {% endfor %}
+              </nav>
+            </div>
+            
+          </div>
+        </div>
+        
+        {# Contact Column #}
+        <div class="md:col-span-1 order-3 md:order-3">
+          <div class="space-y-6">
+            
+            <h3 class="text-lg font-lora font-semibold text-white mb-4">Contato</h3>
+            
+            <div class="space-y-4">
+              <a 
+                href="{{ currentSection.copy.contact.whatsapp.url }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group flex items-center space-x-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl px-4 py-3 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-400/50"
+                data-analytics-event="click_footer_whatsapp"
+                aria-label="Contactar via WhatsApp"
+              >
+                <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.506z"/>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <div class="text-sm font-medium text-white group-hover:text-gold-400 transition-colors">WhatsApp</div>
+                </div>
+              </a>
+
+              <a 
+                href="mailto:{{ currentSection.copy.contact.email.address }}"
+                class="group flex items-center space-x-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl px-4 py-3 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-400/50"
+                data-analytics-event="click_footer_email"
+                aria-label="Email"
+              >
+                <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <div class="text-sm font-medium text-white group-hover:text-gold-400 transition-colors">Email</div>
+                </div>
+              </a>
+
+              {% for social in currentSection.copy.contact.social %}
+              <a 
+                href="{{ social.url }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group flex items-center space-x-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl px-4 py-3 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-400/50"
+                data-analytics-event="click_footer_{{ social.platform | lower }}"
+                aria-label="Seguir no {{ social.platform }}"
+              >
+                <div class="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <div class="text-sm font-medium text-white group-hover:text-gold-400 transition-colors">{{ social.platform }}</div>
+                </div>
+              </a>
+              {% endfor %}
+            </div>
+            
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+  {# Bottom Copyright Section #}
+  <div class="relative border-t border-white/10 py-12">
+    <div class="container mx-auto px-8 md:px-12 max-w-7xl">
+      <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0 md:space-x-8">
+        
+        <div class="text-sm font-century text-white">
+          © {{ currentSection.copyright.year }} {{ currentSection.copyright.owner }}. {{ currentSection.copyright.text }}.
+        </div>
+        
+        <div class="flex items-center space-x-2 text-sm font-century text-white">
+          <span>Feito com</span>
+          <svg class="w-4 h-4 text-burgundy-400 animate-pulse" fill="currentColor" viewBox="0 0 20 20" aria-label="coração">
+            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+          </svg>
+          <span>em Portugal</span>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- Footer Section End -->

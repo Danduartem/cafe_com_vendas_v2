@@ -1,0 +1,129 @@
+{# hero.njk - Enhanced component with improved structure and JavaScript integration #}
+
+<!-- Hero Section Start -->
+<section
+  id="s-hero"
+  class="hero-bg relative flex flex-col
+         bg-cover bg-center bg-no-repeat
+         overflow-hidden w-full h-screen pt-14
+         before:absolute before:inset-0
+         before:bg-gradient-to-b before:from-navy-900/85 before:via-navy-900/78 before:to-navy-900/66"
+  role="banner"
+  aria-label="Seção principal do evento Café com Vendas"
+  data-reveal
+  data-analytics-section="hero"
+>
+  <!-- Simple gradient overlay - CLAUDE.md compliant with pure Tailwind -->
+  <div 
+    aria-hidden="true" 
+    class="absolute right-0 top-0 h-full pointer-events-none z-10 w-[55vw] opacity-0 sm:opacity-100 bg-gradient-to-l from-burgundy-700/5 via-transparent to-transparent"
+  >
+  </div>
+
+  <!-- Content Container (centered vertically, safe from scroll-indicator overlap) -->
+  <div class="relative z-20 flex-1 flex flex-col items-center justify-center text-center w-full px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto py-8 sm:py-12">
+    
+    <!-- Accent Line -->
+    <div class="hero-accent mb-4 sm:mb-6 w-full" data-reveal>
+      <span class="inline-block w-20 sm:w-28 h-1.5 rounded-full bg-gradient-to-r from-neutral-200 to-burgundy-700 opacity-90"></span>
+    </div>
+
+    <!-- Main Headline -->
+    <h1 
+      class="font-lora font-extrabold text-[clamp(3rem,6.5vw,4.6rem)] leading-[1.04] text-white" 
+      id="hero-title"
+      data-reveal
+    >
+      Menos Esforço. Mais Lucro.
+    </h1>
+
+    <!-- Subheadline -->
+    <p 
+      class="font-lora italic text-[clamp(1rem,3.6vw,1.8rem)] text-peach-300" 
+      aria-describedby="hero-title"
+      data-reveal
+    >
+      O mapa para a empreendedora que se recusa a escolher entre sucesso e liberdade.
+    </p>
+
+    <!-- Event Badge -->
+    <div 
+      class="hero-badge inline-flex items-center gap-2 rounded-full bg-white/6 backdrop-blur-md border border-white/12 px-3 py-1.5 mb-6 mt-6 text-neutral-200 text-[clamp(0.72rem,2.8vw,0.95rem)] shadow-[0_6px_30px_rgba(2,6,23,0.35)]" 
+      role="img" 
+      aria-label="Evento: 15 de Fevereiro de 2025, Lisboa Portugal, Mesa Corrida"
+      data-reveal
+    >
+      <time datetime="2025-02-15">15 de Fevereiro de 2025</time>
+      <span class="text-peach-300" aria-hidden="true">•</span>
+      <span>Lisboa, Portugal</span>
+      <span class="text-peach-300" aria-hidden="true">•</span>
+      <em class="not-italic">Mesa Corrida</em>
+    </div>
+
+    <!-- Body Text -->
+    <p 
+      class="font-century text-white text-[clamp(1rem,3.2vw,1.125rem)] leading-relaxed max-w-[60ch] mx-auto mb-6 px-2"
+      data-reveal
+    >
+      Um encontro presencial e intimista em Portugal para reestruturar o seu negócio, recuperar o seu tempo e multiplicar as vendas — sem burnout, com método. Um dia de imersão estratégica, ferramentas accionáveis e um plano de 90 dias para implementar mudanças reais.
+    </p>
+
+    <!-- CTA Group -->
+    <div 
+      class="flex flex-col sm:flex-row items-center gap-4 mt-2 w-full sm:w-auto"
+      data-reveal
+    >
+      <button 
+        type="button"
+        data-checkout-trigger
+        data-source="hero"
+        class="hero-cta-primary inline-flex items-center justify-center px-6 py-3 min-h-[48px] rounded-[14px] bg-gradient-to-r from-burgundy-700 to-navy-800 text-white font-bold shadow-[0_10px_30px_rgba(2,6,23,0.5)] transform-gpu transition-all duration-300 hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-white/40 focus:ring-offset-2 cursor-pointer focus:ring-offset-navy-900"
+        aria-label="Garantir a minha vaga no evento"
+        data-analytics-event="click_hero_cta"
+      >
+        Garantir a minha vaga
+        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+        </svg>
+      </button>
+
+      <a 
+        href="#s-problem" 
+        class="text-white/90 underline underline-offset-4 text-sm sm:text-base transition-colors duration-200 hover:text-white" 
+        data-analytics-event="click_hero_secondary"
+      >
+        Quero saber mais
+      </a>
+    </div>
+
+    <!-- Limited Spots Notice -->
+    <div 
+      class="mt-6 text-xs text-white/70"
+      role="status"
+      aria-live="polite"
+      data-reveal
+    >
+      Vagas limitadas — sessão com capacidade reduzida para garantir transformação.
+    </div>
+  </div>
+
+  <!-- Scroll Indicator Zone (auto-hides on short viewports) -->
+  <div class="relative z-20 flex justify-center pb-6">
+    <button 
+      class="hero-scroll-indicator text-white/90 bg-transparent border-none cursor-pointer transition-all duration-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-navy-900 hidden sm:flex"
+      id="scroll-indicator-btn" 
+      aria-label="Role para baixo para ver mais conteúdo" 
+      type="button"
+      data-reveal
+    >
+      <div class="flex flex-col items-center space-y-1 w-full">
+        <span class="font-lora text-xs">Role para baixo</span>
+        <svg class="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+      </div>
+    </button>
+  </div>
+
+</section>
+<!-- Hero Section End -->
