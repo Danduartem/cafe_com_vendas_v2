@@ -42,7 +42,8 @@ declare global {
       VITE_STRIPE_PUBLIC_KEY?: string;
       VITE_FORMSPREE_FORM_ID?: string;
       VITE_CLOUDINARY_CLOUD_NAME?: string;
-      [key: string]: string | undefined;
+      // Other environment variables
+      readonly [key: string]: string | undefined;
     }
   }
 
