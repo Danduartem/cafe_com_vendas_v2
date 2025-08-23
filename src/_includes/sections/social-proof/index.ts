@@ -7,7 +7,7 @@
 import { safeQuery, safeQueryAll } from '@/utils/dom';
 import { Animations } from '../../../components/ui';
 import { debounce } from '@/utils/throttle';
-import type { Component } from '@/types/component';
+import type { Component } from '../../../types/components/base.js';
 
 // Constants for carousel layout
 const CAROUSEL_GAP_DEFAULT = 24;

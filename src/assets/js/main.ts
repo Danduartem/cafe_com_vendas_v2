@@ -7,7 +7,7 @@
 
 import { CafeComVendas } from './app';
 import { ENV } from '@/config/constants';
-import '@/types/global.ts'; // Import global types
+import '../../types/global/index.js'; // Import global types
 
 // Set global Cloudinary configuration
 window.CLOUDINARY_CLOUD_NAME = ENV.cloudinary.cloudName;

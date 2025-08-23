@@ -198,10 +198,10 @@
                   </div>
                   <div>
                     <p class="font-semibold text-navy-800 mb-2">
-                      MBWay: <span class="text-burgundy-700">{{ event.payments.alternative.mbway.phone }}</span>
+                      MBWay: <span class="text-burgundy-700">{{ site.event.payments.alternative.mbway.phone }}</span>
                     </p>
                     <p class="text-navy-600 text-sm">
-                      {{ event.payments.alternative.mbway.instruction }}
+                      {{ site.event.payments.alternative.mbway.instruction }}
                     </p>
                   </div>
                 </div>
@@ -219,11 +219,11 @@
                 </svg>
                 <span>100% Seguro</span>
               </div>
-              <div class="flex flex-col items-center hover:text-navy-800 transition-colors duration-200" role="img" aria-label="Apenas {{ event.capacity.firstLot }} vagas disponíveis">
+              <div class="flex flex-col items-center hover:text-navy-800 transition-colors duration-200" role="img" aria-label="Apenas {{ site.event.capacity.firstLot }} vagas disponíveis">
                 <svg class="w-5 h-5 text-red-500 mb-1" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                 </svg>
-                <span>{{ event.capacity.totalCapacity }} vagas</span>
+                <span>{{ site.event.capacity.totalCapacity }} vagas</span>
               </div>
               <div class="flex flex-col items-center hover:text-navy-800 transition-colors duration-200" role="img" aria-label="Garantia de 90 dias">
                 <svg class="w-5 h-5 text-green-500 mb-1" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">

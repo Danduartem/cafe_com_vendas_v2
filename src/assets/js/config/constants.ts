@@ -4,7 +4,7 @@
  */
 
 import ENV from './environment';
-import type { Constants as ConstantsType } from '@/types/config';
+import type { Constants as ConstantsType } from '../../../types/components/config.js';
 
 /**
  * Analytics event constants with type safety

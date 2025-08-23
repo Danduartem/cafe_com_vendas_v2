@@ -6,7 +6,7 @@
 
 import { ENV } from '@/config/constants';
 import { safeQuery } from '@/utils/dom';
-import type { Component } from '@/types/component';
+import type { Component } from '../../../types/components/base.js';
 
 // Stripe types (inline to avoid dependencies)
 interface StripeError {
@@ -231,7 +231,7 @@ export const Checkout: CheckoutSectionComponent = {
     }
 
     this.stripeLoadPromise = new Promise<void>((resolve, reject) => {
-      if (typeof Stripe !== 'undefined') {
+      if (typeof window.Stripe !== 'undefined') {
         this.initializeStripe();
         resolve();
         return;

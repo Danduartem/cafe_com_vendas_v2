@@ -11,34 +11,32 @@ import type {
   ComponentRegistration,
   ComponentHealthStatus,
   ComponentStatus
-} from '@/types/component';
+} from '../../types/components/base.js';
 import type {
   AppInitializedEvent,
   ComponentsInitializedEvent
-} from '@/types/analytics';
-import type { AppState } from '@/types/state';
-import type { Constants } from '@/types/config';
+} from '../../types/components/analytics.js';
+import type { AppState } from '../../types/components/state.js';
+import type { Constants } from '../../types/components/config.js';
 
 // Import utility components
 import {
-  PlatformYouTube,
-  PlatformThankYou,
-  PlatformGTM
+  PlatformThankYou
 } from '@components/ui';
 
 // Import co-located section components (new approach)
-import { Hero } from '../../components/sections/hero/index';
-import { Problem } from '../../components/sections/problem/index';
-import { Solution } from '../../components/sections/solution/index';
-import { About } from '../../components/sections/about/index';
-import { SocialProof } from '../../components/sections/social-proof/index';
-import { Offer } from '../../components/sections/offer/index';
-import { FAQ } from '../../components/sections/faq/index';
-import { FinalCTA } from '../../components/sections/final-cta/index';
-import { Footer } from '../../components/sections/footer/index';
-import { TopBanner } from '../../components/sections/top-banner/index';
-import { ThankYou } from '../../components/sections/thank-you/index';
-import { Checkout } from '../../components/sections/checkout/index';
+import { Hero } from '../../_includes/sections/hero/index';
+import { Problem } from '../../_includes/sections/problem/index';
+import { Solution } from '../../_includes/sections/solution/index';
+import { About } from '../../_includes/sections/about/index';
+import { SocialProof } from '../../_includes/sections/social-proof/index';
+import { Offer } from '../../_includes/sections/offer/index';
+import { FAQ } from '../../_includes/sections/faq/index';
+import { FinalCTA } from '../../_includes/sections/final-cta/index';
+import { Footer } from '../../_includes/sections/footer/index';
+import { TopBanner } from '../../_includes/sections/top-banner/index';
+import { ThankYou } from '../../_includes/sections/thank-you/index';
+import { Checkout } from '../../_includes/sections/checkout/index';
 
 /**
  * Main application interface
@@ -151,8 +149,6 @@ export const CafeComVendas: CafeComVendasInterface = {
   initializeComponents(): void {
     const components: ComponentRegistration[] = [
       // Utility components
-      { name: 'GTM', component: { init: () => PlatformGTM.init() } },
-      { name: 'YouTube', component: { init: () => PlatformYouTube.init() } },
       { name: 'ThankYou', component: { init: () => PlatformThankYou.init() } },
 
       // Co-located section components (new approach)

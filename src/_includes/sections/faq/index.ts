@@ -6,7 +6,7 @@
 
 import { PlatformAccordion } from '../../../components/ui';
 import { safeQuery } from '../../../assets/js/utils/dom';
-import type { Component } from '../../../assets/js/types/component';
+import type { Component } from '../../../types/components/base.js';
 
 interface FAQSectionComponent extends Component {
   initializeFAQ(): void;

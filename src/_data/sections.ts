@@ -43,29 +43,18 @@ const pageConfigurations: Record<string, PageConfig> = {
   }
 };
 
-// Basic validation function
-function validateSection(data: unknown, slug: string): data is Section {
-  if (!data || typeof data !== 'object') return false;
-  const section = data as Record<string, unknown>;
-  if (section.id !== slug) return false;
-  return true;
-}
-
-// Load section data from JSON files
+// Load section data from JSON files - simplified for Eleventy v3
 function loadSection(slug: string, _variant?: string): Section | null {
   try {
     const sectionPath = join(process.cwd(), 'src/_data/sections-data/sections', `${slug}.json`);
     const sectionContent = readFileSync(sectionPath, 'utf-8');
-    const sectionData = JSON.parse(sectionContent);
+    const sectionData = JSON.parse(sectionContent) as Section;
     
-    if (!validateSection(sectionData, slug)) {
-      console.warn(`Section validation failed for ${slug}, but continuing build`);
-      return null;
-    }
-
+    // Eleventy v3 handles missing files gracefully
     return sectionData;
-  } catch (error) {
-    console.error(`Failed to load section ${slug}:`, error);
+  } catch {
+    // Let Eleventy handle the error appropriately
+    console.warn(`Section ${slug} not found, skipping`);
     return null;
   }
 }

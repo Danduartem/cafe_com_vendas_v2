@@ -9,7 +9,7 @@ import type {
   AnalyticsEvent,
   ErrorEvent,
   PerformanceEvent
-} from '@/types/analytics';
+} from '../../../types/components/analytics.js';
 
 /**
  * Performance navigation timing interface

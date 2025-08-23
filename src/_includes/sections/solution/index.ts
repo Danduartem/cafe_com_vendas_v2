@@ -3,7 +3,7 @@
  * Handles interactive behaviors for the solution section
  */
 
-import type { Component } from '../../../assets/js/types/component.js';
+import type { Component } from '../../../types/components/base.js';
 import { safeQuery } from '../../../assets/js/utils/dom.js';
 import { Analytics } from '../../../assets/js/core/analytics.js';
 

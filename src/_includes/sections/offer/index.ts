@@ -73,7 +73,7 @@ export const Offer = {
     });
 
     const observer = Animations.createObserver({
-      callback: (entry) => {
+      callback: (entry: IntersectionObserverEntry) => {
         if (entry.target.classList.contains('deliverable-item')) {
           entry.target.classList.remove('opacity-0', 'translate-y-2');
           entry.target.classList.add('opacity-100', 'translate-y-0');

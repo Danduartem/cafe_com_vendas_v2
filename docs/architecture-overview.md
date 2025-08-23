@@ -60,25 +60,27 @@ graph TB
 
 ```
 📦 Project Root
-├─ content/pt-PT/           # i18n content (site, event, pages, sections, strings)
-├─ design/components.json   # Design component definitions
 ├─ src/
-│  ├─ _data/                # Type‑safe data adapters (TS + .js for complex queries)
+│  ├─ _data/                # Type‑safe data adapters and content
+│  │  └─ sections-data/     # Section JSON content files
 │  ├─ _includes/            # Nunjucks templates + sections (co‑located {index.njk,index.ts})
 │  │  ├─ partials/          # Reusable template components
-│  │  └─ sections/          # Page sections with schema (some with schema.ts)
+│  │  └─ sections/          # Page sections with schema (all with schema.ts)
 │  ├─ assets/
 │  │  ├─ css/               # Tailwind v4 CSS-first with @theme tokens
-│  │  ├─ images/            # Optimized images
-│  │  └─ js/                # TS modules (main.ts, app.ts, config/, core/, types/)
+│  │  └─ js/                # TS modules (main.ts, app.ts, config/, core/, utils/)
 │  ├─ components/           # Component foundation
-│  │  └─ ui/                # Reusable UI components (accordion, modal, analytics)
+│  │  └─ ui/                # Reusable UI components (accordion, animations, analytics, thank-you)
 │  ├─ pages/                # Page templates (index, legal, thank‑you)
-│  └─ public/               # Static assets (fonts, favicons, headers)
+│  ├─ public/               # Static assets
+│  │  ├─ fonts/             # Web fonts (CenturyGothic, Lora)
+│  │  ├─ images/            # All images (consolidated)
+│  │  └─ favicon.ico        # Site favicon
+│  └─ types/                # All TypeScript type definitions
 ├─ netlify/
 │  ├─ functions/            # Serverless functions (Stripe, MailerLite, webhooks)
 │  └─ edge-functions/       # Edge functions (CSP headers)
-├─ scripts/                 # Build and utility scripts (validation, screenshots)
+├─ scripts/                 # Build and utility scripts (validation)
 ├─ tests/                   # Test suites (unit, visual, schemas)
 ├─ docs/                    # Architecture, standards, setup guides
 └─ config files             # .eleventy.ts, vite.config.ts, tsconfig.json, etc.
