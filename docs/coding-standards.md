@@ -14,7 +14,7 @@
 
 ## 1) Zero‑Tolerance Rules
 
-* **TypeScript‑first**: primarily `.ts` sources with some `.js` for complex data (e.g., sections.js).
+* **TypeScript‑first**: `.ts` sources throughout for complete type safety.
 * **No `any`** (incl. implicit). Justify rare exceptions with a comment.
 * **No inline styles or HTML event handlers** (e.g., `style=""`, `onclick=""`).
 * **No hardcoded design values** (colors/spacing/fonts). Use `@theme` tokens + Tailwind.
@@ -82,7 +82,7 @@ classes/interfaces: PascalCase
 constants: UPPER_SNAKE_CASE
 sections: src/_includes/sections/<section>/{index.njk,index.ts,schema.ts?}
 platform ui: src/platform/ui/components/<component>.ts
-adapters: src/_data/*.ts (some .js for complex data like sections.js)
+adapters: src/_data/*.ts
 utilities: src/platform/lib/utils/<util>.ts
 types: src/assets/js/types/<category>.ts
 ```
