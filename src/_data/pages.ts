@@ -1,4 +1,4 @@
-import type { PagesData } from './types.js';
+import type { PagesData } from '../types/sections/pages';
 
 /**
  * Page compositions - consolidated from external JSON files

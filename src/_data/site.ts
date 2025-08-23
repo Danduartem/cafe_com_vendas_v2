@@ -1,4 +1,4 @@
-import type { SiteData } from './types';
+import type { SiteData } from '../types/data/site';
 
 /**
  * Load site data - consolidated from external JSON

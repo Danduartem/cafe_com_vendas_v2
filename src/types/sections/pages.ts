@@ -1,4 +1,7 @@
 import type { SectionSlug } from './base';
+
+// Re-export SectionSlug for convenience
+export type { SectionSlug } from './base';
 import type { HeroSection } from './hero';
 import type { ProblemSection } from './problem';
 import type { SolutionSection } from './solution';

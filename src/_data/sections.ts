@@ -2,7 +2,7 @@ import type {
   Section,
   SectionSlug,
   LoadedPageSection,
-} from './types.js';
+} from '../types/sections/pages';
 import { getSection } from './consolidated-sections.js';
 
 // Page configuration interfaces
