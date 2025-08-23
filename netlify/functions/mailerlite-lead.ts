@@ -316,11 +316,32 @@ async function addLeadToMailerLite(leadData: MailerLiteSubscriberData): Promise<
         // Handle specific MailerLite error cases
         if (response.status === 422) {
           // Validation error or subscriber already exists
-          const errorData = JSON.parse(errorText);
-          if (errorData.message && errorData.message.includes('already exists')) {
-            console.log(`Lead already exists in MailerLite: ${leadData.email}`);
-            return { success: true, reason: 'Lead already exists', action: 'skipped' };
+          try {
+            const errorData = JSON.parse(errorText);
+            if (errorData.message && errorData.message.includes('already exists')) {
+              console.log(`Lead already exists in MailerLite: ${leadData.email}`);
+              return { success: true, reason: 'Lead already exists', action: 'skipped' };
+            }
+            // Handle other validation errors more gracefully
+            if (errorData.errors) {
+              console.warn(`MailerLite validation errors for ${leadData.email}:`, errorData.errors);
+              return { success: false, reason: `Validation error: ${JSON.stringify(errorData.errors)}`, recoverable: true };
+            }
+          } catch (parseError) {
+            console.warn(`Could not parse MailerLite 422 error response: ${errorText}`);
           }
+        } else if (response.status === 401) {
+          // Authentication error - not recoverable
+          console.error('MailerLite authentication failed - check API key');
+          return { success: false, reason: 'Authentication failed', recoverable: false };
+        } else if (response.status === 429) {
+          // Rate limited by MailerLite - recoverable
+          console.warn(`MailerLite rate limit exceeded for ${leadData.email}`);
+          return { success: false, reason: 'MailerLite rate limit exceeded', recoverable: true };
+        } else if (response.status >= 500) {
+          // Server error - recoverable
+          console.warn(`MailerLite server error (${response.status}) for ${leadData.email}`);
+          return { success: false, reason: `MailerLite server error: ${response.status}`, recoverable: true };
         }
         
         throw new Error(`MailerLite API error: ${response.status} - ${errorText}`);
@@ -345,16 +366,36 @@ async function addLeadToMailerLite(leadData: MailerLiteSubscriberData): Promise<
       return { success: false, reason: 'Circuit breaker open', recoverable: true };
     }
     
+    // Enhanced error categorization
+    let recoverable = true;
+    let reason = 'Unknown error';
+    
+    if (error instanceof Error) {
+      reason = error.message;
+      
+      // Categorize errors for better handling
+      if (error.message.includes('API key') || error.message.includes('authentication')) {
+        recoverable = false; // Configuration errors are not recoverable
+      } else if (error.message.includes('timed out') || error.message.includes('network')) {
+        recoverable = true; // Network/timeout errors can be retried
+      } else if (error.message.includes('fetch')) {
+        recoverable = true; // Fetch failures are typically recoverable
+      }
+    }
+    
     console.error('MailerLite integration error', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: reason,
       email: leadData.email,
+      recoverable,
+      errorType: error instanceof Error ? error.constructor.name : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined,
       circuitBreakerStatus: mailerliteCircuitBreaker.getStatus()
     });
     
     return { 
       success: false, 
-      reason: error instanceof Error ? error.message : 'Unknown error',
-      recoverable: !(error instanceof Error && error.message.includes('API key')) // API key errors are not recoverable
+      reason,
+      recoverable
     };
   }
 }

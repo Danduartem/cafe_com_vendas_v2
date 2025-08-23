@@ -99,7 +99,7 @@ class CustomerCacheManager {
     }
   }
   
-  static get(email: string): any | null {
+  static get(email: string): Stripe.Customer | null {
     const entry = customerCache.get(email);
     if (!entry) return null;
     
@@ -114,7 +114,7 @@ class CustomerCacheManager {
     return entry.customer;
   }
   
-  static set(email: string, customer: any): void {
+  static set(email: string, customer: Stripe.Customer): void {
     this.cleanExpiredEntries();
     this.evictOldestIfNeeded();
     

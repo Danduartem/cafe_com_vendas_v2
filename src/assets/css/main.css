@@ -287,16 +287,16 @@ html {
 /* Tailwind v4 Responsive Hero Background Utility */
 @utility hero-bg {
   /* Base mobile version - portrait orientation optimized */
-  background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,h_1136,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz');
+  background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,h_1136,c_fill,q_auto,f_auto,g_auto,dpr_auto/cafe_pnkngz');
   
   /* Tablet and small desktop */
   @media (min-width: 640px) {
-    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1024,h_768,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz');
+    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1024,h_768,c_fill,q_auto,f_auto,g_auto,dpr_auto/cafe_pnkngz');
   }
   
   /* Large desktop */
   @media (min-width: 1024px) {
-    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_auto,g_auto/cafe_pnkngz');
+    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_auto,g_auto,dpr_auto/cafe_pnkngz');
   }
 }
 

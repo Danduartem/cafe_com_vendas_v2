@@ -155,13 +155,27 @@ export interface MailerLiteError {
 export type MailerLiteResult = MailerLiteSuccess | MailerLiteError;
 
 // Stripe Webhook Types
+export interface StripeWebhookEventData {
+  id: string;
+  object: string;
+  amount?: number;
+  amount_received?: number;
+  currency?: string;
+  customer?: string;
+  description?: string;
+  metadata?: Record<string, string>;
+  payment_method?: string;
+  status?: string;
+  [key: string]: unknown; // Allow for additional Stripe object properties
+}
+
 export interface StripeWebhookEvent {
   id: string;
   object: 'event';
   api_version: string;
   created: number;
   data: {
-    object: any;
+    object: StripeWebhookEventData;
     previous_attributes?: Record<string, unknown>;
   };
   livemode: boolean;

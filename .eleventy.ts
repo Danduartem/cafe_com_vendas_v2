@@ -1,8 +1,8 @@
 import 'dotenv/config';
 import 'tsx/esm';
-import { HtmlBasePlugin, RenderPlugin } from '@11ty/eleventy';
+import { HtmlBasePlugin, RenderPlugin, type UserConfig } from '@11ty/eleventy';
 
-export default function(eleventyConfig: any) {
+export default function(eleventyConfig: UserConfig) {
   // Add essential Eleventy 3.x plugins
   eleventyConfig.addPlugin(HtmlBasePlugin);
   eleventyConfig.addPlugin(RenderPlugin);

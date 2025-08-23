@@ -1,4 +1,18 @@
-# Netlify headers for performance optimization
+# Netlify headers for performance optimization and security
+
+# Global security headers for all HTML pages
+/*
+  # Security Headers - Modern 2024/2025 recommendations
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), interest-cohort=()
+  Cross-Origin-Embedder-Policy: unsafe-none
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Cross-Origin-Resource-Policy: cross-origin
+  
+  # Content Security Policy - Tailored for Cloudinary, Stripe, GTM, and analytics
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://js.stripe.com https://m.stripe.network; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com https://*.stripe.com https://www.googletagmanager.com; connect-src 'self' https://api.stripe.com https://formspree.io https://connect.mailerlite.com https://www.google-analytics.com https://www.googletagmanager.com; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io
 
 # Static assets cache (1 year) with compression
 /assets/*
