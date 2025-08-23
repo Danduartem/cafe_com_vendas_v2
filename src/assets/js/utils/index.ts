@@ -7,4 +7,3 @@ export { throttle, debounce } from './throttle';
 export { safeQuery, safeQueryAll } from './dom';
 export { ScrollTracker } from './scroll-tracker';
 export { normalizeEventPayload } from './gtm-normalizer';
-// Cloudinary helpers are currently unused; export can be restored if needed

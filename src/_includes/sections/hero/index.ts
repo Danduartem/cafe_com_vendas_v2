@@ -6,7 +6,6 @@
 import { CONFIG } from '../../../assets/js/config/constants';
 import { safeQuery } from '../../../assets/js/utils/dom';
 import { Animations } from '../../../components/ui/index';
-// Inline minimal smooth scroll to avoid importing removed navigation module
 
 export const Hero = {
   init() {
