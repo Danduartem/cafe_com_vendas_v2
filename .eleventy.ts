@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import 'tsx/esm';
 import { HtmlBasePlugin, RenderPlugin } from '@11ty/eleventy';
 
 export default function(eleventyConfig: any) {
@@ -18,6 +19,29 @@ export default function(eleventyConfig: any) {
   eleventyConfig.addFilter('jsonifyArray', (array: unknown[]) => JSON.stringify(array));
   eleventyConfig.addFilter('keys', (obj: Record<string, unknown>) => Object.keys(obj));
   eleventyConfig.addFilter('values', (obj: Record<string, unknown>) => Object.values(obj));
+
+  // TypeScript data file support - explicit configuration for Eleventy 3.x
+  eleventyConfig.addDataExtension("ts", {
+    parser: async (_contents: string, filePath: string) => {
+      // Use dynamic import to load the compiled TypeScript module
+      const { pathToFileURL } = await import('node:url');
+      const moduleUrl = pathToFileURL(filePath).href + '?t=' + Date.now();
+      
+      try {
+        const module = await import(moduleUrl);
+        
+        // If it exports a function, call it; otherwise use the default export
+        if (typeof module.default === 'function') {
+          return module.default();
+        }
+        return module.default;
+      } catch (error) {
+        console.error(`Failed to load TypeScript data file ${filePath}:`, error);
+        return {};
+      }
+    },
+    read: false // We'll handle the file reading via import
+  });
 
   // Static asset handling
   eleventyConfig.addPassthroughCopy({ 'src/assets/css': 'assets/css' });
