@@ -37,7 +37,6 @@
 # Function-specific settings
 [functions]
   node_bundler = "esbuild"
-  deno_import_map = "./.netlify/v1/edge-functions/import_map.json"
 
 # URL redirects and rewrites
 [[redirects]]
@@ -112,10 +111,6 @@
     NODE_ENV = "development"
     ELEVENTY_ENV = "development"
     NODE_OPTIONS = "--max-old-space-size=2048"  # 2GB for branch deploys
-
-[[edge_functions]]
-  function = "csp"
-  path = "/*"
 
 # Plugin configuration
 [[plugins]]
