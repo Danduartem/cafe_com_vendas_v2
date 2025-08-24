@@ -27,8 +27,7 @@ const isDevelopment = isBrowser ? (
   window.location.hostname === 'localhost' ||
   window.location.hostname === '127.0.0.1' ||
   window.location.hostname.includes('netlify.app') ||
-  window.location.port === '8889' || // Netlify unified dev server (legacy)
-  window.location.port === '8888'    // Eleventy frontend dev server
+  window.location.port === '8080'    // Unified Netlify dev server
 ) : (process.env.NODE_ENV !== 'production'); // Node.js fallback
 
 const isProduction = isBrowser ? 
@@ -98,13 +97,9 @@ const config: EnvironmentConfig = {
 
   // URLs and Tracking
   urls: {
-    // Base URL for API calls (functions/backend)
+    // Base URL for API calls (unified server serves both frontend and functions)
     base: isProduction ? 'https://cafecomvendas.com' : (
-      isBrowser ? (
-        window.location.port === '8888' ? 'http://localhost:3000' : // Frontend on 8888, backend on 3000
-        window.location.port === '8889' ? `http://${window.location.hostname}:${window.location.port}` : // Legacy unified server
-        `http://${window.location.hostname}:${window.location.port}`
-      ) : 'http://localhost:3000' // Node.js fallback
+      isBrowser ? `http://${window.location.hostname}:${window.location.port}` : 'http://localhost:8080'
     ),
     thankYou: '/obrigado',
     instagram: '/instagram',

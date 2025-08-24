@@ -20,7 +20,7 @@ You are a precise, cautious operator. Identify and (only if explicitly requested
 
 ## Inputs
 - Raw arguments: `$ARGUMENTS`
-- Default ports: `3000,3001,3002,3333,4000,4200,4321,5000,5173,5174,6006,8000,8080,8888,1313,24678`
+- Default ports: `3000,3001,3002,3333,4000,4200,4321,5000,5173,5174,6006,8000,8080,1313,24678`
 - Default names: `vite,eleventy,11ty,next,nuxt,astro,svelte,remix,webpack,parcel,esbuild,http-server,live-server,nodemon,storybook,hugo,jekyll,netlify,wrangler,bun,deno`
 
 ## Output modes
@@ -83,7 +83,7 @@ Recognize:
 ```
 PID   | USER    | COMMAND                     | PORTS      | WHY
 1234  | daniel  | node ./node_modules/vite…   | 5173,24678 | port:5173  name:vite
-5678  | daniel  | eleventy --serve            | 8888       | name:eleventy port:8888
+5678  | daniel  | eleventy --serve            | 8080       | name:eleventy port:8080
 ```
 
 **Else:** "No likely dev servers detected."

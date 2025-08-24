@@ -8,7 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src/assets/js'),
-      '@sections': resolve(__dirname, 'src/_includes/sections'),
+      '@sections': resolve(__dirname, 'src/_includes/sections'), 
       '@components': resolve(__dirname, 'src/components'),
       '@assets': resolve(__dirname, 'src/assets')
     }
@@ -29,15 +29,7 @@ export default defineConfig({
       output: {
         entryFileNames: 'js/[name].js',
         chunkFileNames: 'js/[name].js',
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name?.endsWith('.css')) {
-            return 'css/[name].[ext]';
-          }
-          if (assetInfo.name?.match(/\.(woff2?|ttf|otf|eot)$/)) {
-            return 'fonts/[name].[ext]';
-          }
-          return '[name].[ext]';
-        }
+        assetFileNames: 'assets/[name].[ext]'
       }
     },
     target: 'es2022',
@@ -46,8 +38,7 @@ export default defineConfig({
   
   // Vite 7 optimized dependency handling
   optimizeDeps: {
-    include: ['stripe'],
-    holdUntilCrawlEnd: false // 500% faster cold start performance
+    include: ['stripe']
   },
   
   // Simplified CSS configuration

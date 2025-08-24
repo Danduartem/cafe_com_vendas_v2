@@ -9,7 +9,7 @@ export default function(eleventyConfig: UserConfig) {
 
   // Development server configuration
   eleventyConfig.setServerOptions({
-    port: 8888
+    port: 8080
   });
 
   // Watch and passthrough configuration
@@ -29,27 +29,21 @@ export default function(eleventyConfig: UserConfig) {
     return Object.values(obj);
   });
 
-  // TypeScript data file support - explicit configuration for Eleventy 3.x
+  // TypeScript data file support for Eleventy 3.x
   eleventyConfig.addDataExtension("ts", {
     parser: async (_contents: string, filePath: string) => {
-      // Use dynamic import to load the compiled TypeScript module
       const { pathToFileURL } = await import('node:url');
       const moduleUrl = pathToFileURL(filePath).href + '?t=' + Date.now();
       
       try {
         const module = await import(moduleUrl);
-        
-        // If it exports a function, call it; otherwise use the default export
-        if (typeof module.default === 'function') {
-          return module.default();
-        }
-        return module.default;
+        return typeof module.default === 'function' ? module.default() : module.default;
       } catch (error) {
         console.error(`Failed to load TypeScript data file ${filePath}:`, error);
         return {};
       }
     },
-    read: false // We'll handle the file reading via import
+    read: false
   });
 
   // Static asset handling - aligned with Vite best practices

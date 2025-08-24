@@ -20,7 +20,7 @@ Simple, practical commands for everyday development tasks. Each command runs in 
 ```bash
 npm run dev:netlify # Unified dev server (recommended - includes payment functions)
 # OR
-npm run dev         # Standard dev server (static only, now uses port 8888)
+npm run dev         # Standard dev server (static only, now uses port 8080)
 ```
 
 ### Before Lunch
@@ -182,7 +182,7 @@ NETLIFY_SITE_ID=...
 
 | Issue | Solution |
 |-------|----------|
-| `npm run dev` port in use | Kill process: `lsof -ti:8888 \| xargs kill` |
+| `npm run dev` port in use | Kill process: `lsof -ti:8080 \| xargs kill` |
 | `/commit` fails | Check quality gates: `npm run type-check && npm run lint` |
 | `npm run build` fails | Check Node version (needs 22+), run quality gates first |
 | `/test` fails | Check specific test type: `/test --visual` or `/test --payment` |

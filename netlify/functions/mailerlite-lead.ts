@@ -406,10 +406,9 @@ async function addLeadToMailerLite(leadData: MailerLiteSubscriberData): Promise<
 export const handler: Handler = async (event: HandlerEvent, context: HandlerContext): Promise<HandlerResponse> => {
   // Set CORS headers with proper domain restrictions
   const allowedOrigins = [
-    'https://cafecomvendas.com',
-    'https://www.cafecomvendas.com',
+    'https://jucanamaximiliano.com',
+    'https://www.jucanamaximiliano.com',
     'http://localhost:8080',
-    'http://localhost:8888',
     'https://netlify.app'
   ];
   
