@@ -32,17 +32,11 @@
 [build.processing.images]
   compress = true
 
-# Development settings (for legacy unified dev server)
+# Development settings - Use Eleventy as primary dev server
 [dev]
-  command = "npm run dev:netlify:build"
-  port = 8889
+  command = "eleventy --serve --watch --incremental --config=.eleventy.ts"
   publish = "_site"
   functions = "netlify/functions"
-
-# Note: For separated development, use:
-# Frontend: npm run dev:frontend (http://localhost:8888)
-# Backend:  npm run dev:backend  (http://localhost:3000)
-# Both:     npm run dev
 
 # Function-specific settings
 [functions]
