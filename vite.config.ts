@@ -18,9 +18,23 @@ export default defineConfig({
     tailwindcss()
   ],
   
+  // Dependency optimization with Vite 7 performance improvements
+  optimizeDeps: {
+    include: [
+      'stripe'
+    ],
+    // Improve cold start performance by processing dependencies in parallel
+    holdUntilCrawlEnd: false
+  },
+  
   build: {
     outDir: '_site/assets',
     emptyOutDir: true,
+    target: 'es2023',
+    minify: 'esbuild',
+    // Disable compressed size reporting for faster builds
+    reportCompressedSize: false,
+    sourcemap: process.env.NODE_ENV === 'development',
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'src/assets/js/main.ts'),
@@ -31,22 +45,14 @@ export default defineConfig({
         chunkFileNames: 'js/[name].js',
         assetFileNames: 'css/[name].[ext]'
       }
-    },
-    target: 'es2022',
-    sourcemap: process.env.NODE_ENV === 'development'
+    }
   },
   
-  // Vite 7 optimized dependency handling
-  optimizeDeps: {
-    include: ['stripe']
-  },
-  
-  // Simplified CSS configuration
   css: {
     devSourcemap: process.env.NODE_ENV === 'development'
   },
   
   esbuild: {
-    target: 'es2022'
+    target: 'es2023'
   }
 });

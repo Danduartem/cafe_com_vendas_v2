@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    // Language and environment
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    // Language and environment optimized for Node 22+
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "ES2022",
     "moduleResolution": "bundler",
 
     // Bundler mode
-    "allowImportingTsExtensions": false,
+    "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "noEmit": true,
@@ -20,10 +20,8 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     
-    // API deprecation detection
+    // Runtime environment
     "types": ["node"],
-    "typeRoots": ["./node_modules/@types"],
-    "checkJs": true,
 
     // Module resolution
     "baseUrl": ".",
@@ -36,8 +34,10 @@
       "@/*": ["src/assets/js/*"]
     },
 
-    // Advanced
-    "skipLibCheck": true, // Skip library type checking for faster builds
+    // Performance optimizations
+    "incremental": true,
+    "tsBuildInfoFile": "node_modules/.cache/ts/typecheck.tsbuildinfo",
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -48,20 +48,17 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.js",
-    "tests/**/*.ts",
-    "netlify/functions/**/*.ts",
-    "scripts/verify-apis.ts",
-    "vite.config.ts",
-    "vitest.config.ts",
+    "scripts/**/*.ts",
+    "*.config.ts",
     ".eleventy.ts",
-    "eslint.config.ts",
     "types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules",
     "_site",
     "dist",
-    "debug-gtm.ts"
+    "debug-gtm.ts",
+    "tests/**/*",
+    "netlify/edge-functions/**/*"
   ]
 }

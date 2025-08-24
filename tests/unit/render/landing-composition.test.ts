@@ -4,18 +4,12 @@
  */
 
 import { describe, test, expect, beforeEach } from 'vitest';
-import { JSDOM } from 'jsdom';
 import type { LoadedPageSection } from '../../../src/_data/types.ts';
 
 describe('Landing Page Composition', () => {
-  let dom: JSDOM;
-  let document: Document;
-
   beforeEach(() => {
-    dom = new JSDOM('<!DOCTYPE html><html><head></head><body></body></html>');
-    document = dom.window.document;
-    global.document = document;
-    global.window = dom.window as unknown as Window & typeof globalThis;
+    // Clean up DOM between tests
+    document.body.innerHTML = '';
   });
 
   describe('Page Data Loading', () => {

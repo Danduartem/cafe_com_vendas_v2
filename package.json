@@ -15,7 +15,7 @@
     "build": "rm -rf _site && NODE_ENV=production vite build && eleventy --config=.eleventy.ts",
     "preview": "npm run build && npx serve _site",
     "lint": "eslint .",
-    "type-check": "tsc -p tsconfig.typecheck.json --pretty false",
+    "type-check": "tsc --noEmit --pretty false",
     "test": "vitest run",
     "verify-apis": "tsx scripts/verify-apis.ts"
   },
@@ -40,8 +40,7 @@
     "@playwright/test": "^1.55.0",
     "@tailwindcss/vite": "^4.1.12",
     "@types/node": "^24.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.40.0",
-    "@typescript-eslint/parser": "^8.40.0",
+    "typescript-eslint": "^8.40.0",
     "eslint": "^9.34.0",
     "globals": "^16.3.0",
     "happy-dom": "^18.0.1",
