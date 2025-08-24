@@ -60,7 +60,8 @@
       "mcp__playwright-mcp__browser_wait_for",
       "Bash(gtimeout:*)",
       "Bash(tree:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "mcp__firecrawl__firecrawl_search"
     ],
     "deny": [],
     "ask": []

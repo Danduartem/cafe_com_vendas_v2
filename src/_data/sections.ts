@@ -3,6 +3,7 @@ import type {
   SectionSlug,
   LoadedPageSection,
 } from '../types/sections/pages';
+import type { EleventyConfigData } from '../types/global/index.js';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -53,7 +54,7 @@ function loadSection(slug: string): Section | null {
  * Unified sections data loader for all pages
  * Follows Eleventy v3 best practices with dynamic page detection
  */
-export default function(configData?: any): LoadedPageSection[] {
+export default function(configData?: EleventyConfigData): LoadedPageSection[] {
   try {
     const sections: LoadedPageSection[] = [];
     

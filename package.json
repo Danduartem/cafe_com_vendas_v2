@@ -10,7 +10,8 @@
   },
   "engineStrict": true,
   "scripts": {
-    "dev": "netlify dev",
+    "dev": "eleventy --serve --watch --config=.eleventy.ts",
+    "netlify:dev": "NODE_NO_WARNINGS=1 netlify dev",
     "build": "rm -rf _site && NODE_ENV=production vite build && eleventy --config=.eleventy.ts",
     "preview": "npm run build && npx serve _site",
     "lint": "eslint .",

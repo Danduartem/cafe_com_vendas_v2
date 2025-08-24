@@ -25,11 +25,11 @@
           
           {% if section.content %}
           <p class="text-neutral-700 font-century leading-relaxed">
-            {{ section.content | replace("{{event.date.local}}", event.date.local) | 
-                               replace("{{event.location.city}}", event.location.city) | 
-                               replace("{{event.location.country}}", event.location.country) | 
-                               replace("{{event.date.durationHours}}", event.date.durationHours) | 
-                               replace("{{event.capacity.totalCapacity}}", event.capacity.firstLot) | safe }}
+            {{ section.content | replace("{{event.date.local}}", site.event.date) | 
+                               replace("{{event.location.city}}", site.event.location) | 
+                               replace("{{event.location.country}}", site.event.location) | 
+                               replace("{{event.date.durationHours}}", site.event.duration) | 
+                               replace("{{event.capacity.totalCapacity}}", site.event.capacity.firstLot) | safe }}
           </p>
           {% endif %}
 
@@ -44,16 +44,16 @@
             <div class="bg-green-50 border-l-4 border-green-400 p-6 my-6">
               {% if section.highlight.showGuarantee %}
               <h3 class="text-lg font-lora font-semibold text-green-800 mb-2">
-                {{ event.guarantee.claim }}
+                {{ site.event.guarantee.claim }}
               </h3>
               <p class="text-green-700 font-century leading-relaxed mb-4">
-                {{ event.guarantee.policy }}
+                {{ site.event.guarantee.policy }}
               </p>
               <p class="text-sm text-green-600 font-century">
                 <strong>Condições aplicáveis:</strong>
               </p>
               <ul class="list-disc list-inside text-sm text-green-600 font-century space-y-1 ml-4">
-                {% for requirement in event.guarantee.requirements %}
+                {% for requirement in site.event.guarantee.requirements %}
                 <li>{{ requirement }}</li>
                 {% endfor %}
               </ul>
@@ -73,8 +73,8 @@
           {% if section.showContact %}
           <div class="bg-neutral-50 rounded-lg p-4 mt-4">
             <p class="text-neutral-700 font-century">
-              <strong>Email:</strong> {{ legal.contact.email }}<br>
-              <strong>WhatsApp:</strong> {{ legal.contact.whatsapp.phone }} ({{ legal.contact.whatsapp.contact }})
+              <strong>Email:</strong> {{ site.contact.email }}<br>
+              <strong>WhatsApp:</strong> {{ site.contact.whatsapp }}
             </p>
           </div>
           {% endif %}

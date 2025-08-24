@@ -44,6 +44,15 @@ export default function() {
             instruction: 'Avisar a Lari que o pagamento foi realizado para garantir a vaga.'
           }
         }
+      },
+      guarantee: {
+        claim: 'Garantia de 90 Dias - 100% do Seu Dinheiro de Volta',
+        policy: 'Se participar do evento e não se sentir completamente satisfeita com o conteúdo e metodologia, devolvemos 100% do valor investido em até 90 dias.',
+        requirements: [
+          'Participação em pelo menos 80% do evento',
+          'Feedback construtivo sobre a experiência',
+          'Solicitação em até 90 dias após o evento'
+        ]
       }
     },
 
@@ -79,6 +88,73 @@ export default function() {
     contact: {
       whatsapp: '+351935251983',
       email: 'contato@cafecomvendas.pt'
+    },
+
+    // Legal pages content
+    legal: {
+      guaranteeRefund: {
+        title: 'Garantia de Resultados e Política de Reembolso',
+        lastUpdated: 'Janeiro 2025',
+        sections: [
+          {
+            title: 'Nossa Garantia de 90 Dias',
+            content: 'Oferecemos uma garantia completa de 90 dias para o evento Café com Vendas. Se não ficar satisfeita com o conteúdo ou metodologia apresentada, devolvemos 100% do valor investido.',
+            highlight: {
+              type: 'success',
+              showGuarantee: true
+            }
+          },
+          {
+            title: 'Condições da Garantia',
+            content: 'Para solicitar o reembolso, é necessário participar de pelo menos 80% do evento e enviar feedback construtivo sobre a experiência.',
+            list: [
+              'Participação mínima de 80% do evento (aproximadamente 5.5 horas)',
+              'Feedback detalhado sobre pontos de melhoria',
+              'Solicitação de reembolso em até 90 dias após o evento',
+              'Justificativa clara dos motivos da insatisfação'
+            ]
+          },
+          {
+            title: 'Processo de Reembolso',
+            content: 'O reembolso será processado no mesmo método de pagamento utilizado na compra, num prazo de até 10 dias úteis após aprovação.',
+            showContact: true
+          },
+          {
+            title: 'Política de Cancelamento',
+            content: 'Cancelamentos até 7 dias antes do evento: reembolso de 100%. De 3 a 7 dias: 50%. Menos de 3 dias: sem reembolso, mas é possível transferir a vaga.'
+          }
+        ]
+      },
+      privacyPolicy: {
+        title: 'Política de Privacidade',
+        lastUpdated: 'Janeiro 2025',
+        sections: [
+          {
+            title: 'Recolha e Utilização de Dados',
+            content: 'Recolhemos apenas os dados pessoais necessários para a organização do evento, incluindo nome, email e informações de contacto para comunicação sobre o evento.'
+          },
+          {
+            title: 'Proteção dos Seus Dados',
+            content: 'Os seus dados pessoais são tratados com confidencialidade e segurança, sendo utilizados exclusivamente para fins relacionados com o evento Café com Vendas.',
+            showContact: true
+          }
+        ]
+      },
+      termsConditions: {
+        title: 'Termos e Condições',
+        lastUpdated: 'Janeiro 2025',
+        sections: [
+          {
+            title: 'Condições de Participação',
+            content: 'A participação no evento Café com Vendas está sujeita à disponibilidade de vagas e ao pagamento antecipado da taxa de participação.'
+          },
+          {
+            title: 'Política de Cancelamento',
+            content: 'Cancelamentos devem ser comunicados por email. Aplicam-se diferentes condições conforme o prazo de antecedência.',
+            showContact: true
+          }
+        ]
+      }
     },
 
     // Global strings and translations

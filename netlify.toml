@@ -11,20 +11,15 @@
   # Functions directory
   functions = "netlify/functions"
   
-  # Node.js version and secrets configuration
-  environment = { NODE_VERSION = "22.17.1", SECRETS_SCAN_OMIT_KEYS = "VITE_FORMSPREE_FORM_ID,VITE_STRIPE_PUBLIC_KEY,VITE_GTM_CONTAINER_ID", NODE_OPTIONS = "--max-old-space-size=4096" }
+  # Environment configuration
+  [build.environment]
+    NODE_VERSION = "22.17.1"
+    NODE_OPTIONS = "--max-old-space-size=6144"  # 6GB for production builds
+    SECRETS_SCAN_OMIT_KEYS = "VITE_FORMSPREE_FORM_ID,VITE_STRIPE_PUBLIC_KEY,VITE_GTM_CONTAINER_ID"
 
-# Build processing
+# Build processing - Vite handles all optimization, keep only essential settings
 [build.processing]
   skip_processing = false
-
-[build.processing.css]
-  bundle = true
-  minify = true
-
-[build.processing.js]
-  bundle = false  # Vite handles bundling
-  minify = false  # Vite handles minification
 
 [build.processing.html]
   pretty_urls = true
@@ -32,9 +27,9 @@
 [build.processing.images]
   compress = true
 
-# Development settings - Use Eleventy as primary dev server
+# Development settings - 2025 best practice: use Eleventy dev server directly
 [dev]
-  command = "eleventy --serve --watch --incremental --config=.eleventy.ts"
+  command = "eleventy --serve --watch --config=.eleventy.ts"
   targetPort = 8080
   publish = "_site"
   functions = "netlify/functions"
@@ -61,40 +56,30 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    # Security headers
+    # Modern security headers (2025 standards) - CSP handled by edge function
     X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
     
-    # Performance headers - Enable text compression (1.33s Lighthouse savings)
+    # HSTS with preload for enhanced security
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    
+    # Performance headers
     X-DNS-Prefetch-Control = "on"
 
-# Headers for static assets with compression
+# Optimized asset caching - 2025 best practices
 [[headers]]
   for = "/assets/*"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=31536000, must-revalidate"
+    X-Content-Type-Options = "nosniff"
 
-# Text compression for CSS files
-[[headers]]
-  for = "*.css"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Text compression for JavaScript files  
-[[headers]]
-  for = "*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# HTML cache headers handled by _headers file to avoid conflicts
-
-# Headers for fonts
+# Font files with long-term caching
 [[headers]]
   for = "*.woff2"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=31536000, must-revalidate"
+    Content-Type = "font/woff2"
 
 # Headers for API endpoints
 [[headers]]
@@ -118,6 +103,7 @@
   [context.deploy-preview.environment]
     NODE_ENV = "development"
     ELEVENTY_ENV = "development"
+    NODE_OPTIONS = "--max-old-space-size=2048"  # 2GB for faster previews
 
 [context.branch-deploy]
   command = "npm run build"
@@ -125,6 +111,7 @@
   [context.branch-deploy.environment]
     NODE_ENV = "development"
     ELEVENTY_ENV = "development"
+    NODE_OPTIONS = "--max-old-space-size=2048"  # 2GB for branch deploys
 
 [[edge_functions]]
   function = "csp"
