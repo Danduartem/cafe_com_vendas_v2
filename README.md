@@ -13,41 +13,70 @@ Premium landing page for an intimate business transformation event in Lisbon, de
 ## 🛠 Tech Stack
 
 - **Framework**: Eleventy 3.1.2 (Static Site Generator)
-- **Language**: TypeScript 5.9.2 (migration complete)
-- **Styling**: Tailwind CSS 4.1.12 (CSS-first configuration)
-- **Build**: Vite 7.1.3 (built-in CSS processing)
-- **Payments**: Stripe 18.4.0 via Netlify Functions
-- **Testing**: Playwright 1.55.0 + Vitest
-- **Deployment**: Netlify with Edge Functions
+- **Language**: TypeScript 5.9.2 (ESM-first, `.js` extensions)
+- **Styling**: Tailwind CSS 4.1.12 (CSS-first, `@theme` configuration)
+- **Build**: Vite 7.1.3 (CSS processing & optimization)
+- **Payments**: Stripe 18.4.0 + Netlify Functions
+- **Email**: MailerLite API integration
+- **Testing**: Vitest 3.2.4 + Playwright 1.55.0
+- **Analytics**: GTM/GA4 with typed dataLayer
+- **Deployment**: Netlify (Functions + static hosting)
 
 ## 🚀 Quick Start
 
 ```bash
-# Install and run
+# Install dependencies (requires Node 22.17.1+)
 npm install
-npm run dev               # Development server
 
-# Quality gates  
+# Development
+npm run dev               # Eleventy dev server (port 8080)
+npm run netlify:dev       # With serverless functions
+
+# Quality checks (must pass all)
 npm run type-check        # TypeScript validation
-npm run lint             # ESLint validation
-npm test                 # Unit tests
-npm run verify-apis      # API validation
+npm run lint              # ESLint validation  
+npm test                  # Vitest unit tests
+npm run verify-apis       # API compatibility check
 
-# Build
-npm run build            # Production build
-npm run dev
-npm run netlify:dev
+# Production build
+npm run build             # Vite + Eleventy production build
+npm run preview           # Preview production build
 ```
 
 ## 📖 Documentation
 
-For development details see `docs/`:
-- **`SETUP.md`** - Environment setup and configuration
-- **`edit-map.md`** - Where to edit content and components  
-- **`STRIPE_TEST_CARDS.md`** - Payment testing
-- **`PAYMENT_TESTING_SUMMARY.md`** - Payment validation checklist
+### Core Docs (`docs/`)
+- **`SETUP.md`** - Environment variables, integrations, deployment
+- **`edit-map.md`** - File structure map for content & code edits
+- **`STRIPE_TEST_CARDS.md`** - Test card numbers for payment flows
+- **`PAYMENT_TESTING_SUMMARY.md`** - Payment testing checklist
 
-Development guidelines: **`CLAUDE.md`**
+### Development
+- **`CLAUDE.md`** - AI coding guidelines & workflow
+- **`.env.example`** - Required environment variables template
+
+### Project Structure
+```
+src/
+├── _data/              # JSON/TS data files
+│   ├── sections/       # Section content (hero, about, etc.)
+│   ├── site.ts         # Site metadata
+│   └── pages.ts        # Page configurations
+├── _includes/          # Templates & components
+│   ├── sections/       # Section templates + logic
+│   └── partials/       # Reusable template parts
+├── assets/             # Static assets
+│   ├── css/            # Tailwind CSS entry
+│   └── js/             # TypeScript utilities
+├── components/         # UI components
+│   └── ui/             # Accordion, analytics, animations
+└── pages/              # Page templates (privacy, terms, etc.)
+
+netlify/functions/      # Serverless functions
+├── create-payment-intent.ts
+├── mailerlite-lead.ts
+└── stripe-webhook.ts
+```
 
 ---
 

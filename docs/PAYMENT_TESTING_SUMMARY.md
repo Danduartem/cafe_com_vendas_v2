@@ -14,7 +14,7 @@
 
 ## 1) Before you start
 
-* [ ] Test keys set: `.env.local`
+* [ ] Test keys set: `.env`
 
   ```bash
   STRIPE_PUBLISHABLE_KEY=pk_test_...
