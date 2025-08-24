@@ -50,14 +50,14 @@
     <div 
       class="hero-badge inline-flex items-center gap-2 rounded-full bg-white/6 backdrop-blur-md border border-white/12 px-3 py-1.5 mb-6 mt-6 text-neutral-200 text-[clamp(0.72rem,2.8vw,0.95rem)] shadow-[0_6px_30px_rgba(2,6,23,0.35)]" 
       role="img" 
-      aria-label="Evento: 15 de Fevereiro de 2025, Lisboa Portugal, Mesa Corrida"
+      aria-label="Evento: {{ currentSection.copy.badge.date }}, {{ currentSection.copy.badge.location }}, {{ currentSection.copy.badge.venue }}"
       data-reveal
     >
-      <time datetime="2025-02-15">15 de Fevereiro de 2025</time>
+      <time datetime="2024-09-20">{{ currentSection.copy.badge.date }}</time>
       <span class="text-peach-300" aria-hidden="true">•</span>
-      <span>Lisboa, Portugal</span>
+      <span>{{ currentSection.copy.badge.location }}</span>
       <span class="text-peach-300" aria-hidden="true">•</span>
-      <em class="not-italic">Mesa Corrida</em>
+      <em class="not-italic">{{ currentSection.copy.badge.venue }}</em>
     </div>
 
     <!-- Body Text -->

@@ -33,7 +33,7 @@ export default function() {
       price: 180,
       description: 'Um encontro presencial e intimista em Portugal para reestruturar o seu negócio, recuperar o seu tempo e multiplicar as vendas — sem burnout, com método.',
       capacity: {
-        firstLot: 20,
+        firstLot: 8,
         totalCapacity: 20,
         limited_spots: 'Vagas limitadas'
       },
@@ -41,7 +41,7 @@ export default function() {
         alternative: {
           mbway: {
             phone: '+351935251983',
-            instruction: 'Envie o pagamento de 180€ via MBWay para o número indicado. Após confirmação do pagamento, receberá por email os detalhes de acesso e localização do evento.'
+            instruction: 'Avisar a Lari que o pagamento foi realizado para garantir a vaga.'
           }
         }
       }

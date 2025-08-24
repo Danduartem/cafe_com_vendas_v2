@@ -30,6 +30,7 @@
     {
       "id": "business-type",
       "question": "Para que tipo de negócio é este evento?",
+      "description": "Clique para saber se este evento é ideal para você",
       "answer": {
         "main_text": "Para empreendedoras com produto/serviço validado que querem estruturar oferta, melhorar margens e automatizar vendas.",
         "highlight": "Ideal para: Negócios de serviços, cursos e produtos digitais com foco em escala sustentável"
@@ -38,39 +39,53 @@
     {
       "id": "time-justification",
       "question": "Não tenho mesmo tempo. Como justificar um dia fora?",
+      "description": "Descubra como um dia pode transformar semanas",
       "answer": {
         "main_text": "O investimento de um dia traz frameworks accionáveis que devolvem horas semanais e aumentam receita.",
-        "highlights": [
-          "Templates prontos e plano de 90 dias",
-          "Recupere horas semanais + aumente receita"
+        "features_with_labels": [
+          {
+            "label": "Resultado imediato:",
+            "text": "Templates prontos e plano de 90 dias"
+          },
+          {
+            "label": "ROI garantido:",
+            "text": "Recupere horas semanais + aumente receita"
+          }
         ]
       }
     },
     {
       "id": "guarantee",
       "question": "E se eu não gostar ou não tiver resultados?",
+      "description": "Conheça nossa garantia de resultados 100% segura",
       "answer": {
         "main_text": "A nossa Garantia de Resultados cobre o seu investimento: aplique o método e, se em 90 dias não houver <strong>+20% nas vendas</strong>, devolvemos o valor.",
-        "features": [
-          "90 dias para aplicar e ver resultados",
-          "Reembolso total se não aumentar 20% nas vendas",
-          "Processo simples com condições claras e justas"
-        ]
+        "features_with_labels": [
+          {
+            "label": "90 dias",
+            "text": "para aplicar e ver resultados"
+          },
+          {
+            "label": "Reembolso total",
+            "text": "se não aumentar 20% nas vendas"
+          },
+          {
+            "label": "Processo simples",
+            "text": "condições claras e justas"
+          }
+        ],
+        "footer_text": "Condições aplicáveis — <a href=\"/garantia-reembolso\">ver termos completos</a>"
       },
       "is_special": true,
       "special_badge": "GARANTIA"
     },
     {
-      "id": "pricing",
-      "question": "Qual é o valor do investimento?",
+      "id": "about-jucana",
+      "question": "Quem é a Juçanã Maximiliano?",
+      "description": "Conheça quem vai guiar sua transformação",
       "answer": {
-        "main_text": "Valor promocional para o primeiro lote: <strong>€297</strong> (25% de desconto do valor regular €397).",
-        "features": [
-          "Acesso ao evento completo de 8 horas",
-          "Kit com templates e ferramentas práticas",
-          "Plano de ação de 90 dias personalizado",
-          "Grupo privado para networking e suporte"
-        ]
+        "main_text": "Juçanã é estratega de negócios e fundadora do Café com Vendas. Ao longo de 7 anos, guiou empreendedoras de serviços, cursos e produtos digitais a simplificarem ofertas, aumentarem margens e criarem rotinas que libertam tempo.",
+        "highlight": "Especialista em transformar negócios complexos em sistemas simples e lucrativos"
       }
     }
   ]

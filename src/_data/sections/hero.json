@@ -14,12 +14,12 @@
       },
       "secondary": {
         "label": "Quero saber mais",
-        "href": "#problema",
+        "href": "#s-problem",
         "variant": "link"
       }
     },
     "badge": {
-      "date": "15 de Fevereiro de 2025",
+      "date": "20 de Setembro",
       "location": "Lisboa, Portugal",
       "venue": "Mesa Corrida"
     },

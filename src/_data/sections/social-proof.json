@@ -8,7 +8,7 @@
     "footer_text": "Junte-se às empreendedoras que já transformaram os seus negócios",
     "cta": {
       "label": "Ver como o método funciona",
-      "href": "#offer",
+      "href": "#s-offer",
       "variant": "gradient"
     }
   },
@@ -33,64 +33,64 @@
     },
     {
       "id": 3,
-      "name": "Sofia Ribeiro",
-      "profession": "Life Coach",
+      "name": "Rita Alves",
+      "profession": "Esteticista",
       "location": "Braga",
-      "result": "+50% faturação em 6 meses",
+      "result": "Resultados em 2 semanas",
       "video_id": "kJQP7kiw5Fk",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/kJQP7kiw5Fk/maxresdefault.jpg"
     },
     {
       "id": 4,
-      "name": "Catarina Santos",
-      "profession": "Designer Gráfica",
+      "name": "Sofia Mendes",
+      "profession": "Coach",
       "location": "Coimbra",
-      "result": "Passou de freelancer a agência",
+      "result": "Dobrei as vendas em 3 meses",
       "video_id": "L_jWHffIx5E",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/L_jWHffIx5E/maxresdefault.jpg"
     },
     {
       "id": 5,
-      "name": "Rita Fernandes",
-      "profession": "Psicóloga",
-      "location": "Aveiro",
-      "result": "+15h/semana e 40% mais clientes",
+      "name": "Catarina Silva",
+      "profession": "Designer",
+      "location": "Faro",
+      "result": "Finalmente tenho tempo livre",
       "video_id": "5NV6Rdv1a3I",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/5NV6Rdv1a3I/maxresdefault.jpg"
     },
     {
       "id": 6,
-      "name": "Beatriz Costa",
+      "name": "Isabel Ferreira",
       "profession": "Nutricionista",
-      "location": "Faro",
-      "result": "Lista de espera de 3 meses",
+      "location": "Aveiro",
+      "result": "Processo de vendas automatizado",
       "video_id": "9bZkp7q19f0",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/9bZkp7q19f0/maxresdefault.jpg"
     },
     {
       "id": 7,
-      "name": "Helena Pereira",
-      "profession": "Coach de Negócios",
-      "location": "Setúbal",
-      "result": "Automatizou 70% dos processos",
+      "name": "Joana Rodrigues",
+      "profession": "Advogada",
+      "location": "Viseu",
+      "result": "Clareza total na estratégia",
       "video_id": "w5Fgp2b0NkY",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/w5Fgp2b0NkY/maxresdefault.jpg"
     },
     {
       "id": 8,
-      "name": "Inês Rodrigues",
-      "profession": "Arquiteta",
-      "location": "Viseu",
-      "result": "+80% margem de lucro",
+      "name": "Patrícia Nunes",
+      "profession": "Psicóloga",
+      "location": "Setúbal",
+      "result": "Trabalho 4 dias por semana",
       "video_id": "i0djHJBAP3M",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/i0djHJBAP3M/maxresdefault.jpg"
     },
     {
       "id": 9,
-      "name": "Joana Silva",
-      "profession": "Fotógrafa",
-      "location": "Funchal",
-      "result": "De 2 para 20 clientes/mês",
+      "name": "Teresa Martins",
+      "profession": "Arquiteta",
+      "location": "Évora",
+      "result": "Método mudou tudo",
       "video_id": "2Vv-BfVoq4g",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/2Vv-BfVoq4g/maxresdefault.jpg"
     },

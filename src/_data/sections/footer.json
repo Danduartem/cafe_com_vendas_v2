@@ -9,12 +9,12 @@
         "counter": true
       },
       {
-        "value": 8,
+        "value": 7,
         "label": "Horas Intensivas",
         "counter": true
       },
       {
-        "value": "15 Fev",
+        "value": "20/09",
         "label": "Lisboa",
         "counter": false
       }
@@ -22,7 +22,7 @@
     "brand": {
       "name": "Café com Vendas",
       "tagline": "Método prático para empreendedoras",
-      "description": "Transforme seu negócio em 15 de Fevereiro no evento mais exclusivo de Lisboa. Menos esforço, mais resultado — com método comprovado.",
+      "description": "Transforme seu negócio em 20 de Setembro no evento mais exclusivo de Lisboa. Menos esforço, mais resultado — com método comprovado.",
       "guarantee": "Garantia 90 dias"
     },
     "navigation": {
