@@ -2,7 +2,7 @@ import type { BaseSection } from './base';
 
 export interface SocialProofSection extends BaseSection {
   id: 'social-proof';
-  testimonials: Array<{
+  testimonials: {
     id: number;
     name: string;
     profession: string;
@@ -10,5 +10,5 @@ export interface SocialProofSection extends BaseSection {
     result: string;
     video_id: string;
     thumbnail: string;
-  }>;
+  }[];
 }

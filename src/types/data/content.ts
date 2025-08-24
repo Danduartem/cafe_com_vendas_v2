@@ -52,6 +52,4 @@ export interface GlobalStrings {
 }
 
 // JSON file loading utility type
-export interface JSONFileLoader<T> {
-  (): T;
-}
+export type JSONFileLoader<T> = () => T;

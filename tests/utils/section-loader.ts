@@ -19,10 +19,19 @@ import type {
   TopBannerSection
 } from '../../src/_data/types.ts';
 
-// Load centralized design configurations (same as production)
-let designConfigs: Record<string, unknown> | null = null;
+// Type definitions for design configuration
+interface DesignConfigs {
+  sections?: Record<SectionSlug, unknown>;
+  faq?: {
+    special_item_styles?: Record<string, unknown>;
+    default_item_styles?: Record<string, unknown>;
+  };
+}
 
-function loadDesignConfigs(): Record<string, unknown> {
+// Load centralized design configurations (same as production)
+let designConfigs: DesignConfigs | null = null;
+
+function loadDesignConfigs(): DesignConfigs {
   if (designConfigs) return designConfigs;
 
   const designPath = join(process.cwd(), 'design/components.json');
@@ -32,7 +41,7 @@ function loadDesignConfigs(): Record<string, unknown> {
   }
 
   try {
-    const rawData = JSON.parse(readFileSync(designPath, 'utf-8'));
+    const rawData = JSON.parse(readFileSync(designPath, 'utf-8')) as DesignConfigs;
     designConfigs = rawData;
     return rawData;
   } catch (error) {
@@ -53,30 +62,38 @@ export function loadSectionData(sectionSlug: SectionSlug): unknown {
   }
 
   try {
-    const rawData = JSON.parse(readFileSync(sectionPath, 'utf-8'));
+    const rawData = JSON.parse(readFileSync(sectionPath, 'utf-8')) as Record<string, unknown>;
 
     // Load design configurations and merge them (production behavior)
     const designData = loadDesignConfigs();
+    const sectionsData = designData.sections;
     const mergedData = {
       ...rawData,
-      design: designData.sections?.[sectionSlug] || {}
+      design: sectionsData?.[sectionSlug] || {}
     };
 
     // For FAQ section, also merge individual item styles (production behavior)
-    if (sectionSlug === 'faq' && designData.faq && mergedData.items) {
-      mergedData.items = mergedData.items.map((item: Record<string, unknown>) => {
+    if (sectionSlug === 'faq' && designData.faq && 'items' in mergedData && Array.isArray(mergedData.items)) {
+      const faqDesignData = designData.faq;
+      const specialItemStyles = faqDesignData.special_item_styles;
+      const defaultItemStyles = faqDesignData.default_item_styles;
+      
+      mergedData.items = mergedData.items.map((item: unknown) => {
+        const itemRecord = item as Record<string, unknown>;
         // Apply special styles based on item ID or use defaults
-        const specialStyles = designData.faq?.special_item_styles?.[item.id as string] || designData.faq?.default_item_styles || {};
+        const itemStyles = (specialItemStyles)?.[itemRecord.id as string] 
+          || (defaultItemStyles) 
+          || {};
         return {
-          ...item,
-          ...specialStyles
+          ...itemRecord,
+          ...itemStyles
         };
       });
     }
 
     return mergedData;
   } catch (error) {
-    throw new Error(`Failed to load section data for ${sectionSlug}: ${error}`);
+    throw new Error(`Failed to load section data for ${sectionSlug}: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 

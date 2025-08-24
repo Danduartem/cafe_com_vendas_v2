@@ -43,7 +43,7 @@ class APIVerifier {
   /**
    * Verify Vite APIs
    */
-  async verifyVite(): Promise<VersionCheckResult> {
+  verifyVite(): VersionCheckResult {
     const result: VersionCheckResult = {
       package: 'vite',
       version: '7.x',
@@ -89,7 +89,7 @@ class APIVerifier {
       console.log(`${colors.green}✅ Vite 7.x APIs validated${colors.reset}`);
     } catch (error) {
       result.status = 'error';
-      result.issues.push(`Vite API error: ${error}`);
+      result.issues.push(`Vite API error: ${error instanceof Error ? error.message : String(error)}`);
     }
 
     this.results.push(result);
@@ -99,7 +99,7 @@ class APIVerifier {
   /**
    * Verify Stripe APIs
    */
-  async verifyStripe(): Promise<VersionCheckResult> {
+  verifyStripe(): VersionCheckResult {
     const result: VersionCheckResult = {
       package: 'stripe',
       version: '18.x',
@@ -140,7 +140,7 @@ class APIVerifier {
       console.log(`${colors.green}✅ Stripe 18.x APIs validated${colors.reset}`);
     } catch (error) {
       result.status = 'error';
-      result.issues.push(`Stripe API error: ${error}`);
+      result.issues.push(`Stripe API error: ${error instanceof Error ? error.message : String(error)}`);
     }
 
     this.results.push(result);
@@ -230,7 +230,7 @@ class APIVerifier {
       console.log(`${colors.green}✅ Tailwind CSS v4 patterns validated${colors.reset}`);
     } catch (error) {
       result.status = 'error';
-      result.issues.push(`Tailwind validation error: ${error}`);
+      result.issues.push(`Tailwind validation error: ${error instanceof Error ? error.message : String(error)}`);
     }
 
     this.results.push(result);
@@ -286,8 +286,8 @@ class APIVerifier {
   async runAll(): Promise<void> {
     console.log(`${colors.bold + colors.cyan  }🔍 Verifying API compatibility...\n${  colors.reset}`);
 
-    await this.verifyVite();
-    await this.verifyStripe();
+    this.verifyVite();
+    this.verifyStripe();
     await this.verifyEleventy();
     await this.verifyTailwind();
 

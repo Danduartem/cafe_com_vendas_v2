@@ -9,19 +9,15 @@ import type { AppState, StateManager as StateManagerInterface } from '../../../t
 /**
  * FAQ open times tracking
  */
-interface FAQOpenTimes {
-  [faqId: string]: number;
-}
+type FAQOpenTimes = Record<string, number>;
 
 /**
  * Component status tracking
  */
-interface ComponentStatuses {
-  [componentName: string]: {
+type ComponentStatuses = Record<string, {
     initialized: boolean;
     error: Error | undefined;
-  };
-}
+  }>;
 
 /**
  * Internal state structure (matches AppState but with more specific tracking)
@@ -105,7 +101,7 @@ export const StateManager: StateManagerInterface = {
   /**
    * Mark application as initialized
    */
-  setInitialized(initialized: boolean = true): void {
+  setInitialized(initialized = true): void {
     state.isInitialized = initialized;
   },
 

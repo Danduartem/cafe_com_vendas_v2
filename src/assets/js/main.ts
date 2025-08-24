@@ -5,7 +5,7 @@
  * Modular ES6 architecture with pure Tailwind CSS styling
  */
 
-import { CafeComVendas } from './app';
+import { CafeComVendas } from './app.js';
 import { ENV } from '@/config/constants';
 import '../../types/global/index.js'; // Import global types
 

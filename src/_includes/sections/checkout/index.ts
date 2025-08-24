@@ -36,6 +36,18 @@ interface StripeInstance {
   confirmPayment: (options: Record<string, unknown>) => Promise<{ error?: StripeError }>;
 }
 
+// API Response types
+interface PaymentIntentResponse {
+  clientSecret: string;
+  id?: string;
+  status?: string;
+}
+
+interface PaymentErrorResponse {
+  error: string;
+  details?: Record<string, unknown>;
+}
+
 
 interface CheckoutSectionComponent extends Component {
   modal: HTMLDialogElement | null;
@@ -89,15 +101,12 @@ export const Checkout: CheckoutSectionComponent = {
   stripeLoadPromise: null,
 
   init(): void {
-    const self = this;
     try {
       // Ensure DOM is fully loaded before initialization
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-          self.performInitialization();
-        });
+        document.addEventListener('DOMContentLoaded', this.performInitialization.bind(this));
       } else {
-        self.performInitialization();
+        this.performInitialization();
       }
     } catch (error) {
       console.error('Error initializing Checkout section:', error);
@@ -246,7 +255,7 @@ export const Checkout: CheckoutSectionComponent = {
           this.initializeStripe();
           resolve();
         } catch (error) {
-          reject(error);
+          reject(error instanceof Error ? error : new Error(String(error)));
         }
       };
 
@@ -267,7 +276,7 @@ export const Checkout: CheckoutSectionComponent = {
 
     const stripeConstructor = window.Stripe;
     if (typeof stripeConstructor === 'function') {
-      this.stripe = stripeConstructor(ENV.stripe.publishableKey);
+      this.stripe = stripeConstructor(ENV.stripe.publishableKey) as StripeInstance;
     } else {
       this.stripe = null;
     }
@@ -319,7 +328,7 @@ export const Checkout: CheckoutSectionComponent = {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Network error' }));
+        const errorData = await response.json().catch(() => ({ error: 'Network error' })) as PaymentErrorResponse;
 
         // If validation failed, show specific validation errors to user
         if (errorData.error === 'Validation failed' && errorData.details) {
@@ -329,7 +338,7 @@ export const Checkout: CheckoutSectionComponent = {
         throw new Error(`Payment service error: ${errorData.error || response.statusText}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as PaymentIntentResponse;
       this.clientSecret = data.clientSecret;
 
       // Create Elements instance with proper Dashboard integration

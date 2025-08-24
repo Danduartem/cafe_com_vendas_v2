@@ -33,8 +33,8 @@ export default function(eleventyConfig: UserConfig) {
       const moduleUrl = pathToFileURL(filePath).href;
       
       try {
-        const module = await import(moduleUrl);
-        return typeof module.default === 'function' ? module.default() : module.default;
+        const module = await import(moduleUrl) as { default: unknown };
+        return typeof module.default === 'function' ? (module.default as () => unknown)() : module.default;
       } catch (error) {
         console.error(`Failed to load TypeScript data file ${filePath}:`, error);
         return {};
@@ -51,11 +51,11 @@ export default function(eleventyConfig: UserConfig) {
   eleventyConfig.addPassthroughCopy({ 'public': '.' });
 
   // Build events for development feedback
-  eleventyConfig.on('eleventy.before', async () => {
+  eleventyConfig.on('eleventy.before', () => {
     console.log('🚀 Starting Eleventy build...');
   });
 
-  eleventyConfig.on('eleventy.after', async () => {
+  eleventyConfig.on('eleventy.after', () => {
     console.log('✅ Eleventy build completed!');
   });
 

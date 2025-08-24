@@ -193,7 +193,7 @@ describe('Analytics Contract Testing', () => {
     test('should validate FAQ items have required structure', async () => {
       // Load FAQ section data
       const { loadSectionData } = await import('../../utils/section-loader.ts');
-      const faqData = loadSectionData('faq') as { items?: Array<{ id: string; question: string; answer: object }> };
+      const faqData = loadSectionData('faq') as { items?: { id: string; question: string; answer: object }[] };
 
       if (faqData.items && Array.isArray(faqData.items)) {
         faqData.items.forEach((item: { id: string; question: string; answer: object }) => {
@@ -209,7 +209,7 @@ describe('Analytics Contract Testing', () => {
 
     test('should validate solution pillars have required structure', async () => {
       const { loadSectionData } = await import('../../utils/section-loader.ts');
-      const solutionData = loadSectionData('solution') as { copy: { pillars?: Array<{ number: string; title: string; description: string; icon: string }> } };
+      const solutionData = loadSectionData('solution') as { copy: { pillars?: { number: string; title: string; description: string; icon: string }[] } };
 
       if (solutionData.copy.pillars && Array.isArray(solutionData.copy.pillars)) {
         solutionData.copy.pillars.forEach((pillar: { number: string; title: string; description: string; icon: string }) => {

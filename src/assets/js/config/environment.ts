@@ -62,6 +62,7 @@ export interface EnvironmentConfig {
     instagram: string;
     linkedin: string;
   };
+  [key: string]: unknown;
 }
 
 // Environment-specific configuration

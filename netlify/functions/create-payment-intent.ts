@@ -13,6 +13,21 @@ import type {
   PaymentIntentMetadata
 } from './types';
 
+/**
+ * Cache and rate limiting interfaces following TypeScript best practices
+ */
+interface CustomerCacheEntry {
+  customer: Stripe.Customer;
+  timestamp: number;
+  lastAccessed: number;
+}
+
+interface RateLimitEntry {
+  count: number;
+  firstRequest: number;
+  lastRequest: number;
+}
+
 // Initialize Stripe with secret key and timeout configuration
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   timeout: 30000, // 30 second timeout for Stripe API calls
@@ -40,9 +55,9 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Ope
   ]);
 }
 
-// Simple in-memory rate limiting store
+// Simple in-memory rate limiting store with proper typing
 // In production, consider using Redis or another persistent store
-const rateLimitStore = new Map();
+const rateLimitStore = new Map<string, RateLimitEntry>();
 
 // Rate limiting configuration - different for development vs production
 const PRODUCTION_RATE_LIMIT = {
@@ -66,8 +81,8 @@ function getRateLimitConfig(origin: string | undefined) {
   return isDevelopmentRequest(origin) ? DEVELOPMENT_RATE_LIMIT : PRODUCTION_RATE_LIMIT;
 }
 
-// Customer caching to reduce Stripe API calls
-const customerCache = new Map();
+// Customer caching to reduce Stripe API calls with proper typing
+const customerCache = new Map<string, CustomerCacheEntry>();
 const CUSTOMER_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 const MAX_CACHE_SIZE = 1000; // Maximum number of cached customers
 
@@ -140,7 +155,7 @@ class CustomerCacheManager {
 const VALIDATION_RULES: ValidationRules = {
   required_fields: ['lead_id', 'full_name', 'email', 'phone'],
   email_regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone_regex: /^[\+]?[0-9][\d\s\-\(\)]{7,20}$/, // International format with spaces/dashes allowed
+  phone_regex: /^[+]?[0-9][\d\s\-()]{7,20}$/, // International format with spaces/dashes allowed
   name_min_length: 2,
   name_max_length: 100,
   amount_min: 50, // 50 cents minimum
@@ -179,7 +194,7 @@ function validatePaymentRequest(requestBody: PaymentIntentRequest): ValidationRe
     errors.push(`Name must be between ${VALIDATION_RULES.name_min_length} and ${VALIDATION_RULES.name_max_length} characters`);
   }
   
-  if (!/^[a-zA-ZÀ-ÿ\u0100-\u017F\s\-\'\.']+$/.test(cleanName)) {
+  if (!/^[a-zA-ZÀ-ÿ\u0100-\u017F\s\-'.]+$/.test(cleanName)) {
     errors.push('Name contains invalid characters');
   }
   
@@ -194,12 +209,12 @@ function validatePaymentRequest(requestBody: PaymentIntentRequest): ValidationRe
   }
   
   // Validate phone - clean and check
-  const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+  const cleanPhone = phone.replace(/[\s\-()]/g, '');
   
   // Check if it has at least 7 digits and starts with + or digit
   if (cleanPhone.length < 7 || cleanPhone.length > 15) {
     errors.push('Phone number must be between 7 and 15 digits');
-  } else if (!/^[\+]?[0-9]+$/.test(cleanPhone)) {
+  } else if (!/^[+]?[0-9]+$/.test(cleanPhone)) {
     errors.push('Phone number contains invalid characters');
   }
   
@@ -268,7 +283,7 @@ function checkRateLimit(clientIP: string, origin: string | undefined): RateLimit
     }
   }
   
-  const record = rateLimitStore.get(key) as { count: number; firstRequest: number; lastRequest: number } | undefined;
+  const record = rateLimitStore.get(key);
   
   if (!record) {
     rateLimitStore.set(key, {
@@ -399,7 +414,7 @@ export default async (request: Request): Promise<Response> => {
     try {
       const body = await request.text();
       requestBody = JSON.parse(body || '{}') as PaymentIntentRequest;
-    } catch (error) {
+    } catch {
       return new Response(JSON.stringify({ error: 'Invalid JSON in request body' }), {
         status: 400,
         headers: responseHeaders
@@ -624,8 +639,8 @@ export default async (request: Request): Promise<Response> => {
   } catch (error) {
     console.error('Error creating payment intent:', error);
 
-    // Handle specific Stripe errors
-    if (error instanceof Error && 'type' in error && (error as any).type === 'StripeCardError') {
+    // Handle specific Stripe errors using proper type guards
+    if (error instanceof Stripe.errors.StripeCardError) {
       return new Response(JSON.stringify({ 
         error: 'Card error: ' + error.message 
       }), {
@@ -634,7 +649,7 @@ export default async (request: Request): Promise<Response> => {
       });
     }
 
-    if (error instanceof Error && 'type' in error && (error as any).type === 'StripeRateLimitError') {
+    if (error instanceof Stripe.errors.StripeRateLimitError) {
       return new Response(JSON.stringify({ 
         error: 'Too many requests. Please try again later.' 
       }), {
@@ -643,7 +658,7 @@ export default async (request: Request): Promise<Response> => {
       });
     }
 
-    if (error instanceof Error && 'type' in error && (error as any).type === 'StripeInvalidRequestError') {
+    if (error instanceof Stripe.errors.StripeInvalidRequestError) {
       // Handle idempotency key conflicts specifically
       if (error instanceof Error && error.message?.includes('idempotency')) {
         return new Response(JSON.stringify({ 
@@ -663,7 +678,7 @@ export default async (request: Request): Promise<Response> => {
       });
     }
 
-    if (error instanceof Error && 'type' in error && (error as any).type === 'StripeAPIError') {
+    if (error instanceof Stripe.errors.StripeAPIError) {
       return new Response(JSON.stringify({ 
         error: 'Payment service temporarily unavailable' 
       }), {
@@ -672,7 +687,7 @@ export default async (request: Request): Promise<Response> => {
       });
     }
 
-    if (error instanceof Error && 'type' in error && (error as any).type === 'StripeConnectionError') {
+    if (error instanceof Stripe.errors.StripeConnectionError) {
       return new Response(JSON.stringify({ 
         error: 'Network error. Please try again.' 
       }), {

@@ -122,11 +122,11 @@ export interface FooterContact {
     address: string;
     url: string;
   };
-  social: Array<{
+  social: {
     platform: string;
     username?: string;
     url: string;
-  }>;
+  }[];
 }
 
 export interface FooterOrganization {
@@ -185,9 +185,7 @@ export interface PresenterData {
 }
 
 // JSON file loading utility type
-export interface JSONFileLoader<T> {
-  (): T;
-}
+export type JSONFileLoader<T> = () => T;
 
 // Section-based content structure
 export interface SectionCTA {
@@ -264,14 +262,14 @@ export interface ProblemSection extends BaseSection {
 export interface SolutionSection extends BaseSection {
   id: 'solution';
   copy: SectionCopy & {
-    pillars: Array<{
+    pillars: {
       number: string;
       title: string;
       description: string;
       icon: string;
       analytics_event: string;
       animation_delay: string;
-    }>;
+    }[];
     supporting_text: string;
     trust_indicators: string[];
   };
@@ -295,7 +293,7 @@ export interface AboutSection extends BaseSection {
 
 export interface SocialProofSection extends BaseSection {
   id: 'social-proof';
-  testimonials: Array<{
+  testimonials: {
     id: number;
     name: string;
     profession: string;
@@ -303,7 +301,7 @@ export interface SocialProofSection extends BaseSection {
     result: string;
     video_id: string;
     thumbnail: string;
-  }>;
+  }[];
 }
 
 export interface OfferSection extends BaseSection {
@@ -337,23 +335,23 @@ export interface OfferSection extends BaseSection {
 
 export interface FAQSection extends BaseSection {
   id: 'faq';
-  items: Array<{
+  items: {
     id: string;
     question: string;
     answer: Record<string, unknown>;
     analytics_event: string;
     [key: string]: unknown;
-  }>;
+  }[];
   contact: {
     whatsapp_url: string;
     whatsapp_name: string;
     whatsapp_phone: string;
     response_time: string;
   };
-  legal_links: Array<{
+  legal_links: {
     text: string;
     url: string;
-  }>;
+  }[];
 }
 
 export interface FinalCTASection extends BaseSection {
@@ -367,11 +365,11 @@ export interface FinalCTASection extends BaseSection {
 export interface FooterSection extends BaseSection {
   id: 'footer';
   copy: SectionCopy & {
-    stats: Array<{
+    stats: {
       value: number | string;
       label: string;
       counter: boolean;
-    }>;
+    }[];
     brand: {
       name: string;
       tagline: string;
@@ -379,11 +377,11 @@ export interface FooterSection extends BaseSection {
       guarantee: string;
     };
     navigation: {
-      legal: Array<{
+      legal: {
         label: string;
         url: string;
         external?: boolean;
-      }>;
+      }[];
     };
     contact: {
       whatsapp: {
@@ -395,11 +393,11 @@ export interface FooterSection extends BaseSection {
         address: string;
         url: string;
       };
-      social: Array<{
+      social: {
         platform: string;
         username?: string;
         url: string;
-      }>;
+      }[];
     };
     organization: {
       name: string;
@@ -448,7 +446,7 @@ export interface ThankYouContentSection extends BaseSection {
         analytics: string;
       };
     };
-    steps: Array<{
+    steps: {
       number: string;
       color: string;
       title: string;
@@ -462,7 +460,7 @@ export interface ThankYouContentSection extends BaseSection {
         rel?: string;
         icon: string;
       };
-    }>;
+    }[];
     eventSummary: {
       title: string;
       subtitle: string;
@@ -546,9 +544,7 @@ export interface PageComposition {
   customTemplate?: string;
 }
 
-export interface PagesData {
-  [key: string]: PageComposition;
-}
+export type PagesData = Record<string, PageComposition>;
 
 // Page Loading System Types
 export interface LoadedPageSection {
@@ -572,9 +568,7 @@ export interface LoadedPage {
   sections: LoadedPageSection[];
 }
 
-export interface PageLoader {
-  (context?: { page?: { url?: string } }): LoadedPage;
-}
+export type PageLoader = (context?: { page?: { url?: string } }) => LoadedPage;
 
 export interface SectionValidationError extends Error {
   sectionSlug: string;

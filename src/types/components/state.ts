@@ -14,12 +14,10 @@ export interface AppState {
     isTablet: boolean;
     isDesktop: boolean;
   };
-  components: {
-    [componentName: string]: {
+  components: Record<string, {
       initialized: boolean;
       error: Error | undefined;
-    };
-  };
+    }>;
 }
 
 /**

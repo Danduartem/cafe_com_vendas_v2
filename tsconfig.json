@@ -49,6 +49,8 @@
   "include": [
     "src/**/*.ts",
     "scripts/**/*.ts",
+    "netlify/functions/**/*.ts",
+    "tests/**/*.ts",
     "*.config.ts",
     ".eleventy.ts",
     "types/**/*.d.ts"
@@ -58,7 +60,6 @@
     "_site",
     "dist",
     "debug-gtm.ts",
-    "tests/**/*",
     "netlify/edge-functions/**/*"
   ]
 }

@@ -179,7 +179,7 @@ describe('Landing Page Composition', () => {
         }
 
         case 'solution': {
-          const copy = sectionData.copy as { pillars?: Array<{ title: string }> };
+          const copy = sectionData.copy as { pillars?: { title: string }[] };
           const pillars = copy.pillars;
           if (pillars) {
             const pillarsContainer = document.createElement('div');
@@ -197,7 +197,7 @@ describe('Landing Page Composition', () => {
         }
 
         case 'social-proof': {
-          const testimonials = (sectionData as { testimonials?: Array<{ name: string }> }).testimonials;
+          const testimonials = (sectionData as { testimonials?: { name: string }[] }).testimonials;
           if (testimonials) {
             const testimonialsContainer = document.createElement('div');
             testimonialsContainer.className = 'testimonials';
@@ -214,7 +214,7 @@ describe('Landing Page Composition', () => {
         }
 
         case 'faq': {
-          const items = (sectionData as { items?: Array<{ id: string; question: string }> }).items;
+          const items = (sectionData as { items?: { id: string; question: string }[] }).items;
           if (items) {
             const faqContainer = document.createElement('div');
             faqContainer.className = 'faq-items';
@@ -253,7 +253,7 @@ describe('Landing Page Composition', () => {
         sectionElement.id = `s-${section.slug}`;
         sectionElement.className = `section section-${section.slug}`;
         sectionElement.setAttribute('data-order', index.toString());
-        sectionElement.setAttribute('data-variant', section.variant);
+        sectionElement.setAttribute('data-variant', section.variant ?? 'default');
 
         // Add analytics attributes
         sectionElement.setAttribute('data-analytics-section', section.slug);

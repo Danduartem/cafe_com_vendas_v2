@@ -14,6 +14,32 @@ import type {
   TimeoutPromise
 } from './types';
 
+/**
+ * MailerLite API response interfaces
+ */
+interface MailerLiteApiResponse {
+  data?: {
+    id?: string;
+    [key: string]: unknown;
+  };
+  message?: string;
+  errors?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+interface MailerLiteErrorResponse {
+  message?: string;
+  errors?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+// Rate limiting interface for MailerLite
+interface MailerLiteRateLimitEntry {
+  count: number;
+  firstRequest: number;
+  lastRequest: number;
+}
+
 // Timeout configuration
 const TIMEOUTS = {
   mailerlite_api: 15000,
@@ -35,8 +61,8 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Ope
   ]);
 }
 
-// Simple in-memory rate limiting store for lead capture
-const rateLimitStore = new Map();
+// Simple in-memory rate limiting store for lead capture with proper typing
+const rateLimitStore = new Map<string, MailerLiteRateLimitEntry>();
 const RATE_LIMIT_WINDOW = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT_MAX_REQUESTS = 8; // Max 8 lead submissions per 10 minutes per IP
 
@@ -47,7 +73,7 @@ const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
 const VALIDATION_RULES: ValidationRules = {
   required_fields: ['lead_id', 'full_name', 'email', 'phone'],
   email_regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone_regex: /^[\+]?[0-9][\d\s\-\(\)]{7,20}$/, 
+  phone_regex: /^[+]?[0-9][\d\s\-()]{7,20}$/, 
   name_min_length: 2,
   name_max_length: 100,
   amount_min: 50,
@@ -69,7 +95,7 @@ class CircuitBreaker {
   public successCount: number;
   public totalCalls: number;
 
-  constructor(name: string, failureThreshold: number = 5, resetTimeout: number = 60000) {
+  constructor(name: string, failureThreshold = 5, resetTimeout = 60000) {
     this.name = name;
     this.failureCount = 0;
     this.lastFailureTime = null;
@@ -167,7 +193,7 @@ function validateLeadRequest(requestBody: MailerLiteLeadRequest): ValidationResu
     errors.push(`Name must be between ${VALIDATION_RULES.name_min_length} and ${VALIDATION_RULES.name_max_length} characters`);
   }
   
-  if (!/^[a-zA-ZÀ-ÿ\u0100-\u017F\s\-\'.]+$/.test(cleanName)) {
+  if (!/^[a-zA-ZÀ-ÿ\u0100-\u017F\s\-'.]+$/.test(cleanName)) {
     errors.push('Name contains invalid characters');
   }
   
@@ -182,10 +208,10 @@ function validateLeadRequest(requestBody: MailerLiteLeadRequest): ValidationResu
   }
   
   // Validate phone - clean and check
-  const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+  const cleanPhone = phone.replace(/[\s\-()]/g, '');
   if (cleanPhone.length < 7 || cleanPhone.length > 15) {
     errors.push('Phone number must be between 7 and 15 digits');
-  } else if (!/^[\+]?[0-9]+$/.test(cleanPhone)) {
+  } else if (!/^[+]?[0-9]+$/.test(cleanPhone)) {
     errors.push('Phone number contains invalid characters');
   }
   
@@ -239,7 +265,7 @@ function checkRateLimit(clientIP: string): RateLimitResult {
     }
   }
   
-  const record = rateLimitStore.get(key) as { count: number; firstRequest: number; lastRequest: number } | undefined;
+  const record = rateLimitStore.get(key);
   
   if (!record) {
     rateLimitStore.set(key, {
@@ -315,8 +341,8 @@ async function addLeadToMailerLite(leadData: MailerLiteSubscriberData): Promise<
         if (response.status === 422) {
           // Validation error or subscriber already exists
           try {
-            const errorData = JSON.parse(errorText);
-            if (errorData.message && errorData.message.includes('already exists')) {
+            const errorData = JSON.parse(errorText) as MailerLiteErrorResponse;
+            if (errorData.message?.includes('already exists')) {
               console.log(`Lead already exists in MailerLite: ${leadData.email}`);
               return { success: true, reason: 'Lead already exists', action: 'skipped' };
             }
@@ -325,7 +351,7 @@ async function addLeadToMailerLite(leadData: MailerLiteSubscriberData): Promise<
               console.warn(`MailerLite validation errors for ${leadData.email}:`, errorData.errors);
               return { success: false, reason: `Validation error: ${JSON.stringify(errorData.errors)}`, recoverable: true };
             }
-          } catch (parseError) {
+          } catch {
             console.warn(`Could not parse MailerLite 422 error response: ${errorText}`);
           }
         } else if (response.status === 401) {
@@ -345,7 +371,7 @@ async function addLeadToMailerLite(leadData: MailerLiteSubscriberData): Promise<
         throw new Error(`MailerLite API error: ${response.status} - ${errorText}`);
       }
 
-      const result = await response.json();
+      const result = await response.json() as MailerLiteApiResponse;
       console.log(`Successfully added lead to MailerLite: ${leadData.email}`, {
         email: leadData.email,
         subscriberId: result.data?.id
@@ -472,7 +498,7 @@ export default async (request: Request): Promise<Response> => {
     try {
       const body = await request.text();
       requestBody = JSON.parse(body || '{}') as MailerLiteLeadRequest;
-    } catch (error) {
+    } catch {
       return new Response(JSON.stringify({ error: 'Invalid JSON in request body' }), {
         status: 400,
         headers: responseHeaders

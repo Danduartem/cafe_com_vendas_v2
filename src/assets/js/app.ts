@@ -6,7 +6,7 @@
 import { CONFIG } from '@/config/constants';
 import { state, StateManager } from '@/core/state';
 import { Analytics } from '@/core/analytics';
-import { ScrollTracker } from '@/utils/scroll-tracker';
+import { ScrollTracker, throttle, debounce, safeQuery, safeQueryAll } from '@/utils/index.js';
 import type {
   ComponentRegistration,
   ComponentHealthStatus,
@@ -14,7 +14,8 @@ import type {
 } from '../../types/components/base.js';
 import type {
   AppInitializedEvent,
-  ComponentsInitializedEvent
+  ComponentsInitializedEvent,
+  AnalyticsEvent
 } from '../../types/components/analytics.js';
 import type { AppState } from '../../types/components/state.js';
 import type { Constants } from '../../types/components/config.js';
@@ -39,9 +40,15 @@ import { ThankYou } from '../../_includes/sections/thank-you/index';
 import { Checkout } from '../../_includes/sections/checkout/index';
 
 /**
- * Main application interface
+ * Main application interface - matches global CafeComVendasApp type
  */
 interface CafeComVendasInterface {
+  Analytics: {
+    track: (event: string, data?: Record<string, unknown>) => void;
+    trackError: (type: string, error: Error, context?: Record<string, unknown>) => void;
+  };
+  Components: Record<string, unknown>;
+  Utils: Record<string, unknown>;
   components: ComponentRegistration[] | undefined;
   init(): void;
   setupGlobalErrorHandling(): void;
@@ -67,6 +74,27 @@ interface ErrorContext {
 }
 
 export const CafeComVendas: CafeComVendasInterface = {
+  // Expose Analytics module with compatible interface
+  Analytics: {
+    track: (event: string, data?: Record<string, unknown>) => {
+      // Type-safe wrapper for analytics tracking
+      Analytics.track(event, data as Omit<AnalyticsEvent, 'event'>);
+    },
+    trackError: Analytics.trackError.bind(Analytics)
+  },
+
+  // Expose Components (will be populated after initialization)
+  Components: {},
+
+  // Expose Utils
+  Utils: {
+    throttle,
+    debounce,
+    safeQuery,
+    safeQueryAll,
+    ScrollTracker
+  },
+
   components: undefined,
 
   /**
@@ -118,9 +146,13 @@ export const CafeComVendas: CafeComVendasInterface = {
   setupGlobalErrorHandling(): void {
     // Handle unhandled promise rejections
     window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent): void => {
+      const reason: unknown = event.reason;
+      const errorMessage = reason instanceof Error ? reason.message : String(reason);
+      const errorStack = reason instanceof Error ? reason.stack : undefined;
+      
       const errorContext: ErrorContext = {
-        message: event.reason?.message ?? 'Unknown promise rejection',
-        stack: event.reason?.stack,
+        message: errorMessage,
+        stack: errorStack,
         filename: undefined,
         lineno: undefined,
         colno: undefined,
@@ -131,15 +163,19 @@ export const CafeComVendas: CafeComVendasInterface = {
 
     // Handle JavaScript errors
     window.addEventListener('error', (event: ErrorEvent): void => {
+      const error: unknown = event.error;
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      const errorToPass = error instanceof Error ? error : new Error(event.message);
+      
       const errorContext: ErrorContext = {
         message: event.message,
         filename: event.filename,
         lineno: event.lineno,
         colno: event.colno,
-        stack: event.error?.stack,
+        stack: errorStack,
         component_name: undefined
       };
-      Analytics.trackError('global_javascript_error', event.error ?? new Error(event.message), errorContext);
+      Analytics.trackError('global_javascript_error', errorToPass, errorContext);
     });
   },
 
@@ -201,6 +237,12 @@ export const CafeComVendas: CafeComVendasInterface = {
     Analytics.track('components_initialized', componentsEvent);
 
     this.components = components;
+    
+    // Populate Components for global access
+    this.Components = components.reduce((acc, { name, component }) => {
+      acc[name] = component;
+      return acc;
+    }, {} as Record<string, unknown>);
   },
 
   /**

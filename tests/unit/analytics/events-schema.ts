@@ -3,7 +3,7 @@
  * Defines all valid GTM events that can be tracked
  */
 
-import type { AnalyticsEvent } from '../../../src/assets/js/types/analytics.ts';
+import type { AnalyticsEvent } from '../../../src/types/components/analytics.ts';
 
 /**
  * All valid GTM event names used in the application

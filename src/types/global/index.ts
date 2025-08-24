@@ -1,11 +1,59 @@
 // Global utility types and Window interface extensions
+
+// GTM Data Layer event structure
+interface DataLayerEvent {
+  event: string;
+  [key: string]: unknown;
+}
+
+// Application configuration structure - matches EnvironmentConfig
+interface AppConfig {
+  environment: 'development' | 'production';
+  isDevelopment: boolean;
+  isProduction: boolean;
+  formspree: {
+    endpoint: string;
+    formId: string;
+  };
+  stripe: {
+    publishableKey: string;
+  };
+  contact: {
+    email: string;
+    whatsapp: string;
+  };
+  cloudinary: {
+    cloudName: string;
+  };
+  urls: {
+    base: string;
+    thankYou: string;
+    instagram: string;
+    linkedin: string;
+  };
+  [key: string]: unknown;
+}
+
+// Main application object structure
+interface CafeComVendasApp {
+  Analytics: {
+    track: (event: string, data?: Record<string, unknown>) => void;
+    trackError: (type: string, error: Error, context?: Record<string, unknown>) => void;
+  };
+  Components: Record<string, unknown>;
+  Utils: Record<string, unknown>;
+}
+
+// Stripe constructor type - specific types defined in checkout component
+type StripeConstructor = (publishableKey: string) => unknown;
+
 declare global {
   interface Window {
-    dataLayer: any[];
-    Stripe?: any;
-    CONFIG: any;
-    ANALYTICS_EVENTS: any;
-    CafeComVendas: any;
+    dataLayer: DataLayerEvent[];
+    Stripe?: StripeConstructor;
+    CONFIG: AppConfig;
+    ANALYTICS_EVENTS: Record<string, unknown>;
+    CafeComVendas: CafeComVendasApp;
     CLOUDINARY_CLOUD_NAME: string;
   }
 }

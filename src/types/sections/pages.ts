@@ -49,9 +49,7 @@ export interface PageComposition {
   customTemplate?: string;
 }
 
-export interface PagesData {
-  [key: string]: PageComposition;
-}
+export type PagesData = Record<string, PageComposition>;
 
 // Page Loading System Types
 export interface LoadedPageSection {
@@ -75,9 +73,7 @@ export interface LoadedPage {
   sections: LoadedPageSection[];
 }
 
-export interface PageLoader {
-  (context?: { page?: { url?: string } }): LoadedPage;
-}
+export type PageLoader = (context?: { page?: { url?: string } }) => LoadedPage;
 
 export interface SectionValidationError extends Error {
   sectionSlug: string;

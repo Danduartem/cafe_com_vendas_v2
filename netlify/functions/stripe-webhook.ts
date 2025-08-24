@@ -11,6 +11,39 @@ import type {
   TimeoutPromise
 } from './types';
 
+// MailerLite API response interfaces
+interface MailerLiteSubscriberResponse {
+  data: {
+    id: string;
+    email: string;
+    name: string;
+    status: string;
+    subscribed_at: string;
+    [key: string]: unknown;
+  };
+}
+
+interface MailerLiteSearchResponse {
+  data: {
+    id: string;
+    email: string;
+    name: string;
+    status: string;
+    [key: string]: unknown;
+  }[];
+  meta: {
+    total: number;
+    per_page: number;
+    current_page: number;
+    [key: string]: unknown;
+  };
+}
+
+// Extended Stripe Invoice interface to include subscription property
+interface StripeInvoiceWithSubscription extends Stripe.Invoice {
+  subscription: string | Stripe.Subscription | null;
+}
+
 // Initialize Stripe with secret key and timeout configuration
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   timeout: 30000, // 30 second timeout for Stripe API calls
@@ -59,12 +92,12 @@ const CIRCUIT_BREAKER_CONFIG: CircuitBreakerConfig = {
   monitoringPeriod: 300000 // 5 minutes
 };
 
-// Fulfillment tracking to prevent duplicates
-const fulfillmentStore = new Map();
+// Fulfillment tracking to prevent duplicates with proper typing
+const fulfillmentStore = new Map<string, FulfillmentRecord>();
 const FULFILLMENT_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
-// Circuit breaker state management
-const circuitBreakers = new Map();
+// Circuit breaker state management with proper typing
+const circuitBreakers = new Map<string, CircuitBreaker>();
 
 /**
  * Circuit Breaker Pattern Implementation
@@ -152,7 +185,7 @@ function getCircuitBreaker(serviceName: string): CircuitBreaker {
   if (!circuitBreakers.has(serviceName)) {
     circuitBreakers.set(serviceName, new CircuitBreaker(serviceName));
   }
-  return circuitBreakers.get(serviceName);
+  return circuitBreakers.get(serviceName)!; // Non-null assertion safe due to set above
 }
 
 /**
@@ -292,49 +325,49 @@ export default async (request: Request): Promise<Response> => {
     // Handle different event types with retry logic
     switch (stripeEvent.type) {
       case 'payment_intent.succeeded':
-        await handlePaymentSuccess(stripeEvent.data.object as Stripe.PaymentIntent, correlationId);
+        await handlePaymentSuccess(stripeEvent.data.object, correlationId);
         break;
 
       case 'payment_intent.processing':
-        await handlePaymentProcessing(stripeEvent.data.object as Stripe.PaymentIntent, correlationId);
+        await handlePaymentProcessing(stripeEvent.data.object, correlationId);
         break;
 
       case 'payment_intent.payment_failed':
-        await handlePaymentFailed(stripeEvent.data.object as Stripe.PaymentIntent, correlationId);
+        await handlePaymentFailed(stripeEvent.data.object, correlationId);
         break;
 
       case 'payment_intent.canceled':
-        await handlePaymentCanceled(stripeEvent.data.object as Stripe.PaymentIntent, correlationId);
+        await handlePaymentCanceled(stripeEvent.data.object, correlationId);
         break;
 
       case 'payment_intent.requires_action':
-        await handlePaymentRequiresAction(stripeEvent.data.object as Stripe.PaymentIntent, correlationId);
+        await handlePaymentRequiresAction(stripeEvent.data.object, correlationId);
         break;
 
       case 'payment_intent.partially_funded':
-        await handlePaymentPartiallyFunded(stripeEvent.data.object as Stripe.PaymentIntent, correlationId);
+        await handlePaymentPartiallyFunded(stripeEvent.data.object, correlationId);
         break;
 
       case 'charge.dispute.created':
-        await handleChargeDispute(stripeEvent.data.object as Stripe.Dispute, correlationId);
+        await handleChargeDispute(stripeEvent.data.object, correlationId);
         break;
 
       case 'invoice.payment_succeeded':
-        await handleInvoicePaymentSucceeded(stripeEvent.data.object as Stripe.Invoice, correlationId);
+        await handleInvoicePaymentSucceeded(stripeEvent.data.object, correlationId);
         break;
 
       case 'checkout.session.async_payment_succeeded':
-        await handleCheckoutSessionAsyncPaymentSucceeded(stripeEvent.data.object as Stripe.Checkout.Session, correlationId);
+        await handleCheckoutSessionAsyncPaymentSucceeded(stripeEvent.data.object, correlationId);
         break;
 
       case 'checkout.session.async_payment_failed':
-        await handleCheckoutSessionAsyncPaymentFailed(stripeEvent.data.object as Stripe.Checkout.Session, correlationId);
+        await handleCheckoutSessionAsyncPaymentFailed(stripeEvent.data.object, correlationId);
         break;
 
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted':
-        await handleSubscriptionChange(stripeEvent.data.object as Stripe.Subscription, stripeEvent.type, correlationId);
+        await handleSubscriptionChange(stripeEvent.data.object, stripeEvent.type, correlationId);
         break;
 
       default:
@@ -684,6 +717,8 @@ async function handleChargeDispute(dispute: Stripe.Dispute, correlationId: strin
       disputeId: dispute.id
     }, correlationId);
     
+    await Promise.resolve(); // Placeholder for future async dispute handling
+    
   } catch (error) {
     logWithCorrelation('error', 'Error processing charge dispute', {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -698,8 +733,10 @@ async function handleChargeDispute(dispute: Stripe.Dispute, correlationId: strin
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Invoice payment succeeded: ${invoice.id}`, {
     invoiceId: invoice.id,
-    subscriptionId: (invoice as any).subscription
+    subscriptionId: (invoice as StripeInvoiceWithSubscription).subscription
   }, correlationId);
+  
+  await Promise.resolve(); // Placeholder for future async invoice processing
 }
 
 /**
@@ -712,6 +749,8 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription, event
     status: subscription.status,
     eventType
   }, correlationId);
+  
+  await Promise.resolve(); // Placeholder for future async subscription handling
 }
 
 /**
@@ -904,7 +943,7 @@ async function handleCheckoutSessionAsyncPaymentFailed(session: Stripe.Checkout.
 /**
  * Add subscriber to MailerLite
  */
-async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promise<any> {
+async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promise<MailerLiteSubscriberResponse | void> {
   if (!MAILERLITE_API_KEY) {
     logWithCorrelation('warn', 'MailerLite API key not configured - skipping email integration');
     return;
@@ -940,10 +979,10 @@ async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promis
       throw new Error(`MailerLite API error: ${response.status} - ${error}`);
     }
 
-    const result = await response.json();
+    const result = await response.json() as MailerLiteSubscriberResponse;
     logWithCorrelation('info', `Added subscriber to MailerLite: ${subscriberData.email}`, {
       email: subscriberData.email,
-      subscriberId: result.data?.id
+      subscriberId: result.data.id
     });
       return result;
     });
@@ -997,7 +1036,7 @@ async function updateMailerLiteSubscriber(email: string, fields: Record<string, 
       throw new Error(`Failed to find subscriber: ${searchResponse.status}`);
     }
 
-    const searchResult = await searchResponse.json();
+    const searchResult = await searchResponse.json() as MailerLiteSearchResponse;
     
     if (!searchResult.data || searchResult.data.length === 0) {
       console.log(`Subscriber not found in MailerLite: ${email}`);
@@ -1069,6 +1108,7 @@ async function triggerConfirmationEmail(email: string, data: Record<string, unkn
     
     // You can implement specific MailerLite automation triggers here
     // Example: Add to a specific group that triggers the automation
+    await Promise.resolve(); // Placeholder for future async automation API calls
     
   } catch (error) {
     console.error('Error triggering confirmation email:', error);
@@ -1088,6 +1128,7 @@ async function triggerAbandonedCartEmail(email: string, data: Record<string, unk
     
     // Add to abandoned cart group or trigger specific automation
     // This would be configured in MailerLite dashboard
+    await Promise.resolve(); // Placeholder for future async automation API calls
     
   } catch (error) {
     console.error('Error triggering abandoned cart email:', error);

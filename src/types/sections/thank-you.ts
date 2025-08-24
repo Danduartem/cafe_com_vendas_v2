@@ -26,7 +26,7 @@ export interface ThankYouContentSection extends BaseSection {
         analytics: string;
       };
     };
-    steps: Array<{
+    steps: {
       number: string;
       color: string;
       title: string;
@@ -40,7 +40,7 @@ export interface ThankYouContentSection extends BaseSection {
         rel?: string;
         icon: string;
       };
-    }>;
+    }[];
     eventSummary: {
       title: string;
       subtitle: string;

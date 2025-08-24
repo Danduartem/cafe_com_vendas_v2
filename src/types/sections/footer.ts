@@ -3,11 +3,11 @@ import type { BaseSection, SectionCopy } from './base';
 export interface FooterSection extends BaseSection {
   id: 'footer';
   copy: SectionCopy & {
-    stats: Array<{
+    stats: {
       value: number | string;
       label: string;
       counter: boolean;
-    }>;
+    }[];
     brand: {
       name: string;
       tagline: string;
@@ -15,11 +15,11 @@ export interface FooterSection extends BaseSection {
       guarantee: string;
     };
     navigation: {
-      legal: Array<{
+      legal: {
         label: string;
         url: string;
         external?: boolean;
-      }>;
+      }[];
     };
     contact: {
       whatsapp: {
@@ -31,11 +31,11 @@ export interface FooterSection extends BaseSection {
         address: string;
         url: string;
       };
-      social: Array<{
+      social: {
         platform: string;
         username?: string;
         url: string;
-      }>;
+      }[];
     };
     organization: {
       name: string;

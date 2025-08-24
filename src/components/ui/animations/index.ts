@@ -99,8 +99,8 @@ export const Animations = {
    */
   addClickFeedback(
     element: SafeElement,
-    scaleClass: string = 'scale-95',
-    duration: number = 100
+    scaleClass = 'scale-95',
+    duration = 100
   ): void {
     if (!element) return;
 
