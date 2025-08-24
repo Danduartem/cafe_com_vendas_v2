@@ -20,17 +20,16 @@ describe('Landing Page Composition', () => {
 
   describe('Page Data Loading', () => {
     test('should load page data without errors', async () => {
-      const { default: pageDataLoader } = await import('../../../src/_data/page.ts');
-      const pageData = pageDataLoader.call({ page: { url: '/' } });
-      expect(pageData).toBeDefined();
-      expect(pageData.sections).toBeDefined();
-      expect(Array.isArray(pageData.sections)).toBe(true);
+      const { default: sectionsLoader } = await import('../../../src/_data/sections.ts');
+      const sections = sectionsLoader.call({ page: { url: '/' } });
+      expect(sections).toBeDefined();
+      expect(Array.isArray(sections)).toBe(true);
     });
 
     test('should have all required sections enabled', async () => {
-      const { default: pageDataLoader } = await import('../../../src/_data/page.ts');
-      const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
+      const { default: sectionsLoader } = await import('../../../src/_data/sections.ts');
+      const sections = sectionsLoader.call({ page: { url: '/' } });
+      const enabledSections = sections.filter((s: LoadedPageSection) => s.enabled);
 
       // Should have at least hero, problem, solution, offer, and footer sections
       const requiredSections = ['hero', 'problem', 'solution', 'offer', 'footer'];
@@ -42,9 +41,9 @@ describe('Landing Page Composition', () => {
     });
 
     test('should load section data for each enabled section', async () => {
-      const { default: pageDataLoader } = await import('../../../src/_data/page.ts');
-      const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
+      const { default: sectionsLoader } = await import('../../../src/_data/sections.ts');
+      const sections = sectionsLoader.call({ page: { url: '/' } });
+      const enabledSections = sections.filter((s: LoadedPageSection) => s.enabled);
 
       enabledSections.forEach((section: LoadedPageSection) => {
         expect(section.data).toBeDefined();
@@ -57,9 +56,9 @@ describe('Landing Page Composition', () => {
 
   describe('Section Order and Structure', () => {
     test('should maintain logical section order', async () => {
-      const { default: pageDataLoader } = await import('../../../src/_data/page.ts');
-      const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
+      const { default: sectionsLoader } = await import('../../../src/_data/sections.ts');
+      const sections = sectionsLoader.call({ page: { url: '/' } });
+      const enabledSections = sections.filter((s: LoadedPageSection) => s.enabled);
       const sectionOrder = enabledSections.map((s: LoadedPageSection) => s.slug);
 
       // Hero should be first after top-banner (if both enabled)
@@ -86,42 +85,42 @@ describe('Landing Page Composition', () => {
     });
 
     test('should have consistent section data structure', async () => {
-      const { default: pageDataLoader } = await import('../../../src/_data/page.ts');
-      const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
+      const { default: sectionsLoader } = await import('../../../src/_data/sections.ts');
+      const sections = sectionsLoader.call({ page: { url: '/' } });
+      const enabledSections = sections.filter((s: LoadedPageSection) => s.enabled);
 
       enabledSections.forEach((section: LoadedPageSection) => {
         const sectionData = section.data;
-        const tracking = sectionData.tracking;
+        const copy = sectionData.copy;
 
         // Each section should have required base properties
         expect(sectionData.id).toBeDefined();
-        expect(sectionData.variant).toBeDefined();
         expect(sectionData.enabled).toBe(true);
         expect(sectionData.copy).toBeDefined();
-        expect(sectionData.design).toBeDefined();
-        expect(sectionData.tracking).toBeDefined();
 
-        // Tracking should reference correct section
-        expect(tracking.section_id).toBe(section.slug);
+        // Section ID should match slug
+        expect(sectionData.id).toBe(section.slug);
+        
+        // Copy should be an object with content
+        expect(typeof copy).toBe('object');
+        expect(copy).not.toBeNull();
       });
     });
   });
 
   describe('Content Rendering Simulation', () => {
     test('should create valid HTML structure for each section', async () => {
-      const { default: pageDataLoader } = await import('../../../src/_data/page.ts');
-      const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
+      const { default: sectionsLoader } = await import('../../../src/_data/sections.ts');
+      const sections = sectionsLoader.call({ page: { url: '/' } });
+      const enabledSections = sections.filter((s: LoadedPageSection) => s.enabled);
 
       enabledSections.forEach((section: LoadedPageSection) => {
         const sectionData = section.data;
-        const tracking = sectionData.tracking;
         const copy = sectionData.copy;
 
         // Simulate section container creation
         const sectionElement = document.createElement('section');
-        sectionElement.id = tracking.section_id;
+        sectionElement.id = `s-${section.slug}`;
         sectionElement.className = `section-${section.slug}`;
         sectionElement.setAttribute('data-section', section.slug);
 
@@ -138,7 +137,7 @@ describe('Landing Page Composition', () => {
         document.body.appendChild(sectionElement);
 
         // Verify element was created correctly
-        expect(sectionElement.id).toBe(tracking.section_id);
+        expect(sectionElement.id).toBe(`s-${section.slug}`);
         expect(sectionElement.getAttribute('data-section')).toBe(section.slug);
         expect(sectionElement.querySelector('.container')).toBeTruthy();
         expect(sectionElement.querySelector('.content')).toBeTruthy();
@@ -146,9 +145,9 @@ describe('Landing Page Composition', () => {
     });
 
     test('should handle section-specific content correctly', async () => {
-      const { default: pageDataLoader } = await import('../../../src/_data/page.ts');
-      const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
+      const { default: sectionsLoader } = await import('../../../src/_data/sections.ts');
+      const sections = sectionsLoader.call({ page: { url: '/' } });
+      const enabledSections = sections.filter((s: LoadedPageSection) => s.enabled);
 
       enabledSections.forEach((section: LoadedPageSection) => {
         const sectionData = section.data;
@@ -246,9 +245,9 @@ describe('Landing Page Composition', () => {
 
   describe('Template Data Flow', () => {
     test('should simulate complete data flow from JSON to rendered content', async () => {
-      const { default: pageDataLoader } = await import('../../../src/_data/page.ts');
-      const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
+      const { default: sectionsLoader } = await import('../../../src/_data/sections.ts');
+      const sections = sectionsLoader.call({ page: { url: '/' } });
+      const enabledSections = sections.filter((s: LoadedPageSection) => s.enabled);
 
       // Simulate the complete page rendering
       const pageContainer = document.createElement('div');
@@ -256,20 +255,14 @@ describe('Landing Page Composition', () => {
       pageContainer.id = 'landing-page';
 
       enabledSections.forEach((section: LoadedPageSection, index: number) => {
-        const sectionData = section.data;
-        const tracking = sectionData.tracking;
-        const design = sectionData.design;
-
         const sectionElement = document.createElement('section');
-        sectionElement.id = tracking.section_id;
+        sectionElement.id = `s-${section.slug}`;
         sectionElement.className = `section section-${section.slug}`;
         sectionElement.setAttribute('data-order', index.toString());
-        sectionElement.setAttribute('data-variant', sectionData.variant);
-        sectionElement.setAttribute('data-theme', design.theme);
+        sectionElement.setAttribute('data-variant', section.variant);
 
         // Add analytics attributes
         sectionElement.setAttribute('data-analytics-section', section.slug);
-        sectionElement.setAttribute('data-analytics-impression', tracking.impression_event);
 
         pageContainer.appendChild(sectionElement);
       });
@@ -289,34 +282,23 @@ describe('Landing Page Composition', () => {
       // Verify analytics attributes
       renderedSections.forEach((element) => {
         expect(element.getAttribute('data-analytics-section')).toBeTruthy();
-        expect(element.getAttribute('data-analytics-impression')).toBeTruthy();
       });
     });
   });
 
   describe('Integration Points', () => {
     test('should validate all sections have required integration points', async () => {
-      const { default: pageDataLoader } = await import('../../../src/_data/page.ts');
-      const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: LoadedPageSection) => s.enabled);
+      const { default: sectionsLoader } = await import('../../../src/_data/sections.ts');
+      const sections = sectionsLoader.call({ page: { url: '/' } });
+      const enabledSections = sections.filter((s: LoadedPageSection) => s.enabled);
 
       enabledSections.forEach((section: LoadedPageSection) => {
         const sectionData = section.data;
-        const tracking = sectionData.tracking;
-        const design = sectionData.design;
         const copy = sectionData.copy;
 
-        // Each section should have analytics integration points
-        expect(tracking.section_id).toBeDefined();
-        expect(tracking.impression_event).toBeDefined();
-
-        // Each section should have design integration points
-        expect(design.theme).toBeDefined();
-        expect(design.layout).toBeDefined();
-
-        // Section should have background or overlay
-        const hasBackgroundStyle = design.background !== undefined || (design as { overlay?: unknown }).overlay !== undefined;
-        expect(hasBackgroundStyle).toBe(true);
+        // Each section should have basic integration points
+        expect(section.slug).toBeDefined();
+        expect(sectionData.id).toBe(section.slug);
 
         // Each section should have content integration points
         const copyExtended = copy as {

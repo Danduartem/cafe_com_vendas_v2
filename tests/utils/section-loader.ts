@@ -46,7 +46,7 @@ function loadDesignConfigs(): Record<string, unknown> {
  * This mirrors the production loadSection() function in src/_data/page.ts
  */
 export function loadSectionData(sectionSlug: SectionSlug): unknown {
-  const sectionPath = resolve(process.cwd(), `content/pt-PT/sections/${sectionSlug}.json`);
+  const sectionPath = resolve(process.cwd(), `src/_data/sections/${sectionSlug}.json`);
 
   if (!existsSync(sectionPath)) {
     throw new Error(`Section file not found: ${sectionPath}`);

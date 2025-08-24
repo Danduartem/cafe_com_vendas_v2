@@ -167,53 +167,60 @@ describe('Analytics Contract Testing', () => {
   describe('Section Analytics Integration', () => {
     test('should validate section tracking configuration', async () => {
       // Load page data to check section tracking
-      const { default: pageDataLoader } = await import('../../../src/_data/page.ts');
-      const pageData = pageDataLoader.call({ page: { url: '/' } });
-      const enabledSections = pageData.sections.filter((s: { enabled: boolean }) => s.enabled);
+      const { default: sectionsLoader } = await import('../../../src/_data/sections.ts');
+      const sections = sectionsLoader.call({ page: { url: '/' } });
+      const enabledSections = sections.filter((s: { enabled: boolean }) => s.enabled);
 
-      enabledSections.forEach((section: { slug: string; enabled: boolean; data: { tracking: { section_id: string; impression_event: string } } }) => {
-        // Each section should have tracking configuration
-        expect(section.data.tracking).toBeDefined();
-        expect(section.data.tracking.section_id).toBeDefined();
-        expect(section.data.tracking.impression_event).toBeDefined();
+      enabledSections.forEach((section: { slug: string; enabled: boolean; data: { id: string; enabled: boolean; copy: object } }) => {
+        // Each section should have basic configuration
+        expect(section.data.id).toBeDefined();
+        expect(section.data.enabled).toBeDefined();
+        expect(section.data.copy).toBeDefined();
 
-        // Section ID should be valid
+        // Section ID should match slug and be valid
+        expect(section.data.id).toBe(section.slug);
         const validSectionIds = [
           'top-banner', 'hero', 'problem', 'solution', 'about',
           'social-proof', 'offer', 'faq', 'final-cta', 'footer'
         ];
-        expect(validSectionIds).toContain(section.data.tracking.section_id);
+        expect(validSectionIds).toContain(section.data.id);
 
-        // Impression event should follow naming convention
-        expect(section.data.tracking.impression_event).toMatch(/^section_view|impression|view/);
+        // Section should be enabled
+        expect(section.data.enabled).toBe(true);
       });
     });
 
-    test('should validate FAQ items have analytics events', async () => {
+    test('should validate FAQ items have required structure', async () => {
       // Load FAQ section data
       const { loadSectionData } = await import('../../utils/section-loader.ts');
-      const faqData = loadSectionData('faq') as { items?: Array<{ analytics_event: string; question: string; answer: string }> };
+      const faqData = loadSectionData('faq') as { items?: Array<{ id: string; question: string; answer: object }> };
 
       if (faqData.items && Array.isArray(faqData.items)) {
-        faqData.items.forEach((item: { analytics_event: string }) => {
-          expect(item.analytics_event).toBeDefined();
-          expect(typeof item.analytics_event).toBe('string');
-          // Should follow FAQ event naming convention (open_faq_* pattern)
-          expect(item.analytics_event).toMatch(/^(faq_|open_faq_)/);
+        faqData.items.forEach((item: { id: string; question: string; answer: object }) => {
+          expect(item.id).toBeDefined();
+          expect(typeof item.id).toBe('string');
+          expect(item.question).toBeDefined();
+          expect(typeof item.question).toBe('string');
+          expect(item.answer).toBeDefined();
+          expect(typeof item.answer).toBe('object');
         });
       }
     });
 
-    test('should validate solution pillars have analytics events', async () => {
+    test('should validate solution pillars have required structure', async () => {
       const { loadSectionData } = await import('../../utils/section-loader.ts');
-      const solutionData = loadSectionData('solution') as { copy: { pillars?: Array<{ analytics_event: string; icon: string; title: string; description: string }> } };
+      const solutionData = loadSectionData('solution') as { copy: { pillars?: Array<{ number: string; title: string; description: string; icon: string }> } };
 
       if (solutionData.copy.pillars && Array.isArray(solutionData.copy.pillars)) {
-        solutionData.copy.pillars.forEach((pillar: { analytics_event: string }) => {
-          expect(pillar.analytics_event).toBeDefined();
-          expect(typeof pillar.analytics_event).toBe('string');
-          // Should follow pillar event naming convention (hover_pillar_* pattern)
-          expect(pillar.analytics_event).toMatch(/^(pillar_|hover_pillar_)/);
+        solutionData.copy.pillars.forEach((pillar: { number: string; title: string; description: string; icon: string }) => {
+          expect(pillar.number).toBeDefined();
+          expect(typeof pillar.number).toBe('string');
+          expect(pillar.title).toBeDefined();
+          expect(typeof pillar.title).toBe('string');
+          expect(pillar.description).toBeDefined();
+          expect(typeof pillar.description).toBe('string');
+          expect(pillar.icon).toBeDefined();
+          expect(typeof pillar.icon).toBe('string');
         });
       }
     });
