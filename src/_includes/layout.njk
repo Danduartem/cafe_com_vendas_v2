@@ -95,10 +95,7 @@
     {% include "partials/checkout-modal.njk" %}
     
     <!-- Optimized Script Loading (Performance Critical) -->
-    <!-- Preload critical JavaScript to start download early -->
-    <link rel="preload" href="/assets/js/main.js" as="script" crossorigin="anonymous">
-    
-    <!-- Main application script with defer for optimal loading -->
-    <script src="/assets/js/main.js" type="module" defer></script>
+    <!-- Main application script - ES6 modules are deferred by default -->
+    <script src="/assets/js/main.js" type="module"></script>
 </body>
 </html>
