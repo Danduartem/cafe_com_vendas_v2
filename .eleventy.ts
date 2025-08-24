@@ -46,6 +46,9 @@ export default function(eleventyConfig: UserConfig) {
   // Static asset handling - aligned with Vite best practices
   eleventyConfig.addPassthroughCopy({ 'src/assets/css': 'assets/css' });
   eleventyConfig.addPassthroughCopy({ 'src/assets/static/images': 'assets/pictures' });
+  
+  // Copy public directory to root for favicon and fonts (Eleventy 3.x best practice)
+  eleventyConfig.addPassthroughCopy({ 'public': '.' });
 
   // Build events for development feedback
   eleventyConfig.on('eleventy.before', async () => {

@@ -29,7 +29,7 @@ export default defineConfig({
       output: {
         entryFileNames: 'js/[name].js',
         chunkFileNames: 'js/[name].js',
-        assetFileNames: 'assets/[name].[ext]'
+        assetFileNames: 'css/[name].[ext]'
       }
     },
     target: 'es2022',
