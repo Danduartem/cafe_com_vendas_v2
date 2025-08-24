@@ -9,7 +9,7 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
-    "dev": "concurrently \"vite dev --port 5173\" \"eleventy --serve --watch --incremental --config=.eleventy.ts\" \"netlify functions:serve --port 3000\" --kill-others-on-fail --names=\"assets,11ty,backend\"",
+    "dev": "netlify dev",
     "build": "rm -rf _site && NODE_ENV=production vite build && eleventy --config=.eleventy.ts",
     "preview": "npm run build && npx serve _site",
     "lint": "eslint . --ext .ts",

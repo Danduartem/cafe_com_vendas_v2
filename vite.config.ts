@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  publicDir: resolve(__dirname, 'src/public'),
+  publicDir: resolve(__dirname, 'public'),
   
   resolve: {
     alias: {

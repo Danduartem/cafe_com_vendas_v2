@@ -45,7 +45,7 @@ export interface PageComposition {
   eleventyNavigation?: {
     key: string;
   };
-  sections: PageSection[];
+  sections?: PageSection[];  // Now optional since sections are loaded separately
   customTemplate?: string;
 }
 

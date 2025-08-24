@@ -5,8 +5,8 @@ title: "Obrigada! Falta 1 passo"
 description: "Página de confirmação do pagamento - próximos passos para o evento Café com Vendas"
 ---
 
-{# Render sections using dedicated thank-you page loader #}
-{% for section in thankYou.sections %}
+{# Render sections from unified sections loader #}
+{% for section in sections %}
   {% if section.enabled %}
     {# Section: {{ section.slug }}{% if section.variant %} ({{ section.variant }}){% endif %} #}
     {# Set section data for template access #}

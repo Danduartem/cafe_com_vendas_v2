@@ -6,7 +6,7 @@ import type {
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-// Page configuration for section organization
+// Unified page configuration for all section organization
 const pageConfigurations = {
   'landing': [
     'top-banner',
@@ -25,10 +25,19 @@ const pageConfigurations = {
   ],
   'legal-privacy': [
     'footer'
+  ],
+  'politica-privacidade': [
+    'footer'
+  ],
+  'termos-condicoes': [
+    'footer'
+  ],
+  'garantia-reembolso': [
+    'footer'
   ]
 } as const;
 
-// Load section data from clean JSON files
+// Shared section loader function
 function loadSection(slug: string): Section | null {
   try {
     const sectionPath = join(process.cwd(), 'src/_data/sections', `${slug}.json`);
@@ -41,14 +50,28 @@ function loadSection(slug: string): Section | null {
 }
 
 /**
- * Clean sections data loader following Eleventy 2025 best practices
- * Uses JSON files for static content as recommended by official docs
+ * Unified sections data loader for all pages
+ * Follows Eleventy v3 best practices with dynamic page detection
  */
-export default function(): LoadedPageSection[] {
+export default function(configData?: any): LoadedPageSection[] {
   try {
     const sections: LoadedPageSection[] = [];
     
-    for (const slug of pageConfigurations.landing) {
+    // Determine which page we're building based on context
+    // Default to landing page if no context available
+    let pageType: keyof typeof pageConfigurations = 'landing';
+    
+    if (configData?.page?.fileSlug) {
+      const slug = configData.page.fileSlug;
+      if (slug in pageConfigurations) {
+        pageType = slug as keyof typeof pageConfigurations;
+      }
+    }
+    
+    // Load sections for the current page
+    const sectionsToLoad = pageConfigurations[pageType] || pageConfigurations.landing;
+    
+    for (const slug of sectionsToLoad) {
       const sectionData = loadSection(slug);
       if (sectionData) {
         sections.push({
