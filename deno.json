@@ -1,7 +1,7 @@
 {
   "importMap": "./.netlify/v1/edge-functions/import_map.json",
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2022", "WebWorker"],
+    "lib": ["DOM", "DOM.Iterable", "ES2023", "WebWorker"],
     "strict": true,
     "allowJs": true,
     "checkJs": false

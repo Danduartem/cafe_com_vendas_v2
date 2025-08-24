@@ -53,7 +53,7 @@ All images served via Cloudinary CDN (`ds4dhbneq`):
 - **TypeScript**: `tsconfig.json`
 - **Vite**: `vite.config.ts`
 - **Eleventy**: `.eleventy.ts`
-- **ESLint**: `eslint.config.ts`
+- **ESLint**: `eslint.config.mjs`
 
 ---
 
