@@ -42,6 +42,7 @@
 # Function-specific settings
 [functions]
   node_bundler = "esbuild"
+  deno_import_map = "./.netlify/v1/edge-functions/import_map.json"
 
 # URL redirects and rewrites
 [[redirects]]

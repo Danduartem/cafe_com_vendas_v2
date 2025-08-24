@@ -1,6 +1,7 @@
-export default async function handler(request, context) {
+import type { Context, Config } from "@netlify/edge-functions";
+
+export default async function handler(_request: Request, context: Context) {
 	const res = await context.next();
-	const contentType = res.headers.get('content-type') || '';
 
 	const csp = [
 		"default-src 'self'",
@@ -26,7 +27,7 @@ export default async function handler(request, context) {
 	});
 }
 
-export const config = {
+export const config: Config = {
 	path: '/*'
 };
 

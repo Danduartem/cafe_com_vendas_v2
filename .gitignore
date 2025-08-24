@@ -55,6 +55,13 @@ temp/
 # Netlify development files
 .netlify/
 
+# Netlify build artifacts
+netlify-automatic-functions/
+.netlify-auto-functions.json
+
+# Local Netlify CLI cache
+.netlify-cache/
+
 # Optional npm cache
 .npm
 
