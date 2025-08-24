@@ -1,0 +1,82 @@
+# Netlify headers for performance optimization and security
+
+# Global security headers for all HTML pages
+/*
+  # Security Headers - Modern 2024/2025 recommendations
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), interest-cohort=()
+  Cross-Origin-Embedder-Policy: unsafe-none
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Cross-Origin-Resource-Policy: cross-origin
+  
+  # Content Security Policy - Tailored for Cloudinary, Stripe, GTM, and analytics
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://js.stripe.com https://m.stripe.network; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com https://*.stripe.com https://www.googletagmanager.com; connect-src 'self' https://api.stripe.com https://formspree.io https://connect.mailerlite.com https://www.google-analytics.com https://www.googletagmanager.com; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io
+
+# Static assets cache (1 year) with compression
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+  
+# CSS files cache with compression
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+  
+# JavaScript files cache with compression
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+# Font files cache with CORS for faster loading
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+  
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+# Homepage optimization - instant CDN serving with background revalidation
+/
+  Cache-Control: public, max-age=0, s-maxage=31536000, stale-while-revalidate=86400
+  Link: </assets/fonts/Lora/Lora-700.woff2>; rel=preload; as=font; type=font/woff2; crossorigin
+  Link: </assets/fonts/CenturyGothic/CenturyGothic-Regular.woff>; rel=preload; as=font; type=font/woff; crossorigin
+  Link: </tailwind.css>; rel=preload; as=style
+  Link: </assets/js/main.js>; rel=preload; as=script
+
+# Directory indexes optimization (like /obrigado/)  
+/*/
+  Cache-Control: public, max-age=0, s-maxage=31536000, stale-while-revalidate=86400
+
+# Other HTML files - shorter CDN cache but still use stale-while-revalidate
+/*.html
+  Cache-Control: public, max-age=0, s-maxage=3600, stale-while-revalidate=86400
+
+# Image files cache with optimization headers
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/*.jpeg  
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+# JSON files cache
+/*.json
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+# SVG files cache  
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff

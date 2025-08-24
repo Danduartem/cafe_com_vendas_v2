@@ -1,0 +1,37 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B2635" stop-opacity="1" />
+      <stop offset="100%" stop-color="#1E3A5F" stop-opacity="1" />
+    </linearGradient>
+    <linearGradient id="cupGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5F5F5" stop-opacity="1" />
+      <stop offset="100%" stop-color="#E5E5E5" stop-opacity="1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <circle cx="16" cy="16" r="16" fill="url(#bgGradient)"/>
+  
+  <!-- Coffee cup -->
+  <g transform="translate(6, 8)">
+    <!-- Cup body -->
+    <path d="M3 16 L17 16 C17.5523 16 18 15.5523 18 15 L18 6 C18 5.44772 17.5523 5 17 5 L3 5 C2.44772 5 2 5.44772 2 6 L2 15 C2 15.5523 2.44772 16 3 16 Z" 
+          fill="url(#cupGradient)" stroke="#8B2635" stroke-width="0.5"/>
+    
+    <!-- Handle -->
+    <path d="M18 8 C19.5 8 20.5 9 20.5 10.5 C20.5 12 19.5 13 18 13" 
+          stroke="#8B2635" stroke-width="1" fill="none" stroke-linecap="round"/>
+    
+    <!-- Coffee inside -->
+    <rect x="3" y="6" width="14" height="8" rx="1" fill="#8B2635" opacity="0.8"/>
+    
+    <!-- Steam -->
+    <g opacity="0.6">
+      <path d="M7 2 C7 3 6 3 6 4 C6 5 7 5 7 6" stroke="#F5F5F5" stroke-width="0.5" fill="none" stroke-linecap="round"/>
+      <path d="M10 1 C10 2 9 2 9 3 C9 4 10 4 10 5" stroke="#F5F5F5" stroke-width="0.5" fill="none" stroke-linecap="round"/>
+      <path d="M13 2 C13 3 12 3 12 4 C12 5 13 5 13 6" stroke="#F5F5F5" stroke-width="0.5" fill="none" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>
