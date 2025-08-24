@@ -4,9 +4,7 @@
  */
 
 import Stripe from 'stripe';
-import type { Handler, HandlerEvent, HandlerContext, HandlerResponse } from '@netlify/functions';
-import {
-  ResponseHeaders,
+import type {
   PaymentIntentRequest,
   ValidationResult,
   RateLimitResult,
@@ -322,7 +320,7 @@ function checkRateLimit(clientIP: string, origin: string | undefined): RateLimit
   };
 }
 
-export const handler: Handler = async (event: HandlerEvent, context: HandlerContext): Promise<HandlerResponse> => {
+export default async (request: Request): Promise<Response> => {
   // Set CORS headers with proper domain restrictions
   const allowedOrigins = [
     'https://jucanamaximiliano.com',
@@ -331,65 +329,63 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
     'https://netlify.app'
   ];
   
-  const origin = event.headers.origin;
+  const origin = request.headers.get('origin');
   const isAllowedOrigin = allowedOrigins.some(allowed => 
     origin === allowed || (allowed.includes('netlify.app') && origin?.includes('netlify.app'))
   );
   
   // Get client IP for rate limiting
-  const clientIP = event.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-                   event.headers['x-real-ip'] ||
-                   context.identity?.sourceIp ||
+  const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+                   request.headers.get('x-real-ip') ||
+                   request.headers.get('cf-connecting-ip') ||
                    'unknown';
   
-  const headers: ResponseHeaders = {
-    'Access-Control-Allow-Origin': isAllowedOrigin ? origin : 'https://cafecomvendas.com',
+  const headers = {
+    'Access-Control-Allow-Origin': isAllowedOrigin ? (origin || 'https://cafecomvendas.com') : 'https://cafecomvendas.com',
     'Access-Control-Allow-Headers': 'Content-Type, X-Idempotency-Key',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Credentials': 'false',
     'Content-Type': 'application/json'
-  };
+  } as Record<string, string>;
 
   // Handle preflight requests
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: ''
-    };
+  if (request.method === 'OPTIONS') {
+    return new Response('', {
+      status: 200,
+      headers
+    });
   }
 
   // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
+  if (request.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers
+    });
   }
   
   // Check rate limit with environment-aware configuration
-  const rateLimitResult = checkRateLimit(clientIP, origin);
-  const rateLimitConfig = getRateLimitConfig(origin);
+  const rateLimitResult = checkRateLimit(clientIP, origin || undefined);
+  const rateLimitConfig = getRateLimitConfig(origin || undefined);
   
-  // Add rate limit headers
-  headers['X-RateLimit-Limit'] = rateLimitConfig.maxRequests.toString();
-  headers['X-RateLimit-Remaining'] = rateLimitResult.remaining.toString();
-  headers['X-RateLimit-Window'] = (rateLimitConfig.window / 1000).toString();
-  headers['X-RateLimit-Environment'] = isDevelopmentRequest(origin) ? 'development' : 'production';
+  // Add rate limit headers - create mutable headers object
+  const responseHeaders = { ...headers };
+  responseHeaders['X-RateLimit-Limit'] = rateLimitConfig.maxRequests.toString();
+  responseHeaders['X-RateLimit-Remaining'] = rateLimitResult.remaining.toString();
+  responseHeaders['X-RateLimit-Window'] = (rateLimitConfig.window / 1000).toString();
+  responseHeaders['X-RateLimit-Environment'] = isDevelopmentRequest(origin || undefined) ? 'development' : 'production';
   
   if (!rateLimitResult.allowed) {
-    headers['Retry-After'] = rateLimitResult.retryAfter?.toString() || '60';
-    return {
-      statusCode: 429,
-      headers,
-      body: JSON.stringify({ 
-        error: 'Rate limit exceeded. Too many payment attempts.',
-        retryAfter: rateLimitResult.retryAfter,
-        message: `Maximum ${rateLimitConfig.maxRequests} payment attempts per ${rateLimitConfig.window / 60000} minutes.`,
-        environment: isDevelopmentRequest(origin) ? 'development' : 'production'
-      })
-    };
+    responseHeaders['Retry-After'] = rateLimitResult.retryAfter?.toString() || '60';
+    return new Response(JSON.stringify({ 
+      error: 'Rate limit exceeded. Too many payment attempts.',
+      retryAfter: rateLimitResult.retryAfter,
+      message: `Maximum ${rateLimitConfig.maxRequests} payment attempts per ${rateLimitConfig.window / 60000} minutes.`,
+      environment: isDevelopmentRequest(origin || undefined) ? 'development' : 'production'
+    }), {
+      status: 429,
+      headers: responseHeaders
+    });
   }
 
   try {
@@ -401,32 +397,31 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
     // Parse request body
     let requestBody: PaymentIntentRequest;
     try {
-      requestBody = JSON.parse(event.body || '{}') as PaymentIntentRequest;
+      const body = await request.text();
+      requestBody = JSON.parse(body || '{}') as PaymentIntentRequest;
     } catch (error) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Invalid JSON in request body' })
-      };
+      return new Response(JSON.stringify({ error: 'Invalid JSON in request body' }), {
+        status: 400,
+        headers: responseHeaders
+      });
     }
 
     // Generate or use provided idempotency key
-    const idempotencyKey = event.headers['x-idempotency-key'] || 
+    const idempotencyKey = request.headers.get('x-idempotency-key') || 
       requestBody.idempotency_key || 
-      `pi_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      `pi_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     
     // Comprehensive request validation
     const validation = validatePaymentRequest(requestBody);
     
     if (!validation.isValid) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Validation failed',
-          details: validation.errors
-        })
-      };
+      return new Response(JSON.stringify({ 
+        error: 'Validation failed',
+        details: validation.errors
+      }), {
+        status: 400,
+        headers: responseHeaders
+      });
     }
     
     // Use sanitized data
@@ -526,23 +521,21 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
       
       // Handle timeout specifically
       if (error instanceof Error && error.message.includes('timed out')) {
-        return {
-          statusCode: 504,
-          headers,
-          body: JSON.stringify({ 
-            error: 'Customer service temporarily unavailable. Please try again.',
-            code: 'service_timeout'
-          })
-        };
+        return new Response(JSON.stringify({ 
+          error: 'Customer service temporarily unavailable. Please try again.',
+          code: 'service_timeout'
+        }), {
+          status: 504,
+          headers: responseHeaders
+        });
       }
       
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Error processing customer information' 
-        })
-      };
+      return new Response(JSON.stringify({ 
+        error: 'Error processing customer information' 
+      }), {
+        status: 500,
+        headers: responseHeaders
+      });
     }
 
     // Prepare metadata for PaymentIntent with validated UTM parameters
@@ -615,105 +608,96 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
     console.log(`Customer cache stats: ${JSON.stringify(cacheStats)}, Cache hit: ${cacheHit}`);
 
     // Return success response with client secret and idempotency info
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        clientSecret: paymentIntent.client_secret,
-        paymentIntentId: paymentIntent.id,
-        customerId: customer.id,
-        amount: paymentAmount,
-        currency: currency,
-        idempotencyKey: idempotencyKey,
-        cacheHit: cacheHit // For debugging/monitoring
-      })
-    };
+    return new Response(JSON.stringify({
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id,
+      customerId: customer.id,
+      amount: paymentAmount,
+      currency: currency,
+      idempotencyKey: idempotencyKey,
+      cacheHit: cacheHit // For debugging/monitoring
+    }), {
+      status: 200,
+      headers: responseHeaders
+    });
 
   } catch (error) {
     console.error('Error creating payment intent:', error);
 
     // Handle specific Stripe errors
     if (error instanceof Error && 'type' in error && (error as any).type === 'StripeCardError') {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Card error: ' + error.message 
-        })
-      };
+      return new Response(JSON.stringify({ 
+        error: 'Card error: ' + error.message 
+      }), {
+        status: 400,
+        headers: responseHeaders
+      });
     }
 
     if (error instanceof Error && 'type' in error && (error as any).type === 'StripeRateLimitError') {
-      return {
-        statusCode: 429,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Too many requests. Please try again later.' 
-        })
-      };
+      return new Response(JSON.stringify({ 
+        error: 'Too many requests. Please try again later.' 
+      }), {
+        status: 429,
+        headers: responseHeaders
+      });
     }
 
     if (error instanceof Error && 'type' in error && (error as any).type === 'StripeInvalidRequestError') {
       // Handle idempotency key conflicts specifically
       if (error instanceof Error && error.message?.includes('idempotency')) {
-        return {
-          statusCode: 409,
-          headers,
-          body: JSON.stringify({ 
-            error: 'Duplicate request detected. Please try again with a new request.',
-            code: 'idempotency_conflict'
-          })
-        };
+        return new Response(JSON.stringify({ 
+          error: 'Duplicate request detected. Please try again with a new request.',
+          code: 'idempotency_conflict'
+        }), {
+          status: 409,
+          headers: responseHeaders
+        });
       }
       
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Invalid request: ' + error.message 
-        })
-      };
+      return new Response(JSON.stringify({ 
+        error: 'Invalid request: ' + error.message 
+      }), {
+        status: 400,
+        headers: responseHeaders
+      });
     }
 
     if (error instanceof Error && 'type' in error && (error as any).type === 'StripeAPIError') {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Payment service temporarily unavailable' 
-        })
-      };
+      return new Response(JSON.stringify({ 
+        error: 'Payment service temporarily unavailable' 
+      }), {
+        status: 500,
+        headers: responseHeaders
+      });
     }
 
     if (error instanceof Error && 'type' in error && (error as any).type === 'StripeConnectionError') {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Network error. Please try again.' 
-        })
-      };
+      return new Response(JSON.stringify({ 
+        error: 'Network error. Please try again.' 
+      }), {
+        status: 500,
+        headers: responseHeaders
+      });
     }
 
     // Handle timeout errors
     if (error instanceof Error && error.message?.includes('timed out')) {
-      return {
-        statusCode: 504,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Request timed out. Please try again.',
-          code: 'request_timeout'
-        })
-      };
+      return new Response(JSON.stringify({ 
+        error: 'Request timed out. Please try again.',
+        code: 'request_timeout'
+      }), {
+        status: 504,
+        headers: responseHeaders
+      });
     }
 
     // Generic error response
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ 
-        error: 'Internal server error. Please try again later.' 
-      })
-    };
+    return new Response(JSON.stringify({ 
+      error: 'Internal server error. Please try again later.' 
+    }), {
+      status: 500,
+      headers: responseHeaders
+    });
   }
 };

@@ -4,10 +4,7 @@
  */
 
 import Stripe from 'stripe';
-import type { Handler, HandlerEvent, HandlerContext, HandlerResponse } from '@netlify/functions';
 import type {
-  ResponseHeaders,
-  StripeWebhookEvent,
   FulfillmentRecord,
   CircuitBreakerStatus,
   MailerLiteSubscriberData,
@@ -204,42 +201,40 @@ function logWithCorrelation(level: string, message: string, data: Record<string,
     timestamp: new Date().toISOString(),
     level,
     message,
-    correlationId: correlationId || `wh_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`,
+    correlationId: correlationId || `wh_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`,
     ...data
   };
   console.log(JSON.stringify(logEntry));
   return logEntry.correlationId;
 }
 
-export const handler: Handler = async (event: HandlerEvent, _context: HandlerContext): Promise<HandlerResponse> => {
+export default async (request: Request): Promise<Response> => {
   // Set CORS headers
-  const headers: ResponseHeaders = {
+  const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Stripe-Signature',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json',
     'Access-Control-Allow-Credentials': 'false'
-  };
+  } as Record<string, string>;
 
   // Handle preflight requests
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: ''
-    };
+  if (request.method === 'OPTIONS') {
+    return new Response('', {
+      status: 200,
+      headers
+    });
   }
 
   // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
+  if (request.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers
+    });
   }
 
-  let stripeEvent: StripeWebhookEvent;
+  let stripeEvent: Stripe.Event;
 
   try {
     // Validate environment variables
@@ -248,29 +243,30 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
     }
 
     // Get Stripe signature from headers
-    const sig = event.headers['stripe-signature'];
+    const sig = request.headers.get('stripe-signature');
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!sig) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Missing Stripe signature' })
-      };
+      return new Response(JSON.stringify({ error: 'Missing Stripe signature' }), {
+        status: 400,
+        headers
+      });
     }
 
     if (!endpointSecret) {
       console.warn('Stripe webhook secret not configured - skipping signature verification');
       // Parse event without verification (development mode)
-      stripeEvent = JSON.parse(event.body || '{}') as any;
+      const body = await request.text();
+      stripeEvent = JSON.parse(body || '{}') as Stripe.Event;
     } else {
       // Verify webhook signature using latest async pattern
       try {
+        const body = await request.text();
         stripeEvent = await stripe.webhooks.constructEventAsync(
-          event.body || '',
+          body || '',
           sig,
           endpointSecret
-        ) as any;
+        );
       } catch (err) {
         // Handle StripeSignatureVerificationError specifically
         if (err instanceof Error && err.name === 'StripeSignatureVerificationError') {
@@ -278,11 +274,10 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
             error: err.message,
             signature: sig?.substring(0, 20) + '...' // Log partial signature for debugging
           });
-          return {
-            statusCode: 400,
-            headers,
-            body: JSON.stringify({ error: 'Invalid signature' })
-          };
+          return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+            status: 400,
+            headers
+          });
         }
         throw err; // Re-throw other errors
       }
@@ -297,49 +292,49 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
     // Handle different event types with retry logic
     switch (stripeEvent.type) {
       case 'payment_intent.succeeded':
-        await handlePaymentSuccess(stripeEvent.data.object, correlationId);
+        await handlePaymentSuccess(stripeEvent.data.object as Stripe.PaymentIntent, correlationId);
         break;
 
       case 'payment_intent.processing':
-        await handlePaymentProcessing(stripeEvent.data.object, correlationId);
+        await handlePaymentProcessing(stripeEvent.data.object as Stripe.PaymentIntent, correlationId);
         break;
 
       case 'payment_intent.payment_failed':
-        await handlePaymentFailed(stripeEvent.data.object, correlationId);
+        await handlePaymentFailed(stripeEvent.data.object as Stripe.PaymentIntent, correlationId);
         break;
 
       case 'payment_intent.canceled':
-        await handlePaymentCanceled(stripeEvent.data.object, correlationId);
+        await handlePaymentCanceled(stripeEvent.data.object as Stripe.PaymentIntent, correlationId);
         break;
 
       case 'payment_intent.requires_action':
-        await handlePaymentRequiresAction(stripeEvent.data.object, correlationId);
+        await handlePaymentRequiresAction(stripeEvent.data.object as Stripe.PaymentIntent, correlationId);
         break;
 
       case 'payment_intent.partially_funded':
-        await handlePaymentPartiallyFunded(stripeEvent.data.object, correlationId);
+        await handlePaymentPartiallyFunded(stripeEvent.data.object as Stripe.PaymentIntent, correlationId);
         break;
 
       case 'charge.dispute.created':
-        await handleChargeDispute(stripeEvent.data.object, correlationId);
+        await handleChargeDispute(stripeEvent.data.object as Stripe.Dispute, correlationId);
         break;
 
       case 'invoice.payment_succeeded':
-        await handleInvoicePaymentSucceeded(stripeEvent.data.object, correlationId);
+        await handleInvoicePaymentSucceeded(stripeEvent.data.object as Stripe.Invoice, correlationId);
         break;
 
       case 'checkout.session.async_payment_succeeded':
-        await handleCheckoutSessionAsyncPaymentSucceeded(stripeEvent.data.object, correlationId);
+        await handleCheckoutSessionAsyncPaymentSucceeded(stripeEvent.data.object as Stripe.Checkout.Session, correlationId);
         break;
 
       case 'checkout.session.async_payment_failed':
-        await handleCheckoutSessionAsyncPaymentFailed(stripeEvent.data.object, correlationId);
+        await handleCheckoutSessionAsyncPaymentFailed(stripeEvent.data.object as Stripe.Checkout.Session, correlationId);
         break;
 
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted':
-        await handleSubscriptionChange(stripeEvent.data.object, stripeEvent.type, correlationId);
+        await handleSubscriptionChange(stripeEvent.data.object as Stripe.Subscription, stripeEvent.type, correlationId);
         break;
 
       default:
@@ -369,26 +364,24 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
     }
 
     // Return success response
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ 
-        received: true, 
-        event: stripeEvent.type,
-        correlationId
-      })
-    };
+    return new Response(JSON.stringify({ 
+      received: true, 
+      event: stripeEvent.type,
+      correlationId
+    }), {
+      status: 200,
+      headers
+    });
 
   } catch (error) {
     console.error('Webhook handler error:', error instanceof Error ? error.message : 'Unknown error');
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ 
-        error: 'Webhook handler failed',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      })
-    };
+    return new Response(JSON.stringify({ 
+      error: 'Webhook handler failed',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    }), {
+      status: 500,
+      headers
+    });
   }
 };
 

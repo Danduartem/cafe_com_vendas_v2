@@ -2,66 +2,8 @@
  * Shared TypeScript types for Netlify Functions
  */
 
-// Netlify Function Types
-export interface NetlifyEvent {
-  httpMethod: string;
-  headers: Record<string, string>;
-  body: string | null;
-  queryStringParameters?: Record<string, string> | null;
-  multiValueQueryStringParameters?: Record<string, string[]> | null;
-  path: string;
-  pathParameters?: Record<string, string> | null;
-  stageVariables?: Record<string, string> | null;
-  requestContext?: {
-    requestId: string;
-    identity: {
-      sourceIp: string;
-      userAgent?: string;
-    };
-  };
-  isBase64Encoded?: boolean;
-}
-
-export interface NetlifyContext {
-  callbackWaitsForEmptyEventLoop?: boolean;
-  functionName: string;
-  functionVersion: string;
-  invokedFunctionArn: string;
-  memoryLimitInMB: string;
-  awsRequestId: string;
-  logGroupName: string;
-  logStreamName: string;
-  identity?: {
-    sourceIp: string;
-    userAgent?: string;
-  };
-  clientContext?: {
-    client: {
-      installationId: string;
-      appTitle: string;
-      appVersionName: string;
-      appVersionCode: string;
-      appPackageName: string;
-    };
-    custom?: Record<string, unknown>;
-    env?: Record<string, string>;
-  };
-}
-
-export interface NetlifyResponse {
-  statusCode: number;
-  headers?: Record<string, string>;
-  body: string;
-  isBase64Encoded?: boolean;
-}
-
-export type NetlifyHandler = (
-  event: NetlifyEvent,
-  context: NetlifyContext
-) => Promise<NetlifyResponse>;
-
-// Response Headers with proper typing
-export type ResponseHeaders = Record<string, string>;
+// Modern Netlify Functions use Web Standards API (Request/Response)
+// Legacy AWS Lambda-style interfaces removed in favor of standard web APIs
 
 // Payment Intent Request/Response Types
 export interface PaymentIntentRequest {
@@ -154,38 +96,7 @@ export interface MailerLiteError {
 
 export type MailerLiteResult = MailerLiteSuccess | MailerLiteError;
 
-// Stripe Webhook Types
-export interface StripeWebhookEventData {
-  id: string;
-  object: string;
-  amount?: number;
-  amount_received?: number;
-  currency?: string;
-  customer?: string;
-  description?: string;
-  metadata?: Record<string, string>;
-  payment_method?: string;
-  status?: string;
-  [key: string]: unknown; // Allow for additional Stripe object properties
-}
-
-export interface StripeWebhookEvent {
-  id: string;
-  object: 'event';
-  api_version: string;
-  created: number;
-  data: {
-    object: StripeWebhookEventData;
-    previous_attributes?: Record<string, unknown>;
-  };
-  livemode: boolean;
-  pending_webhooks: number;
-  request: {
-    id: string | null;
-    idempotency_key: string | null;
-  };
-  type: string;
-}
+// Stripe webhook types are now handled by official Stripe.Event from stripe package
 
 export interface FulfillmentRecord {
   timestamp: number;

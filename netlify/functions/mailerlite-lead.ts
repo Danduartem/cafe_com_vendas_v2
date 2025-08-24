@@ -4,9 +4,7 @@
  * Works alongside Formspree to ensure complete lead capture
  */
 
-import type { Handler, HandlerEvent, HandlerContext, HandlerResponse } from '@netlify/functions';
 import type {
-  ResponseHeaders,
   MailerLiteLeadRequest,
   MailerLiteSubscriberData,
   MailerLiteResult,
@@ -403,7 +401,7 @@ async function addLeadToMailerLite(leadData: MailerLiteSubscriberData): Promise<
 /**
  * Main handler for lead capture requests
  */
-export const handler: Handler = async (event: HandlerEvent, context: HandlerContext): Promise<HandlerResponse> => {
+export default async (request: Request): Promise<Response> => {
   // Set CORS headers with proper domain restrictions
   const allowedOrigins = [
     'https://jucanamaximiliano.com',
@@ -412,89 +410,86 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
     'https://netlify.app'
   ];
   
-  const origin = event.headers.origin;
+  const origin = request.headers.get('origin');
   const isAllowedOrigin = allowedOrigins.some(allowed => 
     origin === allowed || (allowed.includes('netlify.app') && origin?.includes('netlify.app'))
   );
   
   // Get client IP for rate limiting
-  const clientIP = event.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-                   event.headers['x-real-ip'] ||
-                   context.identity?.sourceIp ||
+  const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+                   request.headers.get('x-real-ip') ||
+                   request.headers.get('cf-connecting-ip') ||
                    'unknown';
   
-  const headers: ResponseHeaders = {
-    'Access-Control-Allow-Origin': isAllowedOrigin ? origin : 'https://cafecomvendas.com',
+  const headers = {
+    'Access-Control-Allow-Origin': isAllowedOrigin ? (origin || 'https://cafecomvendas.com') : 'https://cafecomvendas.com',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Credentials': 'false',
     'Content-Type': 'application/json'
-  };
+  } as Record<string, string>;
 
   // Handle preflight requests
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: ''
-    };
+  if (request.method === 'OPTIONS') {
+    return new Response('', {
+      status: 200,
+      headers
+    });
   }
 
   // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
+  if (request.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers
+    });
   }
   
   // Check rate limit
   const rateLimitResult = checkRateLimit(clientIP);
   
-  // Add rate limit headers
-  headers['X-RateLimit-Limit'] = RATE_LIMIT_MAX_REQUESTS.toString();
-  headers['X-RateLimit-Remaining'] = rateLimitResult.remaining.toString();
-  headers['X-RateLimit-Window'] = (RATE_LIMIT_WINDOW / 1000).toString();
+  // Add rate limit headers - create mutable headers object
+  const responseHeaders = { ...headers };
+  responseHeaders['X-RateLimit-Limit'] = RATE_LIMIT_MAX_REQUESTS.toString();
+  responseHeaders['X-RateLimit-Remaining'] = rateLimitResult.remaining.toString();
+  responseHeaders['X-RateLimit-Window'] = (RATE_LIMIT_WINDOW / 1000).toString();
   
   if (!rateLimitResult.allowed) {
-    headers['Retry-After'] = rateLimitResult.retryAfter?.toString() || '60';
-    return {
-      statusCode: 429,
-      headers,
-      body: JSON.stringify({ 
-        error: 'Rate limit exceeded. Too many lead submissions.',
-        retryAfter: rateLimitResult.retryAfter,
-        message: `Maximum ${RATE_LIMIT_MAX_REQUESTS} lead submissions per ${RATE_LIMIT_WINDOW / 60000} minutes.`
-      })
-    };
+    responseHeaders['Retry-After'] = rateLimitResult.retryAfter?.toString() || '60';
+    return new Response(JSON.stringify({ 
+      error: 'Rate limit exceeded. Too many lead submissions.',
+      retryAfter: rateLimitResult.retryAfter,
+      message: `Maximum ${RATE_LIMIT_MAX_REQUESTS} lead submissions per ${RATE_LIMIT_WINDOW / 60000} minutes.`
+    }), {
+      status: 429,
+      headers: responseHeaders
+    });
   }
 
   try {
     // Parse request body
     let requestBody: MailerLiteLeadRequest;
     try {
-      requestBody = JSON.parse(event.body || '{}') as MailerLiteLeadRequest;
+      const body = await request.text();
+      requestBody = JSON.parse(body || '{}') as MailerLiteLeadRequest;
     } catch (error) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Invalid JSON in request body' })
-      };
+      return new Response(JSON.stringify({ error: 'Invalid JSON in request body' }), {
+        status: 400,
+        headers: responseHeaders
+      });
     }
 
     // Comprehensive request validation
     const validation = validateLeadRequest(requestBody);
     
     if (!validation.isValid) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Validation failed',
-          details: validation.errors
-        })
-      };
+      return new Response(JSON.stringify({ 
+        error: 'Validation failed',
+        details: validation.errors
+      }), {
+        status: 400,
+        headers: responseHeaders
+      });
     }
     
     // Use sanitized data
@@ -513,7 +508,7 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
         event_name: 'Café com Vendas - Lisboa',
         event_date: '2024-09-20',
         page: requestBody.page || 'unknown',
-        user_agent: event.headers['user-agent']?.substring(0, 255) || 'unknown'
+        user_agent: request.headers.get('user-agent')?.substring(0, 255) || 'unknown'
       } as Record<string, string | number | null>
     };
     
@@ -538,46 +533,43 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
 
     // Return success response regardless of MailerLite result 
     // (this is a secondary capture, primary is Formspree)
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        success: true,
-        leadId: lead_id,
-        email: email,
-        mailerlite: {
-          success: mailerliteResult.success,
-          action: mailerliteResult.success ? mailerliteResult.action : 'attempted',
-          reason: mailerliteResult.reason,
-          recoverable: !mailerliteResult.success && 'recoverable' in mailerliteResult ? (mailerliteResult.recoverable ?? false) : false
-        },
-        circuitBreaker: mailerliteCircuitBreaker.getStatus()
-      })
-    };
+    return new Response(JSON.stringify({
+      success: true,
+      leadId: lead_id,
+      email: email,
+      mailerlite: {
+        success: mailerliteResult.success,
+        action: mailerliteResult.success ? mailerliteResult.action : 'attempted',
+        reason: mailerliteResult.reason,
+        recoverable: !mailerliteResult.success && 'recoverable' in mailerliteResult ? (mailerliteResult.recoverable ?? false) : false
+      },
+      circuitBreaker: mailerliteCircuitBreaker.getStatus()
+    }), {
+      status: 200,
+      headers: responseHeaders
+    });
 
   } catch (error) {
     console.error('Lead capture handler error:', error);
 
     // Handle timeout errors
     if (error instanceof Error && error.message?.includes('timed out')) {
-      return {
-        statusCode: 504,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Request timed out. Please try again.',
-          code: 'request_timeout'
-        })
-      };
+      return new Response(JSON.stringify({ 
+        error: 'Request timed out. Please try again.',
+        code: 'request_timeout'
+      }), {
+        status: 504,
+        headers: responseHeaders
+      });
     }
 
     // Generic error response
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ 
-        error: 'Internal server error. Lead capture failed.',
-        message: 'This is a secondary lead capture. Primary submission may have succeeded.'
-      })
-    };
+    return new Response(JSON.stringify({ 
+      error: 'Internal server error. Lead capture failed.',
+      message: 'This is a secondary lead capture. Primary submission may have succeeded.'
+    }), {
+      status: 500,
+      headers: responseHeaders
+    });
   }
 };
