@@ -1,13 +1,13 @@
 // Global utility types and Window interface extensions
 
 // GTM Data Layer event structure
-interface DataLayerEvent {
+export interface DataLayerEvent {
   event: string;
   [key: string]: unknown;
 }
 
 // Application configuration structure - matches EnvironmentConfig
-interface AppConfig {
+export interface GlobalAppConfig {
   environment: 'development' | 'production';
   isDevelopment: boolean;
   isProduction: boolean;
@@ -35,7 +35,7 @@ interface AppConfig {
 }
 
 // Main application object structure
-interface CafeComVendasApp {
+export interface CafeComVendasApp {
   Analytics: {
     track: (event: string, data?: Record<string, unknown>) => void;
     trackError: (type: string, error: Error, context?: Record<string, unknown>) => void;
@@ -45,13 +45,13 @@ interface CafeComVendasApp {
 }
 
 // Stripe constructor type - specific types defined in checkout component
-type StripeConstructor = (publishableKey: string) => unknown;
+export type StripeConstructor = (publishableKey: string) => unknown;
 
 declare global {
   interface Window {
     dataLayer: DataLayerEvent[];
     Stripe?: StripeConstructor;
-    CONFIG: AppConfig;
+    CONFIG: GlobalAppConfig;
     ANALYTICS_EVENTS: Record<string, unknown>;
     CafeComVendas: CafeComVendasApp;
     CLOUDINARY_CLOUD_NAME: string;
