@@ -356,7 +356,7 @@ export default async (request: Request): Promise<Response> => {
                    'unknown';
   
   const headers = {
-    'Access-Control-Allow-Origin': isAllowedOrigin ? (origin || 'https://cafecomvendas.com') : 'https://cafecomvendas.com',
+    'Access-Control-Allow-Origin': isAllowedOrigin ? (origin || 'https://jucanamaximiliano.com.br') : 'https://jucanamaximiliano.com.br',
     'Access-Control-Allow-Headers': 'Content-Type, X-Idempotency-Key',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Credentials': 'false',

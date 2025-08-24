@@ -31,7 +31,7 @@ const isDevelopment = isBrowser ? (
 ) : (process.env.NODE_ENV !== 'production'); // Node.js fallback
 
 const isProduction = isBrowser ? 
-  (window.location.hostname === 'cafecomvendas.com') : 
+  (window.location.hostname === 'jucanamaximiliano.com.br') : 
   (process.env.NODE_ENV === 'production'); // Node.js fallback
 
 /**
@@ -85,7 +85,7 @@ const config: EnvironmentConfig = {
 
   // Contact Information (Public)
   contact: {
-    email: 'team@cafecomvendas.com',
+    email: 'contato@jucanamaximiliano.com.br',
     whatsapp: '+351912345678'
   },
 
@@ -99,7 +99,7 @@ const config: EnvironmentConfig = {
   // URLs and Tracking
   urls: {
     // Base URL for API calls (unified server serves both frontend and functions)
-    base: isProduction ? 'https://cafecomvendas.com' : (
+    base: isProduction ? 'https://jucanamaximiliano.com.br' : (
       isBrowser ? `http://${window.location.hostname}:${window.location.port}` : 'http://localhost:8080'
     ),
     thankYou: '/obrigado',
