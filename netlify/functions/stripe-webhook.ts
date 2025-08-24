@@ -3,6 +3,7 @@
  * Handles payment confirmations and triggers MailerLite integration
  */
 
+// Removed unused Context and Config imports - not needed for basic Netlify functions
 import Stripe from 'stripe';
 import type {
   FulfillmentRecord,
@@ -1134,3 +1135,5 @@ async function triggerAbandonedCartEmail(email: string, data: Record<string, unk
     console.error('Error triggering abandoned cart email:', error);
   }
 }
+
+// Removed unnecessary config export - over-engineered for basic webhook handling

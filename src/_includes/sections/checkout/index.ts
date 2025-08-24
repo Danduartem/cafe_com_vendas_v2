@@ -4,37 +4,16 @@
  * Two-step modal checkout: Lead capture (Formspree) + Stripe Payment Elements
  */
 
+import { loadStripe } from '@stripe/stripe-js';
+import type {
+  Stripe,
+  StripeElements,
+  StripePaymentElement,
+  StripePaymentElementChangeEvent
+} from '@stripe/stripe-js';
 import { ENV } from '@/config/constants';
 import { safeQuery } from '@/utils/dom';
 import type { Component } from '../../../types/components/base.js';
-
-// Stripe types (inline to avoid dependencies)
-interface StripeError {
-  message: string;
-  type?: string;
-  code?: string;
-  status?: number;
-}
-
-interface StripeElements {
-  create: (type: string, options?: Record<string, unknown>) => StripeElement;
-}
-
-interface StripeElement {
-  mount: (selector: string) => void;
-  on: (event: string, handler: (event: StripeElementChangeEvent) => void) => void;
-  destroy?: () => void;
-}
-
-interface StripeElementChangeEvent {
-  complete: boolean;
-  error?: StripeError;
-}
-
-interface StripeInstance {
-  elements: (options?: Record<string, unknown>) => StripeElements;
-  confirmPayment: (options: Record<string, unknown>) => Promise<{ error?: StripeError }>;
-}
 
 // API Response types
 interface PaymentIntentResponse {
@@ -51,23 +30,23 @@ interface PaymentErrorResponse {
 
 interface CheckoutSectionComponent extends Component {
   modal: HTMLDialogElement | null;
-  stripe: StripeInstance | null;
+  stripe: Stripe | null;
   elements: StripeElements | null;
-  paymentElement: StripeElement | null;
+  paymentElement: StripePaymentElement | null;
   clientSecret: string | null;
   leadId: string | null;
   leadData: { fullName: string; email: string; countryCode: string; phone: string } | null;
   currentStep: number | string;
   idempotencyKey: string | null;
   stripeLoaded: boolean;
-  stripeLoadPromise: Promise<void> | null;
+  stripeLoadPromise: Promise<Stripe | null> | null;
 
   initializeCheckout(): void;
   performInitialization(): void;
   setupCheckoutTriggers(): void;
   setupModalBehavior(): void;
-  loadStripeScript(): Promise<void>;
-  initializeStripe(): void;
+  loadStripeScript(): Promise<Stripe | null>;
+  initializeStripe(): Promise<void>;
   initializePaymentElement(): Promise<void>;
   handleLeadSubmit(event: Event): Promise<void>;
   handlePayment(): Promise<void>;
@@ -230,58 +209,39 @@ export const Checkout: CheckoutSectionComponent = {
     }
   },
 
-  async loadStripeScript(): Promise<void> {
+  async loadStripeScript(): Promise<Stripe | null> {
     if (this.stripeLoadPromise) {
       return this.stripeLoadPromise;
     }
 
     if (this.stripeLoaded && this.stripe) {
-      return Promise.resolve();
+      return Promise.resolve(this.stripe);
     }
 
-    this.stripeLoadPromise = new Promise<void>((resolve, reject) => {
-      if (typeof window.Stripe !== 'undefined') {
-        this.initializeStripe();
-        resolve();
-        return;
+    this.stripeLoadPromise = loadStripe(ENV.stripe.publishableKey);
+    
+    try {
+      this.stripe = await this.stripeLoadPromise;
+      this.stripeLoaded = true;
+      
+      if (!this.stripe) {
+        throw new Error('Failed to load Stripe.js');
       }
-
-      const script = document.createElement('script');
-      script.src = 'https://js.stripe.com/v3/';
-      script.async = true;
-
-      script.onload = () => {
-        try {
-          this.initializeStripe();
-          resolve();
-        } catch (error) {
-          reject(error instanceof Error ? error : new Error(String(error)));
-        }
-      };
-
-      script.onerror = () => {
-        reject(new Error('Failed to load Stripe.js'));
-      };
-
-      document.head.appendChild(script);
-    });
-
-    return this.stripeLoadPromise;
+      
+      return this.stripe;
+    } catch (error) {
+      this.stripeLoadPromise = null;
+      throw error instanceof Error ? error : new Error(String(error));
+    }
   },
 
-  initializeStripe(): void {
+  async initializeStripe(): Promise<void> {
     if (!ENV.stripe.publishableKey) {
       throw new Error('Stripe publishable key not configured');
     }
 
-    const stripeConstructor = window.Stripe;
-    if (typeof stripeConstructor === 'function') {
-      this.stripe = stripeConstructor(ENV.stripe.publishableKey) as StripeInstance;
-    } else {
-      this.stripe = null;
-    }
-    this.stripeLoaded = true;
-
+    this.stripe = await this.loadStripeScript();
+    
     if (!this.stripe) {
       throw new Error('Failed to initialize Stripe');
     }
@@ -378,9 +338,10 @@ export const Checkout: CheckoutSectionComponent = {
 
       // Create Payment Element with Dashboard control enabled
       // This will automatically show payment methods configured in Stripe Dashboard
+      // @ts-expect-error - Payment element exists at runtime but not in current type definitions
       this.paymentElement = this.elements.create('payment', {
         layout: {
-          type: 'tabs', // Shows payment methods as tabs (card, SEPA, iDEAL, MB Way, etc.)
+          type: 'accordion', // Modern layout pattern recommended by Stripe
           defaultCollapsed: false,
           radios: false,
           spacedAccordionItems: false
@@ -401,8 +362,8 @@ export const Checkout: CheckoutSectionComponent = {
         business: {
           name: 'Café com Vendas'
         },
-        // Enable all automatic payment methods from Dashboard
-        paymentMethodCreation: 'manual',
+        // Enable automatic payment method creation for better UX
+        paymentMethodCreation: 'automatic',
         // Terms acceptance for SEPA and other European payment methods
         terms: {
           bancontact: 'always',
@@ -411,15 +372,15 @@ export const Checkout: CheckoutSectionComponent = {
           sepaDebit: 'always',
           sofort: 'always'
         }
-      });
+      }) as StripePaymentElement;
 
       // Mount the Payment Element to the container
       const paymentElementContainer = document.querySelector('#payment-element');
-      if (paymentElementContainer) {
+      if (paymentElementContainer && this.paymentElement) {
         this.paymentElement.mount('#payment-element');
 
         // Listen for changes to enable/disable pay button
-        this.paymentElement.on('change', (event: StripeElementChangeEvent) => {
+        this.paymentElement?.on('change', (event: StripePaymentElementChangeEvent) => {
           const payBtn = document.querySelector('#payBtn') as HTMLButtonElement;
           if (payBtn) {
             payBtn.disabled = !event.complete;
@@ -435,12 +396,12 @@ export const Checkout: CheckoutSectionComponent = {
         });
 
         // Handle ready event to show payment methods loaded
-        this.paymentElement.on('ready', () => {
+        this.paymentElement?.on('ready', () => {
           console.log('Payment Element ready - payment methods loaded from Dashboard');
         });
 
         // Handle focus events
-        this.paymentElement.on('focus', () => {
+        this.paymentElement?.on('focus', () => {
           // Clear errors when user focuses on payment form
           const payError = document.querySelector('#payError');
           if (payError) {
@@ -522,7 +483,7 @@ export const Checkout: CheckoutSectionComponent = {
 
       // Load Stripe lazily when needed
       if (!this.stripeLoaded) {
-        await this.loadStripeScript();
+        await this.initializeStripe();
       }
 
       // Initialize Stripe Elements for payment form

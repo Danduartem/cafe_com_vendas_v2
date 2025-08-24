@@ -4,6 +4,7 @@
  * Works alongside Formspree to ensure complete lead capture
  */
 
+// Removed unused Context and Config imports - not needed for basic Netlify functions
 import type {
   MailerLiteLeadRequest,
   MailerLiteSubscriberData,
@@ -599,3 +600,5 @@ export default async (request: Request): Promise<Response> => {
     });
   }
 };
+
+// Removed unnecessary config export - over-engineered for basic lead capture
