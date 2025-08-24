@@ -9,7 +9,7 @@
 - Run: `npm run versions`, `npm run outdated`.
 - Emit a table of **package | current | latest | status**.
 2) **Docs sync** (Context7)
-- For: TypeScript, Vite, Eleventy, Tailwind, PostCSS, Stripe.
+- For: TypeScript, Vite, Eleventy, Tailwind, Stripe.
 - Resolve IDs and cache **exact‑version docs** for the session.
 3) **API validation**
 - Run `npm run type-check`.

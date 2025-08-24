@@ -55,5 +55,3 @@ Update dependencies and refactor code to use latest features.
 - Eleventy 3.x (ESM)
 - Vite 7.x
 - Tailwind CSS v4
-- Stripe SDK
-- PostCSS/Autoprefixer
