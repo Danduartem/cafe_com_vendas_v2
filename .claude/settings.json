@@ -6,37 +6,37 @@
     "defaultMode": "default",
     "allow": [
       "Bash(npm run *)",
-      "Bash(git status)",
-      "Bash(git diff*)",
-      "Bash(git add*)",
-      "Bash(git commit*)",
-      "Bash(git log*)",
-      "Bash(git branch*)",
-      "Bash(git checkout*)",
+      "Bash(git *)",
       "Bash(node scripts/*)",
       "Bash(netlify *)",
-      "Bash(stripe *)"
+      "Bash(stripe *)",
+      "Bash(tsx scripts/*)",
+      "Bash(npx *)"
     ],
     "ask": [
       "Bash(npm install*)",
       "Bash(npm update*)",
-      "Bash(git push*)"
+      "Bash(npm uninstall*)",
+      "Bash(git push*)",
+      "Bash(rm -r*)"
     ],
     "deny": [
-      "Bash(rm -rf *)",
-      "Bash(rm package.json)",
+      "Bash(rm -rf /)",
+      "Bash(rm package*.json)",
+      "Bash(rm tsconfig.json)",
       "Bash(rm CLAUDE.md)",
-      "Bash(rm .env*)"
+      "Bash(rm .env*)",
+      "Bash(rm -rf .git)"
     ]
   },
   "env": {
-    "NODE_ENV": "development",
     "PROJECT_TYPE": "landing-page",
     "PROJECT_LANGUAGE": "pt-PT",
     "TARGET_AUDIENCE": "female-entrepreneurs",
-    "FRAMEWORK_PRIMARY": "eleventy",
+    "FRAMEWORK": "eleventy",
     "CSS_FRAMEWORK": "tailwind-v4",
     "BUILD_TOOL": "vite",
-    "PAYMENT_PROVIDER": "stripe"
+    "PAYMENT_PROVIDER": "stripe",
+    "NODE_VERSION": "22.17.1"
   }
 }
