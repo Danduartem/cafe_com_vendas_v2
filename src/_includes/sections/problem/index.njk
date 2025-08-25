@@ -24,10 +24,6 @@
           {{ currentSection.copy.headline }}
         </h2>
 
-        <p data-reveal class="font-century text-neutral-700 max-w-[65ch] text-[clamp(1rem,2.1vw,1.125rem)] leading-[1.7]">
-          {{ currentSection.copy.description | replace('12h por dia', '<span class="font-semibold text-burgundy-700 inline-block">12h por dia</span>') | replace('"trabalhar duro"', '<em class="font-semibold text-burgundy-700 inline-block">"trabalhar duro"</em>') | safe }}
-        </p>
-
         {# Pain points checklist with glassmorphism card design #}
         <div data-reveal class="mt-8 rounded-3xl bg-white/80 backdrop-blur-md border border-white/60 ring-1 ring-black/5 shadow-xl p-6 sm:p-8">
           <h3 class="sr-only">Sinais comuns de sobrecarga</h3>
@@ -57,8 +53,71 @@
               </span>
               <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[2] }}</p>
             </li>
+                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
+                {{ checkmarkIcon | safe }}
+              </span>
+              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[3] }}</p>
+            </li>
+                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
+                {{ checkmarkIcon | safe }}
+              </span>
+              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[4] }}</p>
+            </li>
+                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
+                {{ checkmarkIcon | safe }}
+              </span>
+              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[5] }}</p>
+            </li>
+                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
+                {{ checkmarkIcon | safe }}
+              </span>
+              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[6] }}</p>
+            </li>
+                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
+                {{ checkmarkIcon | safe }}
+              </span>
+              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[7] }}</p>
+            </li>
+                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
+                {{ checkmarkIcon | safe }}
+              </span>
+              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[8] }}</p>
+            </li>
+                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
+                {{ checkmarkIcon | safe }}
+              </span>
+              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[9] }}</p>
+            </li>
+                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
+                {{ checkmarkIcon | safe }}
+              </span>
+              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[10] }}</p>
+            </li>
+                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
+                {{ checkmarkIcon | safe }}
+              </span>
+              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[11] }}</p>
+            </li>
+                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
+                {{ checkmarkIcon | safe }}
+              </span>
+              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[12] }}</p>
+            </li>
           </ul>
         </div>
+                <p data-reveal class="font-century text-neutral-700 max-w-[65ch] text-[clamp(1rem,2.1vw,1.125rem)] leading-[1.7]">
+          {{ currentSection.copy.description | replace('12h por dia', '<span class="font-semibold text-burgundy-700 inline-block">12h por dia</span>') | replace('"trabalhar duro"', '<em class="font-semibold text-burgundy-700 inline-block">"trabalhar duro"</em>') | safe }}
+        </p>
 
         {# Call-to-action button linking to solution section #}
         <div class="mt-10 text-center lg:text-left" data-reveal>

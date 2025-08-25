@@ -18,6 +18,11 @@
         "url": "https://www.instagram.com/jucanamaximiliano",
         "handle": "@jucanamaximiliano"
       }
+    },
+    "cta": {
+      "label": "Garantir a minha vaga",
+      "href": "#checkout",
+      "variant": "gradient"
     }
   },
   "media": {

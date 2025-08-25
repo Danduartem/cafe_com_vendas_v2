@@ -2,44 +2,44 @@
   "id": "solution",
   "enabled": true,
   "copy": {
-    "eyebrow": "O Sistema Comprovado",
+    "eyebrow": "O Plano Comprovado",
     "headline": "Método Seja Livre",
     "subhead": "Apresentamos o",
-    "description": "No Café com Vendas não damos \"dicas\". Implementamos um sistema completo que transforma o seu funcionamento operacional e a forma como vende. Cada pilar resolve uma dor crítica — da mentalidade ao lucro — para que o seu negócio trabalhe para si.",
+    "description": "Para mim, o sucesso sempre foi inegociável. E, por acreditar nisso, cada vez que eu precisava de mais resultados, a única saída que enxergava era trabalhar ainda mais. Mas chegou um momento em que tudo isso se tornou insustentável. Eu queria colher mais resultados, mas já não tinha espaço para trabalhar mais. Estava exausta. Foi então que entendi: continuar trabalhando 16h por dia não era mais uma opção. E, justamente nesse ponto de esgotamento, encontrei novos caminhos, estratégias que me trouxeram ainda mais resultados com muito menos esforço, inspirados por autores como Greg McKeown, Tim Ferriss e Naval Ravikant. Chega um momento em que mais esforço não traz melhores resultados. Pelo contrário: o excesso sabota o desempenho. Foi quando decidi criar um plano focado em trabalhar menos e produzir mais. Testei, validei e, em apenas um ano, já estava gerindo minha empresa à distância, trabalhando 4 horas por semana e vivendo com muito mais leveza. Finalmente consegui tirar minha empresa das costas. Por isso eu criei a SEJA LIVRE. Peguei o método que me tirou do ciclo de 16 horas de trabalho por dia e transformei em um plano prático, feito para mulheres como você, que querem liberdade de verdade sem abrir mão dos resultados. Aqui eu abro meus segredos: o que deu certo, o que deu errado e tudo o que jamais conto em outro lugar. Na SEJA LIVRE, eu te mostro como ter uma vida leve, com propósito e resultados reais sem se matar de trabalhar, sem se afastar da família e sem sacrificar a sua liberdade. É a oportunidade de finalmente tirar sua empresa das costas e fazer o seu negócio trabalhar por você.",
     "pillars": [
       {
         "number": "01",
-        "title": "Clareza Estratégica",
-        "description": "Simplifique a oferta: menos serviços, mais margem. Resultado: decisões mais rápidas e maior foco.",
+        "title": "MENTALIDADE",
+        "description": "Mude seus pensamentos e você mudará seu mundo.” – Norman Vincent Peale Neste pilar, você vai quebrar paradigmas, soltar crenças e transformar seu jeito de empreender através de mentalidade sem esforço, organização, automatização, intencionalidade, estratégia e liderança, criando um negócio mais leve, inteligente e altamente produtivo.",
         "icon": "strategy"
       },
       {
         "number": "02",
-        "title": "Oferta Lucrativa",
-        "description": "Reestruture preços e pacotes para vender mais por cliente, não para trabalhar mais horas.",
+        "title": "ESTRATÉGIA DE MARCA",
+        "description": "Não se trata de vender produtos, mas de construir uma marca que venda por si mesma.” – Philip Kotler No Pilar Estratégia de Marca, eu vou te ensinar a definir a alma da sua marca, conectar profundamente com seu avatar e transformar identidade, propósito, valores e experiências em uma presença memorável que encanta, se diferencia e vende sozinha.",
         "icon": "profit"
       },
       {
         "number": "03",
-        "title": "Fluxo de Vendas Simples",
-        "description": "Um funil prático e repetível que converte sem promessas milagrosas.",
+        "title": "ESTRATÉGIA DE VENDAS",
+        "description": "“Vender é transferir entusiasmo.” – Zig Ziglar Neste pilar, você vai descobrir que vender não é difícil, é uma habilidade que qualquer pessoa pode dominar com método. Vou compartilhar meus 14 anos de experiência, mostrando passo a passo como criar ofertas 11 estrelas, estruturar um CRM eficiente, superar objeções, construir uma promessa poderosa e escolher os canais de aquisição certos. Você vai aprender a transformar leads em clientes e vendas em liberdade, vendendo com intenção, inteligência e escala.",
         "icon": "funnel"
       },
       {
         "number": "04",
-        "title": "Operação Automatizada",
-        "description": "Ferramentas e rotinas que tiram o trabalho mecânico do seu dia.",
+        "title": "SOCIAL SELLER",
+        "description": "“Conteúdo constrói relacionamentos. Relacionamentos baseados em confiança geram receita.” – Andrew Davis No Pilar Social Seller, você vai aprender a vender sem vender: criar conexão, gerar confiança e despertar desejo espontâneo pelo seu produto ou serviço. Vou te ensinar como transformar cada conteúdo em uma ponte para o relacionamento certo, fazendo com que seu público queira se engajar e comprar naturalmente. Você vai dominar a arte de atrair clientes de forma estratégica, usando marketing de conteúdo para construir autoridade, humanizar sua marca e transformar seguidores em compradores fiéis, sem precisar interromper ninguém ou depender de truques chatos de venda.",
         "icon": "automation"
       },
       {
         "number": "05",
-        "title": "Plano de 90 Dias",
-        "description": "A aplicação concreta: o que fazer exatamente nas próximas 12 semanas para ver resultados.",
+        "title": "ALAVANCA",
+        "description": "“Descobrir sua alavanca de negócios é encontrar onde um esforço mínimo produz um efeito máximo.” – Jay Abraham Aqui você vai aprender a usar métricas e estratégias inteligentes para escalar sua empresa sem desperdício. Vai descobrir como identificar os números que realmente importam (como CAC, LTV, ROI e Churn), estruturar um ecossistema de produtos que aumenta a retenção e aplicar ajustes simples que protegem seu caixa. No fim, você terá clareza para tomar decisões estratégicas baseadas em dados, multiplicar seus lucros e conquistar segurança para crescer de forma sustentável.",
         "icon": "calendar"
       }
     ],
     "cta": {
-      "label": "Quero conhecer os 5 pilares em detalhe",
+      "label": "Quero dominar os 5 pilares e acelerar meu sucesso",
       "href": "#checkout",
       "variant": "gradient"
     },
