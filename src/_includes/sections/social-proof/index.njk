@@ -15,12 +15,16 @@
         <div class="w-20 h-1 rounded-full bg-gradient-to-r from-transparent via-gold-400 to-transparent"></div>
       </div>
       
+      <p class="font-century text-sm uppercase tracking-wider text-gold-600 mb-4">
+        {{ currentSection.copy.eyebrow }}
+      </p>
+      
       <h2 class="font-lora font-bold text-[clamp(1.75rem,4vw,2.5rem)] leading-tight text-navy-800 mb-4 sm:mb-6">
-        Elas vieram pela estratégia. Ficaram pela transformação.
+        {{ currentSection.copy.headline }}
       </h2>
       
       <p class="font-century text-lg leading-relaxed text-navy-800/70 max-w-2xl mx-auto">
-        Histórias reais de empreendedoras que escolheram o mapa para a liberdade
+        {{ currentSection.copy.subhead }}
       </p>
     </header>
 
@@ -93,7 +97,7 @@
 
     <footer class="text-center mt-16">
       <p class="font-century text-base italic text-navy-800/70">
-        Junte-se às empreendedoras que já transformaram os seus negócios
+        {{ currentSection.copy.footer_text }}
       </p>
       
       <a href="#s-offer" 
