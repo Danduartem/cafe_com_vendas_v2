@@ -23,24 +23,45 @@ export const Hero = {
     const heroSection = safeQuery('#s-hero');
     if (!heroSection) return;
 
-    const animatableElements = [
-      heroSection.querySelector('.hero-accent'),
-      heroSection.querySelector('h1'),
-      heroSection.querySelector('p[class*="italic"]'),
-      heroSection.querySelector('.hero-badge'),
-      heroSection.querySelector('p[class*="font-century"]'),
-      heroSection.querySelector('.hero-cta-primary'),
-      heroSection.querySelector('a[class*="underline"]'),
-      heroSection.querySelector('.hero-scroll-indicator')
-    ].filter(Boolean);
+    // Get elements in visual hierarchy order for proper stagger
+    const h1Element = heroSection.querySelector('h1');
+    const subheadElement = heroSection.querySelector('p[class*="italic"]');
+    const ctaElement = heroSection.querySelector('.hero-cta-primary');
+    const badgeElement = heroSection.querySelector('.hero-badge');
+    const noticeElement = heroSection.querySelector('[role="status"]');
+    const secondaryCtaElement = heroSection.querySelector('a[class*="underline"]');
+    const scrollIndicator = heroSection.querySelector('.hero-scroll-indicator');
 
-    Animations.prepareRevealElements(animatableElements);
+    // Group elements for staggered reveal (H1 → CTA → Proof triangle)
+    const primaryElements = [h1Element, subheadElement, ctaElement].filter(Boolean);
+    const proofElements = [badgeElement, noticeElement].filter(Boolean);
+    const supportingElements = [secondaryCtaElement, scrollIndicator].filter(Boolean);
+
+    // Prepare all elements
+    const allElements = [...primaryElements, ...proofElements, ...supportingElements];
+    Animations.prepareRevealElements(allElements);
 
     const observer = Animations.createObserver({
       callback: () => {
-        Animations.revealElements(animatableElements, {
-          initialDelay: 300
+        // Reveal primary triangle elements with 60ms stagger
+        Animations.revealElements(primaryElements, {
+          initialDelay: 150,
+          staggerDelay: 60
         });
+        
+        // Reveal proof elements after primary
+        setTimeout(() => {
+          Animations.revealElements(proofElements, {
+            staggerDelay: 40
+          });
+        }, 350);
+        
+        // Reveal supporting elements last
+        setTimeout(() => {
+          Animations.revealElements(supportingElements, {
+            staggerDelay: 80
+          });
+        }, 500);
       },
       once: true,
       rootMargin: '0px 0px -10% 0px'
@@ -128,22 +149,34 @@ export const Hero = {
     const heroCtaButton = safeQuery('.hero-cta-primary');
     if (!heroCtaButton) return;
 
-    // Hover effects
+    // Enhanced hover with arrow animation
+    const arrow = heroCtaButton.querySelector('svg');
+    
     heroCtaButton.addEventListener('mouseenter', function(this: HTMLElement) {
-      this.classList.add('scale-105');
+      // Arrow slides right on hover
+      if (arrow) {
+        arrow.style.transform = 'translateX(2px)';
+      }
     });
 
     heroCtaButton.addEventListener('mouseleave', function(this: HTMLElement) {
-      this.classList.remove('scale-105');
+      // Arrow returns to original position
+      if (arrow) {
+        arrow.style.transform = 'translateX(0)';
+      }
     });
 
-    // Click feedback
-    Animations.addClickFeedback(heroCtaButton);
+    // Click feedback with proper timing
+    heroCtaButton.addEventListener('click', function(this: HTMLElement) {
+      // Active state is handled by active:scale-[0.98] in Tailwind
+      Animations.addClickFeedback(this);
+    });
 
     // Keyboard feedback
     heroCtaButton.addEventListener('keydown', function(this: HTMLElement, e: Event) {
       if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
-        Animations.addClickFeedback(this);
+        e.preventDefault();
+        this.click();
       }
     });
   },

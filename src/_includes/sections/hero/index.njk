@@ -5,105 +5,120 @@
   id="s-hero"
   class="hero-bg relative flex flex-col
          bg-cover bg-center bg-no-repeat
-         overflow-hidden w-full h-screen pt-14
-         before:absolute before:inset-0
-         before:bg-gradient-to-b before:from-navy-900/85 before:via-navy-900/78 before:to-navy-900/66"
+         overflow-hidden w-full min-h-[650px] lg:min-h-[750px] h-screen pt-14"
   role="banner"
   aria-label="Seção principal do evento Café com Vendas"
   data-reveal
   data-analytics-section="hero"
 >
-  <!-- Simple gradient overlay - CLAUDE.md compliant with pure Tailwind -->
+  <!-- Optimized Radial Scrim Overlay using Tailwind v4 gradient syntax -->
   <div 
     aria-hidden="true" 
-    class="absolute right-0 top-0 h-full pointer-events-none z-10 w-[55vw] opacity-0 sm:opacity-100 bg-gradient-to-l from-burgundy-700/5 via-transparent to-transparent"
+    class="absolute inset-0 pointer-events-none z-[5]
+           bg-radial-[at_50%_30%] from-navy-900/65 via-navy-900/75 to-navy-900/85"
+  >
+  </div>
+  
+  <!-- Subtle Film Grain to prevent gradient banding -->
+  <div 
+    aria-hidden="true"
+    class="absolute inset-0 pointer-events-none z-[6] opacity-[0.02]"
+    style="background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" /%3E%3C/svg%3E')"
   >
   </div>
 
-  <!-- Content Container (centered vertically, safe from scroll-indicator overlap) -->
-  <div class="relative z-20 flex-1 flex flex-col items-center justify-center text-center w-full px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto py-8 sm:py-12">
+  <!-- Content Container - Optimized for Eye Path Triangle -->
+  <div class="relative z-20 flex-1 flex flex-col items-center justify-center text-center w-full px-4 sm:px-6 lg:px-8 max-w-[1120px] mx-auto py-20">
     
-    <!-- Accent Line -->
-    <div class="hero-accent mb-4 sm:mb-6 w-full" data-reveal>
-      <span class="inline-block w-20 sm:w-28 h-1.5 rounded-full bg-gradient-to-r from-neutral-200 to-burgundy-700 opacity-90"></span>
-    </div>
-
-    <!-- Main Headline -->
-    <h1 
-      class="font-lora font-extrabold text-[clamp(3rem,6.5vw,4.6rem)] leading-[1.04] text-white" 
-      id="hero-title"
-      data-reveal
-    >
-      {{ currentSection.copy.headline }}
-    </h1>
-
-    <!-- Subheadline -->
-    <p 
-      class="font-lora italic text-[clamp(1rem,3.6vw,1.8rem)] text-peach-300" 
-      aria-describedby="hero-title"
-      data-reveal
-    >
-      {{ currentSection.copy.subhead }}
-    </p>
-
-    <!-- Event Badge -->
-    <div 
-      class="hero-badge inline-flex items-center gap-2 rounded-full bg-white/6 backdrop-blur-md border border-white/12 px-3 py-1.5 mb-6 mt-6 text-neutral-200 text-[clamp(0.72rem,2.8vw,0.95rem)] shadow-[0_6px_30px_rgba(2,6,23,0.35)]" 
-      role="img" 
-      aria-label="Evento: {{ currentSection.copy.badge.date }}, {{ currentSection.copy.badge.location }}, {{ currentSection.copy.badge.venue }}"
-      data-reveal
-    >
-      <time datetime="2024-09-20">{{ currentSection.copy.badge.date }}</time>
-      <span class="text-peach-300" aria-hidden="true">•</span>
-      <span>{{ currentSection.copy.badge.location }}</span>
-      <span class="text-peach-300" aria-hidden="true">•</span>
-      <em class="not-italic">{{ currentSection.copy.badge.venue }}</em>
-    </div>
-
-    <!-- Body Text -->
-    <p 
-      class="font-century text-white text-[clamp(1rem,3.2vw,1.125rem)] leading-relaxed max-w-[60ch] mx-auto mb-6 px-2"
-      data-reveal
-    >
-      {{ currentSection.copy.description }}
-    </p>
-
-    <!-- CTA Group -->
-    <div 
-      class="flex flex-col sm:flex-row items-center gap-4 mt-2 w-full sm:w-auto"
-      data-reveal
-    >
-      <button 
-        type="button"
-        data-checkout-trigger
-        data-source="hero"
-        class="hero-cta-primary inline-flex items-center justify-center px-6 py-3 min-h-[48px] rounded-[14px] bg-gradient-to-r from-burgundy-700 to-navy-800 text-white font-bold shadow-[0_10px_30px_rgba(2,6,23,0.5)] transform-gpu transition-all duration-300 hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-white/40 focus:ring-offset-2 cursor-pointer focus:ring-offset-navy-900"
-        aria-label="Garantir a minha vaga no evento"
-        data-analytics-event="click_hero_cta"
+    <!-- Visual Triangle Layout: H1 → CTA → Proof -->
+    <div class="flex flex-col items-center space-y-4">
+      
+      <!-- 1. Main Headline (Triangle Point 1) -->
+      <h1 
+        class="font-lora font-extrabold text-[clamp(1.75rem,5vw,4rem)] lg:text-[3.5rem] leading-[1.1] text-white tracking-[-0.01em] max-w-[20ch]" 
+        id="hero-title"
+        data-reveal
       >
-        {{ currentSection.copy.cta.primary.label }}
-        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-        </svg>
-      </button>
+        {{ currentSection.copy.headline }}
+      </h1>
 
+      <!-- 2. Subheadline (Supporting, not competing) -->
+      <p 
+        class="font-lora italic text-[1.25rem] lg:text-[1.375rem] text-peach-300 leading-[1.4] mt-3 mb-6" 
+        aria-describedby="hero-title"
+        data-reveal
+      >
+        {{ currentSection.copy.subhead }}
+      </p>
+
+      <!-- 3. Primary CTA (Triangle Point 2) -->
+      <div class="hero-cta-container mb-4" data-reveal>
+        <button 
+          type="button"
+          data-checkout-trigger
+          data-source="hero"
+          class="hero-cta-primary inline-flex items-center justify-center 
+                 min-w-[200px] px-6 py-4 min-h-[52px] 
+                 rounded-2xl bg-linear-to-r from-burgundy-700 to-navy-800 
+                 text-white font-bold text-base
+                 shadow-lg shadow-burgundy-900/30
+                 transform-gpu transition-all duration-200 ease-out
+                 hover:scale-[1.02] hover:shadow-xl hover:shadow-burgundy-900/40
+                 hover:brightness-110
+                 focus:outline-none focus:ring-4 focus:ring-white/35 focus:ring-offset-2 
+                 cursor-pointer focus:ring-offset-transparent
+                 active:scale-[0.98]"
+          aria-label="Garantir a minha vaga no evento"
+          data-analytics-event="click_hero_cta"
+        >
+          {{ currentSection.copy.cta.primary.label }}
+          <svg class="w-5 h-5 ml-2.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 4. Proof/Trust Chips (Triangle Point 3) -->
+      <div class="flex flex-col items-center gap-3">
+        <!-- Event Badge Chip -->
+        <div 
+          class="hero-badge inline-flex items-center gap-2 
+                 rounded-full bg-white/[0.08] backdrop-blur-md 
+                 border border-white/[0.15] px-4 py-2
+                 text-neutral-200 text-[0.875rem] 
+                 shadow-[0_4px_16px_rgba(0,0,0,0.2)]" 
+          role="img" 
+          aria-label="Evento: {{ currentSection.copy.badge.date }}, {{ currentSection.copy.badge.location }}, {{ currentSection.copy.badge.venue }}"
+          data-reveal
+        >
+          <time datetime="2024-09-20">{{ currentSection.copy.badge.date }}</time>
+          <span class="text-peach-300/60" aria-hidden="true">•</span>
+          <span>{{ currentSection.copy.badge.location }}</span>
+          <span class="text-peach-300/60" aria-hidden="true">•</span>
+          <em class="not-italic">{{ currentSection.copy.badge.venue }}</em>
+        </div>
+
+        <!-- Limited Spots Notice Chip -->
+        <div 
+          class="text-[0.8125rem] text-white/80 font-medium"
+          role="status"
+          aria-live="polite"
+          data-reveal
+        >
+          {{ currentSection.copy.notice }}
+        </div>
+      </div>
+
+      <!-- Secondary CTA (Ghost/Link style) -->
       <a 
         href="#s-problem" 
-        class="text-white/90 underline underline-offset-4 text-sm sm:text-base transition-colors duration-200 hover:text-white" 
+        class="text-white/85 underline underline-offset-4 text-[0.9375rem] 
+               transition-all duration-200 hover:text-white hover:underline-offset-8 mt-4" 
         data-analytics-event="click_hero_secondary"
+        data-reveal
       >
         {{ currentSection.copy.cta.secondary.label }}
       </a>
-    </div>
-
-    <!-- Limited Spots Notice -->
-    <div 
-      class="mt-6 text-xs text-white/70"
-      role="status"
-      aria-live="polite"
-      data-reveal
-    >
-      {{ currentSection.copy.notice }}
     </div>
   </div>
 
