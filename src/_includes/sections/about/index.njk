@@ -102,26 +102,36 @@
         <div class="relative group">
           <div class="aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl border border-gold-200 bg-gradient-to-br from-neutral-100 to-neutral-200">
             <picture>
-              <!-- High-resolution desktop image -->
-              <source media="(min-width: 1025px)" 
-                      srcset="https://res.cloudinary.com/ds4dhbneq/image/upload/w_600,h_750,c_fill,q_auto:good,f_auto,g_face/sobre3_pnikcv 1x,
-                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_1200,h_1500,c_fill,q_auto:good,f_auto,g_face/sobre3_pnikcv 2x">
+              <!-- WebP/AVIF for modern browsers with responsive breakpoints -->
+              <source type="image/avif"
+                      srcset="https://res.cloudinary.com/ds4dhbneq/image/upload/w_320,ar_4:5,c_fill,q_auto:eco,f_avif,dpr_auto,g_face/sobre3_pnikcv 320w,
+                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,ar_4:5,c_fill,q_auto:eco,f_avif,dpr_auto,g_face/sobre3_pnikcv 640w,
+                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_768,ar_4:5,c_fill,q_auto:eco,f_avif,dpr_auto,g_face/sobre3_pnikcv 768w,
+                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_1024,ar_4:5,c_fill,q_auto:good,f_avif,dpr_auto,g_face/sobre3_pnikcv 1024w,
+                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_1536,ar_4:5,c_fill,q_auto:good,f_avif,dpr_auto,g_face/sobre3_pnikcv 1536w"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px">
               
-              <!-- Tablet image -->
-              <source media="(min-width: 641px)" 
-                      srcset="https://res.cloudinary.com/ds4dhbneq/image/upload/w_500,h_625,c_fill,q_auto:good,f_auto,g_face/sobre3_pnikcv 1x,
-                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_1000,h_1250,c_fill,q_auto:good,f_auto,g_face/sobre3_pnikcv 2x">
+              <source type="image/webp"
+                      srcset="https://res.cloudinary.com/ds4dhbneq/image/upload/w_320,ar_4:5,c_fill,q_auto:eco,f_webp,dpr_auto,g_face/sobre3_pnikcv 320w,
+                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,ar_4:5,c_fill,q_auto:eco,f_webp,dpr_auto,g_face/sobre3_pnikcv 640w,
+                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_768,ar_4:5,c_fill,q_auto:eco,f_webp,dpr_auto,g_face/sobre3_pnikcv 768w,
+                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_1024,ar_4:5,c_fill,q_auto:good,f_webp,dpr_auto,g_face/sobre3_pnikcv 1024w,
+                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_1536,ar_4:5,c_fill,q_auto:good,f_webp,dpr_auto,g_face/sobre3_pnikcv 1536w"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px">
               
-              <!-- Mobile image -->
-              <source media="(max-width: 640px)" 
-                      srcset="https://res.cloudinary.com/ds4dhbneq/image/upload/w_400,h_500,c_fill,q_auto:good,f_auto,g_face/sobre3_pnikcv 1x,
-                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_800,h_1000,c_fill,q_auto:good,f_auto,g_face/sobre3_pnikcv 2x">
-              
-              <!-- Fallback image -->
-              <img src="https://res.cloudinary.com/ds4dhbneq/image/upload/w_600,h_750,c_fill,q_auto,f_auto,g_face/sobre3_pnikcv" 
+              <!-- Fallback JPEG with responsive srcset -->
+              <img src="https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,ar_4:5,c_fill,q_auto:eco,f_auto,dpr_auto,g_face/sobre3_pnikcv" 
+                   srcset="https://res.cloudinary.com/ds4dhbneq/image/upload/w_320,ar_4:5,c_fill,q_auto:eco,f_auto,dpr_auto,g_face/sobre3_pnikcv 320w,
+                           https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,ar_4:5,c_fill,q_auto:eco,f_auto,dpr_auto,g_face/sobre3_pnikcv 640w,
+                           https://res.cloudinary.com/ds4dhbneq/image/upload/w_768,ar_4:5,c_fill,q_auto:eco,f_auto,dpr_auto,g_face/sobre3_pnikcv 768w,
+                           https://res.cloudinary.com/ds4dhbneq/image/upload/w_1024,ar_4:5,c_fill,q_auto:good,f_auto,dpr_auto,g_face/sobre3_pnikcv 1024w,
+                           https://res.cloudinary.com/ds4dhbneq/image/upload/w_1536,ar_4:5,c_fill,q_auto:good,f_auto,dpr_auto,g_face/sobre3_pnikcv 1536w"
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
                    alt="{{ currentSection.media.alt }}"
                    width="600" height="750"
-                   loading="lazy" decoding="async"
+                   loading="lazy" 
+                   decoding="async"
+                   fetchpriority="low"
                    class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
             </picture>
           </div>

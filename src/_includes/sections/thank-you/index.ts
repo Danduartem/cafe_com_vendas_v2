@@ -9,12 +9,38 @@ import { Animations } from '../../../components/ui';
 export const ThankYou = {
   init() {
     try {
+      this.checkPaymentStatus();
       this.initAnimations();
       this.initProgressBar();
       this.initInteractions();
       this.initCelebrationOverlay();
     } catch (error) {
       console.error('Error initializing ThankYou component:', error);
+    }
+  },
+
+  checkPaymentStatus() {
+    // Check if we came from a payment redirect (3DS, SEPA, etc.)
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentIntent = urlParams.get('payment_intent');
+    const redirectStatus = urlParams.get('redirect_status');
+
+    if (paymentIntent && redirectStatus === 'succeeded') {
+      // Payment succeeded after redirect (e.g., 3DS authentication)
+      // Track the conversion now since it wasn't tracked before redirect
+      import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+        PlatformAnalytics.trackConversion('payment_completed', {
+          transaction_id: paymentIntent,
+          value: 47,
+          currency: 'EUR',
+          items: [{ name: 'Café com Vendas Lisboa', quantity: 1, price: 47 }],
+          pricing_tier: 'early_bird',
+          payment_method: 'card_with_3ds' // Indicate this was a 3DS payment
+        });
+        console.log('Payment completed event tracked for 3DS redirect');
+      }).catch(() => {
+        console.debug('Payment completion analytics tracking unavailable');
+      });
     }
   },
 

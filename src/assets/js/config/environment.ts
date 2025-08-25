@@ -98,9 +98,11 @@ const config: EnvironmentConfig = {
 
   // URLs and Tracking
   urls: {
-    // Base URL for API calls (unified server serves both frontend and functions)
+    // Base URL for API calls 
+    // In production: use production domain
+    // In development: use current origin (works with both 'npm run dev' via Eleventy and 'netlify dev')
     base: isProduction ? 'https://jucanamaximiliano.com.br' : (
-      isBrowser ? `http://${window.location.hostname}:${window.location.port}` : 'http://localhost:8080'
+      isBrowser ? window.location.origin : 'http://localhost:8080'
     ),
     thankYou: '/obrigado',
     instagram: '/instagram',

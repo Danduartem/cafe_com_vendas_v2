@@ -27,7 +27,7 @@
 [build.processing.images]
   compress = true
 
-# Development settings - 2025 best practice: use Eleventy dev server directly
+# Development settings - 2025 best practice: use Netlify dev for full-stack development
 [dev]
   command = "eleventy --serve --watch --config=.eleventy.ts"
   targetPort = 8080

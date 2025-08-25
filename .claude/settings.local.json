@@ -25,7 +25,8 @@
       "mcp__context7__*",
       "mcp__firecrawl__*",
       "WebSearch",
-      "WebFetch(domain:docs.stripe.com)"
+      "WebFetch(domain:docs.stripe.com)",
+      "mcp__playwright-mcp__browser_fill_form"
     ],
     "deny": [],
     "ask": []

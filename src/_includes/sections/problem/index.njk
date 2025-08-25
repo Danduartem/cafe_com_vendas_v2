@@ -83,26 +83,36 @@
         <figure class="group relative overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-br from-neutral-300 to-neutral-400">
           <div class="relative aspect-[1.618/1]">
             <picture>
-              <!-- High-resolution desktop image -->
-              <source media="(min-width: 1025px)" 
-                      srcset="https://res.cloudinary.com/ds4dhbneq/image/upload/w_800,h_533,c_fill,q_auto:good,f_auto,g_face/problem-overworked_p5ntju 1x,
-                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_1600,h_1066,c_fill,q_auto:good,f_auto,g_face/problem-overworked_p5ntju 2x">
+              <!-- WebP/AVIF for modern browsers with responsive breakpoints -->
+              <source type="image/avif"
+                      srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,ar_1.618,c_fill,q_auto:eco,f_avif,dpr_auto,g_face/problem-overworked_p5ntju 320w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_1.618,c_fill,q_auto:eco,f_avif,dpr_auto,g_face/problem-overworked_p5ntju 640w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_768,ar_1.618,c_fill,q_auto:eco,f_avif,dpr_auto,g_face/problem-overworked_p5ntju 768w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,ar_1.618,c_fill,q_auto:good,f_avif,dpr_auto,g_face/problem-overworked_p5ntju 1024w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1536,ar_1.618,c_fill,q_auto:good,f_avif,dpr_auto,g_face/problem-overworked_p5ntju 1536w"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px">
               
-              <!-- Tablet image -->
-              <source media="(min-width: 641px)" 
-                      srcset="https://res.cloudinary.com/ds4dhbneq/image/upload/w_600,h_400,c_fill,q_auto:good,f_auto,g_face/problem-overworked_p5ntju 1x,
-                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_1200,h_800,c_fill,q_auto:good,f_auto,g_face/problem-overworked_p5ntju 2x">
+              <source type="image/webp"
+                      srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,ar_1.618,c_fill,q_auto:eco,f_webp,dpr_auto,g_face/problem-overworked_p5ntju 320w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_1.618,c_fill,q_auto:eco,f_webp,dpr_auto,g_face/problem-overworked_p5ntju 640w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_768,ar_1.618,c_fill,q_auto:eco,f_webp,dpr_auto,g_face/problem-overworked_p5ntju 768w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,ar_1.618,c_fill,q_auto:good,f_webp,dpr_auto,g_face/problem-overworked_p5ntju 1024w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1536,ar_1.618,c_fill,q_auto:good,f_webp,dpr_auto,g_face/problem-overworked_p5ntju 1536w"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px">
               
-              <!-- Mobile image -->
-              <source media="(max-width: 640px)" 
-                      srcset="https://res.cloudinary.com/ds4dhbneq/image/upload/w_400,h_300,c_fill,q_auto:good,f_auto,g_face/problem-overworked_p5ntju 1x,
-                              https://res.cloudinary.com/ds4dhbneq/image/upload/w_800,h_600,c_fill,q_auto:good,f_auto,g_face/problem-overworked_p5ntju 2x">
-              
-              <!-- Fallback image -->
-              <img src="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_800,h_533,c_fill,q_auto,f_auto,g_face/problem-overworked_p5ntju" 
+              <!-- Fallback JPEG with responsive srcset -->
+              <img src="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_1.618,c_fill,q_auto:eco,f_auto,dpr_auto,g_face/problem-overworked_p5ntju" 
+                   srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,ar_1.618,c_fill,q_auto:eco,f_auto,dpr_auto,g_face/problem-overworked_p5ntju 320w,
+                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_1.618,c_fill,q_auto:eco,f_auto,dpr_auto,g_face/problem-overworked_p5ntju 640w,
+                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_768,ar_1.618,c_fill,q_auto:eco,f_auto,dpr_auto,g_face/problem-overworked_p5ntju 768w,
+                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,ar_1.618,c_fill,q_auto:good,f_auto,dpr_auto,g_face/problem-overworked_p5ntju 1024w,
+                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1536,ar_1.618,c_fill,q_auto:good,f_auto,dpr_auto,g_face/problem-overworked_p5ntju 1536w"
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
                    alt="Empreendedora exausta trabalhando tarde da noite com pilhas de papéis e múltiplas telas — simbolizando sobrecarga"
-                   width="800" height="533"
-                   loading="lazy" decoding="async"
+                   width="800" height="494"
+                   loading="lazy" 
+                   decoding="async"
+                   fetchpriority="low"
                    class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
             </picture>
             {# Subtle gradient overlay for brand consistency #}

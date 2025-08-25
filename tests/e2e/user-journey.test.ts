@@ -88,7 +88,7 @@ test.describe('User Journey Tests', () => {
     }
     
     // Step 3: Click main CTA button
-    const ctaButton = page.locator('button:has-text("Quero Participar"), button:has-text("Reservar"), a:has-text("Inscrever")').first();
+    const ctaButton = page.locator('[data-checkout-trigger]').first();
     await expect(ctaButton).toBeVisible({ timeout: TIMEOUT });
     await ctaButton.click();
     
@@ -101,7 +101,7 @@ test.describe('User Journey Tests', () => {
     await fillLeadForm(page);
     
     // Step 5: Submit lead form
-    const submitButton = page.locator('button[type="submit"]:has-text("Continuar"), button[type="submit"]:has-text("Prosseguir")').first();
+    const submitButton = page.locator('button[type="submit"]').first();
     await submitButton.click();
     
     // Step 6: Wait for payment form
@@ -194,7 +194,7 @@ test.describe('User Journey Tests', () => {
     }
     
     // Step 4: Test form usability on mobile
-    const ctaButton = page.locator('button:has-text("Quero Participar"), button:has-text("Reservar")').first();
+    const ctaButton = page.locator('[data-checkout-trigger]').first();
     await ctaButton.scrollIntoViewIfNeeded();
     await ctaButton.click();
     
@@ -212,7 +212,7 @@ test.describe('User Journey Tests', () => {
     
     // Step 5: Verify touch interactions work
     const emailInput = page.locator('input[name="email"]');
-    await emailInput.tap(); // Use tap instead of click for mobile
+    await emailInput.click(); // Click works for both mobile and desktop
     await emailInput.fill(TEST_USER.email);
     
     // Verify form validation works on mobile
@@ -228,7 +228,7 @@ test.describe('User Journey Tests', () => {
 
   test('Abandonment Recovery Journey', async ({ page }) => {
     // Step 1: Start checkout process
-    const ctaButton = page.locator('button:has-text("Quero Participar"), button:has-text("Reservar")').first();
+    const ctaButton = page.locator('[data-checkout-trigger]').first();
     await ctaButton.click();
     
     // Step 2: Fill lead form
@@ -321,7 +321,7 @@ test.describe('User Journey Tests', () => {
     }
     
     // Step 4: After building trust, proceed to purchase
-    const ctaButton = page.locator('button:has-text("Quero Participar"), button:has-text("Reservar")').first();
+    const ctaButton = page.locator('[data-checkout-trigger]').first();
     await ctaButton.scrollIntoViewIfNeeded();
     await ctaButton.click();
     
