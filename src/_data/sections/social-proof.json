@@ -2,12 +2,12 @@
   "id": "social-proof",
   "enabled": true,
   "copy": {
-    "eyebrow": "O que dizem as participantes",
+    "eyebrow": "O que dizem os participantes",
     "headline": "Eu poderia passar horas falando sobre o Café com Vendas. Mas sabe de uma coisa?",
     "subhead": "Vou deixar meus alunos falarem por mim.",
-    "footer_text": "Junte-se às empreendedoras que já transformaram os seus negócios",
+    "footer_text": "O próximo depoimento será o seu.",
     "cta": {
-      "label": "Ver como o método funciona",
+      "label": "Eu quero ser livre",
       "href": "#s-offer",
       "variant": "gradient"
     }
@@ -15,138 +15,136 @@
   "testimonials": [
     {
       "id": 1,
-      "name": "Ana Castro",
-      "profession": "Terapeuta",
-      "location": "Lisboa",
-      "result": "+10h/semana e +30% ticket médio",
+      "name": "Tatiana dos Santos",
+      "profession": "Empresária no ramo automotivo",
       "video_id": "ddKv1irzSvk",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/ddKv1irzSvk/maxresdefault.jpg"
     },
     {
       "id": 2,
-      "name": "Mariana Lopes",
-      "profession": "Consultora",
+      "name": "Geisciane Roberta",
+      "profession": "Nutricionista",
       "location": "Porto",
       "result": "Funil que converte em 90 dias",
-      "video_id": "dQw4w9WgXcQ",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+      "video_id": "eUUPGwc9amQ",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/eUUPGwc9amQ/maxresdefault.jpg"
     },
     {
       "id": 3,
-      "name": "Rita Alves",
-      "profession": "Esteticista",
+      "name": "Daniela Tavares",
+      "profession": "Massoterapeuta",
       "location": "Braga",
       "result": "Resultados em 2 semanas",
-      "video_id": "kJQP7kiw5Fk",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/kJQP7kiw5Fk/maxresdefault.jpg"
+      "video_id": "lk6V36FwGSc",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/lk6V36FwGSc/maxresdefault.jpg"
     },
     {
       "id": 4,
-      "name": "Sofia Mendes",
-      "profession": "Coach",
+      "name": "Laura Fátima",
+      "profession": "Fundadora Guarani Piscicultura",
       "location": "Coimbra",
       "result": "Dobrei as vendas em 3 meses",
-      "video_id": "L_jWHffIx5E",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/L_jWHffIx5E/maxresdefault.jpg"
+      "video_id": "82k-aK9KaX4",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/82k-aK9KaX4/maxresdefault.jpg"
     },
     {
       "id": 5,
-      "name": "Catarina Silva",
-      "profession": "Designer",
+      "name": "Angélica de Cássia Barbosa",
+      "profession": "Terapeuta Ayurvédica e instrutora de yoga",
       "location": "Faro",
       "result": "Finalmente tenho tempo livre",
-      "video_id": "5NV6Rdv1a3I",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/5NV6Rdv1a3I/maxresdefault.jpg"
+      "video_id": "kh0pKpZzIJI",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/kh0pKpZzIJI/maxresdefault.jpg"
     },
     {
       "id": 6,
-      "name": "Isabel Ferreira",
-      "profession": "Nutricionista",
+      "name": "Edineia Lampert",
+      "profession": "Empresária na área da beleza",
       "location": "Aveiro",
       "result": "Processo de vendas automatizado",
-      "video_id": "9bZkp7q19f0",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/9bZkp7q19f0/maxresdefault.jpg"
+      "video_id": "n6IDHv8nMAU",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/n6IDHv8nMAU/maxresdefault.jpg"
     },
     {
       "id": 7,
-      "name": "Joana Rodrigues",
-      "profession": "Advogada",
+      "name": "Daisy Mariana Henn",
+      "profession": "Terapeuta energética",
       "location": "Viseu",
       "result": "Clareza total na estratégia",
-      "video_id": "w5Fgp2b0NkY",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/w5Fgp2b0NkY/maxresdefault.jpg"
+      "video_id": "1wPMvyiUU_8",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/1wPMvyiUU_8/maxresdefault.jpg"
     },
     {
       "id": 8,
-      "name": "Patrícia Nunes",
-      "profession": "Psicóloga",
+      "name": "Larissa Manzan",
+      "profession": "Vendedora",
       "location": "Setúbal",
       "result": "Trabalho 4 dias por semana",
-      "video_id": "i0djHJBAP3M",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/i0djHJBAP3M/maxresdefault.jpg"
+      "video_id": "irnlC9Krsdo",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/irnlC9Krsdo/maxresdefault.jpg"
     },
     {
       "id": 9,
-      "name": "Teresa Martins",
-      "profession": "Arquiteta",
+      "name": "Vanessa Trumseiser",
+      "profession": "Empresária na  área fitness",
       "location": "Évora",
       "result": "Método mudou tudo",
-      "video_id": "2Vv-BfVoq4g",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/2Vv-BfVoq4g/maxresdefault.jpg"
+      "video_id": "w3EmeJpzQG4",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/w3EmeJpzQG4/maxresdefault.jpg"
     },
     {
       "id": 10,
-      "name": "Liliana Cardoso",
-      "profession": "Cabeleireira",
+      "name": "Marcus Negri",
+      "profession": "Fundador Composta Rua",
       "location": "Évora",
       "result": "Dobrou a receita em 4 meses",
-      "video_id": "QpVt0-8uH-c",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/QpVt0-8uH-c/maxresdefault.jpg"
+      "video_id": "HMupKZLJdw4",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/HMupKZLJdw4/maxresdefault.jpg"
     },
     {
       "id": 11,
-      "name": "Patrícia Oliveira",
-      "profession": "Personal Trainer",
+      "name": "Thalyta Maia",
+      "profession": "Terapeuta",
       "location": "Leiria",
       "result": "+12h livres e 25% mais receita",
-      "video_id": "3tmd-ClpJxA",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/3tmd-ClpJxA/maxresdefault.jpg"
+      "video_id": "hP7CWX-PcXY",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/hP7CWX-PcXY/maxresdefault.jpg"
     },
     {
       "id": 12,
-      "name": "Susana Almeida",
-      "profession": "Advogada",
+      "name": "Luis Fernando Leier",
+      "profession": "Fundador Respira Humano",
       "location": "Santarém",
       "result": "Equipa de 5 pessoas em 1 ano",
-      "video_id": "hFZFjoX2cGg",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/hFZFjoX2cGg/maxresdefault.jpg"
+      "video_id": "kKPHUg3t7tI",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/kKPHUg3t7tI/maxresdefault.jpg"
     },
     {
       "id": 13,
-      "name": "Vera Martins",
-      "profession": "Contabilista",
+      "name": "Daiane Della Pasqua",
+      "profession": "Vendedora",
       "location": "Guarda",
       "result": "Sistema 100% automatizado",
-      "video_id": "8leAAwMIigI",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/8leAAwMIigI/maxresdefault.jpg"
+      "video_id": "6yZcVeu-Zl4",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/6yZcVeu-Zl4/maxresdefault.jpg"
     },
     {
       "id": 14,
-      "name": "Cristina Mendes",
-      "profession": "Coach Executiva",
+      "name": "Juliana Hornbrug",
+      "profession": "Empresária no ramo de chocolates",
       "location": "Cascais",
       "result": "+20h/semana e clientes premium",
-      "video_id": "ZbZSe6N_BXs",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/ZbZSe6N_BXs/maxresdefault.jpg"
+      "video_id": "30A1DLPcQc4",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/30A1DLPcQc4/maxresdefault.jpg"
     },
     {
       "id": 15,
-      "name": "Teresa Gomes",
-      "profession": "Veterinária",
+      "name": "Helena dos Santos Förster",
+      "profession": "Fundadora da Casa Ayurveda",
       "location": "Viana do Castelo",
       "result": "Clínica referência na região",
-      "video_id": "tgbNymZ7vqY",
-      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/tgbNymZ7vqY/maxresdefault.jpg"
+      "video_id": "9H7A-KLOi9Q",
+      "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/9H7A-KLOi9Q/maxresdefault.jpg"
     }
   ]
 }
