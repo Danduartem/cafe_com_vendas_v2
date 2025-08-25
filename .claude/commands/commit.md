@@ -1,21 +1,19 @@
-/commit (interactive)
+/commit
 ---
-description: Interactive conventional commit following repository workflow and Claude Code best practices.
-argument-hint: [message] [--quick|--thorough|--no-verify]
+description: Autonomous conventional commits - stages and commits ALL files with intelligent grouping
+argument-hint: [--quick|--no-verify]
 allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git add:*), Bash(git restore:*), Bash(git commit:*), Bash(npm run *), Bash(git log:*)
 model: claude-sonnet
 ---
 
-# /commit - Repository-Aware Interactive Commit
+# /commit - Autonomous Conventional Commits
 
-Create intelligent conventional commits following the **Café com Vendas workflow** and Claude Code best practices.
+Automatically stage and commit ALL modified files with intelligent grouping following **Café com Vendas workflow** and Claude Code best practices.
 
 ## Usage
 ```
-/commit                    # Interactive mode with smart analysis
-/commit "message"          # Direct commit with verification
+/commit                    # Commits ALL files automatically with intelligent grouping
 /commit --quick           # Fast mode, minimal checks
-/commit --thorough        # Full verification including tests
 /commit --no-verify       # Skip verification (emergency use)
 ```
 
@@ -24,22 +22,44 @@ Create intelligent conventional commits following the **Café com Vendas workflo
 - Staged files: !`git diff --name-only --cached`
 - Modified files: !`git status --porcelain`
 
+## File Grouping Logic
+
+**Group 1: Implementation Changes (same commit)**
+- Template files (.njk, .html)
+- TypeScript/JavaScript (.ts, .js, .tsx)
+- Stylesheets (.css, .scss) 
+- Related files that implement the same feature
+
+**Group 2: Content Updates (separate commit)**
+- Data files in `src/_data/` (.json)
+- Markdown content (.md)
+- Copy/content changes
+
+**Group 3: Configuration (separate commit)**
+- Build configs (.eleventy.ts, vite.config.ts)
+- Package management (package.json, package-lock.json)
+- TypeScript config (tsconfig.json)
+
+**Skip (never commit):**
+- Local settings (.claude/settings.local.json)
+- IDE settings (.vscode/settings.json)
+- OS files (.DS_Store)
+
+**Example commit sequence:**
+1. `✨ feat(about): add nl2br filter for line break support` (implementation)
+2. `📝 content(about): update bio with line breaks` (content)
+3. `🔧 chore(build): update TypeScript config` (if changed)
+
 ## Workflow (follows CLAUDE.md plan → apply → verify)
 
-### 1) **Explore Phase** - Analyze Changes
-- Show current repository state and staged changes
-- Identify change categories (feat, fix, chore, etc.)
+### 1) **Analyze Phase** - Discover All Changes
+- Show current repository state (all modified files)
+- Identify change categories (feat, fix, chore, etc.) for each file
 - Detect special contexts (payments, analytics, accessibility)
-- Check for potential issues or missing files
+- Apply file grouping logic (defined above)
 
-### 2) **Plan Phase** - Smart Commit Strategy
-- Suggest appropriate commit type and scope
-- Recommend verification level based on changes
-- Identify if changes should be split into multiple commits
-- Warn about special considerations (payment flows, breaking changes)
-
-### 3) **Verify Phase** - Repository Quality Gates
-Execute verification based on CLAUDE.md standards:
+### 2) **Verify Phase** - Quality Gates
+Execute verification based on CLAUDE.md standards before any commits:
 
 **Always run:** 
 ```bash
@@ -57,7 +77,21 @@ npm run type-check && npm run lint
 - `--no-verify` flag is used
 - Emergency hotfix scenario (must be explicitly confirmed)
 
-### 4) **Commit Phase** - Repository-Aware Messages
+### 3) **Commit Phase** - Autonomous Multi-Commit Loop
+
+**Process ALL files with this loop:**
+```
+WHILE (uncommitted files exist):
+  1. Analyze remaining files
+  2. Select next logical group
+  3. Stage the group
+  4. Generate commit message
+  5. Create commit
+  6. Verify commit success
+END WHILE
+```
+
+**Show final summary:** List all commits created
 
 Generate conventional commits with appropriate emoji and scope:
 
@@ -78,6 +112,7 @@ Generate conventional commits with appropriate emoji and scope:
 - Detect component/section changes: `feat(checkout): add payment validation`
 - Identify function changes: `fix(webhook): handle timeout errors`
 - Recognize config changes: `chore(build): update TypeScript target`
+
 
 ## Repository-Specific Intelligence
 
@@ -105,28 +140,37 @@ If UI components are modified:
 - Color contrast maintained?
 ```
 
-## Error Recovery & Course Correction
-
-**If verification fails:**
-1. Show clear error explanation
-2. Suggest specific fixes
-3. Allow partial staging of working changes
-4. Offer to continue with `--no-verify` if critical
-
-**If commit message needs improvement:**
-1. Analyze staged changes for better context
-2. Suggest conventional commit improvements
-3. Allow manual message editing
-4. Validate message format before committing
 
 ## Implementation Rules
 
-1. **Respect user staging** - Work with what's already staged, don't auto-stage
-2. **Follow CLAUDE.md workflow** - Always plan before applying
-3. **Be interactive** - Ask for clarification when needed
-4. **Enable course-correction** - Allow users to fix issues and retry
-5. **Provide context** - Explain why certain checks are important
-6. **Stay consistent** - Use repository's established patterns and tools
+1. **Auto-stage everything** - Stage all modified files, skip local/IDE settings
+2. **Complete all commits** - Continue until no uncommitted files remain
+3. **Make smart decisions** - Use grouping logic, never ask questions
+4. **Handle errors gracefully** - Show error, continue with remaining groups
+5. **Stay consistent** - Follow repository patterns and conventional commits
+
+## Example Output
+
+**Input:** 4 modified files detected
+```
+M .eleventy.ts
+M src/_includes/sections/about/index.njk
+M src/_data/sections/about.json
+M .claude/settings.local.json
+```
+
+**Process:**
+1. **Group 1 (Implementation):** `.eleventy.ts` + `about/index.njk`
+2. **Group 2 (Content):** `about.json`
+3. **Skip:** `.claude/settings.local.json`
+
+**Output:** 2 commits created
+```
+✨ feat(eleventy): add nl2br filter for line break support
+📝 content(about): update bio with line breaks
+```
+
+**Final Result:** All files committed, repository clean
 
 ---
 
