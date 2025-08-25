@@ -11,11 +11,13 @@
     <meta name="author" content="Juçanã Maximiliano">
     
     <!-- Critical Resource Preloading (Lighthouse Performance Optimization) -->
-    <!-- Preload critical fonts to prevent FOUT and improve LCP -->
+    <!-- Preload only fonts used above the fold to prevent warnings -->
     <link rel="preload" href="/fonts/Lora/Lora-600.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/fonts/Lora/Lora-700.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="/fonts/CenturyGothic/CenturyGothic-Regular.woff" as="font" type="font/woff" crossorigin>
-    <link rel="preload" href="/fonts/CenturyGothic/CenturyGothic-Bold.woff" as="font" type="font/woff" crossorigin>
+    
+    <!-- Prefetch fonts used below the fold (avoids "not used within seconds" warning) -->
+    <link rel="prefetch" href="/fonts/CenturyGothic/CenturyGothic-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="prefetch" href="/fonts/CenturyGothic/CenturyGothic-Bold.woff2" as="font" type="font/woff2" crossorigin>
     
     <!-- Preconnect to external domains for faster third-party loading -->
     <link rel="preconnect" href="https://js.stripe.com">

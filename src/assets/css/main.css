@@ -267,7 +267,7 @@ html, body {
 /* CenturyGothic: complete weight and style variants - body and UI text */
 @font-face {
   font-family: 'CenturyGothic';
-  src: url('/fonts/CenturyGothic/CenturyGothic-Regular.woff') format('woff');
+  src: url('/fonts/CenturyGothic/CenturyGothic-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -275,7 +275,7 @@ html, body {
 
 @font-face {
   font-family: 'CenturyGothic';
-  src: url('/fonts/CenturyGothic/CenturyGothic-Italic.woff') format('woff');
+  src: url('/fonts/CenturyGothic/CenturyGothic-Italic.woff2') format('woff2');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
@@ -283,7 +283,7 @@ html, body {
 
 @font-face {
   font-family: 'CenturyGothic';
-  src: url('/fonts/CenturyGothic/CenturyGothic-Bold.woff') format('woff');
+  src: url('/fonts/CenturyGothic/CenturyGothic-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -291,7 +291,7 @@ html, body {
 
 @font-face {
   font-family: 'CenturyGothic';
-  src: url('/fonts/CenturyGothic/CenturyGothic-BoldItalic.woff') format('woff');
+  src: url('/fonts/CenturyGothic/CenturyGothic-BoldItalic.woff2') format('woff2');
   font-weight: 700;
   font-style: italic;
   font-display: swap;
@@ -332,19 +332,24 @@ html {
 
 /* Removed unused confetti-bg */
 
-/* Tailwind v4 Responsive Hero Background Utility */
+/* Tailwind v4 Responsive Hero Background Utility - Optimized for LCP */
 @utility hero-bg {
-  /* Base mobile version - portrait orientation optimized */
-  background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,h_1136,c_fill,q_auto,f_auto,g_auto,dpr_auto/cafe_pnkngz');
+  /* Base mobile version - optimized for fast loading with progressive JPEG */
+  background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,h_1136,c_fill,q_auto:eco,f_auto,g_auto,dpr_auto,fl_progressive/cafe_pnkngz');
   
-  /* Tablet and small desktop */
+  /* Small tablet */
   @media (min-width: 640px) {
-    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1024,h_768,c_fill,q_auto,f_auto,g_auto,dpr_auto/cafe_pnkngz');
+    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1024,h_768,c_fill,q_auto:good,f_auto,g_auto,dpr_auto,fl_progressive/cafe_pnkngz');
   }
   
-  /* Large desktop */
+  /* Desktop */
   @media (min-width: 1024px) {
-    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto,f_auto,g_auto,dpr_auto/cafe_pnkngz');
+    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1536,h_864,c_fill,q_auto:best,f_auto,g_auto,dpr_auto,fl_progressive/cafe_pnkngz');
+  }
+  
+  /* Large desktop - higher quality for large screens */
+  @media (min-width: 1536px) {
+    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto:best,f_auto,g_auto,dpr_auto,fl_progressive/cafe_pnkngz');
   }
 }
 
