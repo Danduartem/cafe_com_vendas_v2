@@ -53,6 +53,7 @@ Act as an engineer in this repo. Favor **small, verifiable, type‑safe** diffs.
 
 * `npm run type-check && npm run lint && npm test` → all pass
 * UI/Perf touched → quick Lighthouse: Perf ≥ 90 (mobile), A11y ≥ 95  
+  - **Use**: `npm run lighthouse -- https://your-url.com` (saves to `reports/` folder)
 * Analytics respected → **`payment_completed`** fires once on success; GTM maps to GA4 **`purchase`**
 
 ---

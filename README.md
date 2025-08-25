@@ -1,5 +1,10 @@
 # Café com Vendas Landing Page
 
+[![Node.js](https://img.shields.io/badge/node-%3E%3D22.17.1-brightgreen.svg)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9.2-blue.svg)](https://www.typescriptlang.org/)
+[![Eleventy](https://img.shields.io/badge/Eleventy-3.1.2-orange.svg)](https://www.11ty.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1.12-38bdf8.svg)](https://tailwindcss.com/)
+
 Premium landing page for an intimate business transformation event in Lisbon, designed for female entrepreneurs seeking to scale their businesses without burnout.
 
 ## 🎯 Project Overview
@@ -50,6 +55,10 @@ npm run preview           # Preview production build
 - **`edit-map.md`** - File structure map for content & code edits
 - **`STRIPE_TEST_CARDS.md`** - Test card numbers for payment flows
 - **`PAYMENT_TESTING_SUMMARY.md`** - Payment testing checklist
+- **`TROUBLESHOOTING.md`** - Common issues and solutions
+- **`GTM_CONFIGURATION_REFERENCE.md`** - Google Tag Manager setup
+- **`PERFORMANCE.md`** - Lighthouse targets and optimization
+- **`DEPLOYMENT.md`** - Production deployment checklist
 
 ### Development
 - **`CLAUDE.md`** - AI coding guidelines & workflow

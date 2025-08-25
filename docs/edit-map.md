@@ -119,6 +119,21 @@ netlify/functions/
 └── types.ts                  # Shared TypeScript types
 ```
 
+### Utility Scripts
+```
+scripts/
+└── verify-apis.ts            # API compatibility checker
+```
+
+### Generated Reports
+```
+reports/                      # Auto-generated (excluded from git)
+├── lighthouse.*              # Performance audit results
+└── playwright/               # E2E test results & screenshots
+    ├── html/                 # Test report dashboard
+    └── playwright-mcp/       # Visual debugging screenshots
+```
+
 ### Payment Flow
 1. User clicks checkout → `create-payment-intent`
 2. Stripe processes payment
@@ -179,11 +194,14 @@ src/_includes/
 ### Testing Structure
 ```
 tests/
-├── setup.ts              # Test configuration
-├── unit/                 # Unit tests
-│   ├── analytics.test.ts
-│   └── gtm-normalizer.test.ts
-└── visual/               # Playwright E2E (excluded)
+├── setup.ts                                # Test configuration
+├── unit/                                   # Unit tests (Vitest)
+│   └── render/
+│       └── landing-composition.test.ts     # Landing page rendering tests
+├── e2e/                                   # End-to-end tests (Playwright)
+│   └── user-journey.test.ts               # Complete user flow validation
+└── utils/                                 # Test utilities
+    └── section-loader.ts                  # Section loading helpers
 ```
 
 ### Quick Commands
@@ -203,6 +221,9 @@ npm run preview          # Serve production build
 
 # Utilities
 npm run verify-apis      # Check API compatibility
+npm run test:e2e         # Run Playwright E2E tests
+npm run test:e2e:report  # View test results
+npm run lighthouse       # Run Lighthouse performance audit
 ```
 
 ## 📝 Quick Edit Guide
@@ -238,4 +259,4 @@ npm run verify-apis      # Check API compatibility
 
 ---
 
-*Updated: 2025-08-24 | Reflects current codebase structure*
+*Updated: 2025-08-25 | Reflects current codebase structure*

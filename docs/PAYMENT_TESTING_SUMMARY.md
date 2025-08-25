@@ -117,8 +117,7 @@
 ## 7) Links
 
 * Cards & 3DS: `docs/STRIPE_TEST_CARDS.md`
-* GTM mapping: `docs/GTM_CONFIGURATION_REFERENCE.md`
-* GTM setup: `docs/GTM_SETUP_GUIDE.md`
+* GTM setup & configuration: `docs/SETUP.md` (Third-Party Integrations section)
 
 ---
 
@@ -129,4 +128,4 @@
 
 ---
 
-*Last updated: 2025‑08‑22*
+*Last updated: 2025-08-25*
