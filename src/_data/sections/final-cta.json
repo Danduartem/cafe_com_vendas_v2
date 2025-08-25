@@ -3,24 +3,28 @@
   "enabled": true,
   "copy": {
     "eyebrow": "Última chamada",
-    "headline": "O momento é agora",
-    "subhead": "As vagas do primeiro lote estão quase esgotadas",
-    "description": "Este é o seu convite para parar de adiar a sua liberdade. Para transformar o \"um dia\" em \"20 de setembro\". Apenas 8 vagas com desconto especial.",
-    "urgency_points": [
-      "Apenas 8 vagas no primeiro lote",
-      "25% de desconto + brindes exclusivos",
-      "Garantia de 90 dias",
-      "Evento único em Lisboa"
-    ],
-    "cta": {
-      "label": "Sim, quero garantir minha vaga agora",
-      "href": "#checkout",
-      "variant": "gradient-large"
+    "headline": {
+      "line1": "Você tem duas escolhas:",
+      "line2": "continuar a fazer tudo sozinha",
+      "line3": "ou aceitar o mapa para a sua liberdade"
     },
-    "alternative_cta": {
-      "label": "Ainda tenho dúvidas",
-      "href": "#faq",
-      "variant": "link"
+    "description": {
+      "paragraph1": "As vagas são estritamente limitadas para garantir um ambiente intimista e de profunda transformação.",
+      "paragraph2": "Esta edição é única — garanta o seu lugar e comece a transformação hoje."
+    },
+    "cta": {
+      "line1": "Sim, eu escolho",
+      "line2": "A LIBERDADE",
+      "href": "#checkout"
+    },
+    "trustIndicators": [
+      "Últimas vagas disponíveis",
+      "Pagamento 100% seguro", 
+      "Garantia de 90 dias"
+    ],
+    "urgencyMessage": {
+      "line1": "O evento acontece em 20/09 em Lisboa",
+      "line2": "Apenas 20 vagas na primeira turma"
     }
   }
 }

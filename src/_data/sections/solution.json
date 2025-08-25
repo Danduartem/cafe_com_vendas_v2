@@ -42,6 +42,11 @@
       "label": "Quero conhecer os 5 pilares em detalhe",
       "href": "#checkout",
       "variant": "gradient"
-    }
+    },
+    "supportingText": "Cada pilar será aprofundado durante o evento — exemplos práticos, templates e uma folha de ação.",
+    "trustIndicators": [
+      "90 dias de garantia",
+      "Apenas 20 vagas"
+    ]
   }
 }

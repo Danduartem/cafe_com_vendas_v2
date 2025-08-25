@@ -6,7 +6,8 @@
       "Bash(git add:*)",
       "WebFetch(domain:docs.firecrawl.dev)",
       "Bash(env)",
-      "mcp__context7__resolve-library-id"
+      "mcp__context7__resolve-library-id",
+      "Bash(npm run type-check:*)"
     ]
   },
   "hooks": {

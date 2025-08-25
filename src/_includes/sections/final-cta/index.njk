@@ -38,16 +38,16 @@
         <div class="space-y-6">
           <h2 class="font-lora font-bold text-white leading-tight tracking-tight">
             <span class="block text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
-              Você tem duas escolhas:
+              {{ currentSection.copy.headline.line1 }}
             </span>
             <span class="block text-3xl md:text-4xl lg:text-5xl xl:text-6xl mt-4 text-white/95">
-              continuar a fazer tudo sozinha
+              {{ currentSection.copy.headline.line2 }}
             </span>
             <span class="block text-3xl md:text-4xl lg:text-5xl xl:text-6xl mt-4">
               ou aceitar o 
               <span class="relative">
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-gold-400 to-gold-500">
-                  mapa para a sua liberdade
+                  {{ currentSection.copy.headline.line3 | replace('ou aceitar o ', '') }}
                 </span>
                 <div class="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-gold-400/60 to-gold-600/60 rounded-full"></div>
               </span>
@@ -58,14 +58,10 @@
         {# Premium Body Copy #}
         <div class="space-y-6 max-w-2xl" id="final-cta-description">
           <p class="text-xl md:text-2xl text-white/95 leading-relaxed font-century font-light">
-            As vagas são estritamente limitadas para garantir um ambiente intimista 
-            e de profunda transformação.
+            {{ currentSection.copy.description.paragraph1 }}
           </p>
           <p class="text-xl md:text-2xl text-white/95 leading-relaxed font-century font-light">
-            Esta edição é única — garanta o seu lugar e 
-            <span class="font-medium text-transparent bg-clip-text bg-gradient-to-r from-gold-300 to-gold-400">
-              comece a transformação hoje
-            </span>.
+            {{ currentSection.copy.description.paragraph2 | replace('comece a transformação hoje', '<span class="font-medium text-transparent bg-clip-text bg-gradient-to-r from-gold-300 to-gold-400">comece a transformação hoje</span>') | safe }}
           </p>
         </div>
       </div>
@@ -90,10 +86,10 @@
             {# Button content #}
             <div class="text-center space-y-2">
               <span class="block font-bold text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-gold-200 to-gold-400">
-                Sim, eu escolho
+                {{ currentSection.copy.cta.line1 }}
               </span>
               <span class="block font-bold text-2xl md:text-3xl text-white">
-                A LIBERDADE
+                {{ currentSection.copy.cta.line2 }}
               </span>
             </div>
             
@@ -121,7 +117,7 @@
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                 </svg>
               </div>
-              <span class="text-base font-medium text-white/90">Últimas vagas disponíveis</span>
+              <span class="text-base font-medium text-white/90">{{ currentSection.copy.trustIndicators[0] }}</span>
             </div>
             
             {# Lock Icon - Secure payment #}
@@ -131,7 +127,7 @@
                   <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
                 </svg>
               </div>
-              <span class="text-base font-medium text-white/90">Pagamento 100% seguro</span>
+              <span class="text-base font-medium text-white/90">{{ currentSection.copy.trustIndicators[1] }}</span>
             </div>
             
             {# Check Circle Icon - Guarantee #}
@@ -141,7 +137,7 @@
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
               </div>
-              <span class="text-base font-medium text-white/90">Garantia de 90 dias</span>
+              <span class="text-base font-medium text-white/90">{{ currentSection.copy.trustIndicators[2] }}</span>
             </div>
             
           </div>
@@ -159,10 +155,10 @@
         </div>
         <div class="text-left">
           <p class="text-lg md:text-xl text-white font-century leading-relaxed">
-            O evento acontece em <span class="font-bold text-white">20/09</span> em Lisboa
+            {{ currentSection.copy.urgencyMessage.line1 | replace('20/09', '<span class="font-bold text-white">20/09</span>') | safe }}
           </p>
           <p class="text-base md:text-lg text-white/80 mt-1">
-            Apenas <span class="font-bold text-white">20 vagas</span> na primeira turma
+            {{ currentSection.copy.urgencyMessage.line2 | replace('20 vagas', '<span class="font-bold text-white">20 vagas</span>') | safe }}
           </p>
         </div>
       </div>

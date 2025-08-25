@@ -21,14 +21,11 @@
 
         {# Main headline with gradient text treatment #}
         <h2 data-reveal class="font-lora font-bold tracking-tight leading-tight mb-6 text-[clamp(1.75rem,3.2vw,2.5rem)] bg-gradient-to-br from-navy-900 to-burgundy-700 bg-clip-text text-transparent">
-          O seu dia parece uma lista infinita de tarefas que nunca tem fim?
+          {{ currentSection.copy.headline }}
         </h2>
 
         <p data-reveal class="font-century text-neutral-700 max-w-[65ch] text-[clamp(1rem,2.1vw,1.125rem)] leading-[1.7]">
-          Trabalha <span class="font-semibold text-burgundy-700 inline-block">12h por dia</span>
-          e continua com a sensação de que nada muda. Anda a apagar fogos, sem espaço para estratégia — e o
-          <em class="font-semibold text-burgundy-700 inline-block">"trabalhar duro"</em>
-          transforma‑se numa rota sem saída. O resultado é previsível: exaustão, decisões reativas e um negócio que não escala.
+          {{ currentSection.copy.description | replace('12h por dia', '<span class="font-semibold text-burgundy-700 inline-block">12h por dia</span>') | replace('"trabalhar duro"', '<em class="font-semibold text-burgundy-700 inline-block">"trabalhar duro"</em>') | safe }}
         </p>
 
         {# Pain points checklist with glassmorphism card design #}
@@ -46,19 +43,19 @@
               <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
                 {{ checkmarkIcon | safe }}
               </span>
-              <p class="font-century text-neutral-800 flex-1">Sem tempo para pensar em crescimento — o dia a dia consome tudo.</p>
+              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[0] }}</p>
             </li>
             <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
               <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
                 {{ checkmarkIcon | safe }}
               </span>
-              <p class="font-century text-neutral-800 flex-1">Muitos clientes, pouca margem — o lucro desaparece entre entregas apressadas.</p>
+              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[1] }}</p>
             </li>
             <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
               <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
                 {{ checkmarkIcon | safe }}
               </span>
-              <p class="font-century text-neutral-800 flex-1">Sente que tudo depende de si — a equipa não assume responsabilidade suficiente.</p>
+              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[2] }}</p>
             </li>
           </ul>
         </div>
@@ -70,7 +67,7 @@
                     bg-gradient-to-r from-burgundy-700 to-navy-900 transition-all duration-300 
                     hover:-translate-y-0.5 hover:shadow-[0_20px_40px_rgba(26,14,15,0.35)]
                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy-700 focus-visible:ring-offset-2">
-            <span>Descobrir a solução</span>
+            <span>{{ currentSection.copy.cta.label }}</span>
             <svg class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/>
             </svg>

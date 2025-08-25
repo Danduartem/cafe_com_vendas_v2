@@ -33,7 +33,7 @@
       </div>
       
       <h2 class="font-lora font-bold mb-8 text-navy-800 text-[clamp(2.5rem,5vw,3.5rem)] leading-[1.1]">
-        <span class="block">Apresentamos o</span>
+        <span class="block">{{ currentSection.copy.subhead }}</span>
         <span class="relative inline-block mt-2">
           <span class="relative z-10 bg-gradient-to-r from-burgundy-700 via-gold-500 to-burgundy-700 bg-clip-text text-transparent">{{ currentSection.copy.headline }}</span>
           {# Decorative underline #}
@@ -161,10 +161,7 @@
         {# Supporting text with refined styling #}
         <div class="mt-8 relative">
           <p class="font-century text-navy-800/70 text-base leading-relaxed max-w-[65ch] mx-auto">
-            Cada pilar será aprofundado durante o evento — 
-            <span class="font-semibold text-navy-800">exemplos práticos</span>, 
-            <span class="font-semibold text-navy-800">templates</span> e uma 
-            <span class="font-semibold text-navy-800">folha de ação</span>.
+            {{ currentSection.copy.supportingText | replace('exemplos práticos', '<span class="font-semibold text-navy-800">exemplos práticos</span>') | replace('templates', '<span class="font-semibold text-navy-800">templates</span>') | replace('folha de ação', '<span class="font-semibold text-navy-800">folha de ação</span>') | safe }}
           </p>
           
           {# Trust indicators - responsive layout #}
@@ -173,13 +170,13 @@
               <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
               </svg>
-              <span class="font-century whitespace-nowrap">90 dias de garantia</span>
+              <span class="font-century whitespace-nowrap">{{ currentSection.copy.trustIndicators[0] }}</span>
             </div>
             <div class="flex items-center gap-2">
               <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
               </svg>
-              <span class="font-century whitespace-nowrap">Apenas 20 vagas</span>
+              <span class="font-century whitespace-nowrap">{{ currentSection.copy.trustIndicators[1] }}</span>
             </div>
           </div>
         </div>
