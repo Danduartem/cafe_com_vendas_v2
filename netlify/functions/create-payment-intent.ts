@@ -585,8 +585,7 @@ export default async (request: Request): Promise<Response> => {
           enabled: true,
           allow_redirects: 'always'
         },
-        // Payment method configuration for European market
-        payment_method_configuration: undefined, // Use account default configuration
+        // Use account default payment method configuration
         metadata: {
           ...metadata,
           idempotency_key: idempotencyKey
@@ -596,7 +595,9 @@ export default async (request: Request): Promise<Response> => {
         // Payment method options for different payment types
         payment_method_options: {
           card: {
-            request_three_d_secure: 'automatic',
+            // Use 'any' to request 3DS for all cards when possible (required for EU regulations)
+            // This ensures proper authentication for Portugal/EU cards
+            request_three_d_secure: 'any',
             setup_future_usage: 'off_session'
           },
           sepa_debit: {

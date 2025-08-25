@@ -212,9 +212,35 @@
             </p>
           </div>
 
-          <!-- Stripe Payment Element Container -->
-          <div id="payment-element" class="mb-4">
-            <!-- Stripe Elements will mount here -->
+          <!-- Payment Form Container -->
+          <div class="mb-4 min-h-[280px] relative">
+            <!-- Skeleton loader for payment form -->
+            <div id="payment-skeleton" class="space-y-4">
+              <div class="animate-pulse">
+                <div class="h-4 bg-neutral-200 rounded w-1/3 mb-2"></div>
+                <div class="h-10 bg-neutral-100 rounded-lg border border-neutral-200"></div>
+              </div>
+              <div class="animate-pulse">
+                <div class="h-4 bg-neutral-200 rounded w-1/4 mb-2"></div>
+                <div class="h-10 bg-neutral-100 rounded-lg border border-neutral-200"></div>
+              </div>
+              <div class="animate-pulse">
+                <div class="h-4 bg-neutral-200 rounded w-2/5 mb-2"></div>
+                <div class="h-10 bg-neutral-100 rounded-lg border border-neutral-200"></div>
+              </div>
+              <div class="animate-pulse">
+                <div class="h-4 bg-neutral-200 rounded w-1/3 mb-2"></div>
+                <div class="flex gap-2">
+                  <div class="h-10 bg-neutral-100 rounded-lg border border-neutral-200 flex-1"></div>
+                  <div class="h-10 bg-neutral-100 rounded-lg border border-neutral-200 w-20"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stripe Payment Element Container (empty for clean mounting) -->
+            <div id="payment-element" class="hidden">
+              <!-- Stripe Elements will mount here -->
+            </div>
           </div>
 
           <!-- Payment Submit Button -->

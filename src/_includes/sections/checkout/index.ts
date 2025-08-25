@@ -338,7 +338,6 @@ export const Checkout: CheckoutSectionComponent = {
 
       // Create Payment Element with Dashboard control enabled
       // This will automatically show payment methods configured in Stripe Dashboard
-      // @ts-expect-error - Payment element exists at runtime but not in current type definitions
       this.paymentElement = this.elements.create('payment', {
         layout: {
           type: 'accordion', // Modern layout pattern recommended by Stripe
@@ -359,12 +358,7 @@ export const Checkout: CheckoutSectionComponent = {
             name: 'never'    // We already have it from lead form
           }
         },
-        business: {
-          name: 'Café com Vendas'
-        },
-        // Enable automatic payment method creation for better UX
-        paymentMethodCreation: 'automatic',
-        // Terms acceptance for SEPA and other European payment methods
+        // Terms acceptance for European payment methods
         terms: {
           bancontact: 'always',
           card: 'never',
@@ -372,12 +366,21 @@ export const Checkout: CheckoutSectionComponent = {
           sepaDebit: 'always',
           sofort: 'always'
         }
-      }) as StripePaymentElement;
+      });
 
       // Mount the Payment Element to the container
       const paymentElementContainer = document.querySelector('#payment-element');
       if (paymentElementContainer && this.paymentElement) {
         this.paymentElement.mount('#payment-element');
+
+        // Hide skeleton loader and show payment element
+        const skeleton = document.querySelector('#payment-skeleton');
+        if (skeleton) {
+          skeleton.classList.add('hidden');
+        }
+        
+        // Show the payment element container
+        paymentElementContainer.classList.remove('hidden');
 
         // Listen for changes to enable/disable pay button
         this.paymentElement?.on('change', (event: StripePaymentElementChangeEvent) => {
@@ -398,6 +401,17 @@ export const Checkout: CheckoutSectionComponent = {
         // Handle ready event to show payment methods loaded
         this.paymentElement?.on('ready', () => {
           console.log('Payment Element ready - payment methods loaded from Dashboard');
+          // Ensure skeleton is hidden and payment element is visible when ready
+          const skeleton = document.querySelector('#payment-skeleton');
+          if (skeleton) {
+            skeleton.classList.add('hidden');
+          }
+          
+          // Ensure payment element container is visible
+          const paymentContainer = document.querySelector('#payment-element');
+          if (paymentContainer) {
+            paymentContainer.classList.remove('hidden');
+          }
         });
 
         // Handle focus events
@@ -575,7 +589,7 @@ export const Checkout: CheckoutSectionComponent = {
 
       // Confirm the payment with Stripe using the Payment Element
       // This handles all payment methods configured in Dashboard (cards, SEPA, iDEAL, MB Way, etc.)
-      const { error } = await this.stripe.confirmPayment({
+      const { error, paymentIntent } = await this.stripe.confirmPayment({
         elements: this.elements,
         confirmParams: {
           return_url: `${window.location.origin}/thank-you`,
@@ -587,7 +601,7 @@ export const Checkout: CheckoutSectionComponent = {
             }
           }
         },
-        redirect: 'if_required' // Stay on page if possible, redirect if required (e.g., for SEPA)
+        redirect: 'if_required' // Stay on page if possible, redirect if required (e.g., for SEPA/3DS)
       });
 
       if (error) {
@@ -606,14 +620,14 @@ export const Checkout: CheckoutSectionComponent = {
         }).catch(() => {
           console.debug('Payment error analytics tracking unavailable');
         });
-      } else {
-        // Payment succeeded
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        // Payment succeeded without redirect (no 3DS required)
         this.setStep('success');
 
-        // Track payment success
+        // Track payment success immediately since we know it succeeded
         import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
           PlatformAnalytics.trackConversion('payment_completed', {
-            transaction_id: this.clientSecret?.split('_secret')[0],
+            transaction_id: paymentIntent.id,
             value: 47,
             currency: 'EUR',
             items: [{ name: 'Café com Vendas Lisboa', quantity: 1, price: 47 }],
@@ -627,6 +641,11 @@ export const Checkout: CheckoutSectionComponent = {
         setTimeout(() => {
           window.location.href = '/thank-you';
         }, 3000);
+      } else {
+        // Payment requires additional action (3DS, SEPA redirect, etc.)
+        // User will be redirected automatically by Stripe
+        // Analytics will be tracked on the thank-you page after redirect
+        console.log('Payment requires additional authentication, redirecting...');
       }
     } catch (error: unknown) {
       console.error('Payment error:', error);
@@ -776,6 +795,18 @@ export const Checkout: CheckoutSectionComponent = {
     }
     if (this.elements) {
       this.elements = null;
+    }
+
+    // Reset payment element UI state
+    const skeleton = document.querySelector('#payment-skeleton');
+    const paymentContainer = document.querySelector('#payment-element');
+    
+    if (skeleton) {
+      skeleton.classList.remove('hidden');
+    }
+    
+    if (paymentContainer) {
+      paymentContainer.classList.add('hidden');
     }
 
     // Reset UI to step 1
