@@ -1,34 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "includeCoAuthoredBy": false,
-  "cleanupPeriodDays": 30,
-  "permissions": {
-    "defaultMode": "default",
-    "allow": [
-      "Bash(npm run *)",
-      "Bash(git *)",
-      "Bash(node scripts/*)",
-      "Bash(netlify *)",
-      "Bash(stripe *)",
-      "Bash(tsx scripts/*)",
-      "Bash(npx *)"
-    ],
-    "ask": [
-      "Bash(npm install*)",
-      "Bash(npm update*)",
-      "Bash(npm uninstall*)",
-      "Bash(git push*)",
-      "Bash(rm -r*)"
-    ],
-    "deny": [
-      "Bash(rm -rf /)",
-      "Bash(rm package*.json)",
-      "Bash(rm tsconfig.json)",
-      "Bash(rm CLAUDE.md)",
-      "Bash(rm .env*)",
-      "Bash(rm -rf .git)"
-    ]
-  },
   "env": {
     "PROJECT_TYPE": "landing-page",
     "PROJECT_LANGUAGE": "pt-PT",
@@ -38,5 +9,55 @@
     "BUILD_TOOL": "vite",
     "PAYMENT_PROVIDER": "stripe",
     "NODE_VERSION": "22.17.1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(git *)",
+      "Bash(node scripts/*)",
+      "Bash(netlify *)",
+      "Bash(stripe *)",
+      "Bash(tsx scripts/*)",
+      "Bash(npx *)",
+      "Bash(diff *)",
+      "Bash(rm *)",
+      "Bash(mv *)",
+      "Bash(cp *)",
+      "Bash(touch *)",
+      "Bash(mkdir *)",
+      "Bash(chmod *)",
+      "Bash(curl *)",
+      "Bash(tree *)",
+      "Bash(lsof *)",
+      "Bash(find *)",
+      "Bash(sed *)",
+      "Bash(grep *)",
+      "Bash(npm outdated)",
+      "Bash(npx lighthouse *)",
+      "Bash(netlify dev*)",
+      "Bash(netlify functions:*)",
+      "Bash(stripe listen *)",
+      "Bash(claude mcp:*)",
+      "mcp__playwright-mcp__*",
+      "mcp__context7__*",
+      "mcp__firecrawl__*",
+      "WebSearch",
+      "WebFetch(domain:docs.stripe.com)",
+      "WebFetch(domain:www.anthropic.com)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "mcp__context7__get-library-docs",
+      "mcp__ide__*",
+      "Read(//Users/danielmenezes/.config/**)",
+      "Read(//Users/danielmenezes/.config/Code/User/**)",
+      "Bash(npm run lint)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm package*.json)",
+      "Bash(rm tsconfig.json)",
+      "Bash(rm CLAUDE.md)",
+      "Bash(rm .env*)",
+      "Bash(rm -rf .git)"
+    ]
   }
 }
