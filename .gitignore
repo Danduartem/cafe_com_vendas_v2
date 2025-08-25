@@ -6,10 +6,6 @@
 !.env.example
 !.env.test
 
-# Claude settings with sensitive data
-.claude/settings.local.json
-.claude/settings.local
-
 # ==============================================================================
 # Dependencies
 # ==============================================================================
