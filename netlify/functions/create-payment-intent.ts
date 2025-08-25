@@ -5,12 +5,12 @@
 
 import Stripe from 'stripe';
 import type {
+  PaymentIntentMetadata,
   PaymentIntentRequest,
-  ValidationResult,
   RateLimitResult,
-  ValidationRules,
   TimeoutPromise,
-  PaymentIntentMetadata
+  ValidationResult,
+  ValidationRules
 } from './types';
 
 /**
@@ -98,50 +98,50 @@ class CustomerCacheManager {
       }
     }
   }
-  
+
   static evictOldestIfNeeded() {
     if (customerCache.size >= MAX_CACHE_SIZE) {
       // Remove oldest 10% of entries
       const entries = Array.from(customerCache.entries())
         .sort((a, b) => a[1].timestamp - b[1].timestamp);
-      
+
       const toRemove = Math.floor(MAX_CACHE_SIZE * 0.1);
       for (let i = 0; i < toRemove && i < entries.length; i++) {
         customerCache.delete(entries[i][0]);
       }
     }
   }
-  
+
   static get(email: string): Stripe.Customer | null {
     const entry = customerCache.get(email);
     if (!entry) return null;
-    
+
     const now = Date.now();
     if (now - entry.timestamp > CUSTOMER_CACHE_TTL) {
       customerCache.delete(email);
       return null;
     }
-    
+
     // Update access time for LRU behavior
     entry.lastAccessed = now;
     return entry.customer;
   }
-  
+
   static set(email: string, customer: Stripe.Customer): void {
     this.cleanExpiredEntries();
     this.evictOldestIfNeeded();
-    
+
     customerCache.set(email, {
       customer,
       timestamp: Date.now(),
       lastAccessed: Date.now()
     });
   }
-  
+
   static invalidate(email: string): void {
     customerCache.delete(email);
   }
-  
+
   static getStats() {
     return {
       size: customerCache.size,
@@ -169,55 +169,55 @@ const VALIDATION_RULES: ValidationRules = {
  */
 function validatePaymentRequest(requestBody: PaymentIntentRequest): ValidationResult {
   const errors = [];
-  
+
   // Check required fields
   for (const field of VALIDATION_RULES.required_fields) {
     if (!requestBody[field] || typeof requestBody[field] !== 'string' || !requestBody[field].trim()) {
       errors.push(`Missing or invalid required field: ${field}`);
     }
   }
-  
+
   if (errors.length > 0) {
     return { isValid: false, errors };
   }
-  
+
   const { lead_id, full_name, email, phone, amount, currency = 'eur' } = requestBody;
-  
+
   // Validate lead_id format (UUID-like)
   if (!/^[a-zA-Z0-9\-_]{8,}$/.test(lead_id.trim())) {
     errors.push('Invalid lead_id format');
   }
-  
+
   // Validate full name
   const cleanName = full_name.trim();
   if (cleanName.length < VALIDATION_RULES.name_min_length || cleanName.length > VALIDATION_RULES.name_max_length) {
     errors.push(`Name must be between ${VALIDATION_RULES.name_min_length} and ${VALIDATION_RULES.name_max_length} characters`);
   }
-  
+
   if (!/^[a-zA-ZÀ-ÿ\u0100-\u017F\s\-'.]+$/.test(cleanName)) {
     errors.push('Name contains invalid characters');
   }
-  
+
   // Validate email
   const cleanEmail = email.toLowerCase().trim();
   if (!VALIDATION_RULES.email_regex.test(cleanEmail)) {
     errors.push('Invalid email format');
   }
-  
+
   if (cleanEmail.length > 254) {
     errors.push('Email address too long');
   }
-  
+
   // Validate phone - clean and check
   const cleanPhone = phone.replace(/[\s\-()]/g, '');
-  
+
   // Check if it has at least 7 digits and starts with + or digit
   if (cleanPhone.length < 7 || cleanPhone.length > 15) {
     errors.push('Phone number must be between 7 and 15 digits');
   } else if (!/^[+]?[0-9]+$/.test(cleanPhone)) {
     errors.push('Phone number contains invalid characters');
   }
-  
+
   // Validate amount if provided
   if (amount !== undefined) {
     const numAmount = parseInt(amount.toString());
@@ -225,23 +225,23 @@ function validatePaymentRequest(requestBody: PaymentIntentRequest): ValidationRe
       errors.push(`Amount must be between ${VALIDATION_RULES.amount_min} and ${VALIDATION_RULES.amount_max} cents`);
     }
   }
-  
+
   // Validate currency
   if (!VALIDATION_RULES.currency_allowed.includes(currency.toLowerCase())) {
     errors.push(`Currency must be one of: ${VALIDATION_RULES.currency_allowed.join(', ')}`);
   }
-  
+
   // Validate UTM parameters if present
   for (const utmParam of VALIDATION_RULES.utm_params) {
     if (requestBody[utmParam] && (typeof requestBody[utmParam] !== 'string' || requestBody[utmParam].length > 255)) {
       errors.push(`Invalid ${utmParam}: must be string under 255 characters`);
     }
   }
-  
+
   // Check for suspicious patterns (basic XSS/injection prevention)
   const suspiciousPatterns = [/<script/i, /javascript:/i, /on\w+=/i, /\bselect\b.*\bfrom\b/i];
   const allStringValues = [full_name, email, phone, ...(requestBody.utm_source ? [requestBody.utm_source] : [])];
-  
+
   for (const value of allStringValues) {
     for (const pattern of suspiciousPatterns) {
       if (pattern.test(value)) {
@@ -250,7 +250,7 @@ function validatePaymentRequest(requestBody: PaymentIntentRequest): ValidationRe
       }
     }
   }
-  
+
   return {
     isValid: errors.length === 0,
     errors,
@@ -273,7 +273,7 @@ function checkRateLimit(clientIP: string, origin: string | undefined): RateLimit
   const key = `ratelimit:${clientIP}`;
   const rateLimitConfig = getRateLimitConfig(origin);
   const isDev = isDevelopmentRequest(origin);
-  
+
   // Clean up old entries
   if (rateLimitStore.size > 1000) {
     for (const [k, v] of rateLimitStore.entries()) {
@@ -282,24 +282,24 @@ function checkRateLimit(clientIP: string, origin: string | undefined): RateLimit
       }
     }
   }
-  
+
   const record = rateLimitStore.get(key);
-  
+
   if (!record) {
     rateLimitStore.set(key, {
       count: 1,
       firstRequest: now,
       lastRequest: now
     });
-    
+
     // Log rate limit info for development
     if (isDev) {
       console.log(`[DEV] Rate limit initialized for ${clientIP}: ${rateLimitConfig.maxRequests} requests per ${rateLimitConfig.window / 60000} minutes`);
     }
-    
+
     return { allowed: true, remaining: rateLimitConfig.maxRequests - 1 };
   }
-  
+
   // Reset if window has passed
   if (now - record.firstRequest > rateLimitConfig.window) {
     rateLimitStore.set(key, {
@@ -307,29 +307,29 @@ function checkRateLimit(clientIP: string, origin: string | undefined): RateLimit
       firstRequest: now,
       lastRequest: now
     });
-    
+
     if (isDev) {
       console.log(`[DEV] Rate limit window reset for ${clientIP}`);
     }
-    
+
     return { allowed: true, remaining: rateLimitConfig.maxRequests - 1 };
   }
-  
+
   // Increment counter
   record.count++;
   record.lastRequest = now;
   rateLimitStore.set(key, record);
-  
+
   const remaining = Math.max(0, rateLimitConfig.maxRequests - record.count);
   const allowed = record.count <= rateLimitConfig.maxRequests;
-  
+
   // Log rate limit status for development
   if (isDev) {
     console.log(`[DEV] Rate limit check for ${clientIP}: ${record.count}/${rateLimitConfig.maxRequests}, remaining: ${remaining}, allowed: ${allowed}`);
   }
-  
-  return { 
-    allowed, 
+
+  return {
+    allowed,
     remaining,
     retryAfter: allowed ? null : Math.ceil((record.firstRequest + rateLimitConfig.window - now) / 1000)
   };
@@ -343,18 +343,18 @@ export default async (request: Request): Promise<Response> => {
     'http://localhost:8080',
     'https://netlify.app'
   ];
-  
+
   const origin = request.headers.get('origin');
-  const isAllowedOrigin = allowedOrigins.some(allowed => 
+  const isAllowedOrigin = allowedOrigins.some(allowed =>
     origin === allowed || (allowed.includes('netlify.app') && origin?.includes('netlify.app'))
   );
-  
+
   // Get client IP for rate limiting
   const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-                   request.headers.get('x-real-ip') ||
-                   request.headers.get('cf-connecting-ip') ||
-                   'unknown';
-  
+    request.headers.get('x-real-ip') ||
+    request.headers.get('cf-connecting-ip') ||
+    'unknown';
+
   const headers = {
     'Access-Control-Allow-Origin': isAllowedOrigin ? (origin || 'https://jucanamaximiliano.com.br') : 'https://jucanamaximiliano.com.br',
     'Access-Control-Allow-Headers': 'Content-Type, X-Idempotency-Key',
@@ -378,21 +378,21 @@ export default async (request: Request): Promise<Response> => {
       headers
     });
   }
-  
+
   // Check rate limit with environment-aware configuration
   const rateLimitResult = checkRateLimit(clientIP, origin || undefined);
   const rateLimitConfig = getRateLimitConfig(origin || undefined);
-  
+
   // Add rate limit headers - create mutable headers object
   const responseHeaders = { ...headers };
   responseHeaders['X-RateLimit-Limit'] = rateLimitConfig.maxRequests.toString();
   responseHeaders['X-RateLimit-Remaining'] = rateLimitResult.remaining.toString();
   responseHeaders['X-RateLimit-Window'] = (rateLimitConfig.window / 1000).toString();
   responseHeaders['X-RateLimit-Environment'] = isDevelopmentRequest(origin || undefined) ? 'development' : 'production';
-  
+
   if (!rateLimitResult.allowed) {
     responseHeaders['Retry-After'] = rateLimitResult.retryAfter?.toString() || '60';
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       error: 'Rate limit exceeded. Too many payment attempts.',
       retryAfter: rateLimitResult.retryAfter,
       message: `Maximum ${rateLimitConfig.maxRequests} payment attempts per ${rateLimitConfig.window / 60000} minutes.`,
@@ -422,15 +422,15 @@ export default async (request: Request): Promise<Response> => {
     }
 
     // Generate or use provided idempotency key
-    const idempotencyKey = request.headers.get('x-idempotency-key') || 
-      requestBody.idempotency_key || 
+    const idempotencyKey = request.headers.get('x-idempotency-key') ||
+      requestBody.idempotency_key ||
       `pi_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-    
+
     // Comprehensive request validation
     const validation = validatePaymentRequest(requestBody);
-    
+
     if (!validation.isValid) {
-      return new Response(JSON.stringify({ 
+      return new Response(JSON.stringify({
         error: 'Validation failed',
         details: validation.errors
       }), {
@@ -438,7 +438,7 @@ export default async (request: Request): Promise<Response> => {
         headers: responseHeaders
       });
     }
-    
+
     // Use sanitized data
     const { lead_id, full_name, email, phone, amount: paymentAmount, currency } = validation.sanitized!;
 
@@ -457,20 +457,20 @@ export default async (request: Request): Promise<Response> => {
 
     let customer;
     let cacheHit = false;
-    
+
     try {
       // First, check cache for existing customer
       customer = CustomerCacheManager.get(customerData.email);
-      
+
       if (customer) {
         cacheHit = true;
         console.log(`Customer cache hit for ${customerData.email}`);
-        
+
         // Update customer with latest information if data has changed
-        const needsUpdate = 
+        const needsUpdate =
           customer.name !== customerData.name ||
           customer.phone !== customerData.phone;
-          
+
         if (needsUpdate) {
           customer = await withTimeout(
             stripe.customers.update(customer.id, {
@@ -485,13 +485,13 @@ export default async (request: Request): Promise<Response> => {
             TIMEOUTS.stripe_api,
             'Customer update'
           );
-          
+
           // Update cache with new customer data
           CustomerCacheManager.set(customerData.email, customer);
         }
       } else {
         console.log(`Customer cache miss for ${customerData.email}, querying Stripe`);
-        
+
         // Try to find existing customer by email with timeout
         const existingCustomers = await withTimeout(
           stripe.customers.list({
@@ -504,7 +504,7 @@ export default async (request: Request): Promise<Response> => {
 
         if (existingCustomers.data.length > 0) {
           customer = existingCustomers.data[0];
-          
+
           // Update customer with latest information
           customer = await withTimeout(
             stripe.customers.update(customer.id, {
@@ -527,16 +527,16 @@ export default async (request: Request): Promise<Response> => {
             'Customer creation'
           );
         }
-        
+
         // Cache the customer for future requests
         CustomerCacheManager.set(customerData.email, customer);
       }
     } catch (error) {
       console.error('Error managing customer:', error);
-      
+
       // Handle timeout specifically
       if (error instanceof Error && error.message.includes('timed out')) {
-        return new Response(JSON.stringify({ 
+        return new Response(JSON.stringify({
           error: 'Customer service temporarily unavailable. Please try again.',
           code: 'service_timeout'
         }), {
@@ -544,9 +544,9 @@ export default async (request: Request): Promise<Response> => {
           headers: responseHeaders
         });
       }
-      
-      return new Response(JSON.stringify({ 
-        error: 'Error processing customer information' 
+
+      return new Response(JSON.stringify({
+        error: 'Error processing customer information'
       }), {
         status: 500,
         headers: responseHeaders
@@ -567,7 +567,7 @@ export default async (request: Request): Promise<Response> => {
       validation_version: '1.0',
       idempotency_key: idempotencyKey
     };
-    
+
     // Add validated UTM parameters
     for (const utmParam of VALIDATION_RULES.utm_params) {
       if (requestBody[utmParam] && typeof requestBody[utmParam] === 'string') {
@@ -618,7 +618,7 @@ export default async (request: Request): Promise<Response> => {
     );
 
     console.log(`Created PaymentIntent ${paymentIntent.id} for customer ${customer.email}`);
-    
+
     // Log cache performance for monitoring
     const cacheStats = CustomerCacheManager.getStats();
     console.log(`Customer cache stats: ${JSON.stringify(cacheStats)}, Cache hit: ${cacheHit}`);
@@ -642,8 +642,8 @@ export default async (request: Request): Promise<Response> => {
 
     // Handle specific Stripe errors using proper type guards
     if (error instanceof Stripe.errors.StripeCardError) {
-      return new Response(JSON.stringify({ 
-        error: 'Card error: ' + error.message 
+      return new Response(JSON.stringify({
+        error: 'Card error: ' + error.message
       }), {
         status: 400,
         headers: responseHeaders
@@ -651,8 +651,8 @@ export default async (request: Request): Promise<Response> => {
     }
 
     if (error instanceof Stripe.errors.StripeRateLimitError) {
-      return new Response(JSON.stringify({ 
-        error: 'Too many requests. Please try again later.' 
+      return new Response(JSON.stringify({
+        error: 'Too many requests. Please try again later.'
       }), {
         status: 429,
         headers: responseHeaders
@@ -662,7 +662,7 @@ export default async (request: Request): Promise<Response> => {
     if (error instanceof Stripe.errors.StripeInvalidRequestError) {
       // Handle idempotency key conflicts specifically
       if (error instanceof Error && error.message?.includes('idempotency')) {
-        return new Response(JSON.stringify({ 
+        return new Response(JSON.stringify({
           error: 'Duplicate request detected. Please try again with a new request.',
           code: 'idempotency_conflict'
         }), {
@@ -670,9 +670,9 @@ export default async (request: Request): Promise<Response> => {
           headers: responseHeaders
         });
       }
-      
-      return new Response(JSON.stringify({ 
-        error: 'Invalid request: ' + error.message 
+
+      return new Response(JSON.stringify({
+        error: 'Invalid request: ' + error.message
       }), {
         status: 400,
         headers: responseHeaders
@@ -680,8 +680,8 @@ export default async (request: Request): Promise<Response> => {
     }
 
     if (error instanceof Stripe.errors.StripeAPIError) {
-      return new Response(JSON.stringify({ 
-        error: 'Payment service temporarily unavailable' 
+      return new Response(JSON.stringify({
+        error: 'Payment service temporarily unavailable'
       }), {
         status: 500,
         headers: responseHeaders
@@ -689,8 +689,8 @@ export default async (request: Request): Promise<Response> => {
     }
 
     if (error instanceof Stripe.errors.StripeConnectionError) {
-      return new Response(JSON.stringify({ 
-        error: 'Network error. Please try again.' 
+      return new Response(JSON.stringify({
+        error: 'Network error. Please try again.'
       }), {
         status: 500,
         headers: responseHeaders
@@ -699,7 +699,7 @@ export default async (request: Request): Promise<Response> => {
 
     // Handle timeout errors
     if (error instanceof Error && error.message?.includes('timed out')) {
-      return new Response(JSON.stringify({ 
+      return new Response(JSON.stringify({
         error: 'Request timed out. Please try again.',
         code: 'request_timeout'
       }), {
@@ -709,8 +709,8 @@ export default async (request: Request): Promise<Response> => {
     }
 
     // Generic error response
-    return new Response(JSON.stringify({ 
-      error: 'Internal server error. Please try again later.' 
+    return new Response(JSON.stringify({
+      error: 'Internal server error. Please try again later.'
     }), {
       status: 500,
       headers: responseHeaders
