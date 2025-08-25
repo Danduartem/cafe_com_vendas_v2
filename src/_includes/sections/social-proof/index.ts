@@ -7,6 +7,7 @@
 import { safeQuery, safeQueryAll } from '@/utils/dom';
 import { Animations } from '../../../components/ui';
 import { debounce } from '@/utils/throttle';
+import { embedYouTubeVideo } from '../../../utils/youtube.js';
 import type { Component } from '../../../types/components/base.js';
 
 // Constants for carousel layout
@@ -24,7 +25,7 @@ interface SocialProofComponent extends Component {
   currentIndex: number;
   carouselElements: CarouselElements | null;
   initTestimonialsCarousel(): void;
-  initVideoCardEffects(): void;
+  initYouTubeVideos(): void;
   getCarouselElements(): CarouselElements;
   validateCarouselElements(elements: CarouselElements): boolean;
   setupCarouselState(elements: CarouselElements): void;
@@ -39,6 +40,7 @@ interface SocialProofComponent extends Component {
   goToSlide(index: number): void;
   toggleButtonState(button: HTMLElement, isDisabled: boolean): void;
   scrollToSlide(index: number): void;
+  handleVideoClick(event: Event): void;
 }
 
 export const SocialProof: SocialProofComponent = {
@@ -48,7 +50,7 @@ export const SocialProof: SocialProofComponent = {
   init(): void {
     try {
       this.initTestimonialsCarousel();
-      this.initVideoCardEffects();
+      this.initYouTubeVideos();
     } catch (error) {
       console.error('Error initializing Social Proof section:', error);
     }
@@ -210,7 +212,7 @@ export const SocialProof: SocialProofComponent = {
         position: this.currentIndex + 1
       });
     }).catch(() => {
-      console.debug('Testimonial analytics tracking unavailable');
+      console.debug('Slide view analytics tracking unavailable');
     });
   },
 
@@ -227,11 +229,25 @@ export const SocialProof: SocialProofComponent = {
     }
   },
 
-  initVideoCardEffects(): void {
-    const videoCards = safeQueryAll('[data-video-card]');
+  /**
+   * Initializes YouTube video functionality with click-to-play
+   * Uses modern YouTube IFrame API with lazy loading
+   */
+  initYouTubeVideos(): void {
+    // Find all play buttons for YouTube videos
+    const playButtons = safeQueryAll('.youtube-play-btn');
+    
+    playButtons.forEach(button => {
+      // Add click handler for video embedding
+      button.addEventListener('click', (event) => {
+        this.handleVideoClick(event);
+      });
+    });
 
+    // Add hover effects to video cards
+    const videoCards = safeQueryAll('[data-video-card]');
     videoCards.forEach(card => {
-      // Add hover effects with platform animations
+      // Add platform animations for better UX
       Animations.addClickFeedback(card, 'scale-105');
 
       card.addEventListener('mouseenter', function(this: HTMLElement) {
@@ -241,6 +257,62 @@ export const SocialProof: SocialProofComponent = {
       card.addEventListener('mouseleave', function(this: HTMLElement) {
         this.classList.remove('-translate-y-1');
       }, { passive: true });
+    });
+  },
+
+  /**
+   * Handles YouTube video play button clicks
+   * Replaces thumbnail with embedded YouTube player
+   */
+  handleVideoClick(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const button = event.currentTarget as HTMLElement;
+    const videoContainer = button.closest('.youtube-embed') as HTMLElement;
+    
+    if (!videoContainer) {
+      console.error('YouTube video container not found');
+      return;
+    }
+
+    const videoId = videoContainer.getAttribute('data-video-id');
+    if (!videoId) {
+      console.error('YouTube video ID not found');
+      return;
+    }
+
+    // Show loading state
+    button.innerHTML = `
+      <svg class="w-16 h-16 text-white animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    `;
+    button.setAttribute('aria-label', 'Carregando vídeo...');
+
+    // Embed the YouTube video and handle the promise properly
+    embedYouTubeVideo(videoContainer, videoId).catch((error) => {
+      console.error('Failed to embed YouTube video:', error);
+      
+      // Reset button state on error
+      button.innerHTML = `
+        <svg class="w-16 h-16 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      `;
+      button.setAttribute('aria-label', 'Reproduzir testemunho em vídeo');
+    });
+
+    // Track analytics for video interaction
+    import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+      PlatformAnalytics.track('section_engagement', {
+        section: 'testimonials',
+        action: 'video_embed_started',
+        video_id: videoId
+      });
+    }).catch(() => {
+      console.debug('Video embed analytics tracking unavailable');
     });
   },
 

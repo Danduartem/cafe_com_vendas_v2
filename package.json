@@ -11,7 +11,8 @@
   "engineStrict": true,
   "scripts": {
     "dev": "eleventy --serve --watch --config=.eleventy.ts",
-    "netlify:dev": "NODE_NO_WARNINGS=1 netlify dev",
+    "netlify:dev": "NODE_NO_WARNINGS=1 BROWSER=none netlify dev",
+    "netlify:dev:chrome": "NODE_NO_WARNINGS=1 BROWSER=none netlify dev & sleep 3 && open -a 'Google Chrome' http://localhost:8888",
     "build": "rm -rf _site && NODE_ENV=production vite build && eleventy --config=.eleventy.ts",
     "preview": "npm run build && npx serve _site",
     "lint": "eslint .",

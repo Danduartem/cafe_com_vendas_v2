@@ -11,8 +11,8 @@
   Cross-Origin-Opener-Policy: same-origin-allow-popups
   Cross-Origin-Resource-Policy: cross-origin
   
-  # Content Security Policy - Tailored for Cloudinary, Stripe, GTM, and analytics
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://js.stripe.com https://m.stripe.network; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com https://*.stripe.com https://www.googletagmanager.com; connect-src 'self' https://api.stripe.com https://formspree.io https://connect.mailerlite.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io
+  # Content Security Policy - Tailored for Cloudinary, Stripe, GTM, analytics, and YouTube
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://js.stripe.com https://m.stripe.network https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com https://*.stripe.com https://www.googletagmanager.com https://i.ytimg.com https://img.youtube.com; connect-src 'self' https://api.stripe.com https://formspree.io https://connect.mailerlite.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.youtube.com; frame-src https://js.stripe.com https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io
 
 # Static assets cache (1 year) with compression
 /assets/*
