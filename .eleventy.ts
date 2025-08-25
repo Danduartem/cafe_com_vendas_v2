@@ -25,6 +25,19 @@ export default function(eleventyConfig: UserConfig) {
   eleventyConfig.addFilter('values', (obj: unknown) => {
     return Object.values(obj as Record<string, unknown>);
   });
+  
+  // Line break filter - converts \n to <br> tags
+  eleventyConfig.addFilter('nl2br', (str: unknown) => {
+    if (typeof str !== 'string') return str;
+    // First escape HTML to prevent XSS, then replace newlines with <br>
+    const escaped = str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+    return escaped.replace(/\n/g, '<br>');
+  });
 
   // TypeScript data file support for Eleventy 3.x
   eleventyConfig.addDataExtension("ts", {
