@@ -17,7 +17,10 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit --pretty false",
     "test": "vitest run",
-    "verify-apis": "tsx scripts/verify-apis.ts"
+    "test:e2e": "npx playwright test",
+    "test:e2e:report": "npx playwright show-report reports/playwright/html",
+    "verify-apis": "tsx scripts/verify-apis.ts",
+    "lighthouse": "mkdir -p reports && npx lighthouse --output=json,html --output-path=reports/lighthouse"
   },
   "keywords": [
     "landing-page",

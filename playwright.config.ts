@@ -15,6 +15,9 @@ dotenv.config({ path: resolve(__dirname, '.env') });
 export default defineConfig({
   testDir: './tests/e2e',
   
+  // Output directory for test artifacts (screenshots, videos, traces, etc.)
+  outputDir: 'reports/playwright/test-results',
+  
   // Run tests in files in parallel
   fullyParallel: true,
   
@@ -33,10 +36,14 @@ export default defineConfig({
   // Global timeout for entire test run (CI only - 10 minutes)
   globalTimeout: process.env.CI ? 10 * 60 * 1000 : undefined,
   
-  // Reporter to use - enhanced configuration
+  // Reporter to use - enhanced configuration with proper output paths
   reporter: process.env.CI 
-    ? [['github'], ['html', { open: 'never' }], ['json', { outputFile: 'test-results.json' }]]
-    : [['html', { open: 'on-failure' }]],
+    ? [
+        ['github'], 
+        ['html', { open: 'never', outputFolder: 'reports/playwright/html' }], 
+        ['json', { outputFile: 'reports/playwright/test-results.json' }]
+      ]
+    : [['html', { open: 'on-failure', outputFolder: 'reports/playwright/html' }]],
   
   // Shared settings for all the projects below
   use: {
