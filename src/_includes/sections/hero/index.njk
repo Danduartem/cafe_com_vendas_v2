@@ -33,6 +33,14 @@
     <!-- Visual Triangle Layout: H1 → CTA → Proof -->
     <div class="flex flex-col items-center space-y-4">
       
+      <!-- Eyebrow Text (First Edition Notice) -->
+      <p 
+        class="text-gold-500 font-semibold text-sm uppercase tracking-wider mb-2"
+        data-reveal
+      >
+        {{ currentSection.copy.eyebrow }}
+      </p>
+      
       <!-- 1. Main Headline (Triangle Point 1) -->
       <h1 
         class="font-lora font-extrabold text-[clamp(1.75rem,5vw,4rem)] lg:text-[3.5rem] leading-[1.1] text-white tracking-[-0.01em] max-w-[20ch]" 
@@ -44,7 +52,7 @@
 
       <!-- 2. Subheadline (Supporting, not competing) -->
       <p 
-        class="font-lora italic text-[1.25rem] lg:text-[1.375rem] text-peach-300 leading-[1.4] mt-3 mb-6" 
+        class="font-lora italic text-[1.125rem] lg:text-[1.25rem] text-peach-300 leading-[1.4] mt-3 mb-6 max-w-[42ch]" 
         aria-describedby="hero-title"
         data-reveal
       >
@@ -58,9 +66,9 @@
           data-checkout-trigger
           data-source="hero"
           class="hero-cta-primary inline-flex items-center justify-center 
-                 min-w-[200px] px-6 py-4 min-h-[52px] 
+                 min-w-[240px] px-8 py-4 sm:py-5 min-h-[56px] 
                  rounded-2xl bg-linear-to-r from-burgundy-700 to-navy-800 
-                 text-white font-bold text-base
+                 text-white font-bold text-base sm:text-lg
                  shadow-lg shadow-burgundy-900/30
                  transform-gpu transition-all duration-200 ease-out
                  hover:scale-[1.02] hover:shadow-xl hover:shadow-burgundy-900/40
