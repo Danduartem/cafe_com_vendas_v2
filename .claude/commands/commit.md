@@ -162,7 +162,6 @@ M .claude/settings.local.json
 **Process:**
 1. **Group 1 (Implementation):** `.eleventy.ts` + `about/index.njk`
 2. **Group 2 (Content):** `about.json`
-3. **Skip:** `.claude/settings.local.json`
 
 **Output:** 2 commits created
 ```
