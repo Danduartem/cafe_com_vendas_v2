@@ -38,6 +38,7 @@ html, body {
   --color-neutral-400: #BDBDBD;
   --color-neutral-500: #A5A5A5;
   --color-neutral-600: #8E8E8E;
+  --color-neutral-650: #6B6B6B;
   --color-neutral-700: #767676;
   --color-neutral-800: #474747;
   --color-neutral-900: #181818;
@@ -141,6 +142,13 @@ html, body {
   --animate-fade-in-up: fadeInUp 0.8s ease-out;
   --animate-slide-in-right: slideInRight 0.6s ease-out;
   --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
+
+  /* Gradient Design Tokens - Problem Section */
+  --gradient-background-primary: linear-gradient(to bottom right, var(--color-neutral-50), var(--color-white), color-mix(in srgb, var(--color-peach-50) 20%, transparent));
+  --gradient-radial-burgundy: radial-gradient(circle, color-mix(in srgb, var(--color-burgundy-700) 6%, transparent) 0%, color-mix(in srgb, var(--color-burgundy-700) 3%, transparent) 50%, transparent 100%);
+  --gradient-radial-peach: radial-gradient(circle, color-mix(in srgb, var(--color-peach-400) 8%, transparent) 0%, color-mix(in srgb, var(--color-peach-400) 4%, transparent) 50%, transparent 100%);
+  --gradient-radial-shadow: radial-gradient(circle, color-mix(in srgb, var(--color-black) 8%, transparent) 0%, transparent 70%);
+  --gradient-accent-line: linear-gradient(to right, var(--color-neutral-400), var(--color-neutral-300));
 }
 
 /* Tailwind v4 Advanced Features - Custom Utilities and Variants */
@@ -211,6 +219,27 @@ html, body {
 
 @utility animate-pulse-soft {
   animation: var(--animate-pulse-soft);
+}
+
+/* Problem Section Gradient Utilities */
+@utility bg-gradient-problem {
+  background-image: var(--gradient-background-primary);
+}
+
+@utility bg-radial-burgundy {
+  background-image: var(--gradient-radial-burgundy);
+}
+
+@utility bg-radial-peach {
+  background-image: var(--gradient-radial-peach);
+}
+
+@utility bg-radial-shadow {
+  background-image: var(--gradient-radial-shadow);
+}
+
+@utility bg-gradient-accent-line {
+  background-image: var(--gradient-accent-line);
 }
 
 /* Design tokens are now managed natively via Tailwind v4 @theme directive above. */

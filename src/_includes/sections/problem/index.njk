@@ -6,175 +6,146 @@
   data-section="problem"
   aria-label="Problem and Pain Points"
   data-analytics-section="problem"
-  class="relative isolate w-full overflow-hidden bg-gradient-to-b from-neutral-50 via-peach-100 to-neutral-50 py-20 sm:py-24 lg:py-28 scroll-mt-14 before:content-[''] before:absolute before:inset-0 before:pointer-events-none before:[background:radial-gradient(620px_620px_at_0%_0%,rgba(212,165,116,.40),transparent_60%),radial-gradient(380px_380px_at_100%_100%,rgba(139,21,56,.30),transparent_60%),radial-gradient(236px_236px_at_80%_50%,rgba(212,165,116,.30),transparent_60%)] before:blur-[80px] before:opacity-40"
+  class="relative w-full overflow-hidden bg-gradient-to-br from-neutral-50 via-white to-peach-50/20 py-24 sm:py-32 lg:py-40 xl:py-48 scroll-mt-14"
   data-scroll-offset
 >
-  {# Main content container with golden ratio layout #}
-  <div class="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid lg:grid-cols-[1.618fr_1fr] items-center gap-10 lg:gap-16">
+  {# Refined decorative elements with radial wash #}
+  <div class="absolute top-1/3 left-0 w-[32rem] h-[32rem] bg-[radial-gradient(circle,rgba(129,23,31,0.06)_0%,rgba(129,23,31,0.03)_50%,transparent_100%)] rounded-full blur-3xl transform -translate-x-1/2 pointer-events-none"></div>
+  <div class="absolute bottom-1/3 right-0 w-[28rem] h-[28rem] bg-[radial-gradient(circle,rgba(229,144,116,0.08)_0%,rgba(229,144,116,0.04)_50%,transparent_100%)] rounded-full blur-3xl transform translate-x-1/3 pointer-events-none"></div>
 
-      {# Primary content column - pain validation text and checklist #}
-      <div class="order-2 lg:order-1">
-        <div class="mb-5" data-reveal>
-          <span class="inline-block h-[3px] w-24 rounded-sm bg-gradient-to-r from-burgundy-700 to-gold-500"></span>
+  {# Main content container with true 55/45 split layout #}
+  <div class="relative max-w-[1280px] mx-auto px-6 sm:px-8 lg:px-12">
+    <div class="grid grid-cols-1 lg:grid-cols-[55fr_45fr] items-start gap-12 lg:gap-16 xl:gap-20">
+
+      {# Primary content column - optically aligned with constrained line length #}
+      <div class="order-2 lg:order-1 lg:pt-2">
+        {# Eyebrow text with gradient accent #}
+        <div data-reveal class="opacity-0 translate-y-3 transition-all duration-200 ease-out mb-4">
+          <p class="text-sm font-medium text-burgundy-700 uppercase tracking-[0.1em] font-century">O Problema Real</p>
         </div>
 
-        {# Main headline with gradient text treatment #}
-        <h2 data-reveal class="font-lora font-bold tracking-tight leading-tight mb-6 text-[clamp(1.75rem,3.2vw,2.5rem)] bg-gradient-to-br from-navy-900 to-burgundy-700 bg-clip-text text-transparent">
-          {{ currentSection.copy.headline }}
+        {# Subtle accent line with refined positioning #}
+        <div data-reveal class="opacity-0 translate-y-3 transition-all duration-200 ease-out mb-8 delay-75">
+          <span class="inline-block h-[1.5px] w-20 rounded-full bg-gradient-to-r from-neutral-400 to-neutral-300"></span>
+        </div>
+
+        {# Main headline with enhanced typography hierarchy and refined scaling #}
+        <h2 data-reveal class="opacity-0 translate-y-3 font-lora font-semibold tracking-[-0.02em] leading-[1.06] text-[clamp(2.5rem,4.5vw,3.75rem)] text-navy-900 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-100 max-w-[48ch] mb-7 lg:mb-9">
+          {{ currentSection.copy.headline | replace('12h por dia', '<span class="text-burgundy-700 relative"><span class="absolute -inset-x-1 -inset-y-0.5 bg-burgundy-50/40 rounded-md -z-10"></span>12h por dia</span>') | safe }}
         </h2>
 
-        {# Pain points checklist with glassmorphism card design #}
-        <div data-reveal class="mt-8 rounded-3xl bg-white/80 backdrop-blur-md border border-white/60 ring-1 ring-black/5 shadow-xl p-6 sm:p-8">
-          <h3 class="sr-only">Sinais comuns de sobrecarga</h3>
-          {# Common checkmark icon for list items #}
-          {% set checkmarkIcon %}
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          {% endset %}
+        {# Pain points list with enhanced visual hierarchy and micro-interactions #}
+        <div data-reveal class="opacity-0 translate-y-3 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-150 mb-9">
+          <h3 class="sr-only">Sinais de sobrecarga empresarial</h3>
           
-          <ul role="list" class="space-y-4">
-            <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
-                {{ checkmarkIcon | safe }}
-              </span>
-              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[0] }}</p>
+          <ul role="list" class="space-y-3.5">
+            {# Display all pain points with enhanced interactivity #}
+            {% for point in currentSection.copy.pain_points %}
+            <li class="flex items-baseline gap-3.5 group transition-all duration-200 ease-out hover:translate-x-1 focus-within:translate-x-1 rounded-lg p-2 -m-2 hover:bg-neutral-50/50 cursor-default" data-reveal-item tabindex="0" role="listitem" aria-label="Pain point {{ loop.index }}">
+              {# Enhanced bullet with subtle glow effect #}
+              <span class="flex-shrink-0 mt-[0.4375rem] w-1.5 h-1.5 rounded-full bg-gradient-to-br from-burgundy-600 to-burgundy-700 shadow-sm group-hover:shadow-burgundy-200 group-hover:shadow-md transition-all duration-200" aria-hidden="true"></span>
+              <p class="font-century text-neutral-700 text-[1.0625rem] lg:text-[1.125rem] leading-[1.55] max-w-[58ch] group-hover:text-neutral-800 transition-colors duration-200">{{ point }}</p>
             </li>
-            <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
-                {{ checkmarkIcon | safe }}
-              </span>
-              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[1] }}</p>
-            </li>
-            <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
-                {{ checkmarkIcon | safe }}
-              </span>
-              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[2] }}</p>
-            </li>
-                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
-                {{ checkmarkIcon | safe }}
-              </span>
-              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[3] }}</p>
-            </li>
-                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
-                {{ checkmarkIcon | safe }}
-              </span>
-              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[4] }}</p>
-            </li>
-                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
-                {{ checkmarkIcon | safe }}
-              </span>
-              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[5] }}</p>
-            </li>
-                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
-                {{ checkmarkIcon | safe }}
-              </span>
-              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[6] }}</p>
-            </li>
-                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
-                {{ checkmarkIcon | safe }}
-              </span>
-              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[7] }}</p>
-            </li>
-                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
-                {{ checkmarkIcon | safe }}
-              </span>
-              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[8] }}</p>
-            </li>
-                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
-                {{ checkmarkIcon | safe }}
-              </span>
-              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[9] }}</p>
-            </li>
-                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
-                {{ checkmarkIcon | safe }}
-              </span>
-              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[10] }}</p>
-            </li>
-                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
-                {{ checkmarkIcon | safe }}
-              </span>
-              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[11] }}</p>
-            </li>
-                        <li class="flex items-start gap-4 py-2 border-b border-neutral-200/40 last:border-0 transition-transform duration-300 hover:translate-x-2 focus-within:translate-x-2" tabindex="0">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-burgundy-700 to-gold-500 shadow-md text-white">
-                {{ checkmarkIcon | safe }}
-              </span>
-              <p class="font-century text-neutral-800 flex-1">{{ currentSection.copy.pain_points[12] }}</p>
-            </li>
+            {% endfor %}
           </ul>
         </div>
-                <p data-reveal class="font-century text-neutral-700 max-w-[65ch] text-[clamp(1rem,2.1vw,1.125rem)] leading-[1.7]">
-          {{ currentSection.copy.description | replace('12h por dia', '<span class="font-semibold text-burgundy-700 inline-block">12h por dia</span>') | replace('"trabalhar duro"', '<em class="font-semibold text-burgundy-700 inline-block">"trabalhar duro"</em>') | safe }}
+
+        {# Supporting description with enhanced readability #}
+        <p data-reveal class="opacity-0 translate-y-3 font-century text-neutral-650 max-w-[58ch] text-[1.0625rem] lg:text-[1.1875rem] leading-[1.6] transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-200 mb-7">
+          {{ currentSection.copy.description | replace('"trabalhar duro"', '<em class="font-medium not-italic text-navy-800 bg-neutral-100/60 px-1.5 py-0.5 rounded">"trabalhar duro"</em>') | replace('trabalhar de forma diferente', '<span class="font-semibold text-burgundy-700 relative"><span class="absolute -inset-x-0.5 bottom-0 h-0.5 bg-burgundy-200 rounded-full"></span>trabalhar de forma diferente</span>') | safe }}
         </p>
 
-        {# Call-to-action button linking to solution section #}
-        <div class="mt-10 text-center lg:text-left" data-reveal>
+        {# Enhanced micro-CTA with sophisticated interactions #}
+        <div class="opacity-0 translate-y-3 mt-6 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-275" data-reveal>
           <a href="#s-solution" data-analytics-event="click_problem_cta"
-             class="group inline-flex items-center gap-2 px-7 py-3 rounded-full font-semibold text-white shadow-2xl
-                    bg-gradient-to-r from-burgundy-700 to-navy-900 transition-all duration-300 
-                    hover:-translate-y-0.5 hover:shadow-[0_20px_40px_rgba(26,14,15,0.35)]
-                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy-700 focus-visible:ring-offset-2">
-            <span>{{ currentSection.copy.cta.label }}</span>
-            <svg class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"/>
+             class="group inline-flex items-center gap-2.5 text-burgundy-700 font-semibold
+                    transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]
+                    hover:text-burgundy-800 hover:gap-4
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy-500 focus-visible:ring-offset-3 focus-visible:ring-offset-white
+                    active:scale-[0.98]
+                    text-base lg:text-[1.0625rem]
+                    relative overflow-hidden
+                    before:absolute before:inset-0 before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-burgundy-50/20 before:to-transparent before:transition-transform before:duration-500 hover:before:translate-x-full">
+            <span class="relative border-b border-burgundy-700/30 group-hover:border-burgundy-800/50 transition-all duration-300 pb-0.5">{{ currentSection.copy.cta.label }}</span>
+            <svg class="w-4 h-4 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-110" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M2.4 8a.6.6 0 01.6-.6h8.51L8.244 4.223a.6.6 0 01.832-.864l4.4 4.2a.6.6 0 010 .864l-4.4 4.2a.6.6 0 01-.832-.864L11.51 8.6H3a.6.6 0 01-.6-.6z" clip-rule="evenodd"/>
             </svg>
           </a>
         </div>
       </div>
 
-      {# Supporting image column - visual representation of problem #}
-      <div class="order-1 lg:order-2 mb-10 lg:mb-0" data-reveal>
-        <figure class="group relative overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-br from-neutral-300 to-neutral-400">
-          <div class="relative aspect-[1.618/1]">
+      {# Supporting image column - emotionally resonant presentation #}
+      <div class="opacity-0 translate-y-3 order-1 lg:order-2 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] lg:sticky lg:top-24" data-reveal>
+        <figure class="relative group">
+          {# Stress visualization - multiple layered shadows to show overwhelm #}
+          <div class="absolute inset-0 -inset-x-6 -inset-y-6 bg-[radial-gradient(circle,rgba(129,23,31,0.12)_0%,rgba(129,23,31,0.06)_40%,transparent_80%)] rounded-full blur-2xl pointer-events-none"></div>
+          <div class="absolute inset-0 -inset-x-4 -inset-y-4 bg-[radial-gradient(circle,rgba(24,24,24,0.08)_0%,transparent_60%)] rounded-full blur-xl pointer-events-none"></div>
+          
+          {# Main image container with emotional framing #}
+          <div class="relative overflow-hidden rounded-xl shadow-[0_8px_32px_rgba(129,23,31,0.15),0_4px_16px_rgba(0,0,0,0.1)] transition-all duration-500 ease-out group-hover:shadow-[0_12px_48px_rgba(129,23,31,0.2),0_8px_24px_rgba(0,0,0,0.15)] border border-neutral-200/50">
+            {# Subtle overlay to enhance emotional connection #}
+            <div class="absolute inset-0 bg-gradient-to-br from-burgundy-900/5 via-transparent to-navy-900/8 pointer-events-none z-10"></div>
+            
+            {# Clock overlay - subtle time pressure indicator #}
+            <div class="absolute top-4 right-4 z-20 opacity-60 group-hover:opacity-80 transition-opacity duration-300">
+              <div class="bg-burgundy-700/90 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1.5 rounded-md shadow-lg">
+                <span class="flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                  </svg>
+                  <span>12h+</span>
+                </span>
+              </div>
+            </div>
+            
+            <div class="relative aspect-[3/4] min-h-[500px] lg:min-h-[600px]">
             <picture>
-              <!-- WebP/AVIF for modern browsers with responsive breakpoints -->
+              <!-- WebP/AVIF for modern browsers with 3:4 portrait aspect ratio -->
               <source type="image/avif"
-                      srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,ar_1.618,c_fill,q_auto:eco,f_avif,dpr_auto,g_face/problem-overworked_p5ntju 320w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_1.618,c_fill,q_auto:eco,f_avif,dpr_auto,g_face/problem-overworked_p5ntju 640w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_768,ar_1.618,c_fill,q_auto:eco,f_avif,dpr_auto,g_face/problem-overworked_p5ntju 768w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,ar_1.618,c_fill,q_auto:good,f_avif,dpr_auto,g_face/problem-overworked_p5ntju 1024w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1536,ar_1.618,c_fill,q_auto:good,f_avif,dpr_auto,g_face/problem-overworked_p5ntju 1536w"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px">
+                      srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,ar_3:4,c_fill,q_auto:eco,f_avif,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 320w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_480,ar_3:4,c_fill,q_auto:eco,f_avif,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 480w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_3:4,c_fill,q_auto:good,f_avif,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 640w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_800,ar_3:4,c_fill,q_auto:good,f_avif,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 800w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,ar_3:4,c_fill,q_auto:good,f_avif,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 1024w"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 45vw, 480px">
               
               <source type="image/webp"
-                      srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,ar_1.618,c_fill,q_auto:eco,f_webp,dpr_auto,g_face/problem-overworked_p5ntju 320w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_1.618,c_fill,q_auto:eco,f_webp,dpr_auto,g_face/problem-overworked_p5ntju 640w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_768,ar_1.618,c_fill,q_auto:eco,f_webp,dpr_auto,g_face/problem-overworked_p5ntju 768w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,ar_1.618,c_fill,q_auto:good,f_webp,dpr_auto,g_face/problem-overworked_p5ntju 1024w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1536,ar_1.618,c_fill,q_auto:good,f_webp,dpr_auto,g_face/problem-overworked_p5ntju 1536w"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px">
+                      srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,ar_3:4,c_fill,q_auto:eco,f_webp,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 320w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_480,ar_3:4,c_fill,q_auto:eco,f_webp,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 480w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_3:4,c_fill,q_auto:good,f_webp,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 640w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_800,ar_3:4,c_fill,q_auto:good,f_webp,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 800w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,ar_3:4,c_fill,q_auto:good,f_webp,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 1024w"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 45vw, 480px">
               
-              <!-- Fallback JPEG with responsive srcset -->
-              <img src="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_1.618,c_fill,q_auto:eco,f_auto,dpr_auto,g_face/problem-overworked_p5ntju" 
-                   srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,ar_1.618,c_fill,q_auto:eco,f_auto,dpr_auto,g_face/problem-overworked_p5ntju 320w,
-                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_1.618,c_fill,q_auto:eco,f_auto,dpr_auto,g_face/problem-overworked_p5ntju 640w,
-                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_768,ar_1.618,c_fill,q_auto:eco,f_auto,dpr_auto,g_face/problem-overworked_p5ntju 768w,
-                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,ar_1.618,c_fill,q_auto:good,f_auto,dpr_auto,g_face/problem-overworked_p5ntju 1024w,
-                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1536,ar_1.618,c_fill,q_auto:good,f_auto,dpr_auto,g_face/problem-overworked_p5ntju 1536w"
-                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
-                   alt="Empreendedora exausta trabalhando tarde da noite com pilhas de papéis e múltiplas telas — simbolizando sobrecarga"
-                   width="800" height="494"
+              <!-- Fallback JPEG with 3:4 portrait responsive srcset -->
+              <img src="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_480,ar_3:4,c_fill,q_auto:eco,f_auto,dpr_auto,g_auto:subject/{{ currentSection.media.image }}" 
+                   srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,ar_3:4,c_fill,q_auto:eco,f_auto,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 320w,
+                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_480,ar_3:4,c_fill,q_auto:eco,f_auto,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 480w,
+                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_3:4,c_fill,q_auto:good,f_auto,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 640w,
+                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_800,ar_3:4,c_fill,q_auto:good,f_auto,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 800w,
+                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,ar_3:4,c_fill,q_auto:good,f_auto,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 1024w"
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
+                   alt="{{ currentSection.media.alt }}"
+                   width="600" height="800"
                    loading="lazy" 
                    decoding="async"
                    fetchpriority="low"
-                   class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+                   class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]" />
             </picture>
-            {# Subtle gradient overlay for brand consistency #}
-            <div class="absolute inset-0 bg-gradient-to-br from-transparent to-burgundy-700/15 pointer-events-none"></div>
+            </div>
           </div>
-          <figcaption class="sr-only">Empreendedora sobrecarregada trabalhando em excesso, simbolizando o problema de falta de tempo e excesso de tarefas.</figcaption>
+          
+          {# Emotional caption with visual connection to content #}
+          <div class="mt-6 text-center opacity-75 group-hover:opacity-90 transition-opacity duration-300">
+            <p class="font-century text-neutral-600 text-sm italic leading-relaxed max-w-[28ch] mx-auto">
+              "Trabalho 12h por dia, mas sinto que não saio do lugar..."
+            </p>
+            <div class="mt-2 flex justify-center">
+              <div class="h-px w-12 bg-gradient-to-r from-transparent via-burgundy-300 to-transparent"></div>
+            </div>
+          </div>
+          
+          <figcaption class="sr-only">Empreendedora sobrecarregada trabalhando em excesso, simbolizando o problema de falta de tempo e excesso de tarefas, com indicador visual de sobrecarga de horário.</figcaption>
         </figure>
       </div>
 
