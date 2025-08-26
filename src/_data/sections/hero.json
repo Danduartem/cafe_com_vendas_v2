@@ -2,10 +2,10 @@
   "id": "hero",
   "enabled": true,
   "copy": {
-    "eyebrow": "Evento íntimo em Lisboa",
+    "eyebrow": "Primeira edição • Evento presencial",
     "headline": "7 horas para libertar suas vendas e libertar você.",
-    "subhead": "Participe do Café com Vendas em Lisboa e descubra o método SEJA LIVRE para aumentar resultados e conquistar liberdade.",
-    "description": "O Café com Vendas é um evento imersivo em Lisboa para empreendedores que querem vender mais sem sobrecarga. Em 7 horas práticas, você aplicará o método Seja Livre, construirá um plano de execução e aprenderá a aumentar resultados com liberdade, propósito e leveza nos negócios.",
+    "subhead": "Explore o método SEJA LIVRE que me tirou do ciclo exaustivo de 16h/dia para apenas 4h/semana, aumentando resultados.",
+    "description": "Durante 7 horas estratégicas em um casarão histórico de 150 anos, você receberá o método Seja Livre, o mesmo que já ajudou dezenas de fundadoras a se libertarem das próprias empresas. Aqui não tem motivação vazia nem palestras distantes de um palco. Eu estarei com você olho no olho, e você já vai colocar a mão na massa para construir sua liberdade.",
     "cta": {
       "primary": {
         "label": "Garantir a minha vaga",
@@ -23,7 +23,7 @@
       "location": "Lisboa, Portugal",
       "venue": "Mesa Corrida"
     },
-    "notice": "Vagas limitadas — sessão com capacidade reduzida para garantir transformação.",
+    "notice": "A proposta é simples: aumentar suas vendas sem se matar de trabalhar.",
     "scrollIndicator": "Role para baixo"
   },
   "media": {
