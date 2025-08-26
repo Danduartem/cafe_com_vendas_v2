@@ -30,7 +30,12 @@
       "mcp__playwright-mcp__browser_console_messages",
       "mcp__playwright-mcp__browser_close",
       "Bash(git rm:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(pgrep:*)",
+      "Bash(ps:*)",
+      "Bash(kill:*)",
+      "Bash(/dev/null)",
+      "WebFetch(domain:localhost)"
     ]
   },
   "hooks": {
