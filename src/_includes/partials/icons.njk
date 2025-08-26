@@ -2,11 +2,13 @@
 {% macro pillarIcon(iconName) %}
   {% if iconName == "brain" %}
     <svg class="relative z-10 w-10 h-10 text-navy-800 group-hover:text-burgundy-700 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v15A2.5 2.5 0 0 0 9.5 22h5a2.5 2.5 0 0 0 2.5-2.5v-15A2.5 2.5 0 0 0 14.5 2h-5z"/>
-      <path d="M12 6v6l4 2"/>
-      <path d="M9 9h6"/>
-      <path d="M9 12h6"/>
-      <path d="M9 15h6"/>
+      <path d="M12 5C9 5 7 7 7 10s2 5 5 5 5-2 5-5-2-5-5-5z"/>
+      <path d="M12 5c-3 0-5 2-5 5s2 5 5 5"/>
+      <path d="M12 5c3 0 5 2 5 5s-2 5-5 5"/>
+      <path d="M9 8c-1.5 0-2.5 1-2.5 2.5S7.5 13 9 13"/>
+      <path d="M15 8c1.5 0 2.5 1 2.5 2.5S16.5 13 15 13"/>
+      <path d="M12 10v4"/>
+      <path d="M10 12h4"/>
     </svg>
   {% elif iconName == "cogs" %}
     <svg class="relative z-10 w-10 h-10 text-navy-800 group-hover:text-burgundy-700 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -71,6 +73,35 @@
       <path d="M8 18h.01"></path>
       <path d="M12 18h.01"></path>
       <path d="M16 18h.01"></path>
+    </svg>
+  {% elif iconName == "lightbulb" %}
+    <svg class="relative z-10 w-10 h-10 text-navy-800 group-hover:text-burgundy-700 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"></path>
+      <path d="M9.5 18.5h5"></path>
+      <path d="M10.5 21.5h3"></path>
+      <circle cx="12" cy="9" r="2" fill="currentColor" fill-opacity="0.3"></circle>
+    </svg>
+  {% elif iconName == "diamond" %}
+    <svg class="relative z-10 w-10 h-10 text-navy-800 group-hover:text-burgundy-700 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M6 3h12l4 6-10 12L2 9z"></path>
+      <path d="M11 3L6 9l6 12"></path>
+      <path d="M13 3l5 6-6 12"></path>
+    </svg>
+  {% elif iconName == "target" %}
+    <svg class="relative z-10 w-10 h-10 text-navy-800 group-hover:text-burgundy-700 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"></circle>
+      <circle cx="12" cy="12" r="6"></circle>
+      <circle cx="12" cy="12" r="2"></circle>
+    </svg>
+  {% elif iconName == "heart" %}
+    <svg class="relative z-10 w-10 h-10 text-navy-800 group-hover:text-burgundy-700 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+    </svg>
+  {% elif iconName == "trending-up-chart" %}
+    <svg class="relative z-10 w-10 h-10 text-navy-800 group-hover:text-burgundy-700 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+      <polyline points="16 7 22 7 22 13"></polyline>
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" fill="none"></rect>
     </svg>
   {% endif %}
 {% endmacro %}

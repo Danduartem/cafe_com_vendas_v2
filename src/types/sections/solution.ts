@@ -8,10 +8,9 @@ export interface SolutionSection extends BaseSection {
       title: string;
       description: string;
       icon: string;
-      analytics_event: string;
-      animation_delay: string;
     }[];
-    supporting_text: string;
-    trust_indicators: string[];
+    transitionText: string;
+    supportingText: string;
+    trustIndicators: string[];
   };
 }
