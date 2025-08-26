@@ -29,7 +29,8 @@
       "mcp__playwright-mcp__browser_resize",
       "mcp__playwright-mcp__browser_console_messages",
       "mcp__playwright-mcp__browser_close",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(find:*)"
     ]
   },
   "hooks": {

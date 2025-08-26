@@ -41,7 +41,6 @@ Automatically stage and commit ALL modified files with intelligent grouping foll
 - TypeScript config (tsconfig.json)
 
 **Skip (never commit):**
-- Local settings (.claude/settings.local.json)
 - IDE settings (.vscode/settings.json)
 - OS files (.DS_Store)
 
