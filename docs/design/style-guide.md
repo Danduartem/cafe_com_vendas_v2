@@ -1,6 +1,6 @@
-# Café com Vendas  Brand Style Guide
+# Cafï¿½ com Vendas  Brand Style Guide
 
-**Mission:** Libertar empreendedoras do burnout através de estratégia inteligente, vendas eficazes e sistemas que funcionam.
+**Mission:** Libertar empreendedoras do burnout atravÃ©s de estratÃ©gia inteligente, vendas eficazes e sistemas que funcionam.
 
 ---
 
@@ -13,7 +13,7 @@
 
 ### Brand Values
 - **Liberdade**  Time, choices, financial security
-- **Método**  Systems over hustle, strategy over effort
+- **MÃ©todo**  Systems over hustle, strategy over effort
 - **Autenticidade**  Real experiences, tested approaches
 - **Leveza**  Growth without burnout, success with balance
 
@@ -85,7 +85,7 @@ font-family: 'CenturyGothic', sans-serif;  /* Body text, UI */
 
 ### Communication Style
 - **Direct:** Clear, actionable language without jargon
-- **Personal:** Use "você" to create connection, share real experiences
+- **Personal:** Use "vocÃª" to create connection, share real experiences
 - **Confident:** Assertive about methodology, backed by results
 - **Supportive:** Acknowledge struggles, offer practical solutions
 
@@ -97,7 +97,7 @@ font-family: 'CenturyGothic', sans-serif;  /* Body text, UI */
 
 ### Portuguese Localization
 - Use European Portuguese (PT-PT)
-- Formal "você" for respect while maintaining warmth
+- Formal "vocÃª" for respect while maintaining warmth
 - Business terminology that resonates with Portuguese entrepreneurs
 
 ---
