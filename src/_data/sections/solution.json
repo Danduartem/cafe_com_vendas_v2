@@ -9,37 +9,37 @@
     "pillars": [
       {
         "number": "01",
-        "title": "Mentalidade Sem Esforço",
+        "title": "Mentalidade",
         "description": "Quebre paradigmas e transforme seu jeito de empreender com estratégia inteligente.",
         "icon": "lightbulb"
       },
       {
         "number": "02",
-        "title": "Marca que Vende Sozinha",
+        "title": "Estratégia de Marca",
         "description": "Defina a alma da sua marca e crie uma presença memorável que encanta.",
         "icon": "diamond"
       },
       {
         "number": "03",
-        "title": "Vendas em Escala",
+        "title": "Estratégia de Vendas",
         "description": "Domine o método para transformar leads em clientes e vendas em liberdade.",
         "icon": "target"
       },
       {
         "number": "04",
-        "title": "Venda Sem Vender",
+        "title": "Social Seller",
         "description": "Crie conexão e desperte desejo espontâneo pelos seus produtos.",
         "icon": "heart"
       },
       {
         "number": "05",
-        "title": "Crescimento Sustentável",
+        "title": "Alavanca",
         "description": "Use métricas inteligentes para escalar sem desperdício de recursos.",
         "icon": "trending-up-chart"
       }
     ],
     "cta": {
-      "label": "Garantir Minha Vaga no Método SEJA LIVRE",
+      "label": "Quero dominar os 5 pilares e acelerar meu sucesso",
       "href": "#checkout",
       "variant": "gradient"
     },
