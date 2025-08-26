@@ -328,7 +328,6 @@ html, body {
 
 
 /* Font utility classes now handled by Tailwind config (font-century, font-lora) */
-/* Unused animation keyframes removed */
 
 /* Tailwind v4 Smooth Scroll Utility */
 @utility scroll-smooth {
@@ -359,7 +358,6 @@ html {
   stop-opacity: 1;
 }
 
-/* Removed unused confetti-bg */
 
 /* Tailwind v4 Responsive Hero Background Utility - Optimized for LCP */
 @utility hero-bg {

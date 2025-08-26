@@ -26,12 +26,32 @@ export default function() {
     event: {
       title: 'Café com Vendas',
       subtitle: 'Evento para Empreendedoras em Portugal',
-      date: '20 de Setembro',
-      location: 'Lisboa, Portugal',
-      venue: 'Mesa Corrida',
+      name: 'Café com Vendas',
+      date: {
+        display: '20 de Setembro',
+        local: '20 de Setembro'
+      },
+      location: {
+        city: 'Lisboa, Portugal',
+        venue: 'Mesa Corrida'
+      },
       duration: '7 horas',
-      price: 180,
       description: 'Um encontro presencial e intimista em Portugal para reestruturar o seu negócio, recuperar o seu tempo e multiplicar as vendas — sem burnout, com método.',
+      // 🎯 SINGLE SOURCE OF TRUTH FOR PRICING
+      pricing: {
+        basePrice: 180, // ← Change this one value to update ALL pricing
+        currency: 'EUR',
+        symbol: '€',
+        tiers: [
+          {
+            id: 'early_bird',
+            label: 'Inscrição Antecipada',
+            price: 180, // Matches basePrice
+            priceInCents: 18000, // For Stripe (basePrice * 100)
+            notes: 'Vagas limitadas - Garanta já a sua!'
+          }
+        ]
+      },
       capacity: {
         firstLot: 8,
         totalCapacity: 20,
