@@ -35,7 +35,11 @@
       "Bash(ps:*)",
       "Bash(kill:*)",
       "Bash(/dev/null)",
-      "WebFetch(domain:localhost)"
+      "WebFetch(domain:localhost)",
+      "mcp__playwright-mcp__browser_press_key",
+      "Bash(npm run serve:*)",
+      "Bash(npm run:*)",
+      "mcp__playwright-mcp__browser_type"
     ]
   },
   "hooks": {
