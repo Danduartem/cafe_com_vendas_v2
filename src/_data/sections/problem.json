@@ -2,33 +2,32 @@
   "id": "problem",
   "enabled": true,
   "copy": {
-    "eyebrow": "O problema que você vive",
-    "headline": "O café com vendas foi feito para você que:",
-    "description": "Eu te garanto: depois do Café com vendas, a sua empresa e a sua vida nunca mais serão a mesma.",
+    "eyebrow": "Se reconhece nestes sinais?",
+    "headline": "Você trabalha 12h por dia mas sente que a empresa não sai do lugar",
+    "description": "Se você chegou até aqui, é porque já percebeu que \"trabalhar duro\" não é sinônimo de crescer. Talvez seja hora de trabalhar de forma diferente.",
     "pain_points": [
-      "Sonha em tirar sua empresa das costas e finalmente conquistar liberdade.",
-      "Deseja quebrar a barreira e ir para o próximo nível no seu negócio sem se matar em trabalhar.",
-      "Tem muitos sonhos e busca um plano prático, claro e eficiente.",
-      "Está em busca de liberdade mas se vê cada vez mais presa.",
-      "Quer viajar várias vezes ao ano sem a preocupação constante com sua empresa.",
-      "Precisa de um ambiente intimista para transformar seu jeito de empreender.",
-      "Gosta de lugares bonitos e tardes cheias de propósito.",
-      "Busca uma atmosfera de abundância, com conexões de alto valor.",
-      "Ainda não empreende, mas já quer iniciar com menos esforço e mais estratégia",
-      "Busca uma atmosfera de abundância, com conexões de alto valor.",
-      "Almeja realizar seus sonhos sem se matar em trabalhar.",
-      "Aspira passar mais tempo com a família do que no trabalho.",
-      "Visa destravar suas vendas e crescer crescer de verdade"
+      "Acorda pensando no trabalho e dorme preocupada com as vendas do dia seguinte",
+      "Trabalha fins de semana e feriados, mas o faturamento continua instável",
+      "Sente que carrega o peso da empresa sozinha, sem conseguir delegar",
+      "Tem medo de tirar férias porque tudo pode desmoronar na sua ausência",
+      "Vive apagando incêndios ao invés de planejar o crescimento",
+      "Conhece todas as estratégias de marketing, mas nada funciona de forma consistente",
+      "Tem vergonha de admitir que está exausta, porque \"empreendedor não pode desistir\"",
+      "Cancelou planos pessoais pela empresa mais vezes do que consegue contar",
+      "Sente que está presa numa rotina que ela mesma criou, mas não sabe como sair",
+      "Tem medo de contratar porque \"ninguém faz como ela faz\"",
+      "Vê outras empreendedoras prosperando e se pergunta o que está fazendo de errado",
+      "Sonha em ter um negócio que funcione mesmo quando ela não está presente"
     ],
     "cta": {
-      "label": "Descobrir a solução",
+      "label": "Quero sair deste ciclo",
       "href": "#s-solution",
       "variant": "gradient"
     }
   },
   "media": {
-    "image": "problem-overworked_p5ntju",
+    "image": "tablet_a3ewil",
     "alt": "Empreendedora exausta trabalhando tarde da noite com pilhas de papéis e múltiplas telas — simbolizando sobrecarga",
-    "aspect_ratio": "1.618/1"
+    "aspect_ratio": "3/4"
   }
 }
