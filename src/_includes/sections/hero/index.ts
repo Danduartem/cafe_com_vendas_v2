@@ -13,7 +13,6 @@ export const Hero = {
       this.initAnimations();
       this.initInteractions();
       this.initScrollIndicator();
-      this.initWhatsAppButton();
     } catch (error) {
       console.error('Error initializing Hero component:', error);
     }
@@ -181,24 +180,4 @@ export const Hero = {
     });
   },
 
-  initWhatsAppButton() {
-    const whatsappButton = safeQuery('#whatsapp-button');
-    if (!whatsappButton) return;
-
-    // Animate entrance
-    setTimeout(() => {
-      whatsappButton.classList.remove('opacity-0', 'translate-y-4');
-      whatsappButton.classList.add('opacity-100', 'translate-y-0');
-    }, 500);
-
-    // Add WhatsApp click tracking using platform analytics
-    const whatsappLink = whatsappButton.querySelector('a[href*="wa.me"]') as HTMLAnchorElement;
-    if (whatsappLink) {
-      import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
-        PlatformAnalytics.trackClick(whatsappLink, 'whatsapp_click', 'floating_button');
-      }).catch(() => {
-        console.debug('WhatsApp analytics tracking unavailable');
-      });
-    }
-  }
 };

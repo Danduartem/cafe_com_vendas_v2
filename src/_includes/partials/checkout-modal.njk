@@ -3,17 +3,30 @@
   border: none;
   padding: 0;
   max-inline-size: min(90vw, 32rem);
-  max-block-size: min(90vh, 90dvh);
+  max-block-size: min(85vh, 85dvh);
   border-radius: 0.75rem;
   background: white;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   animation: modalFadeIn 300ms ease-out;
+  will-change: transform;
+  overflow: hidden;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 640px) {
+  #checkoutModal {
+    max-inline-size: calc(100vw - 2rem);
+    max-block-size: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 2rem);
+    max-block-size: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 2rem);
+    margin: auto;
+  }
 }
 
 #checkoutModal::backdrop {
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
   animation: backdropFadeIn 200ms ease-out;
+  -webkit-backdrop-filter: blur(2px);
 }
 
 @keyframes modalFadeIn {
@@ -38,6 +51,7 @@
   overflow-y: auto;
   overscroll-behavior-y: contain;
   justify-items: stretch;
+  -webkit-overflow-scrolling: touch;
 }
 
 #checkoutModal header {
@@ -48,11 +62,29 @@
   align-items: flex-start;
   padding: 1.5rem;
   border-bottom: 1px solid rgb(209 213 219);
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
+
+@media (max-width: 640px) {
+  #checkoutModal header {
+    padding: 1.25rem 1rem;
+  }
 }
 
 #checkoutModal main {
   padding: 1.5rem;
   flex-grow: 1;
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 640px) {
+  #checkoutModal main {
+    padding: 1.25rem 1rem;
+    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));
+  }
 }
 
 #checkoutModal .error-message {
@@ -64,6 +96,41 @@
 #checkoutModal input.error {
   border-color: var(--color-burgundy-700, #81171F);
   outline-color: var(--color-burgundy-700, #81171F);
+}
+
+/* Responsive typography and enhanced mobile experience */
+@media (max-width: 640px) {
+  #checkoutModal h3 {
+    font-size: 1.125rem;
+    line-height: 1.25;
+  }
+  
+  #checkoutModal label {
+    font-size: 0.9375rem;
+  }
+  
+  #checkoutModal input,
+  #checkoutModal select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 2.75rem;
+  }
+  
+  #checkoutModal button[type="submit"] {
+    font-size: 1rem;
+  }
+  
+  /* Better focus states for mobile */
+  #checkoutModal input:focus,
+  #checkoutModal select:focus {
+    box-shadow: 0 0 0 3px rgba(129, 23, 31, 0.1);
+  }
+}
+
+/* Improve keyboard visibility on mobile */
+@supports (height: 100dvh) {
+  #checkoutModal:has(input:focus, select:focus) {
+    max-block-size: calc(100dvh - 8rem);
+  }
 }
 </style>
 
@@ -83,22 +150,22 @@
                 type="button"
                 data-modal-close
                 aria-label="Fechar modal"
-                class="flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-200 hover:bg-gray-100">
+                class="flex min-h-[2.75rem] min-w-[2.75rem] h-11 w-11 items-center justify-center rounded-full transition-colors duration-200 hover:bg-gray-100 -mr-2 -mt-2">
           <svg class="h-5 w-5 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
     </header>
 
-    <div class="h-2 w-full bg-neutral-200">
+    <div class="h-1 sm:h-1.5 w-full bg-neutral-200">
       <div id="progressBar" 
-           class="h-full w-1/2 rounded-r-full transition-all duration-500 ease-out bg-gradient-to-r from-burgundy-700 to-burgundy-600">
+           class="h-full w-1/2 rounded-r-full transition-all duration-500 ease-out bg-gradient-to-r from-burgundy-700 to-burgundy-600 shadow-sm">
       </div>
     </div>
 
     <main>
         <!-- Step 1: Lead Form -->
-        <form id="leadForm" class="space-y-6" novalidate>
+        <form id="leadForm" class="space-y-5 sm:space-y-6" novalidate>
           <div>
             <label for="fullName" 
                    class="block text-sm font-medium mb-2 text-navy-700">
@@ -110,7 +177,7 @@
                    required 
                    autocomplete="name"
                    placeholder="Digite seu nome completo"
-                   class="w-full rounded-xl border border-neutral-300 px-4 py-3 text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700"/>
+                   class="w-full rounded-xl border border-neutral-300 px-4 py-3 sm:py-3 text-base sm:text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700 touch-manipulation"/>
           </div>
           
           <div>
@@ -124,7 +191,7 @@
                    required 
                    autocomplete="email"
                    placeholder="seu@email.com"
-                   class="w-full rounded-xl border border-neutral-300 px-4 py-3 text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700"/>
+                   class="w-full rounded-xl border border-neutral-300 px-4 py-3 sm:py-3 text-base sm:text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700 touch-manipulation"/>
           </div>
           
           <div>
@@ -135,7 +202,7 @@
             <div class="relative flex">
               <select id="countryCode" 
                       name="countryCode"
-                      class="rounded-l-xl border border-r-0 border-neutral-300 pl-3 pr-8 py-3 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700 bg-white focus:z-10">
+                      class="rounded-l-xl rounded-r-none border border-neutral-300 border-r-0 pl-3 pr-8 py-3 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700 bg-white focus:z-10 touch-manipulation min-w-[120px]">
                 <option value="+351" selected>🇵🇹 +351</option>
                 <option value="+55">🇧🇷 +55</option>
                 <option value="+34">🇪🇸 +34</option>
@@ -153,16 +220,13 @@
                      pattern="[0-9\s\-\(\)]{7,15}"
                      title="Apenas números, espaços, traços e parênteses (7-15 dígitos)"
                      placeholder="912 345 678"
-                     class="flex-1 rounded-r-xl border border-neutral-300 px-4 py-3 text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700 focus:z-10"/>
+                     class="flex-1 rounded-l-none rounded-r-xl border border-neutral-300 px-4 py-3 text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700 focus:z-10 touch-manipulation"/>
             </div>
-            <p class="mt-2 text-xs text-neutral-500">
-              WhatsApp facilita nosso contato rápido após o evento.
-            </p>
           </div>
 
           <button id="leadSubmit" 
                   type="submit" 
-                  class="w-full rounded-xl px-6 py-3 text-white font-semibold shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-gradient-to-r from-burgundy-700 to-burgundy-600 focus:ring-burgundy-700">
+                  class="w-full rounded-xl px-6 py-4 sm:py-4 text-white font-semibold text-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-gradient-to-r from-burgundy-700 to-burgundy-600 focus:ring-burgundy-700 touch-manipulation min-h-[3.5rem] mt-8">
             <div class="inline-flex items-center justify-center gap-2 min-h-[1.5rem]">
               <span id="leadSubmitText" class="transition-opacity duration-200">Garantir minha vaga</span>
               <svg id="leadSubmitSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -239,7 +303,7 @@
           <button id="payBtn" 
                   type="button"
                   disabled
-                  class="w-full rounded-2xl px-6 py-3 text-white font-semibold shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none bg-navy-800 focus:ring-navy-700">
+                  class="w-full rounded-2xl px-6 py-3 text-white font-semibold shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none bg-navy-800 focus:ring-navy-700 mt-6">
             <div class="inline-flex items-center justify-center gap-2 min-h-[1.5rem]">
               <span id="payBtnText" class="transition-opacity duration-200">Confirmar pagamento • €{{ event.pricing.tiers[0].price }}</span>
               <svg id="payBtnSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

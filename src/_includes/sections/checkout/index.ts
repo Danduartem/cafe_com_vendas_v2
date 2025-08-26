@@ -62,7 +62,6 @@ interface CheckoutSectionComponent extends Component {
   generateIdempotencyKey(): string;
   isValidEmail(email: string): boolean;
   isValidPhone(phone: string): boolean;
-  getUTMParams(): Record<string, string>;
   translateStripeError(message: string): string;
 }
 
@@ -170,6 +169,9 @@ export const Checkout: CheckoutSectionComponent = {
       return;
     }
 
+    // Block background scrolling
+    document.body.style.overflow = 'hidden';
+    
     // Use standard dialog API
     this.modal.showModal();
 
@@ -197,6 +199,9 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   handleModalClose(): void {
+    // Restore background scrolling
+    document.body.style.overflow = '';
+    
     // Clean application state when modal closes (via any method)
     this.resetForm();
     this.resetModalState();
@@ -768,17 +773,6 @@ export const Checkout: CheckoutSectionComponent = {
     return phoneRegex.test(cleanPhone);
   },
 
-  getUTMParams(): Record<string, string> {
-    const params = new URLSearchParams(window.location.search);
-    const utm: Record<string, string> = {};
-
-    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
-      const value = params.get(key);
-      if (value) utm[key] = value;
-    });
-
-    return utm;
-  },
 
   resetModalState(): void {
     // Reset application state only - let browser handle dialog visibility
