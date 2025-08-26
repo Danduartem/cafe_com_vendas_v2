@@ -49,9 +49,14 @@
           },
           {
             "label": "ROI garantido:",
-            "text": "Recupere horas semanais + aumente receita"
+            "text": "Recupere 5-8 horas semanais + aumente receita em 30 dias"
+          },
+          {
+            "label": "Investimento:",
+            "text": "1 dia para transformar os próximos 12 meses"
           }
-        ]
+        ],
+        "footer_text": "<a href=\"#cta\" class=\"inline-flex items-center gap-2 text-burgundy-600 hover:text-burgundy-700 font-semibold transition-colors duration-300\">Reservar minha transformação <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17 8l4 4m0 0l-4 4m4-4H3\"/></svg></a>"
       }
     },
     {
@@ -78,6 +83,86 @@
       },
       "is_special": true,
       "special_badge": "GARANTIA"
+    },
+    {
+      "id": "event-logistics",
+      "question": "Onde acontece e como é a logística do evento?",
+      "description": "Tudo sobre localização, horários e o que levar",
+      "answer": {
+        "main_text": "O evento acontece no centro de Lisboa, em espaço exclusivo e intimista. Começamos às 9h e terminamos às 18h, com pausas estratégicas e networking dirigido.",
+        "features_with_labels": [
+          {
+            "label": "Localização:",
+            "text": "Centro de Lisboa, fácil acesso de metro e autocarro"
+          },
+          {
+            "label": "Grupo pequeno:",
+            "text": "Máximo 25 empreendedoras para atenção personalizada"
+          },
+          {
+            "label": "Incluso:",
+            "text": "Coffee breaks, almoço e todos os materiais"
+          }
+        ],
+        "footer_text": "Endereço exato enviado 48h antes do evento"
+      }
+    },
+    {
+      "id": "networking-value",
+      "question": "Vou conseguir fazer networking de qualidade?",
+      "description": "Descubra o valor das conexões que vai criar",
+      "answer": {
+        "main_text": "Sim! Selecionamos cuidadosamente cada participante para criar um grupo diverso mas alinhado de empreendedoras sérias, focadas em crescimento sustentável.",
+        "highlight": "Networking dirigido com pausas estratégicas e atividades de conexão",
+        "features": [
+          "Perfil das participantes: negócios estabelecidos buscando escala",
+          "Dinâmicas facilitadas para conexões genuínas",
+          "Grupo WhatsApp exclusivo pós-evento para continuar as trocas"
+        ]
+      }
+    },
+    {
+      "id": "post-event-support",
+      "question": "Que suporte terei após o evento?",
+      "description": "Como continuar a aplicar o que aprender",
+      "answer": {
+        "main_text": "Você não fica sozinha! Oferecemos suporte estruturado para garantir a implementação do que aprender e maximizar os seus resultados.",
+        "features_with_labels": [
+          {
+            "label": "30 dias:",
+            "text": "Acesso ao grupo exclusivo para dúvidas e partilhas"
+          },
+          {
+            "label": "Templates digitais:",
+            "text": "Todos os frameworks prontos para usar"
+          },
+          {
+            "label": "Sessão de follow-up:",
+            "text": "Encontro online 30 dias depois para acompanhar progressos"
+          }
+        ],
+        "footer_text": "<a href=\"#cta\" class=\"inline-flex items-center gap-2 text-burgundy-600 hover:text-burgundy-700 font-semibold transition-colors duration-300\">Garantir meu lugar agora <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17 8l4 4m0 0l-4 4m4-4H3\"/></svg></a>"
+      }
+    },
+    {
+      "id": "investment-value",
+      "question": "O investimento vale mesmo a pena?",
+      "description": "Compare o custo com o retorno esperado",
+      "answer": {
+        "main_text": "O investimento representa menos de 0,5% da receita que a maioria das participantes gera nos primeiros 90 dias após aplicar o método.",
+        "highlight": "Retorno médio: 300-500% do investimento nos primeiros 6 meses",
+        "features_with_labels": [
+          {
+            "label": "Perspectiva:",
+            "text": "Equivale ao que gasta num almoço de negócios por semana"
+          },
+          {
+            "label": "Retorno documentado:",
+            "text": "Participantes anteriores aumentaram 35-80% das vendas"
+          }
+        ],
+        "footer_text": "<a href=\"#cta\" class=\"inline-flex items-center gap-2 text-burgundy-600 hover:text-burgundy-700 font-semibold transition-colors duration-300\">Reservar minha vaga com desconto <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17 8l4 4m0 0l-4 4m4-4H3\"/></svg></a>"
+      }
     },
     {
       "id": "about-jucana",
