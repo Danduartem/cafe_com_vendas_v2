@@ -47,15 +47,7 @@
 
 ---
 
-## 6) Typography & Readability
-- [ ] **Headline**: 1.25–1.6× larger than section body; strong weight.
-- [ ] **Subhead**: 60–80% of headline size; relaxed line-height.
-- [ ] **Pillar titles**: consistent weight; body text highly legible (AA/AAA contrast).
-- [ ] Limit to **2 font families**; 3 sizes per block max to avoid noise.
-
----
-
-## 7) Micro-Interactions (Tasteful, Non-Circus)
+## 6) Micro-Interactions (Tasteful, Non-Circus)
 - [ ] **Entrance sequencing**: eyebrow → headline → subhead → pillars (gentle fade/slide).
 - [ ] **Hover/focus** on pillar cards: slight lift or underline; no jarring motion.
 - [ ] **Icon micro-animation** optional (100–200ms); must feel premium and restrained.
@@ -63,7 +55,7 @@
 
 ---
 
-## 8) Copy Principles (Benefit-First, Skimmable)
+## 7) Copy Principles (Benefit-First, Skimmable)
 - [ ] Headline speaks to **outcome** (sell more, work fewer hours).
 - [ ] Each pillar expresses a **single benefit** (not a feature dump).
 - [ ] Avoid jargon; use **plain, confident language**; feminine-empowering tone.
@@ -71,7 +63,7 @@
 
 ---
 
-## 9) Conversion Hooks (Soft, Contextual)
+## 8) Conversion Hooks (Soft, Contextual)
 - [ ] **Transition line** at the end (e.g., “Ready to experience these five pillars live?”).
 - [ ] **Micro-CTA** (text link/button) that **collects lead data** (step 1 of your 2-step flow).
 - [ ] CTA styling is **visible but secondary** to the learning experience (save primary for Offer/Final CTA).
@@ -79,15 +71,15 @@
 
 ---
 
-## 10) Accessibility & Inclusivity
+## 9) Accessibility & Inclusivity
 - [ ] Color contrast meets **WCAG AA** minimums (text/icons over backgrounds).
 - [ ] Icons have **text labels**; no meaning by color alone.
-- [ ] All interactive elements have **focus states** and adequate targets (≥44px).
+- [ ] All interactive elements have **focus states** and adequate targets.
 - [ ] Content reads well by **screen readers** (semantic headings/list structure).
 
 ---
 
-## 11) Mobile & Responsive Behavior
+## 10) Mobile & Responsive Behavior
 - [ ] Headline scales gracefully; no awkward wraps.
 - [ ] Pillars become **stacked cards** or a **snap-carousel** with visible progress.
 - [ ] Touch targets comfortable; spacing preserved; no overflow bugs.
@@ -95,7 +87,7 @@
 
 ---
 
-## 12) Performance & Polish
+## 11) Performance & Polish
 - [ ] Images **next-gen** (AVIF/WebP), properly sized for breakpoints.
 - [ ] Motion kept GPU-friendly (opacity/transform).
 - [ ] No blocking assets; fonts preloaded if needed; icons as SVGs.
@@ -103,14 +95,14 @@
 
 ---
 
-## 13) Flow Options (Pick one and commit)
+## 12) Flow Options (Pick one and commit)
 - [ ] **Scroll-Stopping (Mini-Hero):** High visual impact; bold headline; pillars as the star.
 - [ ] **Flow-Sustaining (Bridge):** Softer intro; pillars as elegant cards; smooth segue to “About Me”.
 - [ ] Whichever chosen, ensure **cohesive rhythm** with the **Vision** and **About** sections.
 
 ---
 
-## 14) Do / Don’t
+## 13) Do / Don’t
 - [ ] **Do**: Lead with the headline promise; make pillars skimmable; keep motion subtle.
 - [ ] **Do**: Use consistent iconography and spacing; one accent color; generous whitespace.
 - [ ] **Don’t**: Over-animate, overcrowd, or over-explain; avoid five different visual treatments.
@@ -118,7 +110,7 @@
 
 ---
 
-## 15) Final QA Before Ship
+## 14) Final QA Before Ship
 - [ ] Can a new visitor **explain the method in 1 sentence** after 10 seconds?
 - [ ] Can they **name at least 3 pillars** from memory after scanning?
 - [ ] Does the section **feel premium** and aligned to brand?
@@ -127,7 +119,7 @@
 
 ---
 
-## 16) Optional Enhancements
+## 15) Optional Enhancements
 - [ ] **Numbered pillars** (1–5) to imply sequence and progress.
 - [ ] **Outcome badges** near pillars (e.g., “Clarity”, “Time-Freedom”) as tasteful chips.
 - [ ] **Mini diagram** connecting the 5 pillars around a central outcome.

@@ -61,24 +61,6 @@ font-family: 'Lora', serif;          /* Headlines, emphasis */
 font-family: 'CenturyGothic', sans-serif;  /* Body text, UI */
 ```
 
-### Type Scale
-```css
---text-hero: clamp(2.25rem, 6.5vw, 3rem)  /* Hero headlines */
---text-h2: clamp(1.5rem, 3.5vw, 2rem)     /* Section headers */
---text-lead: 1.125rem                      /* Lead paragraphs */
---text-body: 1rem                          /* Body text */
---text-caption: 0.875rem                   /* Small text, captions */
-```
-
-### Line Heights & Spacing
-```css
---leading-tight: 1.06     /* Headlines */
---leading-heading: 1.12   /* Subheadings */
---leading-base: 1.55      /* Body text */
---tracking-tight: -0.01em /* Headlines */
---tracking-wide: 0.06em   /* Buttons, labels */
-```
-
 ---
 
 ## Voice & Tone
@@ -102,59 +84,6 @@ font-family: 'CenturyGothic', sans-serif;  /* Body text, UI */
 
 ---
 
-## UI Patterns
-
-### Button Styles
-```css
-/* Primary CTA (Burgundy gradient) */
-.btn-gradient {
-  background: linear-gradient(135deg, #81171F, #671219);
-  color: white;
-  padding: 0.875rem 2rem;
-  border-radius: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-}
-
-/* Secondary (Navy outline) */
-.btn-outline {
-  border: 2px solid #191F3A;
-  color: #191F3A;
-  background: transparent;
-}
-
-/* Link style (underlined) */
-.btn-link {
-  color: #81171F;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-```
-
-### Spacing System
-```css
---spacing-xs: 0.5rem    /* 8px - tight elements */
---spacing-sm: 0.75rem   /* 12px - component padding */
---spacing-md: 1rem      /* 16px - standard spacing */
---spacing-lg: 1.5rem    /* 24px - section spacing */
---spacing-xl: 2rem      /* 32px - major sections */
---spacing-2xl: 3rem     /* 48px - hero spacing */
-```
-
-### Interactive States
-```css
-/* Hover animations (200-300ms) */
-transition: all 0.25s ease-out;
-
-/* Focus states (accessibility) */
-focus:ring-2 focus:ring-burgundy-500 focus:ring-offset-2
-
-/* Active states */
-active:scale-[0.98] active:transition-transform
-```
-
----
-
 ## Content Patterns
 
 ### Section Structure
@@ -169,27 +98,6 @@ active:scale-[0.98] active:transition-transform
 - **Social proof** after methodology explanation
 - **Urgency** through scarcity (limited spots)
 - **Guarantee** to reduce risk perception
-
----
-
-## Animation Principles
-
-### Micro-interactions
-```css
-/* Fade in with upward motion */
-@keyframes fadeInUp {
-  from: opacity: 0; transform: translateY(2rem);
-  to: opacity: 1; transform: translateY(0);
-}
-
-/* Stagger delays: 150ms initial + 60ms between elements */
-```
-
-### Performance Guidelines
-- Respect `prefers-reduced-motion: reduce`
-- Keep animations under 300ms
-- Use `transform` and `opacity` for smooth 60fps
-- Stagger reveals for visual hierarchy
 
 ---
 
