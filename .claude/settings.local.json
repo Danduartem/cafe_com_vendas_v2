@@ -8,10 +8,56 @@
       "Bash(env)",
       "mcp__context7__resolve-library-id",
       "Bash(npm run type-check:*)",
-      "Read(//Users/danielmenezes/Library/Application Support/Code/User/**)"
+      "Read(//Users/danielmenezes/Library/Application Support/Code/User/**)",
+      "Bash(grep:*)",
+      "mcp__playwright-mcp__browser_navigate",
+      "Bash(netlify dev:*)",
+      "Bash(echo $BROWSER)",
+      "Bash(open:*)",
+      "Bash(BROWSER='Google Chrome' open http://example.com)",
+      "Read(//Applications/**)",
+      "Bash(npm run build:*)",
+      "Bash(lsof:*)",
+      "mcp__playwright-mcp__browser_click",
+      "mcp__playwright-mcp__browser_take_screenshot",
+      "mcp__playwright-mcp__browser_evaluate",
+      "mcp__playwright-mcp__browser_snapshot",
+      "Bash(npm run dev)",
+      "Bash(mkdir:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(curl:*)",
+      "mcp__playwright-mcp__browser_resize",
+      "mcp__playwright-mcp__browser_console_messages",
+      "mcp__playwright-mcp__browser_close",
+      "Bash(git rm:*)"
     ]
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/check-library-versions.sh"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/external-apis-check.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/context7-reminder.sh"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "hooks": [
