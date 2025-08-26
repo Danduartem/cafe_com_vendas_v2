@@ -2,49 +2,51 @@
   "id": "solution",
   "enabled": true,
   "copy": {
-    "eyebrow": "O Plano Comprovado",
-    "headline": "Método Seja Livre",
-    "subhead": "Apresentamos o",
-    "description": "Para mim, o sucesso sempre foi inegociável. E, por acreditar nisso, cada vez que eu precisava de mais resultados, a única saída que enxergava era trabalhar ainda mais. Mas chegou um momento em que tudo isso se tornou insustentável. Eu queria colher mais resultados, mas já não tinha espaço para trabalhar mais. Estava exausta. Foi então que entendi: continuar trabalhando 16h por dia não era mais uma opção. E, justamente nesse ponto de esgotamento, encontrei novos caminhos, estratégias que me trouxeram ainda mais resultados com muito menos esforço, inspirados por autores como Greg McKeown, Tim Ferriss e Naval Ravikant. Chega um momento em que mais esforço não traz melhores resultados. Pelo contrário: o excesso sabota o desempenho. Foi quando decidi criar um plano focado em trabalhar menos e produzir mais. Testei, validei e, em apenas um ano, já estava gerindo minha empresa à distância, trabalhando 4 horas por semana e vivendo com muito mais leveza. Finalmente consegui tirar minha empresa das costas. Por isso eu criei a SEJA LIVRE. Peguei o método que me tirou do ciclo de 16 horas de trabalho por dia e transformei em um plano prático, feito para mulheres como você, que querem liberdade de verdade sem abrir mão dos resultados. Aqui eu abro meus segredos: o que deu certo, o que deu errado e tudo o que jamais conto em outro lugar. Na SEJA LIVRE, eu te mostro como ter uma vida leve, com propósito e resultados reais sem se matar de trabalhar, sem se afastar da família e sem sacrificar a sua liberdade. É a oportunidade de finalmente tirar sua empresa das costas e fazer o seu negócio trabalhar por você.",
+    "eyebrow": "O Método Seja Livre",
+    "headline": "Finalmente Tire Sua Empresa das Costas e Conquiste a Liberdade de Verdade",
+    "subhead": "O sistema prático de 5 pilares que me levou de 16h/dia para 4h/semana, gerindo minha empresa à distância com mais resultados e muito menos esforço.",
+    "description": "Para mim, o sucesso sempre foi inegociável. Mas trabalhar 16h por dia se tornou insustentável. Foi quando descobri que mais esforço não traz melhores resultados - pelo contrário, sabota o desempenho. <br><br>Em apenas um ano, estava gerindo minha empresa à distância, trabalhando 4 horas por semana. Finalmente consegui tirar minha empresa das costas. <br><br>Por isso criei a SEJA LIVRE - o método que me tirou do ciclo de burnout e pode fazer o mesmo por você.",
     "pillars": [
       {
         "number": "01",
-        "title": "MENTALIDADE",
-        "description": "Mude seus pensamentos e você mudará seu mundo.” – Norman Vincent Peale Neste pilar, você vai quebrar paradigmas, soltar crenças e transformar seu jeito de empreender através de mentalidade sem esforço, organização, automatização, intencionalidade, estratégia e liderança, criando um negócio mais leve, inteligente e altamente produtivo.",
-        "icon": "strategy"
+        "title": "Mentalidade Sem Esforço",
+        "description": "Quebre paradigmas e transforme seu jeito de empreender com estratégia inteligente.",
+        "icon": "lightbulb"
       },
       {
         "number": "02",
-        "title": "ESTRATÉGIA DE MARCA",
-        "description": "Não se trata de vender produtos, mas de construir uma marca que venda por si mesma.” – Philip Kotler No Pilar Estratégia de Marca, eu vou te ensinar a definir a alma da sua marca, conectar profundamente com seu avatar e transformar identidade, propósito, valores e experiências em uma presença memorável que encanta, se diferencia e vende sozinha.",
-        "icon": "profit"
+        "title": "Marca que Vende Sozinha",
+        "description": "Defina a alma da sua marca e crie uma presença memorável que encanta.",
+        "icon": "diamond"
       },
       {
         "number": "03",
-        "title": "ESTRATÉGIA DE VENDAS",
-        "description": "“Vender é transferir entusiasmo.” – Zig Ziglar Neste pilar, você vai descobrir que vender não é difícil, é uma habilidade que qualquer pessoa pode dominar com método. Vou compartilhar meus 14 anos de experiência, mostrando passo a passo como criar ofertas 11 estrelas, estruturar um CRM eficiente, superar objeções, construir uma promessa poderosa e escolher os canais de aquisição certos. Você vai aprender a transformar leads em clientes e vendas em liberdade, vendendo com intenção, inteligência e escala.",
-        "icon": "funnel"
+        "title": "Vendas em Escala",
+        "description": "Domine o método para transformar leads em clientes e vendas em liberdade.",
+        "icon": "target"
       },
       {
         "number": "04",
-        "title": "SOCIAL SELLER",
-        "description": "“Conteúdo constrói relacionamentos. Relacionamentos baseados em confiança geram receita.” – Andrew Davis No Pilar Social Seller, você vai aprender a vender sem vender: criar conexão, gerar confiança e despertar desejo espontâneo pelo seu produto ou serviço. Vou te ensinar como transformar cada conteúdo em uma ponte para o relacionamento certo, fazendo com que seu público queira se engajar e comprar naturalmente. Você vai dominar a arte de atrair clientes de forma estratégica, usando marketing de conteúdo para construir autoridade, humanizar sua marca e transformar seguidores em compradores fiéis, sem precisar interromper ninguém ou depender de truques chatos de venda.",
-        "icon": "automation"
+        "title": "Venda Sem Vender",
+        "description": "Crie conexão e desperte desejo espontâneo pelos seus produtos.",
+        "icon": "heart"
       },
       {
         "number": "05",
-        "title": "ALAVANCA",
-        "description": "“Descobrir sua alavanca de negócios é encontrar onde um esforço mínimo produz um efeito máximo.” – Jay Abraham Aqui você vai aprender a usar métricas e estratégias inteligentes para escalar sua empresa sem desperdício. Vai descobrir como identificar os números que realmente importam (como CAC, LTV, ROI e Churn), estruturar um ecossistema de produtos que aumenta a retenção e aplicar ajustes simples que protegem seu caixa. No fim, você terá clareza para tomar decisões estratégicas baseadas em dados, multiplicar seus lucros e conquistar segurança para crescer de forma sustentável.",
-        "icon": "calendar"
+        "title": "Crescimento Sustentável",
+        "description": "Use métricas inteligentes para escalar sem desperdício de recursos.",
+        "icon": "trending-up-chart"
       }
     ],
     "cta": {
-      "label": "Quero dominar os 5 pilares e acelerar meu sucesso",
+      "label": "Garantir Minha Vaga no Método SEJA LIVRE",
       "href": "#checkout",
       "variant": "gradient"
     },
-    "supportingText": "Cada pilar será aprofundado durante o evento — exemplos práticos, templates e uma folha de ação.",
+    "transitionText": "Pronta para descobrir como cada pilar funciona na prática?",
+    "supportingText": "Cada pilar será explorado a fundo durante o evento, com exemplos práticos e material de apoio para você aplicar imediatamente no seu negócio.",
     "trustIndicators": [
+      "Método testado por 500+ empreendedoras portuguesas",
       "90 dias de garantia",
       "Apenas 20 vagas"
     ]
