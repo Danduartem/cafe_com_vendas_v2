@@ -27,7 +27,7 @@ import {
 
 // Import co-located section components (new approach)
 import { Hero } from '../../_includes/sections/hero/index';
-import { Problem } from '../../_includes/sections/problem/index';
+import { Vision } from '../../_includes/sections/problem/index';
 import { Solution } from '../../_includes/sections/solution/index';
 import { About } from '../../_includes/sections/about/index';
 import { SocialProof } from '../../_includes/sections/social-proof/index';
@@ -190,7 +190,7 @@ export const CafeComVendas: CafeComVendasInterface = {
       // Co-located section components (new approach)
       { name: 'TopBanner', component: TopBanner },
       { name: 'Hero', component: Hero },
-      { name: 'Problem', component: Problem },
+      { name: 'Vision', component: Vision },
       { name: 'Solution', component: Solution },
       { name: 'About', component: About },
       { name: 'SocialProof', component: SocialProof },

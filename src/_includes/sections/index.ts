@@ -5,7 +5,7 @@
 
 export { TopBanner } from './top-banner';
 export { Hero } from './hero';
-export { Problem } from './problem';
+export { Vision } from './problem';
 export { Solution } from './solution';
 export { About } from './about';
 export { SocialProof } from './social-proof';

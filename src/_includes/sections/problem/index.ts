@@ -1,13 +1,13 @@
 /**
- * Problem Section Component
- * Handles interactive behaviors and refined animations for the problem section
+ * Vision Section Component
+ * Handles interactive behaviors and refined animations for the vision section
  */
 
 import type { Component } from '../../../types/components/base.js';
 import { safeQuery } from '../../../assets/js/utils/dom.js';
 import { Analytics } from '../../../assets/js/core/analytics.js';
 
-interface ProblemComponent extends Component {
+interface VisionComponent extends Component {
   bindEvents(): void;
   animateElements(): void;
   handleReducedMotion(): void;
@@ -16,9 +16,9 @@ interface ProblemComponent extends Component {
 // Enhanced motion preferences handling
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-export const Problem: ProblemComponent = {
+export const Vision: VisionComponent = {
   /**
-   * Initialize problem section with enhanced accessibility
+   * Initialize vision section with enhanced accessibility
    */
   init(): void {
     this.handleReducedMotion();
@@ -35,7 +35,7 @@ export const Problem: ProblemComponent = {
    * Handle reduced motion preferences
    */
   handleReducedMotion(): void {
-    const section = safeQuery('#s-problem');
+    const section = safeQuery('#s-vision');
     if (!section) return;
     
     if (prefersReducedMotion.matches) {
@@ -54,7 +54,7 @@ export const Problem: ProblemComponent = {
    * Handle entrance animations with sophisticated timing and easing
    */
   animateElements(): void {
-    const section = safeQuery('#s-problem');
+    const section = safeQuery('#s-vision');
     if (!section) return;
 
     // Enhanced intersection observer with optimized thresholds
@@ -159,9 +159,9 @@ export const Problem: ProblemComponent = {
    * Bind enhanced event listeners with advanced interaction tracking
    */
   bindEvents(): void {
-    const section = safeQuery('#s-problem');
+    const section = safeQuery('#s-vision');
     if (!section) {
-      console.warn('Problem section not found');
+      console.warn('Vision section not found');
       return;
     }
 
@@ -174,7 +174,7 @@ export const Problem: ProblemComponent = {
             Analytics.track('section_view', {
               event: 'section_view',
               event_category: 'Engagement',
-              section: 'problem',
+              section: 'vision',
               element_type: 'section_entry',
               scroll_depth: scrollDepth,
               intersection_ratio: Math.round(entry.intersectionRatio * 100)
@@ -204,11 +204,11 @@ export const Problem: ProblemComponent = {
         if (hoverStartTime) {
           const hoverDuration = Date.now() - hoverStartTime;
           if (hoverDuration > 1000) { // Only track meaningful engagement
-            Analytics.track('pain_point_engagement', {
-              event: 'pain_point_hover',
+            Analytics.track('vision_outcome_engagement', {
+              event: 'vision_outcome_hover',
               event_category: 'Engagement',
-              section: 'problem',
-              element_type: 'pain_point',
+              section: 'vision',
+              element_type: 'vision_outcome',
               element_index: index,
               engagement_duration: hoverDuration,
               element_text: item.textContent?.trim().substring(0, 50) || 'unknown'
@@ -220,11 +220,11 @@ export const Problem: ProblemComponent = {
       // Enhanced click tracking
       item.addEventListener('click', () => {
         itemInteractionCount++;
-        Analytics.track('problem_point_click', {
-          event: 'problem_point_click',
+        Analytics.track('vision_outcome_click', {
+          event: 'vision_outcome_click',
           event_category: 'Engagement',
-          section: 'problem',
-          element_type: 'pain_point',
+          section: 'vision',
+          element_type: 'vision_outcome',
           element_index: index,
           total_interactions: itemInteractionCount,
           element_text: item.textContent?.trim().substring(0, 50) || 'unknown'
@@ -233,10 +233,10 @@ export const Problem: ProblemComponent = {
       
       // Track focus for accessibility
       item.addEventListener('focus', () => {
-        Analytics.track('pain_point_focus', {
-          event: 'pain_point_focus',
+        Analytics.track('vision_outcome_focus', {
+          event: 'vision_outcome_focus',
           event_category: 'Accessibility',
-          section: 'problem',
+          section: 'vision',
           element_index: index,
           navigation_method: 'keyboard'
         });
@@ -244,14 +244,14 @@ export const Problem: ProblemComponent = {
     });
     
     // Track CTA interactions
-    const ctaElement = section.querySelector('[data-analytics-event="click_problem_cta"]');
+    const ctaElement = section.querySelector('[data-analytics-event="click_vision_cta"]');
     if (ctaElement) {
       ctaElement.addEventListener('click', () => {
-        Analytics.track('problem_cta_click', {
-          event: 'click_problem_cta',
+        Analytics.track('vision_cta_click', {
+          event: 'click_vision_cta',
           event_category: 'Conversion',
-          section: 'problem',
-          total_pain_point_interactions: itemInteractionCount,
+          section: 'vision',
+          total_vision_outcome_interactions: itemInteractionCount,
           user_engagement_level: itemInteractionCount > 3 ? 'high' : itemInteractionCount > 0 ? 'medium' : 'low'
         });
       });

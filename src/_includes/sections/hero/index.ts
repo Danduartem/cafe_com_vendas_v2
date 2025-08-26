@@ -87,10 +87,10 @@ export const Hero = {
     window.addEventListener('resize', checkViewportHeight);
 
     scrollIndicatorBtn.addEventListener('click', () => {
-      // Scroll directly to the problem section (next section after hero)
-      const problemSection = safeQuery('#s-problem');
-      if (problemSection) {
-        problemSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Scroll directly to the vision section (next section after hero)
+      const visionSection = safeQuery('#s-vision');
+      if (visionSection) {
+        visionSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         return;
       }
 
@@ -127,9 +127,9 @@ export const Hero = {
         e.preventDefault();
 
         // Scroll directly to the problem section (next section after hero)
-        const problemSection = safeQuery('#s-problem');
-        if (problemSection) {
-          problemSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const visionSection = safeQuery('#s-vision');
+        if (visionSection) {
+          visionSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
           // Fallback: find next sibling section
           const heroSection = safeQuery('#s-hero');
