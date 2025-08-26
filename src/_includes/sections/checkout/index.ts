@@ -487,11 +487,9 @@ export const Checkout: CheckoutSectionComponent = {
     try {
       // Show loading state
       const submitBtn = form.querySelector('#leadSubmit');
-      const submitText = submitBtn?.querySelector('#leadSubmitText') as HTMLElement | null;
       const submitSpinner = submitBtn?.querySelector('#leadSubmitSpinner') as HTMLElement | null;
 
       if (submitBtn) (submitBtn as HTMLButtonElement).disabled = true;
-      if (submitText) submitText.classList.add('opacity-0');
       if (submitSpinner) submitSpinner.classList.remove('hidden');
 
       // TODO: Submit to your lead capture service (Formspree, etc.)
@@ -524,11 +522,9 @@ export const Checkout: CheckoutSectionComponent = {
     } finally {
       // Reset loading state
       const submitBtn = form.querySelector('#leadSubmit');
-      const submitText = submitBtn?.querySelector('#leadSubmitText') as HTMLElement | null;
       const submitSpinner = submitBtn?.querySelector('#leadSubmitSpinner') as HTMLElement | null;
 
       if (submitBtn) (submitBtn as HTMLButtonElement).disabled = false;
-      if (submitText) submitText.classList.remove('opacity-0');
       if (submitSpinner) submitSpinner.classList.add('hidden');
     }
   },
@@ -716,11 +712,9 @@ export const Checkout: CheckoutSectionComponent = {
 
     // Reset all button states
     const leadSubmit = safeQuery('#leadSubmit');
-    const leadSubmitText = safeQuery('#leadSubmitText');
     const leadSubmitSpinner = safeQuery('#leadSubmitSpinner');
 
     if (leadSubmit) (leadSubmit as HTMLButtonElement).disabled = false;
-    if (leadSubmitText) leadSubmitText.classList.remove('opacity-0');
     if (leadSubmitSpinner) leadSubmitSpinner.classList.add('hidden');
 
     const payBtn = safeQuery('#payBtn');
