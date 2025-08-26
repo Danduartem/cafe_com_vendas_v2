@@ -6,7 +6,6 @@ export interface FAQSection extends BaseSection {
     id: string;
     question: string;
     answer: Record<string, unknown>;
-    analytics_event: string;
     [key: string]: unknown;
   }[];
   contact: {

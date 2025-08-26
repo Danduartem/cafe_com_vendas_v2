@@ -25,10 +25,10 @@
     </div>
 
     <!-- FAQ Items -->
-    <div class="space-y-4" data-reveal data-faq-container>
+    <div class="space-y-4 lg:space-y-6" data-reveal data-faq-container>
       {% for item in currentSection.items %}
-      <details class="group relative {% if item.is_special %}bg-gradient-to-br from-white/95 to-gold-50/50 border border-gold-300/40{% else %}bg-white/90 border border-white/50{% endif %} backdrop-blur-sm rounded-2xl shadow-lg {% if item.is_special %}shadow-gold-900/10{% else %}shadow-navy-900/5{% endif %} transition-all duration-300 open:shadow-xl" data-faq-item="{{ item.number }}" data-analytics-event="{{ item.analytics_event }}">
-        <summary class="flex items-start justify-between w-full cursor-pointer px-6 py-5 focus:outline-none focus:ring-2 focus:ring-{% if item.is_special %}gold{% else %}burgundy{% endif %}-400/50 focus:ring-offset-2 focus:ring-offset-white">
+      <details class="group relative {% if item.is_special %}bg-gradient-to-br from-white/95 to-gold-50/50 border border-gold-300/40{% else %}bg-white/90 border border-white/50{% endif %} backdrop-blur-sm rounded-2xl shadow-lg {% if item.is_special %}shadow-gold-900/10{% else %}shadow-navy-900/5{% endif %} transition-all duration-300 open:shadow-xl" data-faq-item="{{ item.id }}">
+        <summary class="flex items-start justify-between w-full cursor-pointer px-6 lg:px-8 py-6 lg:py-7 min-h-[60px] focus:outline-none focus:ring-2 focus:ring-{% if item.is_special %}gold{% else %}burgundy{% endif %}-400/50 focus:ring-offset-2 focus:ring-offset-white">
           <div class="pr-4">
             {% if item.is_special %}
             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gold-100 text-gold-800 border border-gold-200 mb-3">{{ item.special_badge }}</span>
@@ -44,8 +44,8 @@
             </svg>
           </div>
         </summary>
-        <div class="px-6 pb-6 overflow-hidden transition-all duration-500 max-h-0 opacity-0 group-open:max-h-[1200px] group-open:opacity-100">
-          <p class="font-century text-lg text-navy-800 leading-relaxed mb-{% if item.answer.highlights or item.answer.features or item.answer.highlight %}4{% else %}0{% endif %}">{{ item.answer.main_text | safe }}</p>
+        <div class="px-6 lg:px-8 pb-6 lg:pb-8 overflow-hidden transition-all duration-500 max-h-0 opacity-0 group-open:max-h-[1200px] group-open:opacity-100">
+          <p class="font-century text-lg text-navy-800 leading-relaxed mb-{% if item.answer.features or item.answer.highlight %}4{% else %}0{% endif %}">{{ item.answer.main_text | safe }}</p>
           {% if item.answer.highlight %}
           <div class="p-4 bg-{% if item.is_special %}gold{% else %}burgundy{% endif %}-50/50 border border-{% if item.is_special %}gold{% else %}burgundy{% endif %}-200/30 rounded-xl mb-4">
             <p class="font-century text-base text-{% if item.is_special %}gold{% else %}burgundy{% endif %}-800 leading-relaxed">{{ item.answer.highlight | safe }}</p>
@@ -56,9 +56,29 @@
             {% for feature in item.answer.features_with_labels %}
             <li class="flex items-start gap-3">
               <div class="flex-shrink-0 mt-1">
+                {% if feature.label == "90 dias" or feature.label == "30 dias" %}
+                <svg class="w-5 h-5 text-{% if item.is_special %}gold{% else %}burgundy{% endif %}-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+                  <circle cx="12" cy="12" r="10"/>
+                </svg>
+                {% elif feature.label == "Reembolso total" or feature.label == "ROI garantido" or feature.label == "Retorno documentado" %}
+                <svg class="w-5 h-5 text-{% if item.is_special %}gold{% else %}burgundy{% endif %}-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M10 1L3 5v6c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V5l-7-4z" clip-rule="evenodd"/>
+                </svg>
+                {% elif feature.label == "Localização:" or feature.label == "Grupo pequeno:" %}
+                <svg class="w-5 h-5 text-{% if item.is_special %}gold{% else %}burgundy{% endif %}-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                {% elif feature.label == "Templates digitais:" or feature.label == "Resultado imediato:" %}
+                <svg class="w-5 h-5 text-{% if item.is_special %}gold{% else %}burgundy{% endif %}-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                {% else %}
                 <svg class="w-5 h-5 text-{% if item.is_special %}gold{% else %}burgundy{% endif %}-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L7.53 10.23a.75.75 0 00-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/>
                 </svg>
+                {% endif %}
               </div>
               <p class="font-century text-base text-navy-700 leading-relaxed">
                 <strong class="text-navy-800">{{ feature.label }}</strong> {{ feature.text }}
@@ -79,18 +99,6 @@
               <p class="font-century text-base text-navy-700 leading-relaxed">
                 <strong class="text-navy-800">{{ feature }}</strong>
               </p>
-            </li>
-            {% endfor %}
-          </ul>
-          {% endif %}
-          {% if item.answer.highlights %}
-          <ul class="space-y-2 mt-4">
-            {% for highlight in item.answer.highlights %}
-            <li class="flex items-start gap-3">
-              <svg class="w-5 h-5 text-{% if item.is_special %}gold{% else %}burgundy{% endif %}-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <span class="font-century text-base text-navy-800">{{ highlight | safe }}</span>
             </li>
             {% endfor %}
           </ul>
