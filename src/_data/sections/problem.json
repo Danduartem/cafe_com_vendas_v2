@@ -1,33 +1,27 @@
 {
-  "id": "problem",
+  "id": "vision",
   "enabled": true,
   "copy": {
-    "eyebrow": "Se reconhece nestes sinais?",
-    "headline": "Você trabalha 12h por dia mas sente que a empresa não sai do lugar",
-    "description": "Se você chegou até aqui, é porque já percebeu que \"trabalhar duro\" não é sinônimo de crescer. Talvez seja hora de trabalhar de forma diferente.",
-    "pain_points": [
-      "Acorda pensando no trabalho e dorme preocupada com as vendas do dia seguinte",
-      "Trabalha fins de semana e feriados, mas o faturamento continua instável",
-      "Sente que carrega o peso da empresa sozinha, sem conseguir delegar",
-      "Tem medo de tirar férias porque tudo pode desmoronar na sua ausência",
-      "Vive apagando incêndios ao invés de planejar o crescimento",
-      "Conhece todas as estratégias de marketing, mas nada funciona de forma consistente",
-      "Tem vergonha de admitir que está exausta, porque \"empreendedor não pode desistir\"",
-      "Cancelou planos pessoais pela empresa mais vezes do que consegue contar",
-      "Sente que está presa numa rotina que ela mesma criou, mas não sabe como sair",
-      "Tem medo de contratar porque \"ninguém faz como ela faz\"",
-      "Vê outras empreendedoras prosperando e se pergunta o que está fazendo de errado",
-      "Sonha em ter um negócio que funcione mesmo quando ela não está presente"
+    "eyebrow": "A sua nova realidade",
+    "headline": "Empreendedora que cresce com método, não com mais horas",
+    "description": "Descubra como transformar o seu negócio numa máquina de vendas que funciona mesmo quando está de férias.",
+    "vision_outcomes": [
+      "Sistemas de venda automáticos que trazem clientes enquanto dorme",
+      "Equipa treinada que resolve tudo sem precisar de si",
+      "Crescimento consistente sem trabalhar fins de semana",
+      "Mais tempo para a família e os seus projetos pessoais",
+      "Liberdade para viajar sem preocupações com o negócio"
     ],
+    "guarantee": "Depois do Café com Vendas, a sua empresa e a sua vida nunca mais serão a mesma",
     "cta": {
-      "label": "Quero sair deste ciclo",
+      "label": "Garantir a minha nova rotina",
       "href": "#s-solution",
       "variant": "gradient"
     }
   },
   "media": {
     "image": "tablet_a3ewil",
-    "alt": "Empreendedora exausta trabalhando tarde da noite com pilhas de papéis e múltiplas telas — simbolizando sobrecarga",
+    "alt": "Empreendedora focada no crescimento do seu negócio através de método e estratégia inteligente",
     "aspect_ratio": "3/4"
   }
 }
