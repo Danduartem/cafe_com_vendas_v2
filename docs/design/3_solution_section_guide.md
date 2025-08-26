@@ -66,7 +66,6 @@
 ## 8) Conversion Hooks (Soft, Contextual)
 - [ ] **Transition line** at the end (e.g., “Ready to experience these five pillars live?”).
 - [ ] **Micro-CTA** (text link/button) that **collects lead data** (step 1 of your 2-step flow).
-- [ ] CTA styling is **visible but secondary** to the learning experience (save primary for Offer/Final CTA).
 - [ ] Optional **micro-trust cue**: “Proven with X+ founders” (keep minimal here; full proof later).
 
 ---
