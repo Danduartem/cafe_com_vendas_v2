@@ -42,6 +42,7 @@ export interface CafeComVendasApp {
   };
   Components: Record<string, unknown>;
   Utils: Record<string, unknown>;
+  init(): void;
 }
 
 // Stripe constructor type - specific types defined in checkout component

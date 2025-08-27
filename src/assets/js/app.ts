@@ -126,6 +126,13 @@ export const CafeComVendas: CafeComVendasInterface = {
       StateManager.setInitialized(true);
       // Café com Vendas initialized successfully
 
+      // Track page view (standard GA4 event for E2E tests)
+      Analytics.track('page_view', {
+        event_category: 'Page',
+        page_title: document.title,
+        page_location: window.location.href
+      });
+
       // Track successful initialization
       const initEvent: AppInitializedEvent = {
         event: 'app_initialized',

@@ -124,5 +124,4 @@ export default config;
 // Also make available globally for debugging (development only)
 if (isDevelopment && isBrowser) {
   window.CONFIG = config;
-  console.log('🔧 Environment config loaded:', config.environment);
 }
