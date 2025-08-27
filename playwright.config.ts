@@ -33,6 +33,9 @@ export default defineConfig({
   // Maximum number of failures before stopping (CI only)
   maxFailures: process.env.CI ? 5 : undefined,
   
+  // Test timeout per individual test (2 minutes to handle slow mobile browsers)
+  timeout: 120 * 1000,
+  
   // Global timeout for entire test run (CI only - 10 minutes)
   globalTimeout: process.env.CI ? 10 * 60 * 1000 : undefined,
   
@@ -48,7 +51,7 @@ export default defineConfig({
   // Shared settings for all the projects below
   use: {
     // Base URL to use in actions like `await page.goto('/')`
-    baseURL: process.env.TEST_URL || 'http://localhost:8080',
+    baseURL: process.env.TEST_URL || 'http://localhost:8888',
     
     // Collect trace when retrying the failed test
     trace: 'on-first-retry',
@@ -72,9 +75,8 @@ export default defineConfig({
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
     },
-    // Firefox removed as per agreement (< 5% market share)
     
-    // Mobile viewports - keeping both as requested
+    // Mobile viewports
     {
       name: 'mobile-chrome',
       use: { ...devices['Pixel 5'] },
@@ -85,10 +87,10 @@ export default defineConfig({
     },
   ],
 
-  // Run your local dev server before starting the tests
+  // Run your local dev server with Netlify (includes functions) before starting the tests
   webServer: process.env.CI ? undefined : {
-    command: 'npm run dev',
-    port: 8080,
+    command: 'npm run netlify:dev',
+    port: 8888,
     reuseExistingServer: true,
     timeout: 30 * 1000,
     stdout: 'ignore',

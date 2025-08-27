@@ -40,7 +40,15 @@
       "Bash(npm run serve:*)",
       "Bash(npm run:*)",
       "mcp__playwright-mcp__browser_type",
-      "Bash(npx playwright show-report:*)"
+      "Bash(npx playwright show-report:*)",
+      "Bash(npm test)",
+      "Bash(pkill:*)",
+      "Bash(test:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(timeout 300 npx playwright test --reporter=list)",
+      "Bash(BROWSER=none netlify dev --port=8888)",
+      "WebFetch(domain:stackoverflow.com)",
+      "Read(/Users/**)"
     ]
   },
   "hooks": {
