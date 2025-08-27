@@ -5,6 +5,7 @@
 
 import { ENV } from '@/config/constants';
 import { StateManager } from './state';
+import { logger } from '../../../utils/logger.js';
 import type {
   AnalyticsEvent,
   ErrorEvent,
@@ -80,7 +81,7 @@ export const Analytics: AnalyticsInterface = {
 
       // Debug logging in development
       if (ENV.isDevelopment) {
-        console.log(`[GTM Event] ${eventName}:`, parameters);
+        logger.debug(`[GTM Event] ${eventName}:`, parameters);
       }
 
       // Track to performance timeline for debugging

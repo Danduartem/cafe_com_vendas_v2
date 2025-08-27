@@ -12,6 +12,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
+import { logger } from './logger';
 
 // Global YouTube API types
 declare global {
@@ -117,7 +118,7 @@ export const YouTube: YouTubeUtility = {
       },
       events: {
         'onReady': (event: any) => {
-          console.debug(`YouTube player ready for video: ${videoId}`);
+          logger.debug(`YouTube player ready for video: ${videoId}`);
           onReady?.(event);
         },
         'onStateChange': (event: any) => {
@@ -125,7 +126,7 @@ export const YouTube: YouTubeUtility = {
           onStateChange?.(event);
         },
         'onError': (event: any) => {
-          console.error(`YouTube player error for video ${videoId}:`, event.data);
+          logger.error(`YouTube player error for video ${videoId}:`, event.data);
           this.handleError(event, videoId);
           onError?.(event);
         }
@@ -152,7 +153,7 @@ export const YouTube: YouTubeUtility = {
     };
 
     const stateName = states[event.data as keyof typeof states] || 'unknown';
-    console.debug(`YouTube player state changed: ${stateName} for video ${videoId}`);
+    logger.debug(`YouTube player state changed: ${stateName} for video ${videoId}`);
 
     // Track video play event for analytics
     if (event.data === 1) { // Playing state
@@ -172,7 +173,7 @@ export const YouTube: YouTubeUtility = {
     };
 
     const errorMsg = errors[event.data as keyof typeof errors] || `Unknown error code: ${event.data}`;
-    console.error(`YouTube error for video ${videoId}: ${errorMsg}`);
+    logger.error(`YouTube error for video ${videoId}: ${errorMsg}`);
 
     // Optionally show user-friendly error message
     this.showVideoError(videoId, errorMsg);
@@ -190,7 +191,7 @@ export const YouTube: YouTubeUtility = {
         video_id: videoId
       });
     }).catch(() => {
-      console.debug('Video play analytics tracking unavailable');
+      logger.debug('Video play analytics tracking unavailable');
     });
   },
 
@@ -221,7 +222,7 @@ export const YouTube: YouTubeUtility = {
       try {
         player.destroy();
       } catch (error) {
-        console.warn(`Error destroying YouTube player: ${String(error)}`);
+        logger.warn(`Error destroying YouTube player: ${String(error)}`);
       }
     }
     this.playersMap.delete(containerId);
@@ -241,7 +242,7 @@ export const YouTube: YouTubeUtility = {
  */
 export async function embedYouTubeVideo(container: HTMLElement, videoId: string): Promise<void> {
   if (!container || !videoId) {
-    console.error('embedYouTubeVideo: Missing container or videoId');
+    logger.error('embedYouTubeVideo: Missing container or videoId');
     return;
   }
 
@@ -277,7 +278,7 @@ export async function embedYouTubeVideo(container: HTMLElement, videoId: string)
     });
 
   } catch (error) {
-    console.error('Failed to embed YouTube video:', error);
+    logger.error('Failed to embed YouTube video:', error);
     YouTube.showVideoError(videoId, 'Erro ao carregar o player do YouTube');
   }
 }

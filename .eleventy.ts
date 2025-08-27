@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import 'tsx/esm';
 import { HtmlBasePlugin, RenderPlugin, type UserConfig } from '@11ty/eleventy';
+import { logger } from './src/utils/logger.js';
 
 export default function(eleventyConfig: UserConfig) {
   // Add essential Eleventy 3.x plugins
@@ -65,11 +66,11 @@ export default function(eleventyConfig: UserConfig) {
 
   // Build events for development feedback
   eleventyConfig.on('eleventy.before', () => {
-    console.log('🚀 Starting Eleventy build...');
+    logger.info('🚀 Starting Eleventy build...');
   });
 
   eleventyConfig.on('eleventy.after', () => {
-    console.log('✅ Eleventy build completed!');
+    logger.info('✅ Eleventy build completed!');
   });
 
   // Return configuration object (stable approach)
