@@ -3,22 +3,30 @@
   border: none;
   padding: 0;
   max-inline-size: min(90vw, 32rem);
-  max-block-size: min(85vh, 85dvh);
+  /* Safari fix: explicit height with fit-content */
+  height: fit-content;
+  /* Responsive height with Safari fallback */
+  max-height: calc(100dvh - 2rem);
+  max-height: calc(var(--vh, 1vh) * 100 - 2rem);
   border-radius: 0.75rem;
   background: white;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   animation: modalFadeIn 300ms ease-out;
   will-change: transform;
-  overflow: hidden;
+  /* Enable vertical scrolling, prevent horizontal */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Mobile-specific adjustments */
 @media (max-width: 640px) {
   #checkoutModal {
     max-inline-size: calc(100vw - 2rem);
-    max-block-size: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 2rem);
-    max-block-size: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 2rem);
-    margin: auto;
+    /* Mobile sizing with safe area support */
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 2rem);
+    max-height: calc(var(--vh, 1vh) * 100 - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 2rem);
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
   }
 }
 
@@ -46,11 +54,10 @@
 }
 
 #checkoutModal > article {
-  display: grid;
-  max-block-size: 100%;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
   overscroll-behavior-y: contain;
-  justify-items: stretch;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -129,7 +136,7 @@
 /* Improve keyboard visibility on mobile */
 @supports (height: 100dvh) {
   #checkoutModal:has(input:focus, select:focus) {
-    max-block-size: calc(100dvh - 8rem);
+    max-height: calc(100dvh - 8rem);
   }
 }
 </style>
@@ -272,7 +279,7 @@
             </p>
           </div>
 
-          <div class="mb-4 min-h-[280px] relative">
+          <div class="mb-4 relative">
             <!-- 🚀 Predictive Payment Status Indicator -->
             <div id="predictive-status" class="hidden mb-3 p-2 rounded-lg bg-blue-50 border border-blue-200">
               <div class="flex items-center gap-2 text-sm text-blue-700">
