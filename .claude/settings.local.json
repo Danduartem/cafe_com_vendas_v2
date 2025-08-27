@@ -39,7 +39,8 @@
       "mcp__playwright-mcp__browser_press_key",
       "Bash(npm run serve:*)",
       "Bash(npm run:*)",
-      "mcp__playwright-mcp__browser_type"
+      "mcp__playwright-mcp__browser_type",
+      "Bash(npx playwright show-report:*)"
     ]
   },
   "hooks": {
