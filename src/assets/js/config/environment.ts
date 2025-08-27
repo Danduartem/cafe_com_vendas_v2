@@ -100,9 +100,12 @@ const config: EnvironmentConfig = {
   urls: {
     // Base URL for API calls 
     // In production: use production domain
-    // In development: use current origin (works with both 'npm run dev' via Eleventy and 'netlify dev')
+    // In development: detect if running under Netlify dev (port 54393) or Eleventy dev (port 8080)
     base: isProduction ? 'https://jucanamaximiliano.com.br' : (
-      isBrowser ? window.location.origin : 'http://localhost:8080'
+      isBrowser ? (
+        // Check if Netlify dev server is available (functions on different port)
+        window.location.port === '8080' ? 'http://localhost:54393' : window.location.origin
+      ) : 'http://localhost:54393'
     ),
     thankYou: '/obrigado',
     instagram: '/instagram',
