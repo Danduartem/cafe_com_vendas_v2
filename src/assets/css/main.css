@@ -359,74 +359,9 @@ html {
 }
 
 
-/* Tailwind v4 Responsive Hero Background Utility - Optimized for LCP */
-@utility hero-bg {
-  /* Base mobile version - optimized for fast loading with progressive JPEG */
-  background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_640,h_1136,c_fill,q_auto:eco,f_auto,g_auto,dpr_auto,fl_progressive/cafe_pnkngz');
-  
-  /* Small tablet */
-  @media (min-width: 640px) {
-    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1024,h_768,c_fill,q_auto:good,f_auto,g_auto,dpr_auto,fl_progressive/cafe_pnkngz');
-  }
-  
-  /* Desktop */
-  @media (min-width: 1024px) {
-    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1536,h_864,c_fill,q_auto:best,f_auto,g_auto,dpr_auto,fl_progressive/cafe_pnkngz');
-  }
-  
-  /* Large desktop - higher quality for large screens */
-  @media (min-width: 1536px) {
-    background-image: url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto:best,f_auto,g_auto,dpr_auto,fl_progressive/cafe_pnkngz');
-  }
-}
+/* Hero background is now handled inline as critical CSS for optimal LCP performance */
 
-/* Tailwind v4 Enhanced Dialog Utilities */
-@utility dialog-base {
-  /* Base state - prevent layout interference when closed */
-  border: none;
-  padding: 0;
-  margin: 0;
-  display: none;
-}
-
-@utility dialog-open {
-  /* Open state - full dialog styling */
-  display: flex;
-  flex-direction: column;
-  border: none;
-  border-radius: 1.5rem;
-  padding: 0;
-  max-width: 32rem;
-  width: calc(100vw - 2rem);
-  max-height: 90vh;
-  margin: auto;
-  box-shadow: var(--shadow-2xl);
-  background: var(--color-white);
-  
-  /* Smooth transitions when dialog opens */
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-  opacity: 1;
-  transform: scale(1);
-}
-
-@utility dialog-backdrop {
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-  transition: opacity 0.2s ease-out, backdrop-filter 0.2s ease-out;
-}
-
-/* Apply utilities to dialog elements */
-dialog {
-  @apply dialog-base;
-}
-
-dialog[open] {
-  @apply dialog-open;
-}
-
-dialog::backdrop {
-  @apply dialog-backdrop;
-}
+/* Dialog styling is now handled per-component for better specificity and maintainability */
 
 /* Accessibility - respect user's motion preferences */
 @media (prefers-reduced-motion: reduce) {
