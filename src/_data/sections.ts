@@ -3,12 +3,11 @@ import type {
   SectionSlug,
   LoadedPageSection,
 } from '../types/sections/pages';
-import type { EleventyConfigData } from '../types/global/index.js';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-// Unified page configuration for all section organization
-const pageConfigurations = {
+// All available sections mapped by page
+const sectionsByPage = {
   'landing': [
     'top-banner',
     'hero', 
@@ -24,21 +23,14 @@ const pageConfigurations = {
   'thank-you': [
     'thank-you-content'
   ],
-  'legal-privacy': [
-    'footer'
-  ],
-  'politica-privacidade': [
-    'footer'
-  ],
-  'termos-condicoes': [
-    'footer'
-  ],
-  'garantia-reembolso': [
+  'legal': [
     'footer'
   ]
 } as const;
 
-// Shared section loader function
+/**
+ * Loads a section's data from its JSON file
+ */
 function loadSection(slug: string): Section | null {
   try {
     const sectionPath = join(process.cwd(), 'src/_data/sections', `${slug}.json`);
@@ -51,28 +43,21 @@ function loadSection(slug: string): Section | null {
 }
 
 /**
- * Unified sections data loader for all pages
- * Follows Eleventy v3 best practices with dynamic page detection
+ * Global sections loader for Eleventy
+ * Returns all unique sections - templates filter what they need
  */
-export default function(configData?: EleventyConfigData): LoadedPageSection[] {
+export default function(): LoadedPageSection[] {
   try {
     const sections: LoadedPageSection[] = [];
+    const uniqueSlugs = new Set<string>();
     
-    // Determine which page we're building based on context
-    // Default to landing page if no context available
-    let pageType: keyof typeof pageConfigurations = 'landing';
+    // Collect all unique section slugs
+    Object.values(sectionsByPage).forEach(pageSections => {
+      pageSections.forEach(slug => uniqueSlugs.add(slug));
+    });
     
-    if (configData?.page?.fileSlug) {
-      const slug = configData.page.fileSlug;
-      if (slug in pageConfigurations) {
-        pageType = slug as keyof typeof pageConfigurations;
-      }
-    }
-    
-    // Load sections for the current page
-    const sectionsToLoad = pageConfigurations[pageType] || pageConfigurations.landing;
-    
-    for (const slug of sectionsToLoad) {
+    // Load each unique section
+    uniqueSlugs.forEach(slug => {
       const sectionData = loadSection(slug);
       if (sectionData) {
         sections.push({
@@ -82,10 +67,9 @@ export default function(configData?: EleventyConfigData): LoadedPageSection[] {
           data: sectionData
         });
       }
-    }
+    });
     
     return sections;
-
   } catch (error) {
     console.error('Sections data loader failed:', error);
     return [];

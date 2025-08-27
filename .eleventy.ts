@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import 'tsx/esm';
 import { HtmlBasePlugin, RenderPlugin, type UserConfig } from '@11ty/eleventy';
-import { logger } from './src/utils/logger.js';
+import { logger } from './src/utils/logger.ts';
 
 export default function(eleventyConfig: UserConfig) {
   // Add essential Eleventy 3.x plugins
