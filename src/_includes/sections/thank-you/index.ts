@@ -5,6 +5,7 @@
 
 import { safeQuery } from '../../../assets/js/utils/dom';
 import { Animations } from '../../../components/ui';
+import { logger } from '../../../utils/logger.js';
 
 export const ThankYou = {
   init() {
@@ -15,7 +16,7 @@ export const ThankYou = {
       this.initInteractions();
       this.initCelebrationOverlay();
     } catch (error) {
-      console.error('Error initializing ThankYou component:', error);
+      logger.error('Error initializing ThankYou component:', error);
     }
   },
 
@@ -37,9 +38,9 @@ export const ThankYou = {
           pricing_tier: 'early_bird',
           payment_method: 'card_with_3ds' // Indicate this was a 3DS payment
         });
-        console.log('Payment completed event tracked for 3DS redirect');
+        logger.info('Payment completed event tracked for 3DS redirect');
       }).catch(() => {
-        console.debug('Payment completion analytics tracking unavailable');
+        logger.debug('Payment completion analytics tracking unavailable');
       });
     }
   },
@@ -107,7 +108,7 @@ export const ThankYou = {
             file_type: 'ics'
           });
         }).catch(() => {
-          console.debug('Calendar download analytics tracking unavailable');
+          logger.debug('Calendar download analytics tracking unavailable');
         });
       });
     }
@@ -119,7 +120,7 @@ export const ThankYou = {
       import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
         PlatformAnalytics.trackClick(whatsappButton, 'whatsapp_click', 'thank_you_page');
       }).catch(() => {
-        console.debug('WhatsApp analytics tracking unavailable');
+        logger.debug('WhatsApp analytics tracking unavailable');
       });
     }
 

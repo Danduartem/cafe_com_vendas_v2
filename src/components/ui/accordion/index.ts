@@ -4,6 +4,7 @@
  */
 
 import { safeQuery, safeQueryAll } from '@/utils/dom';
+import { logger } from '../../../utils/logger.js';
 import { Animations } from '../animations';
 
 interface AccordionConfig {
@@ -23,7 +24,7 @@ export const PlatformAccordion = {
     const items = safeQueryAll(config.itemSelector) as NodeListOf<HTMLDetailsElement>;
 
     if (!container || !items.length) {
-      console.warn(`Accordion elements not found for ${config.containerSelector}`);
+      logger.warn(`Accordion elements not found for ${config.containerSelector}`);
       return;
     }
 
@@ -100,7 +101,7 @@ export const PlatformAccordion = {
           import('../analytics').then(({ PlatformAnalytics }) => {
             PlatformAnalytics.trackFAQ(itemNumber, isOpen, questionText);
           }).catch(() => {
-            console.debug('FAQ analytics tracking unavailable');
+            logger.debug('FAQ analytics tracking unavailable');
           });
         }
       }

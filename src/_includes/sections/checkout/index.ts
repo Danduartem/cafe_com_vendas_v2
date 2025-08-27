@@ -13,6 +13,7 @@ import type {
 } from '@stripe/stripe-js';
 import { ENV } from '@/config/constants';
 import { safeQuery } from '@/utils/dom';
+import { logger } from '../../../utils/logger.js';
 import type { Component } from '../../../types/components/base.js';
 import siteData from '../../../_data/site.js';
 
@@ -100,7 +101,7 @@ export const Checkout: CheckoutSectionComponent = {
         this.performInitialization();
       }
     } catch (error) {
-      console.error('Error initializing Checkout section:', error);
+      logger.error('Error initializing Checkout section:', error);
     }
   },
 
@@ -116,7 +117,7 @@ export const Checkout: CheckoutSectionComponent = {
     this.modal = safeQuery('#checkoutModal') as HTMLDialogElement;
 
     if (!this.modal) {
-      console.error('Modal element not found');
+      logger.error('Modal element not found');
       return;
     }
 
@@ -148,7 +149,7 @@ export const Checkout: CheckoutSectionComponent = {
     const leadForm = safeQuery('#leadForm');
     leadForm?.addEventListener('submit', (event: Event) => {
       this.handleLeadSubmit(event).catch(error => {
-        console.error('Error handling lead submit:', error);
+        logger.error('Error handling lead submit:', error);
       });
     });
 
@@ -156,7 +157,7 @@ export const Checkout: CheckoutSectionComponent = {
     const payButton = safeQuery('#payBtn');
     payButton?.addEventListener('click', () => {
       this.handlePayment().catch(error => {
-        console.error('Error handling payment:', error);
+        logger.error('Error handling payment:', error);
       });
     });
 
@@ -179,7 +180,7 @@ export const Checkout: CheckoutSectionComponent = {
     event.preventDefault();
 
     if (!this.modal) {
-      console.error('Modal not initialized');
+      logger.error('Modal not initialized');
       return;
     }
 
@@ -192,7 +193,7 @@ export const Checkout: CheckoutSectionComponent = {
     // 🚀 OPTIMIZATION: Preload Stripe.js immediately when modal opens
     // This eliminates 200-500ms delay later when transitioning to payment step
     this.preloadStripe().catch((error) => {
-      console.warn('Stripe preloading failed, will fallback to lazy loading:', error);
+      logger.warn('Stripe preloading failed, will fallback to lazy loading:', error);
     });
 
     // Track checkout opened (GTM production event + test alias)
@@ -203,7 +204,7 @@ export const Checkout: CheckoutSectionComponent = {
         action: 'modal_opened'
       });
     }).catch(() => {
-      console.debug('Checkout modal analytics tracking unavailable');
+      logger.debug('Checkout modal analytics tracking unavailable');
     });
   },
 
@@ -266,7 +267,7 @@ export const Checkout: CheckoutSectionComponent = {
     if (!this.stripeLoaded && !this.stripeLoadPromise) {
       
       if (!ENV.stripe.publishableKey) {
-        console.warn('Stripe publishable key not configured, skipping preload');
+        logger.warn('Stripe publishable key not configured, skipping preload');
         return;
       }
 
@@ -278,7 +279,7 @@ export const Checkout: CheckoutSectionComponent = {
         this.stripe = await this.stripeLoadPromise;
         this.stripeLoaded = true;
       } catch (error) {
-        console.warn('⚠️ Stripe.js preload failed, will retry on demand:', error);
+        logger.warn('⚠️ Stripe.js preload failed, will retry on demand:', error);
         this.stripeLoadPromise = null;
       }
     }
@@ -313,6 +314,9 @@ export const Checkout: CheckoutSectionComponent = {
       // 🚀 OPTIMIZATION: Use existing clientSecret if available from predictive creation
       if (!this.clientSecret) {
         
+        // Generate fresh idempotency key for each payment attempt to avoid conflicts during testing
+        this.idempotencyKey = this.generateIdempotencyKey();
+        
         // Prepare request payload
         const requestPayload = {
           // Required fields for Netlify Function
@@ -320,7 +324,7 @@ export const Checkout: CheckoutSectionComponent = {
           full_name: this.leadData.fullName,
           email: this.leadData.email,
           phone: `${this.leadData.countryCode}${this.leadData.phone}`,
-          amount: priceInCents, // 🎯 From centralized pricing
+          amount: priceInCents, // From centralized pricing
           currency: 'eur',
           idempotency_key: this.idempotencyKey
         };
@@ -346,7 +350,7 @@ export const Checkout: CheckoutSectionComponent = {
 
           // If validation failed, show specific validation errors to user
           if (errorData.error === 'Validation failed' && errorData.details) {
-            console.error('Validation errors:', errorData.details);
+            logger.error('Validation errors:', errorData.details);
           }
 
           throw new Error(`Payment service error: ${errorData.error || response.statusText}`);
@@ -425,6 +429,7 @@ export const Checkout: CheckoutSectionComponent = {
 
       // Mount the Payment Element to the container
       const paymentElementContainer = document.querySelector('#payment-element');
+      
       if (paymentElementContainer && this.paymentElement) {
         this.paymentElement.mount('#payment-element');
 
@@ -478,7 +483,7 @@ export const Checkout: CheckoutSectionComponent = {
         });
       }
     } catch (error) {
-      console.error('Error initializing payment element:', error);
+      logger.error('Error initializing payment element:', error);
 
       // Show specific error messages based on the type of error
       let errorMessage = 'Erro ao carregar formulário de pagamento.';
@@ -516,7 +521,7 @@ export const Checkout: CheckoutSectionComponent = {
       return new Promise<void>((resolve) => {
         timeoutId = setTimeout(() => {
           this.createPredictivePaymentIntent().catch((error) => {
-            console.debug('Predictive PaymentIntent creation failed (non-critical):', error);
+            logger.debug('Predictive PaymentIntent creation failed (non-critical):', error);
           }).finally(() => {
             resolve();
           });
@@ -565,7 +570,7 @@ export const Checkout: CheckoutSectionComponent = {
     const countryInput = document.querySelector('#countryCode') as HTMLSelectElement;
 
     if (!nameInput?.value || !emailInput?.value) {
-      console.debug('Insufficient form data for predictive PaymentIntent');
+      logger.debug('Insufficient form data for predictive PaymentIntent');
       return;
     }
 
@@ -579,11 +584,14 @@ export const Checkout: CheckoutSectionComponent = {
 
     // Basic validation before API call
     if (!this.isValidEmail(tempLeadData.email) || tempLeadData.fullName.length < 2) {
-      console.debug('Form data not yet valid for predictive PaymentIntent');
+      logger.debug('Form data not yet valid for predictive PaymentIntent');
       return;
     }
 
     try {
+      
+      // Generate fresh idempotency key for predictive payment attempt
+      this.idempotencyKey = this.generateIdempotencyKey();
       
       // Prepare request payload (same structure as regular flow)
       const requestPayload = {
@@ -641,7 +649,7 @@ export const Checkout: CheckoutSectionComponent = {
       }
       
     } catch (error) {
-      console.debug('Predictive PaymentIntent creation failed (will retry on form submit):', error);
+      logger.debug('Predictive PaymentIntent creation failed (will retry on form submit):', error);
       
       // Hide predictive status indicator on error
       const predictiveStatus = document.querySelector('#predictive-status');
@@ -729,10 +737,10 @@ export const Checkout: CheckoutSectionComponent = {
           lead_id: this.leadId
         });
       }).catch(() => {
-        console.debug('Lead submission analytics tracking unavailable');
+        logger.debug('Lead submission analytics tracking unavailable');
       });
     } catch (error: unknown) {
-      console.error('Lead submission error:', error);
+      logger.error('Lead submission error:', error);
       this.showError('leadError', 'Erro ao processar inscrição. Tente novamente.');
     } finally {
       // Reset loading state
@@ -792,7 +800,7 @@ export const Checkout: CheckoutSectionComponent = {
             error_code: error.code
           });
         }).catch(() => {
-          console.debug('Payment error analytics tracking unavailable');
+          logger.debug('Payment error analytics tracking unavailable');
         });
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
         // Payment succeeded without redirect (no 3DS required)
@@ -808,7 +816,7 @@ export const Checkout: CheckoutSectionComponent = {
             pricing_tier: 'early_bird'
           });
         }).catch(() => {
-          console.debug('Payment completion analytics tracking unavailable');
+          logger.debug('Payment completion analytics tracking unavailable');
         });
 
         // Auto-redirect after success
@@ -821,7 +829,7 @@ export const Checkout: CheckoutSectionComponent = {
         // Analytics will be tracked on the thank-you page after redirect
       }
     } catch (error: unknown) {
-      console.error('Payment error:', error);
+      logger.error('Payment error:', error);
       this.showError('payError', 'Erro no processamento do pagamento. Tente novamente.');
     } finally {
       // Reset loading state
@@ -914,7 +922,37 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   generateIdempotencyKey(): string {
-    return `idm_${Date.now()}_${Math.random().toString(36).substr(2, 12)}`;
+    // Enhanced idempotency key with test environment isolation and crypto-level randomness
+    const now = Date.now();
+    const microTime = performance.now().toString().replace('.', '');
+    const randomSuffix = Math.random().toString(36).substr(2, 15);
+    const sessionId = Math.random().toString(36).substr(2, 8);
+    
+    // Detect test environment and add test-specific prefixes to prevent collisions
+    const isTestEnvironment = typeof window !== 'undefined' && 
+      (window.location?.hostname === 'localhost' || 
+       window.navigator?.webdriver || 
+       window.location?.port === '8888');
+    
+    // Add extra entropy and test isolation
+    const extraEntropy = typeof window !== 'undefined' 
+      ? (window.crypto?.getRandomValues 
+          ? Array.from(window.crypto.getRandomValues(new Uint8Array(6)))
+              .map(b => b.toString(36)).join('')
+          : Math.random().toString(36).substr(2, 10))
+      : Math.random().toString(36).substr(2, 10);
+    
+    // Generate unique worker/test identifier for test environments
+    const testPrefix = isTestEnvironment 
+      ? `test_${Math.random().toString(36).substr(2, 6)}_`
+      : '';
+    
+    // Include page navigation count for additional uniqueness in rapid test scenarios
+    const navCount = typeof window !== 'undefined' && window.performance 
+      ? Math.floor(window.performance.now() / 1000) 
+      : 0;
+    
+    return `${testPrefix}idm_${now}_${navCount}_${microTime}_${sessionId}_${randomSuffix}_${extraEntropy}`;
   },
 
   isValidEmail(email: string): boolean {

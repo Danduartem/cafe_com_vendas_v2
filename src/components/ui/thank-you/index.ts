@@ -4,6 +4,7 @@
  */
 
 import { safeQuery } from '@/utils/dom';
+import { logger } from '../../../utils/logger.js';
 import { Animations } from '../animations';
 
 interface ThankYouConfig {
@@ -77,7 +78,7 @@ export const PlatformThankYou = {
           progress_value: targetProgress
         });
       }).catch(() => {
-        console.debug('Progress bar analytics tracking unavailable');
+        logger.debug('Progress bar analytics tracking unavailable');
       });
     }, 500);
   },
@@ -132,7 +133,7 @@ export const PlatformThankYou = {
           page: 'thank_you'
         });
       }).catch(() => {
-        console.debug('Celebration analytics tracking unavailable');
+        logger.debug('Celebration analytics tracking unavailable');
       });
     }, 800);
   },
@@ -185,7 +186,7 @@ export const PlatformThankYou = {
           page: 'thank_you'
         });
       }).catch(() => {
-        console.debug('Personalization analytics tracking unavailable');
+        logger.debug('Personalization analytics tracking unavailable');
       });
     }
   },
@@ -216,7 +217,7 @@ export const PlatformThankYou = {
         });
       }
     }).catch(() => {
-      console.debug('Thank you page analytics tracking unavailable');
+      logger.debug('Thank you page analytics tracking unavailable');
     });
   }
 };

@@ -6,6 +6,7 @@
 
 import { PlatformAccordion } from '../../../components/ui';
 import { safeQuery } from '../../../assets/js/utils/dom';
+import { logger } from '../../../utils/logger.js';
 import type { Component } from '../../../types/components/base.js';
 
 interface FAQSectionComponent extends Component {
@@ -47,7 +48,7 @@ export const FAQ: FAQSectionComponent = {
                 action: 'section_view'
               });
             }).catch(() => {
-              console.debug('FAQ section view analytics tracking unavailable');
+              logger.debug('FAQ section view analytics tracking unavailable');
             });
           }
         });

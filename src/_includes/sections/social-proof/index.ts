@@ -8,6 +8,7 @@ import { safeQuery, safeQueryAll } from '@/utils/dom';
 import { Animations } from '../../../components/ui';
 import { debounce } from '@/utils/throttle';
 import { embedYouTubeVideo } from '../../../utils/youtube.js';
+import { logger } from '../../../utils/logger.js';
 import type { Component } from '../../../types/components/base.js';
 
 // Constants for carousel layout
@@ -52,7 +53,7 @@ export const SocialProof: SocialProofComponent = {
       this.initTestimonialsCarousel();
       this.initYouTubeVideos();
     } catch (error) {
-      console.error('Error initializing Social Proof section:', error);
+      logger.error('Error initializing Social Proof section:', error);
     }
   },
 
@@ -78,7 +79,7 @@ export const SocialProof: SocialProofComponent = {
 
   validateCarouselElements(elements: CarouselElements): boolean {
     if (!elements.carousel || !elements.slides.length) {
-      console.warn('Testimonials carousel elements not found');
+      logger.warn('Testimonials carousel elements not found');
       return false;
     }
     return true;
@@ -212,7 +213,7 @@ export const SocialProof: SocialProofComponent = {
         position: this.currentIndex + 1
       });
     }).catch(() => {
-      console.debug('Slide view analytics tracking unavailable');
+      logger.debug('Slide view analytics tracking unavailable');
     });
   },
 
@@ -272,13 +273,13 @@ export const SocialProof: SocialProofComponent = {
     const videoContainer = button.closest('.youtube-embed') as HTMLElement;
     
     if (!videoContainer) {
-      console.error('YouTube video container not found');
+      logger.error('YouTube video container not found');
       return;
     }
 
     const videoId = videoContainer.getAttribute('data-video-id');
     if (!videoId) {
-      console.error('YouTube video ID not found');
+      logger.error('YouTube video ID not found');
       return;
     }
 
@@ -293,7 +294,7 @@ export const SocialProof: SocialProofComponent = {
 
     // Embed the YouTube video and handle the promise properly
     embedYouTubeVideo(videoContainer, videoId).catch((error) => {
-      console.error('Failed to embed YouTube video:', error);
+      logger.error('Failed to embed YouTube video:', error);
       
       // Reset button state on error
       button.innerHTML = `
@@ -312,7 +313,7 @@ export const SocialProof: SocialProofComponent = {
         video_id: videoId
       });
     }).catch(() => {
-      console.debug('Video embed analytics tracking unavailable');
+      logger.debug('Video embed analytics tracking unavailable');
     });
   },
 
@@ -325,7 +326,7 @@ export const SocialProof: SocialProofComponent = {
             action: 'section_view'
           });
         }).catch(() => {
-          console.debug('Section view analytics tracking unavailable');
+          logger.debug('Section view analytics tracking unavailable');
         });
       },
       once: true,
