@@ -57,5 +57,53 @@ export const PlatformAnalytics = {
       event: eventName,
       ...data
     }));
+  },
+
+  /**
+   * Track CTA clicks with both production and test event names
+   */
+  trackCTAClick(location: string, data?: Record<string, unknown>): void {
+    window.dataLayer = window.dataLayer || [];
+    
+    // Fire GTM production event
+    window.dataLayer.push(normalizeEventPayload({
+      event: 'checkout_opened',
+      source_section: location,
+      timestamp: new Date().toISOString(),
+      ...data
+    }));
+    
+    // Fire test alias
+    window.dataLayer.push(normalizeEventPayload({
+      event: 'cta_click',
+      location,
+      timestamp: new Date().toISOString(),
+      ...data
+    }));
+  },
+
+  /**
+   * Track section views with both production and test event names
+   */
+  trackSectionView(sectionName: string, data?: Record<string, unknown>): void {
+    window.dataLayer = window.dataLayer || [];
+    
+    // Fire specific section event if available (for testimonials)
+    if (sectionName === 'testimonials' || sectionName === 'social-proof') {
+      window.dataLayer.push(normalizeEventPayload({
+        event: 'view_testimonials_section',
+        section_name: sectionName,
+        timestamp: new Date().toISOString(),
+        ...data
+      }));
+    }
+    
+    // Fire generic test alias
+    window.dataLayer.push(normalizeEventPayload({
+      event: 'section_view',
+      section: sectionName,
+      timestamp: new Date().toISOString(),
+      ...data
+    }));
   }
 };

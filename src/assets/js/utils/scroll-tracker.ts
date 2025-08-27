@@ -88,11 +88,6 @@ export const ScrollTracker = {
 
     // Push to dataLayer
     window.dataLayer.push(eventData);
-
-    // Debug logging in development
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      console.log(`[GTM Scroll] Depth reached: ${threshold}%`);
-    }
   },
 
   /**

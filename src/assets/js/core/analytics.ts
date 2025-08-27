@@ -60,7 +60,7 @@ export const Analytics: AnalyticsInterface = {
   errors: new Set<string>(),
 
   /**
-   * Track event via GTM dataLayer
+   * Track event via GTM dataLayer with optional aliases for test compatibility
    * All events flow through GTM for centralized tag management
    */
   track<T extends AnalyticsEvent>(eventName: T['event'], parameters: Omit<T, 'event'> = {} as Omit<T, 'event'>): void {
@@ -75,7 +75,7 @@ export const Analytics: AnalyticsInterface = {
         ...parameters
       };
 
-      // Push to dataLayer
+      // Push primary event to dataLayer
       window.dataLayer.push(eventData);
 
       // Debug logging in development
@@ -92,6 +92,7 @@ export const Analytics: AnalyticsInterface = {
       console.error('Analytics tracking failed:', error);
     }
   },
+
 
   /**
    * Track JavaScript errors for improved debugging
