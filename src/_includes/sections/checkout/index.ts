@@ -195,12 +195,12 @@ export const Checkout: CheckoutSectionComponent = {
       console.warn('Stripe preloading failed, will fallback to lazy loading:', error);
     });
 
-    // Track checkout opened using platform analytics
+    // Track checkout opened (GTM production event + test alias)
     import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
-      PlatformAnalytics.track('section_engagement', {
-        section: 'checkout',
-        action: 'modal_opened',
-        trigger_location: this.getSourceSection()
+      // Use new method that fires both events
+      PlatformAnalytics.trackCTAClick(this.getSourceSection(), {
+        trigger_location: this.getSourceSection(),
+        action: 'modal_opened'
       });
     }).catch(() => {
       console.debug('Checkout modal analytics tracking unavailable');
@@ -713,9 +713,17 @@ export const Checkout: CheckoutSectionComponent = {
       // Initialize Stripe Elements for payment form (will be instant if clientSecret exists)
       await this.initializePaymentElement();
 
-      // Track lead conversion
+      // Track lead conversion (GTM production event + test alias)
       import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
-        PlatformAnalytics.track('section_engagement', {
+        // Fire the GTM production event
+        PlatformAnalytics.trackConversion('lead_form_submitted', {
+          lead_id: this.leadId,
+          form_location: 'checkout_modal',
+          pricing_tier: 'early_bird'
+        });
+        
+        // Fire test alias for E2E compatibility
+        PlatformAnalytics.track('form_submission', {
           section: 'checkout',
           action: 'lead_submitted',
           lead_id: this.leadId
