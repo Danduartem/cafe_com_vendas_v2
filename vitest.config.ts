@@ -18,6 +18,7 @@ export default defineConfig({
       '**/node_modules/**',
       '_site/**',
       'tests/visual/**',
+      'tests/e2e/**', // Exclude Playwright e2e tests from Vitest
       'netlify/**'
     ],
     

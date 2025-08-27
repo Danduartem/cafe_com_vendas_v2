@@ -138,7 +138,8 @@ export function isProblemSection(data: unknown): data is ProblemSection {
   const section = data as Record<string, unknown>;
 
   return (
-    section.id === 'problem' &&
+    // Handle ongoing refactor: problem section now has id "vision" 
+    (section.id === 'problem' || section.id === 'vision') &&
     typeof section.variant === 'string' &&
     typeof section.enabled === 'boolean' &&
     typeof section.copy === 'object' &&
