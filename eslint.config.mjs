@@ -31,7 +31,7 @@ export default tseslint.config(
     },
     rules: {
       'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'no-console': 'warn', // Warn about console statements in all environments
       'prefer-const': 'error'
     }
   },
@@ -49,6 +49,7 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/prefer-optional-chain': 'error',
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
+      'no-console': ['warn', { allow: ['warn', 'error'] }], // Allow warn and error, but warn about others
     }
   },
 
@@ -67,9 +68,17 @@ export default tseslint.config(
     },
     rules: {
       'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'no-console': 'warn', // Warn about console statements
       'prefer-const': 'error',
       'no-var': 'error'
+    }
+  },
+
+  // Test files overrides
+  {
+    files: ['**/*.test.{js,ts}', '**/*.spec.{js,ts}', 'tests/**/*.{js,ts}'],
+    rules: {
+      'no-console': 'off' // Allow console in test files
     }
   },
 
