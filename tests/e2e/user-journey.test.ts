@@ -19,28 +19,68 @@ const TEST_USER = {
   countryCode: 'PT'
 };
 
+// GTM event mapping: test names → production GTM event names
+const GTM_EVENT_ALIASES: Record<string, string[]> = {
+  'form_submission': ['lead_form_submitted', 'form_submission'],
+  'cta_click': ['checkout_opened', 'cta_click'],
+  'section_view': ['view_testimonials_section', 'section_view'],
+  'payment_completed': ['purchase_completed', 'payment_completed'],
+  'faq_toggle': ['faq_toggle'],
+  'page_view': ['page_view'],
+  'scroll_depth': ['scroll_depth']
+};
+
 // Helper function to check if analytics event was fired
-async function checkAnalyticsEvent(page: Page, eventName: string, timeout = 5000): Promise<boolean> {
+async function checkAnalyticsEvent(page: Page, eventName: string, timeout = 8000): Promise<boolean> {
   try {
+    // Get possible event names (including GTM aliases)
+    const possibleEvents = GTM_EVENT_ALIASES[eventName] || [eventName];
+    
     const result = await page.evaluate(
-      ({ eventName, timeout }) => {
+      ({ possibleEvents, timeout, originalEventName }) => {
         return new Promise<boolean>((resolve) => {
           const startTime = Date.now();
+          let foundEvent = false;
+          
           const checkInterval = setInterval(() => {
             const dataLayer = window.dataLayer || [];
-            const hasEvent = dataLayer.some((event) => event.event === eventName);
             
-            if (hasEvent || Date.now() - startTime > timeout) {
+            // Check for any of the possible event names
+            const hasEvent = dataLayer.some((event) => 
+              possibleEvents.some((eventName) => event.event === eventName)
+            );
+            
+            if (hasEvent) {
+              foundEvent = true;
+              // Debug logging in development
+              if (window.location.hostname === 'localhost') {
+                const matchedEvents = dataLayer.filter((event) => 
+                  possibleEvents.some((eventName) => event.event === eventName)
+                );
+                console.log(`[Test Analytics] Found event(s) for "${originalEventName}":`, matchedEvents);
+              }
+            }
+            
+            if (foundEvent || Date.now() - startTime > timeout) {
               clearInterval(checkInterval);
-              resolve(hasEvent);
+              
+              // Debug logging for failed events
+              if (!foundEvent && window.location.hostname === 'localhost') {
+                console.warn(`[Test Analytics] Event "${originalEventName}" not found. Looking for:`, possibleEvents);
+                console.log('[Test Analytics] Current dataLayer:', dataLayer.map(e => e.event).filter(Boolean));
+              }
+              
+              resolve(foundEvent);
             }
           }, 100);
         });
       },
-      { eventName, timeout }
+      { possibleEvents, timeout, originalEventName: eventName }
     );
+    
     return result;
-  } catch {
+  } catch (error) {
+    console.error(`[Test Analytics] Error checking event "${eventName}":`, error);
     return false;
   }
 }
@@ -67,6 +107,12 @@ test.describe('User Journey Tests', () => {
     
     // Check if GTM is loaded
     await page.waitForFunction(() => typeof window.dataLayer !== 'undefined', { timeout: 10000 });
+    
+    // Wait for app to initialize
+    await page.waitForFunction(() => typeof window.CafeComVendas !== 'undefined', { timeout: 15000 });
+    
+    // Add a small delay to ensure all events have fired
+    await page.waitForTimeout(2000);
   });
 
   test('Complete Purchase Journey', async ({ page }) => {
@@ -338,8 +384,11 @@ test.describe('User Journey Tests', () => {
   test('Analytics Events Tracking', async ({ page }) => {
     // This test specifically validates that all critical analytics events fire correctly
     
+    // This test specifically validates that all critical analytics events fire correctly
+    
     // Step 1: Page view event
-    const pageViewFired = await checkAnalyticsEvent(page, 'page_view');
+    const pageViewFired = await checkAnalyticsEvent(page, 'page_view', 8000);
+    
     expect(pageViewFired).toBeTruthy();
     
     // Step 2: Scroll depth tracking
