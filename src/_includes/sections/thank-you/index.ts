@@ -1,11 +1,20 @@
 /**
  * Thank You Component for Café com Vendas
- * Handles thank-you page animations, progress bar, and celebration effects
+ * Handles thank-you page animations, milestone progress, and premium interactions
  */
 
 import { safeQuery } from '../../../assets/js/utils/dom';
 import { Animations } from '../../../components/ui';
 import { logger } from '../../../utils/logger.js';
+import { 
+  generateIcsContent, 
+  downloadIcsFile, 
+  createCafeComVendasEvent, 
+  generateCalendarUrls, 
+  detectUserPlatform,
+  type CalendarUrls,
+  type CalendarEvent
+} from '../../../utils/calendar.js';
 
 export const ThankYou = {
   init() {
@@ -80,9 +89,7 @@ export const ThankYou = {
     revealElements.forEach(element => observer.observe(element));
 
     // Add premium entrance animation to page
-    setTimeout(() => {
-      this.initPageEntranceEffects();
-    }, 100);
+    this.initPageEntranceEffects();
   },
 
   initPageEntranceEffects() {
@@ -100,105 +107,30 @@ export const ThankYou = {
     }, 50);
   },
 
-
   initInteractions() {
     // Enhanced Main CTA button
     const mainCtaButton = safeQuery('[data-analytics-click="cta_complete_form"]');
     if (mainCtaButton) {
       Animations.addClickFeedback(mainCtaButton);
-
-      // Premium hover effects
-      mainCtaButton.addEventListener('mouseenter', function(this: HTMLElement) {
-        this.style.transform = 'scale(1.03) translateY(-2px)';
-        this.style.boxShadow = '0 16px 40px rgb(129,23,31,0.35), 0 0 0 1px rgba(255,255,255,0.1)';
-        
-        // Add glow effect
-        this.style.filter = 'drop-shadow(0 0 8px rgba(129,23,31,0.3))';
-      });
-
-      mainCtaButton.addEventListener('mouseleave', function(this: HTMLElement) {
-        this.style.transform = 'scale(1) translateY(0)';
-        this.style.boxShadow = '0 8px 24px rgb(129,23,31,0.3)';
-        this.style.filter = 'none';
-      });
-
-      // Add subtle breathing animation
-      const breathingInterval = setInterval(() => {
-        if (!document.body.contains(mainCtaButton)) {
-          clearInterval(breathingInterval);
-          return;
-        }
-        
-        const currentTransform = (mainCtaButton as HTMLElement).style.transform;
-        (mainCtaButton as HTMLElement).style.transform = currentTransform + ' scale(1.005)';
-        setTimeout(() => {
-          if (document.body.contains(mainCtaButton)) {
-            const updatedTransform = (mainCtaButton as HTMLElement).style.transform;
-            (mainCtaButton as HTMLElement).style.transform = updatedTransform.replace(' scale(1.005)', '');
-          }
-        }, 1500);
-      }, 3000);
     }
 
-    // Calendar download button
-    const calendarButton = safeQuery('[data-analytics-click="add_to_calendar"]');
-    if (calendarButton) {
-      Animations.addClickFeedback(calendarButton);
+    // Calendar dropdown functionality
+    this.initCalendarDropdown();
 
-      calendarButton.addEventListener('click', () => {
-        // Track calendar download
-        import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
-          PlatformAnalytics.track('ui_interaction', {
-            interaction: 'calendar_download',
-            location: 'thank_you_page',
-            file_type: 'ics'
-          });
-        }).catch(() => {
-          logger.debug('Calendar download analytics tracking unavailable');
-        });
+    // Enhanced step cards interactions  
+    const stepCards = safeQuery('#thankyou')?.querySelectorAll('.step-card');
+    stepCards?.forEach((card) => {
+      card.addEventListener('mouseenter', function(this: HTMLElement) {
+        this.style.transform = 'translateY(-2px)';
+        this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
+        this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
       });
-    }
 
-    // WhatsApp contact button
-    const whatsappButton = safeQuery('[data-analytics-click="contact_whatsapp"]') as HTMLAnchorElement;
-    if (whatsappButton) {
-      Animations.addClickFeedback(whatsappButton);
-      import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
-        PlatformAnalytics.trackClick(whatsappButton, 'whatsapp_click', 'thank_you_page');
-      }).catch(() => {
-        logger.debug('WhatsApp analytics tracking unavailable');
+      card.addEventListener('mouseleave', function(this: HTMLElement) {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '';
+        this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
       });
-    }
-
-    // Enhanced step cards interactions
-    const stepCards = safeQuery('#thankyou')?.querySelectorAll('.group');
-    stepCards?.forEach((card, index) => {
-      if (card.classList.contains('rounded-2xl')) { // Only target step cards
-        card.addEventListener('mouseenter', function(this: HTMLElement) {
-          this.style.transform = 'translateY(-2px)';
-          this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
-          this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-        });
-
-        card.addEventListener('mouseleave', function(this: HTMLElement) {
-          this.style.transform = 'translateY(0)';
-          this.style.boxShadow = '';
-          this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-        });
-
-        // Add staggered entrance animation
-        setTimeout(() => {
-          const htmlCard = card as HTMLElement;
-          htmlCard.style.opacity = '0';
-          htmlCard.style.transform = 'translateX(-20px)';
-          htmlCard.style.transition = 'all 0.6s ease-out';
-          
-          setTimeout(() => {
-            htmlCard.style.opacity = '1';
-            htmlCard.style.transform = 'translateX(0)';
-          }, 50);
-        }, 2000 + (index * 200));
-      }
     });
 
     // Add premium interactions to feature cards in sidebar
@@ -213,6 +145,152 @@ export const ThankYou = {
         this.style.transform = 'translateX(0)';
         this.style.borderColor = '';
       });
+    });
+  },
+
+  initCalendarDropdown() {
+    const dropdownContainer = safeQuery('[data-calendar-dropdown]');
+    if (!dropdownContainer) return;
+
+    const dropdownButton = dropdownContainer.querySelector('[data-dropdown-button]') as HTMLButtonElement;
+    const dropdownMenu = dropdownContainer.querySelector('[data-dropdown-menu]') as HTMLElement;
+    const dropdownIcon = dropdownContainer.querySelector('[data-dropdown-icon]') as SVGElement;
+    
+    if (!dropdownButton || !dropdownMenu || !dropdownIcon) return;
+
+    // Generate calendar URLs once
+    const eventData = createCafeComVendasEvent();
+    const calendarUrls = generateCalendarUrls(eventData);
+    const userPlatform = detectUserPlatform();
+
+    // Highlight recommended option based on platform
+    this.highlightRecommendedOption(userPlatform);
+
+    // Toggle dropdown visibility
+    const toggleDropdown = (show?: boolean) => {
+      const isVisible = show ?? dropdownMenu.classList.contains('opacity-100');
+      
+      if (!isVisible) {
+        dropdownMenu.classList.remove('opacity-0', 'invisible', 'scale-95');
+        dropdownMenu.classList.add('opacity-100', 'visible', 'scale-100');
+        dropdownButton.setAttribute('aria-expanded', 'true');
+        dropdownIcon.style.transform = 'rotate(180deg)';
+      } else {
+        dropdownMenu.classList.remove('opacity-100', 'visible', 'scale-100');
+        dropdownMenu.classList.add('opacity-0', 'invisible', 'scale-95');
+        dropdownButton.setAttribute('aria-expanded', 'false');
+        dropdownIcon.style.transform = 'rotate(0deg)';
+      }
+    };
+
+    // Button click handler
+    dropdownButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+      toggleDropdown();
+    });
+
+    // Calendar option handlers
+    const calendarOptions = dropdownMenu.querySelectorAll('[data-calendar-option]');
+    calendarOptions.forEach((option) => {
+      option.addEventListener('click', (event) => {
+        event.stopPropagation();
+        
+        const calendarType = (option as HTMLElement).getAttribute('data-calendar-option') as string;
+        this.handleCalendarSelection(calendarType, calendarUrls, eventData);
+        toggleDropdown(true); // Close dropdown
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (event) => {
+      if (!dropdownContainer.contains(event.target as Node)) {
+        toggleDropdown(true);
+      }
+    });
+
+    // Close dropdown on escape key
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        toggleDropdown(true);
+        dropdownButton.focus();
+      }
+    });
+  },
+
+  highlightRecommendedOption(platform: string) {
+    // Remove existing recommended badges
+    const existingBadges = document.querySelectorAll('.bg-gold-100');
+    existingBadges.forEach(badge => {
+      if (badge.textContent?.includes('Recomendado')) {
+        badge.remove();
+      }
+    });
+
+    // Add platform-specific recommendation
+    let recommendedOption = 'google'; // Default
+    
+    if (platform === 'ios') {
+      recommendedOption = 'apple';
+    } else if (platform === 'windows') {
+      recommendedOption = 'outlook';
+    }
+
+    const targetOption = document.querySelector(`[data-calendar-option="${recommendedOption}"]`);
+    if (targetOption) {
+      const textContainer = targetOption.querySelector('.flex-1 .flex');
+      if (textContainer && !textContainer.querySelector('.bg-gold-100')) {
+        const badge = document.createElement('span');
+        badge.className = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gold-100 text-gold-700';
+        badge.textContent = 'Recomendado';
+        textContainer.appendChild(badge);
+      }
+    }
+  },
+
+  handleCalendarSelection(calendarType: string, calendarUrls: CalendarUrls, eventData: CalendarEvent) {
+    try {
+      switch (calendarType) {
+        case 'google':
+          window.open(calendarUrls.google, '_blank');
+          this.trackCalendarInteraction('google', 'direct_link');
+          break;
+          
+        case 'outlook':
+          window.open(calendarUrls.outlook, '_blank');
+          this.trackCalendarInteraction('outlook', 'direct_link');
+          break;
+          
+        case 'apple':
+        default: {
+          // For iPhone/Apple devices, create an optimized ICS file
+          const icsContent = generateIcsContent(eventData);
+          downloadIcsFile(icsContent, 'cafe-com-vendas-evento.ics');
+          this.trackCalendarInteraction('apple', 'ics_download');
+          break;
+        }
+      }
+      
+      logger.info(`Calendar ${calendarType} integration successful`);
+      
+    } catch (error) {
+      logger.error(`Error with calendar ${calendarType} integration:`, error);
+      alert('Erro ao criar o evento no calendário. Por favor, tente novamente.');
+    }
+  },
+
+  trackCalendarInteraction(provider: string, method: string) {
+    import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+      PlatformAnalytics.track('ui_interaction', {
+        interaction: 'calendar_add',
+        calendar_provider: provider,
+        integration_method: method,
+        location: 'thank_you_page',
+        event_date: '2025-09-20',
+        event_name: 'cafe_com_vendas_portugal',
+        user_platform: detectUserPlatform()
+      });
+    }).catch(() => {
+      logger.debug('Calendar analytics tracking unavailable');
     });
   },
 

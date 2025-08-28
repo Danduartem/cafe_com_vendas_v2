@@ -1,6 +1,6 @@
 <section
   id="thankyou"
-  aria-label="Página de agradecimento e próximos passos"
+  aria-label="{{ currentSection.copy.accessibility.ariaLabel }}"
   class="relative isolate w-full min-h-[90vh] bg-gradient-to-b from-neutral-50 via-white to-neutral-50/30 py-20 sm:py-24 lg:py-28"
   data-analytics-section="thankyou"
   data-reveal
@@ -8,13 +8,6 @@
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
     <!-- Header -->
     <div class="text-center mb-16" data-reveal>
-      <!-- Premium Eyebrow -->
-      <div class="mb-4">
-        <span class="inline-block px-3 py-1 text-xs font-medium text-gold-600 bg-gradient-to-r from-gold-50 to-gold-100/60 rounded-full border border-gold-200/50 backdrop-blur-sm tracking-wider uppercase">
-          Investimento confirmado
-        </span>
-      </div>
-
       <!-- Success Badge -->
       <div class="inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-burgundy-50 to-burgundy-100/80 text-burgundy-700 shadow-md backdrop-blur-sm border border-burgundy-200/40 mb-8">
         <!-- check icon with subtle animation -->
@@ -112,10 +105,10 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
       <!-- Left: CTA + Steps -->
       <div class="lg:col-span-7" data-reveal>
-        <div class="group relative rounded-3xl bg-white shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_16px_40px_rgb(0,0,0,0.12)] p-6 sm:p-10 lg:p-12 border border-neutral-200/40 backdrop-blur-sm transition-all duration-300 before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/60 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300">
+        <div class="group relative rounded-3xl bg-white shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_16px_40px_rgb(0,0,0,0.12)] p-6 sm:p-10 lg:p-12 border border-neutral-200/40 backdrop-blur-sm transition-all duration-300">
           <div class="flex items-start gap-4 mb-6">
             <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-burgundy-500 to-burgundy-600 flex items-center justify-center text-white font-bold shadow-md">
-              {{ currentSection.copy.mainAction.stepNumber }}
+              1
             </div>
             <div>
               <h2 class="font-lora text-[clamp(1.4rem,3.5vw,1.9rem)] text-navy-900 leading-[1.15] font-bold">
@@ -140,26 +133,70 @@
 
           <div class="mt-12 space-y-6">
             {% for step in currentSection.copy.steps %}
-            <div class="relative group flex items-start gap-5 p-6 rounded-2xl bg-gradient-to-br from-neutral-50/50 to-white hover:from-neutral-50 hover:to-neutral-25 border border-neutral-200/30 hover:border-neutral-300/50 transition-all duration-300 hover:shadow-md">
+            <div class="relative step-card flex items-start gap-5 p-6 rounded-2xl bg-gradient-to-br from-neutral-50/50 to-white hover:from-neutral-50 hover:to-neutral-25 border border-neutral-200/30 hover:border-neutral-300/50 transition-all duration-300 hover:shadow-md">
               <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-{{ step.color }}-100 to-{{ step.color }}-200 flex items-center justify-center text-{{ step.color }}-700 font-bold text-sm">
                 {{ step.number }}
               </div>
               <div class="flex-1">
                 <h3 class="font-lora text-navy-800 text-[1.15rem] leading-[1.25] font-semibold mb-1">{{ step.title }}</h3>
-                <p class="font-century text-navy-600 leading-relaxed{% if step.button %} mb-3{% endif %}">
+                <p class="font-century text-navy-600 leading-relaxed{% if step.calendarDropdown %} mb-3{% endif %}">
                   {{ step.description | safe }}
                 </p>
-                {% if step.button %}
-                <a
-                  href="{{ step.button.url }}"
-                  class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold {{ step.button.classes }}"
-                  data-analytics-click="{{ step.button.analytics }}"
-                  {% if step.button.target %}target="{{ step.button.target }}"{% endif %}
-                  {% if step.button.rel %}rel="{{ step.button.rel }}"{% endif %}
-                >
-                  {{ step.button.icon | safe }}
-                  {{ step.button.text }}
-                </a>
+                {% if step.calendarDropdown %}
+                <!-- Calendar Dropdown -->
+                <div class="relative inline-block" data-calendar-dropdown>
+                  <button
+                    type="button"
+                    class="{{ step.calendarDropdown.buttonClasses }}"
+                    data-analytics-click="{{ step.calendarDropdown.analytics }}"
+                    data-dropdown-button
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                  >
+                    <span>{{ step.calendarDropdown.buttonText }}</span>
+                    <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" data-dropdown-icon>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  <!-- Dropdown Menu -->
+                  <div
+                    class="absolute top-full left-0 mt-2 w-80 bg-white border border-neutral-200 rounded-xl shadow-lg opacity-0 invisible transform scale-95 transition-all duration-200 z-50"
+                    data-dropdown-menu
+                    role="menu"
+                    aria-orientation="vertical"
+                  >
+                    <div class="p-3">
+                      <div class="text-xs font-medium text-navy-500 uppercase tracking-wider mb-2 px-1">Escolha o seu calendário</div>
+                      
+                      {% for option in step.calendarDropdown.options %}
+                      <button
+                        type="button"
+                        class="w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg hover:bg-navy-50 transition-colors duration-150 group"
+                        data-calendar-option="{{ option.id }}"
+                        data-analytics-click="calendar_{{ option.id }}"
+                        role="menuitem"
+                      >
+                        <span class="text-lg flex-shrink-0">{{ option.icon }}</span>
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center gap-2">
+                            <span class="font-medium text-navy-700 text-sm">{{ option.text }}</span>
+                            {% if option.recommended %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gold-100 text-gold-700">
+                              Recomendado
+                            </span>
+                            {% endif %}
+                          </div>
+                          <p class="text-xs text-navy-500 mt-0.5 group-hover:text-navy-600">{{ option.description }}</p>
+                        </div>
+                        <svg class="w-4 h-4 text-navy-400 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </button>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
                 {% endif %}
               </div>
             </div>
