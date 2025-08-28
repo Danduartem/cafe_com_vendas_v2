@@ -12,9 +12,6 @@
       "Bash(grep:*)",
       "mcp__playwright-mcp__browser_navigate",
       "Bash(netlify dev:*)",
-      "Bash(echo $BROWSER)",
-      "Bash(open:*)",
-      "Bash(BROWSER='Google Chrome' open http://example.com)",
       "Read(//Applications/**)",
       "Bash(npm run build:*)",
       "Bash(lsof:*)",
@@ -30,11 +27,6 @@
       "mcp__playwright-mcp__browser_console_messages",
       "mcp__playwright-mcp__browser_close",
       "Bash(git rm:*)",
-      "Bash(find:*)",
-      "Bash(pgrep:*)",
-      "Bash(ps:*)",
-      "Bash(kill:*)",
-      "Bash(/dev/null)",
       "WebFetch(domain:localhost)",
       "mcp__playwright-mcp__browser_press_key",
       "Bash(npm run serve:*)",
@@ -48,7 +40,11 @@
       "Bash(timeout 300 npx playwright test --reporter=list)",
       "Bash(BROWSER=none netlify dev --port=8888)",
       "WebFetch(domain:stackoverflow.com)",
-      "Read(/Users/**)"
+      "Read(/Users/**)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "mcp__playwright-mcp__browser_wait_for",
+      "mcp__firecrawl__firecrawl_scrape",
+      "mcp__playwright-mcp__browser_fill_form"
     ]
   },
   "hooks": {
