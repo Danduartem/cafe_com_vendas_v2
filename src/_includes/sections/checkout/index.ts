@@ -11,6 +11,15 @@ import type {
   StripePaymentElement,
   StripePaymentElementChangeEvent
 } from '@stripe/stripe-js';
+import { 
+  getPaymentIntentId, 
+  getPaymentIntentStatus,
+  getPaymentIntentAmount,
+  getPaymentIntentMetadata,
+  isStripePaymentIntent,
+  hasMultibancoDetails,
+  getMultibancoDetails
+} from '../../../types/stripe.js';
 import { ENV } from '@/config/constants';
 import { safeQuery } from '@/utils/dom';
 import { logger } from '../../../utils/logger.js';
@@ -1015,13 +1024,19 @@ export const Checkout: CheckoutSectionComponent = {
 
   handleAsyncPaymentRedirect(paymentIntent: unknown, paymentMethod: string): void {
     // Enhanced redirect logic with better error handling and state management
-    // @ts-expect-error - Complex Stripe PaymentIntent type handling
+    // Validate payment intent and get safe values
+    const paymentIntentId = getPaymentIntentId(paymentIntent);
+     
+    // @ts-expect-error - Safe unknown parameter handling with type guards
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const redirectDelay = this.getRedirectDelay(paymentMethod, paymentIntent);
     
+     
     logger.info('Scheduling redirect for async payment', {
       paymentMethod,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       redirectDelay,
-      paymentIntentId: (paymentIntent as { id?: string })?.id || 'unknown'
+      paymentIntentId
     });
     
     // Clear any existing timeout to prevent conflicts
@@ -1034,14 +1049,18 @@ export const Checkout: CheckoutSectionComponent = {
     
     this.redirectTimeoutId = window.setTimeout(() => {
       try {
-        // @ts-expect-error - Complex Stripe PaymentIntent type handling
+         
+        // @ts-expect-error - Safe unknown parameter handling with type guards  
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const redirectUrl = this.buildRedirectUrl(paymentIntent, paymentMethod);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         logger.info('Redirecting to thank-you page', { redirectUrl });
         
         // Clear redirect state before navigating
         this.pendingRedirect = false;
         this.redirectTimeoutId = null;
         
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         window.location.href = redirectUrl;
       } catch (error) {
         logger.error('Error during async payment redirect', error);
@@ -1050,37 +1069,44 @@ export const Checkout: CheckoutSectionComponent = {
         this.pendingRedirect = false;
         this.redirectTimeoutId = null;
         
-        // Fallback to basic redirect
-        const paymentId = (paymentIntent as { id?: string })?.id || 'unknown';
-        window.location.href = `/thank-you?payment_intent=${paymentId}`;
+        // Fallback to basic redirect using safe getter
+        window.location.href = `/thank-you?payment_intent=${paymentIntentId}`;
       }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     }, redirectDelay);
   },
 
-  getRedirectDelay(paymentMethod: string, paymentIntent: any): number {
+  getRedirectDelay(paymentMethod: string, paymentIntent: unknown): number {
     // Determine appropriate redirect delay based on payment method and user needs
-    if (paymentMethod === 'multibanco' || paymentIntent.next_action?.type === 'multibanco_display_details') {
+    // Safe type checking for payment intent
+    const isMultibancoPayment = paymentMethod === 'multibanco' || 
+      (isStripePaymentIntent(paymentIntent) && hasMultibancoDetails(paymentIntent));
+    
+    if (isMultibancoPayment) {
       return 12000; // Extended delay for Multibanco to allow user to see/copy voucher details
     }
     return 5000; // Standard delay for other async methods
   },
 
-  buildRedirectUrl(paymentIntent: any, paymentMethod: string): string {
-    const paymentId = paymentIntent?.id || 'unknown';
+  buildRedirectUrl(paymentIntent: unknown, paymentMethod: string): string {
+    // Safe extraction of payment intent properties
+    const paymentId = getPaymentIntentId(paymentIntent);
+    const status = getPaymentIntentStatus(paymentIntent);
+    
     let redirectUrl = `/thank-you?payment_intent=${paymentId}`;
     
     // Always add payment method for proper detection
     redirectUrl += `&payment_method=${encodeURIComponent(paymentMethod)}`;
     
     // Add payment status for better detection logic
-    if (paymentIntent.status) {
-      redirectUrl += `&payment_status=${encodeURIComponent(paymentIntent.status)}`;
+    if (status !== 'unknown') {
+      redirectUrl += `&payment_status=${encodeURIComponent(status)}`;
     }
     
     // Add redirect status for consistency with Stripe's patterns
-    if (paymentIntent.status === 'processing') {
+    if (status === 'processing') {
       redirectUrl += `&redirect_status=processing`;
-    } else if (paymentIntent.status === 'succeeded') {
+    } else if (status === 'succeeded') {
       redirectUrl += `&redirect_status=succeeded`;
     }
     
@@ -1090,23 +1116,25 @@ export const Checkout: CheckoutSectionComponent = {
     }
     
     // Add session ID for Multibanco payments (critical for fallback logic)
-    if (paymentMethod === 'multibanco' && paymentIntent?.latest_charge) {
-      // Try to extract session info from payment intent metadata or other sources
-      if (paymentIntent?.metadata?.session_id) {
-        redirectUrl += `&session_id=${encodeURIComponent(paymentIntent.metadata.session_id)}`;
+    if (paymentMethod === 'multibanco' && isStripePaymentIntent(paymentIntent)) {
+      // Try to extract session info from payment intent metadata
+      const metadata = getPaymentIntentMetadata(paymentIntent);
+      if (metadata.session_id) {
+        redirectUrl += `&session_id=${encodeURIComponent(metadata.session_id)}`;
       }
     }
     
     // Add Multibanco details to URL if available
-    if (paymentIntent?.next_action?.multibanco_display_details) {
-      const details = paymentIntent.next_action.multibanco_display_details;
+    if (isStripePaymentIntent(paymentIntent) && hasMultibancoDetails(paymentIntent)) {
+      const details = getMultibancoDetails(paymentIntent);
       if (details?.entity && details?.reference) {
         redirectUrl += `&multibanco_entity=${encodeURIComponent(details.entity)}`;
         redirectUrl += `&multibanco_reference=${encodeURIComponent(details.reference)}`;
       }
       // Add amount for display consistency
-      if (paymentIntent?.amount) {
-        redirectUrl += `&amount=${encodeURIComponent(paymentIntent.amount)}`;
+      const amount = getPaymentIntentAmount(paymentIntent);
+      if (amount !== undefined) {
+        redirectUrl += `&amount=${encodeURIComponent(amount.toString())}`;
       }
     }
     
@@ -1114,11 +1142,10 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   showMultibancoInstructions(paymentIntent: unknown): void {
-    const pi = paymentIntent as { id?: string; next_action?: { type?: string } };
     logger.info('Displaying Multibanco instructions in modal', {
-      paymentIntentId: pi.id,
-      hasNextAction: !!pi.next_action,
-      nextActionType: pi.next_action?.type
+      paymentIntentId: getPaymentIntentId(paymentIntent),
+      hasNextAction: isStripePaymentIntent(paymentIntent) && paymentIntent.next_action !== undefined,
+      nextActionType: isStripePaymentIntent(paymentIntent) ? paymentIntent.next_action?.type : undefined
     });
     
     // Hide competing elements to prevent stacking context issues
@@ -1149,37 +1176,41 @@ export const Checkout: CheckoutSectionComponent = {
       multibancoInstructions.classList.add('relative', 'isolate');
       
       // Extract Multibanco details if available
-      const multibancoDetails = (pi.next_action as any)?.multibanco_display_details;
-      if (multibancoDetails) {
-        const details = multibancoDetails;
+      if (isStripePaymentIntent(paymentIntent) && hasMultibancoDetails(paymentIntent)) {
+        const details = getMultibancoDetails(paymentIntent);
         
-        const mbEntity = document.querySelector('#mbEntity');
-        const mbReference = document.querySelector('#mbReference');
-        const mbAmount = document.querySelector('#mbAmount');
-        
-        if (mbEntity && details.entity) {
-          mbEntity.textContent = details.entity;
+        if (details) {
+          const mbEntity = document.querySelector('#mbEntity');
+          const mbReference = document.querySelector('#mbReference');
+          const mbAmount = document.querySelector('#mbAmount');
+          
+          if (mbEntity && details.entity) {
+            mbEntity.textContent = details.entity;
+          }
+          
+          if (mbReference && details.reference) {
+            // Format reference in groups of 3 digits for better readability
+            const formattedRef = details.reference.replace(/(\d{3})(?=\d)/g, '$1 ');
+            mbReference.textContent = formattedRef;
+          }
+          
+          if (mbAmount) {
+            const amount = getPaymentIntentAmount(paymentIntent);
+            if (amount !== undefined) {
+              mbAmount.textContent = `€${(amount / 100).toFixed(2)}`; // Stripe amounts are in cents
+            }
+          }
+          
+          logger.info('Multibanco voucher details populated', {
+            entity: details.entity,
+            reference: details.reference,
+            amount: getPaymentIntentAmount(paymentIntent)
+          });
         }
-        
-        if (mbReference && details.reference) {
-          // Format reference in groups of 3 digits for better readability
-          const formattedRef = details.reference.replace(/(\d{3})(?=\d)/g, '$1 ');
-          mbReference.textContent = formattedRef;
-        }
-        
-        if (mbAmount) {
-          mbAmount.textContent = `€${basePrice.toFixed(2)}`;
-        }
-        
-        logger.info('Multibanco voucher details populated', {
-          entity: details.entity,
-          reference: details.reference,
-          amount: basePrice
-        });
       } else {
         logger.warn('Multibanco details not available in next_action', {
-          paymentIntentId: pi.id,
-          nextAction: pi.next_action
+          paymentIntentId: getPaymentIntentId(paymentIntent),
+          hasPaymentIntent: isStripePaymentIntent(paymentIntent)
         });
       }
       
@@ -1194,8 +1225,8 @@ export const Checkout: CheckoutSectionComponent = {
     }
     
     logger.debug('Multibanco instructions displayed', {
-      paymentIntentId: pi.id,
-      status: (pi as any).status
+      paymentIntentId: getPaymentIntentId(paymentIntent),
+      status: getPaymentIntentStatus(paymentIntent)
     });
   }
 };

@@ -994,10 +994,10 @@ function processFreeOrder(session: Stripe.Checkout.Session, correlationId: strin
     correlationId
   });
 
-  // TODO: Implement free order processing if needed
-  // Similar to immediate payment processing but for free orders
-  // Implementation would be similar to processImmediatePaymentSuccess
-  // but with payment_status: 'free' and different email templates
+  // Free order processing is intentionally minimal - only logging
+  // Current business model focuses on paid events/courses
+  // If free checkout flows are needed in the future, implement similar to
+  // processImmediatePaymentSuccess but with payment_status: 'free'
 }
 
 /**
