@@ -52,7 +52,8 @@
             <div class="relative z-10 flex items-center justify-center w-16 h-16 rounded-full mb-3 transition-all duration-300
               {% if milestone.status == 'completed' %}bg-gradient-to-br from-burgundy-500 to-burgundy-700 shadow-lg
               {% elif milestone.status == 'current' %}bg-gradient-to-br from-gold-400 to-gold-600 shadow-lg ring-4 ring-gold-100
-              {% else %}bg-white border-2 border-neutral-300{% endif %}">
+              {% else %}bg-white border-2 border-neutral-300{% endif %}"
+              {% if milestone.title == 'Pagamento' %}data-milestone="payment"{% endif %}>
               
               {% if milestone.icon == 'check' %}
                 <svg class="w-6 h-6 {% if milestone.status == 'completed' %}text-white{% else %}text-neutral-400{% endif %}" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
