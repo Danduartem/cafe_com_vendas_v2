@@ -2,44 +2,43 @@
   "id": "thank-you-content",
   "enabled": true,
   "copy": {
+    "accessibility": {
+      "ariaLabel": "Página de agradecimento e próximos passos"
+    },
     "badge": {
-      "text": "🎉 Pagamento confirmado com sucesso"
+      "text": "✓ Pagamento confirmado com sucesso"
     },
     "header": {
-      "title": "<span class=\"text-gold-500\">Parabéns!</span> Falta só <em class=\"italic text-burgundy-600 font-black\">um</em> passo<br class=\"hidden sm:block\"/>\\n        <span class=\"text-navy-700\">para garantir a sua experiência premium</span>",
-      "subtitle": "Excelente decisão! Agora só precisamos de algumas informações rápidas para personalizar completamente a sua participação no <strong>Café com Vendas</strong>.\\n        <span class=\"font-semibold text-burgundy-700\">Em apenas 2 minutos, terá acesso completo ao evento.</span>"
+      "title": "<span class=\"text-gold-500\">Parabéns!</span> Falta só <em class=\"italic text-burgundy-600 font-black\">um</em> passo<br class=\"hidden sm:block\"/><span class=\"text-navy-700\">para garantir a sua experiência premium</span>",
+      "subtitle": "Excelente decisão! Agora só precisamos de algumas informações rápidas para personalizar completamente a sua participação no <strong>Café com Vendas</strong>. <span class=\"font-semibold text-burgundy-700\">Em apenas 2 minutos, terá acesso completo ao evento.</span>"
     },
     "progress": {
       "label": "O seu percurso",
       "milestones": [
         {
-          "step": 1,
           "title": "Pagamento",
           "status": "completed",
           "icon": "check"
         },
         {
-          "step": 2, 
           "title": "Perfil",
           "status": "current",
           "icon": "user",
           "time": "2 min"
         },
         {
-          "step": 3,
           "title": "Acesso Completo",
-          "status": "pending", 
+          "status": "pending",
           "icon": "star"
         }
       ],
       "message": "Quase lá! Complete o seu perfil para acesso total ao evento."
     },
     "mainAction": {
-      "stepNumber": "1",
       "title": "Garanta o seu lugar agora",
       "description": "Complete o seu perfil personalizado em apenas 2 minutos. Estas informações garantem que preparamos tudo especificamente para si e que recebe todos os materiais exclusivos antes do evento.",
       "button": {
-        "text": "Completar o meu perfil →",
+        "text": "Completar o meu perfil",
         "url": "https://formspree.io/f/xanbnrvp",
         "analytics": "cta_complete_form"
       }
@@ -47,33 +46,51 @@
     "steps": [
       {
         "number": "2",
-        "color": "navy",
         "title": "Receba a confirmação por email",
         "description": "Após completar o perfil, receberá automaticamente todos os detalhes do evento, incluindo localização, horários e materiais de preparação."
       },
       {
         "number": "3",
-        "color": "navy", 
         "title": "Adicione ao seu calendário",
         "description": "Não perca esta oportunidade única. Adicione o evento ao seu calendário.",
-        "button": {
-          "text": "📅 Adicionar ao calendário",
-          "url": "/assets/evento.ics",
-          "classes": "inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-navy-600 bg-navy-50 hover:bg-navy-100 rounded-lg transition-colors duration-200",
-          "analytics": "add_to_calendar"
+        "calendarDropdown": {
+          "buttonText": "+ Adicionar ao calendário",
+          "buttonClasses": "inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-navy-600 bg-navy-50 hover:bg-navy-100 rounded-lg transition-colors duration-200 cursor-pointer",
+          "analytics": "add_to_calendar",
+          "options": [
+            {
+              "id": "google",
+              "text": "Google Calendar",
+              "icon": "🗓️",
+              "recommended": true,
+              "description": "Abrir diretamente no Google Calendar"
+            },
+            {
+              "id": "outlook",
+              "text": "Outlook.com",
+              "icon": "📅",
+              "description": "Abrir no Outlook pessoal"
+            },
+            {
+              "id": "apple",
+              "text": "iPhone",
+              "icon": "📱", 
+              "description": "Optimizado para iPhone"
+            }
+          ]
         }
       }
     ],
     "eventSummary": {
       "title": "Café com Vendas",
-      "subtitle": "Edição Exclusiva Portugal • 15 Fevereiro 2025",
+      "subtitle": "Edição Exclusiva Portugal • 20 Set 2025",
       "features": [
         "<span class=\"font-semibold text-gold-600\">Experiência premium</span> com estratégias comprovadas para liberdade empresarial",
         "<span class=\"font-semibold text-gold-600\">Grupo seleto</span> de empreendedoras comprometidas com o crescimento inteligente",
         "<span class=\"font-semibold text-gold-600\">Materiais exclusivos</span> e acesso prioritário a recursos avançados",
         "<span class=\"font-semibold text-gold-600\">Suporte personalizado</span> durante e após o evento"
       ],
-      "important": "<span class=\"font-bold text-burgundy-700\">⚡ Ação necessária:</span> Complete o seu perfil nos próximos minutos para receber todos os materiais de preparação e garantir o acesso completo a esta experiência transformadora."
+      "important": "<span class=\"font-bold text-burgundy-700\">● Ação necessária:</span> Complete o seu perfil nos próximos minutos para receber todos os materiais de preparação e garantir o acesso completo a esta experiência transformadora."
     }
   }
 }
