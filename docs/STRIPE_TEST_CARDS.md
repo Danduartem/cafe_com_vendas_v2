@@ -16,6 +16,20 @@
 
 > These cover 95% of our tests: success + EU 3DS + BR + two failure paths.
 
+## 🏦 Multibanco (Portugal Bank Transfer)
+
+**Payment Method**: Multibanco (appears automatically for Portuguese customers)
+**Currency**: EUR only
+**Behavior**: Generates voucher with entity/reference numbers; payment confirmed via bank transfer (can take several days)
+
+**What to verify**:
+* Customer receives voucher with entity and reference numbers
+* `checkout.session.async_payment_succeeded` webhook fires when payment completes
+* MailerLite integration triggers on delayed payment success
+* Order fulfillment waits for async payment confirmation
+
+> **Note**: Multibanco testing requires using Stripe's test environment. The payment shows as "processing" until manually completed in Stripe Dashboard.
+
 ---
 
 ## How to use (Payment Element)

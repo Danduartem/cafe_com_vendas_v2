@@ -38,6 +38,7 @@
 
 * [ ] **EU / 3DS approval path** (Portugal card) → successful confirmation
 * [ ] **Brazil success path** → successful confirmation
+* [ ] **Multibanco delayed payment** (Portugal bank transfer) → voucher generated + async webhook
 * [ ] **Decline path** (insufficient funds or generic decline) → clear error + retry possible
 * [ ] **3DS challenge cancel** → user sees non‑blocking guidance and can retry
 * [ ] **Mobile viewport** (≈375px) → form usable, no layout shifts
@@ -72,6 +73,7 @@
 * **Backend**
 
   * `payment_intent.succeeded` received by `stripe-webhook`
+  * For Multibanco: `checkout.session.async_payment_succeeded` received
   * No unhandled errors in function logs
 
 ---
@@ -121,11 +123,33 @@
 
 ---
 
-## 8) Notes for contributors
+## 8) Multibanco-specific testing
 
-* Keep this page a **checklist**, not a card database—add new cards only to `STRIPE_TEST_CARDS.md`
-* If you change event names or payloads, update the GTM docs **in the same PR**
+Since Multibanco uses delayed notifications, additional verification is needed:
+
+### A) Stripe Dashboard Testing
+1. **Enable Multibanco**: Payment methods → Enable Multibanco
+2. **Simulate completion**: Use Dashboard to manually complete test Multibanco payments
+3. **Check webhook delivery**: Verify `checkout.session.async_payment_succeeded` webhook fires
+
+### B) Delayed Payment Workflow
+* **Initial state**: Payment shows "processing" status
+* **Voucher display**: Customer sees entity/reference numbers for bank payment
+* **Webhook timing**: `async_payment_succeeded` fires when manually completed
+* **Fulfillment**: MailerLite integration triggers only after payment confirmation
+
+### C) Expected Timeline
+* **Immediate**: Voucher generation + `checkout.session.completed` (processing status)
+* **Delayed**: Manual completion + `checkout.session.async_payment_succeeded` + fulfillment
 
 ---
 
-*Last updated: 2025-08-25*
+## 9) Notes for contributors
+
+* Keep this page a **checklist**, not a card database—add new cards only to `STRIPE_TEST_CARDS.md`
+* If you change event names or payloads, update the GTM docs **in the same PR**
+* For Multibanco changes, test both immediate voucher generation and delayed confirmation
+
+---
+
+*Last updated: 2025-08-28*
