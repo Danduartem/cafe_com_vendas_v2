@@ -51,7 +51,7 @@ export type StripeConstructor = (publishableKey: string) => unknown;
 declare global {
   interface Window {
     dataLayer: DataLayerEvent[];
-    Stripe?: StripeConstructor;
+    // Stripe?: StripeConstructor; // Use Stripe's own global type declaration
     CONFIG: GlobalAppConfig;
     ANALYTICS_EVENTS: Record<string, unknown>;
     CafeComVendas: CafeComVendasApp;

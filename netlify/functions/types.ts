@@ -19,7 +19,7 @@ export interface PaymentIntentRequest {
   utm_campaign?: string;
   utm_term?: string;
   utm_content?: string;
-  [key: string]: unknown; // Index signature for dynamic access
+  [key: string]: unknown; // Needed for validation iteration
 }
 
 export interface ValidationResult {
@@ -71,7 +71,7 @@ export interface MailerLiteLeadRequest {
   utm_campaign?: string;
   utm_term?: string;
   utm_content?: string;
-  [key: string]: unknown; // Index signature for dynamic access
+  [key: string]: unknown; // Needed for validation iteration
 }
 
 export interface MailerLiteSubscriberData {
@@ -106,16 +106,9 @@ export interface FulfillmentRecord {
   sessionId?: string;
   fulfillmentType?: string;
   fulfilledAt?: string;
+  awaitingPaymentCompletion?: boolean;
 }
 
-export interface CircuitBreakerStatus {
-  name: string;
-  state: 'CLOSED' | 'OPEN' | 'HALF_OPEN';
-  failureCount: number;
-  successCount: number;
-  totalCalls: number;
-  lastFailureTime: number | null;
-}
 
 // Timeout promise wrapper type
 export type TimeoutPromise<T> = Promise<T>;

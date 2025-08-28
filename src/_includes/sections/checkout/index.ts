@@ -49,6 +49,8 @@ interface CheckoutSectionComponent extends Component {
   idempotencyKey: string | null;
   stripeLoaded: boolean;
   stripeLoadPromise: Promise<Stripe | null> | null;
+  pendingRedirect: boolean;
+  redirectTimeoutId: number | null;
 
   initializeCheckout(): void;
   performInitialization(): void;
@@ -58,9 +60,6 @@ interface CheckoutSectionComponent extends Component {
   preloadStripe(): Promise<void>;
   initializeStripe(): Promise<void>;
   initializePaymentElement(): Promise<void>;
-  setupPredictivePayment(): void;
-  createPredictivePaymentIntent(): Promise<void>;
-  debouncedPredictivePayment: (() => Promise<void>) | null;
   handleLeadSubmit(event: Event): Promise<void>;
   handlePayment(): Promise<void>;
   handleOpenClick(event: Event): void;
@@ -76,6 +75,9 @@ interface CheckoutSectionComponent extends Component {
   isValidEmail(email: string): boolean;
   isValidPhone(phone: string): boolean;
   translateStripeError(message: string): string;
+  showMultibancoInstructions(paymentIntent: unknown): void;
+  createBackdrop(): void;
+  removeBackdrop(): void;
 }
 
 export const Checkout: CheckoutSectionComponent = {
@@ -90,7 +92,8 @@ export const Checkout: CheckoutSectionComponent = {
   idempotencyKey: null,
   stripeLoaded: false,
   stripeLoadPromise: null,
-  debouncedPredictivePayment: null,
+  pendingRedirect: false,
+  redirectTimeoutId: null,
 
   init(): void {
     try {
@@ -109,7 +112,6 @@ export const Checkout: CheckoutSectionComponent = {
     this.initializeCheckout();
     this.setupCheckoutTriggers();
     this.setupModalBehavior();
-    this.setupPredictivePayment();
   },
 
   initializeCheckout(): void {
@@ -187,8 +189,17 @@ export const Checkout: CheckoutSectionComponent = {
     // Block background scrolling
     document.body.style.overflow = 'hidden';
     
-    // Use standard dialog API
-    this.modal.showModal();
+    // Create custom backdrop to avoid top-layer issues
+    this.createBackdrop();
+    
+    // One-frame reveal technique to prevent position flash
+    this.modal.style.visibility = 'hidden';
+    this.modal.show();
+    requestAnimationFrame(() => {
+      if (this.modal) {
+        this.modal.style.visibility = 'visible';
+      }
+    });
 
     // 🚀 OPTIMIZATION: Preload Stripe.js immediately when modal opens
     // This eliminates 200-500ms delay later when transitioning to payment step
@@ -220,12 +231,51 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   handleModalClose(): void {
+    // Prevent modal closure if redirect is pending
+    if (this.pendingRedirect) {
+      logger.info('Modal close prevented: redirect pending for async payment');
+      return;
+    }
+    
     // Restore background scrolling
     document.body.style.overflow = '';
+    
+    // Remove custom backdrop
+    this.removeBackdrop();
     
     // Clean application state when modal closes (via any method)
     this.resetForm();
     this.resetModalState();
+  },
+
+  createBackdrop(): void {
+    // Remove existing backdrop if present
+    this.removeBackdrop();
+    
+    // Create backdrop element
+    const backdrop = document.createElement('div');
+    backdrop.id = 'checkoutBackdrop';
+    backdrop.className = 'fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm';
+    backdrop.style.zIndex = '9998';
+    backdrop.style.animation = 'backdropFadeIn 200ms ease-out';
+    
+    // Handle backdrop click to close modal
+    backdrop.addEventListener('click', (e) => {
+      // Only close if clicking directly on backdrop (not its children)
+      if (e.target === backdrop) {
+        this.modal?.close();
+      }
+    });
+    
+    // Add backdrop to document
+    document.body.appendChild(backdrop);
+  },
+
+  removeBackdrop(): void {
+    const backdrop = document.getElementById('checkoutBackdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
   },
 
   handleBackdropClick(event: Event): void {
@@ -311,7 +361,7 @@ export const Checkout: CheckoutSectionComponent = {
         throw new Error('Lead data not available');
       }
 
-      // 🚀 OPTIMIZATION: Use existing clientSecret if available from predictive creation
+      // Create PaymentIntent for this checkout
       if (!this.clientSecret) {
         
         // Generate fresh idempotency key for each payment attempt to avoid conflicts during testing
@@ -397,24 +447,30 @@ export const Checkout: CheckoutSectionComponent = {
 
       // Create Payment Element with Dashboard control enabled
       // This will automatically show payment methods configured in Stripe Dashboard
-      this.paymentElement = this.elements.create('payment', {
+      // Using type assertion due to TypeScript definitions not fully covering latest Stripe.js features
+      this.paymentElement = this.elements.create('payment' as const, {
         layout: {
           type: 'tabs', // Show tabs for each payment method (cards, Multibanco, SEPA, etc.)
-          defaultCollapsed: false,
-          radios: false,
-          spacedAccordionItems: false
+          defaultCollapsed: false
+          // Removed incompatible options (radios, spacedAccordionItems) that only work with 'accordion' layout
         },
         defaultValues: {
           billingDetails: {
             email: this.leadData.email,
-            name: this.leadData.fullName
+            name: this.leadData.fullName,
+            address: {
+              country: 'PT' // Default to Portugal for better Multibanco visibility
+            }
           }
         },
         fields: {
           billingDetails: {
             email: 'never', // We already have it from lead form
             phone: 'never',  // We already have it from lead form
-            name: 'never'    // We already have it from lead form
+            name: 'never',   // We already have it from lead form
+            address: {
+              country: 'auto' // Auto-detect country but allow change
+            }
           }
         },
         // Terms acceptance for European payment methods
@@ -424,7 +480,9 @@ export const Checkout: CheckoutSectionComponent = {
           ideal: 'always',
           sepaDebit: 'always',
           sofort: 'always'
-        }
+        },
+        // Payment method order preference (Multibanco will show prominently for PT customers)
+        paymentMethodOrder: ['card', 'multibanco']
       });
 
       // Mount the Payment Element to the container
@@ -506,161 +564,6 @@ export const Checkout: CheckoutSectionComponent = {
     }
   },
 
-  setupPredictivePayment(): void {
-    // 🚀 OPTIMIZATION: Set up debounced predictive PaymentIntent creation
-    // This monitors form inputs and creates PaymentIntent in background while user types
-    
-    // Debounce function to avoid too many API calls
-    let timeoutId: NodeJS.Timeout | null = null;
-    
-    this.debouncedPredictivePayment = (): Promise<void> => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      
-      return new Promise<void>((resolve) => {
-        timeoutId = setTimeout(() => {
-          this.createPredictivePaymentIntent().catch((error) => {
-            logger.debug('Predictive PaymentIntent creation failed (non-critical):', error);
-          }).finally(() => {
-            resolve();
-          });
-        }, 2000); // Wait 2 seconds after user stops typing
-      });
-    };
-
-    // Set up form input monitoring
-    const formInputs = ['#fullName', '#email', '#phone'];
-    
-    formInputs.forEach(selector => {
-      const input = document.querySelector(selector) as HTMLInputElement;
-      if (input) {
-        input.addEventListener('input', () => {
-          // Only start predictive creation if we have minimal valid data
-          const nameInput = document.querySelector('#fullName') as HTMLInputElement;
-          const emailInput = document.querySelector('#email') as HTMLInputElement;
-          
-          if (nameInput?.value.length >= 3 && emailInput?.value.includes('@')) {
-            
-            // 🚀 OPTIMIZATION: Show predictive loading indicator
-            const predictiveStatus = document.querySelector('#predictive-status');
-            if (predictiveStatus && !this.clientSecret) {
-              predictiveStatus.classList.remove('hidden');
-            }
-            
-            void this.debouncedPredictivePayment?.();
-          }
-        });
-      }
-    });
-  },
-
-  async createPredictivePaymentIntent(): Promise<void> {
-    // 🚀 OPTIMIZATION: Create PaymentIntent with current form data (even if incomplete)
-    // This runs in background while user is still filling the form
-    
-    if (this.clientSecret) {
-      return; // Already have a PaymentIntent
-    }
-
-    // Get current form values (may be incomplete)
-    const nameInput = document.querySelector('#fullName') as HTMLInputElement;
-    const emailInput = document.querySelector('#email') as HTMLInputElement;
-    const phoneInput = document.querySelector('#phone') as HTMLInputElement;
-    const countryInput = document.querySelector('#countryCode') as HTMLSelectElement;
-
-    if (!nameInput?.value || !emailInput?.value) {
-      logger.debug('Insufficient form data for predictive PaymentIntent');
-      return;
-    }
-
-    // Create temporary lead data with current form state
-    const tempLeadData = {
-      fullName: nameInput.value.trim(),
-      email: emailInput.value.trim().toLowerCase(),
-      countryCode: countryInput?.value || '+351',
-      phone: phoneInput?.value?.trim() || '000000000' // Temporary placeholder
-    };
-
-    // Basic validation before API call
-    if (!this.isValidEmail(tempLeadData.email) || tempLeadData.fullName.length < 2) {
-      logger.debug('Form data not yet valid for predictive PaymentIntent');
-      return;
-    }
-
-    try {
-      
-      // Generate fresh idempotency key for predictive payment attempt
-      this.idempotencyKey = this.generateIdempotencyKey();
-      
-      // Prepare request payload (same structure as regular flow)
-      const requestPayload = {
-        lead_id: this.leadId,
-        full_name: tempLeadData.fullName,
-        email: tempLeadData.email,
-        phone: `${tempLeadData.countryCode}${tempLeadData.phone}`,
-        amount: priceInCents, // 🎯 From centralized pricing
-        currency: 'eur',
-        idempotency_key: this.idempotencyKey
-      };
-
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json'
-      };
-
-      if (this.idempotencyKey) {
-        headers['X-Idempotency-Key'] = this.idempotencyKey;
-      }
-
-      // Create PaymentIntent in background
-      const response = await fetch(`${ENV.urls.base}/.netlify/functions/create-payment-intent`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(requestPayload)
-      });
-
-      if (!response.ok) {
-        throw new Error(`PaymentIntent API error: ${response.status}`);
-      }
-
-      const data = await response.json() as { clientSecret: string };
-      this.clientSecret = data.clientSecret;
-      
-      // Store the lead data that was used for PaymentIntent creation
-      this.leadData = tempLeadData;
-      
-      
-      // 🚀 OPTIMIZATION: Update predictive status indicator to show success
-      const predictiveStatus = document.querySelector('#predictive-status');
-      if (predictiveStatus) {
-        predictiveStatus.innerHTML = `
-          <div class="flex items-center gap-2 text-sm text-green-700">
-            <svg class="w-3 h-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            <span>Pagamento preparado! Próximo passo será instantâneo.</span>
-          </div>
-        `;
-        
-        // Hide after 3 seconds
-        setTimeout(() => {
-          predictiveStatus?.classList.add('hidden');
-        }, 3000);
-      }
-      
-    } catch (error) {
-      logger.debug('Predictive PaymentIntent creation failed (will retry on form submit):', error);
-      
-      // Hide predictive status indicator on error
-      const predictiveStatus = document.querySelector('#predictive-status');
-      if (predictiveStatus) {
-        predictiveStatus.classList.add('hidden');
-      }
-      
-      // Don't set error state - this is just an optimization attempt
-      // Regular flow will handle PaymentIntent creation if this fails
-    }
-  },
 
   async handleLeadSubmit(event: Event): Promise<void> {
     event.preventDefault();
@@ -707,18 +610,12 @@ export const Checkout: CheckoutSectionComponent = {
 
       this.setStep(2);
 
-      // 🚀 OPTIMIZATION: Use preloaded Stripe if available, otherwise initialize on demand  
+      // Initialize Stripe if not already loaded
       if (!this.stripeLoaded) {
         await this.initializeStripe();
       }
 
-      // 🚀 OPTIMIZATION: Check if we already have a predictive PaymentIntent ready
-      if (this.clientSecret && this.leadData) {
-        // Update lead data with final form values (in case phone changed)
-        this.leadData = leadData;
-      }
-
-      // Initialize Stripe Elements for payment form (will be instant if clientSecret exists)
+      // Initialize Stripe Elements for payment form
       await this.initializePaymentElement();
 
       // Track lead conversion (GTM production event + test alias)
@@ -832,6 +729,62 @@ export const Checkout: CheckoutSectionComponent = {
         setTimeout(() => {
           window.location.href = '/thank-you';
         }, 3000);
+      } else if (paymentIntent && paymentIntent.status === 'processing') {
+        // Payment is processing (typical for Multibanco and other async payment methods)
+        const paymentMethodTypes = (paymentIntent as { payment_method_types?: string[] }).payment_method_types;
+        const paymentMethod = paymentMethodTypes?.[0] || 'unknown';
+        
+        logger.info('Payment processing initiated', {
+          paymentMethod,
+          paymentIntentId: paymentIntent.id,
+          hasNextAction: !!paymentIntent.next_action,
+          nextActionType: paymentIntent.next_action?.type
+        });
+        
+        // For Multibanco, display voucher details in our modal following Stripe best practices
+        if (paymentMethod === 'multibanco' || paymentIntent.next_action?.type === 'multibanco_display_details') {
+          // Add a visual indicator that we're transitioning to voucher display
+          if (payBtnText) {
+            payBtnText.textContent = 'Gerando referência Multibanco...';
+          }
+          
+          // Small delay to ensure payment step cleanup before showing voucher
+          setTimeout(() => {
+            // Show success step with Multibanco voucher details in our modal
+            this.setStep('success');
+            
+            // Display Multibanco voucher details using the dedicated method
+            this.showMultibancoInstructions(paymentIntent);
+            
+            logger.info('Multibanco payment initiated - displaying voucher details in checkout modal');
+          }, 200);
+        } else {
+          // For other async methods, show success state in our modal
+          this.setStep('success');
+          
+          // Generic processing message for other async methods
+          const successTitle = document.querySelector('#successTitle');
+          const successMessage = document.querySelector('#successMessage');
+          if (successTitle) successTitle.textContent = 'Processando pagamento...';
+          if (successMessage) successMessage.textContent = 'Você será redirecionado em breve...';
+        }
+
+        // Track payment initiation (not completion yet)
+        import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+          PlatformAnalytics.track('section_engagement', {
+            section: 'checkout',
+            action: 'payment_processing',
+            payment_method: paymentMethod,
+            payment_intent_id: paymentIntent.id,
+            lead_id: this.leadId
+          });
+        }).catch(() => {
+          logger.debug('Payment processing analytics tracking unavailable');
+        });
+
+        // Enhanced redirect logic with better URL parameter handling
+        // @ts-expect-error - Complex Stripe response type handling
+        this.handleAsyncPaymentRedirect(paymentIntent, paymentMethod || 'unknown');
       } else {
         // Payment requires additional action (3DS, SEPA redirect, etc.)
         // User will be redirected automatically by Stripe
@@ -862,22 +815,41 @@ export const Checkout: CheckoutSectionComponent = {
     const paymentSuccess = safeQuery('#paymentSuccess');
     const progressBar = safeQuery('#progressBar');
 
-    // Hide all steps first
-    leadForm?.classList.add('hidden');
-    paymentStep?.classList.add('hidden');
-    paymentSuccess?.classList.add('hidden');
+    // Force hide all steps with explicit display and visibility control
+    const allSteps = [leadForm, paymentStep, paymentSuccess];
+    allSteps.forEach(element => {
+      if (element) {
+        element.classList.add('hidden');
+        // Ensure proper z-index reset
+        (element as HTMLElement).style.zIndex = '';
+      }
+    });
 
-    if (step === 1) {
-      leadForm?.classList.remove('hidden');
-      progressBar?.classList.remove('w-full');
-      progressBar?.classList.add('w-1/2');
-    } else if (step === 2) {
-      paymentStep?.classList.remove('hidden');
-      progressBar?.classList.remove('w-1/2');
-      progressBar?.classList.add('w-full');
-    } else if (step === 'success') {
-      paymentSuccess?.classList.remove('hidden');
-      progressBar?.classList.add('w-full');
+    // Add small delay for better transition when moving to success step from payment
+    const showStep = () => {
+      if (step === 1) {
+        leadForm?.classList.remove('hidden');
+        progressBar?.classList.remove('w-full');
+        progressBar?.classList.add('w-1/2');
+      } else if (step === 2) {
+        paymentStep?.classList.remove('hidden');
+        progressBar?.classList.remove('w-1/2');
+        progressBar?.classList.add('w-full');
+      } else if (step === 'success') {
+        paymentSuccess?.classList.remove('hidden');
+        // Ensure success step has proper z-index for Multibanco instructions
+        if (paymentSuccess) {
+          (paymentSuccess as HTMLElement).style.zIndex = '20';
+        }
+        progressBar?.classList.add('w-full');
+      }
+    };
+
+    // For success step transitions (especially from payment), add small delay
+    if (step === 'success' && this.currentStep === 2) {
+      setTimeout(showStep, 50);
+    } else {
+      showStep();
     }
   },
 
@@ -994,6 +966,13 @@ export const Checkout: CheckoutSectionComponent = {
     this.leadData = null; // Clear lead data
     this.leadId = this.generateUUID();
     this.idempotencyKey = this.generateIdempotencyKey();
+    
+    // Clear pending redirect state and timeout
+    if (this.redirectTimeoutId) {
+      clearTimeout(this.redirectTimeoutId);
+      this.redirectTimeoutId = null;
+    }
+    this.pendingRedirect = false;
 
     // Clean up Stripe elements
     if (this.paymentElement?.destroy) {
@@ -1007,7 +986,6 @@ export const Checkout: CheckoutSectionComponent = {
     // Reset payment element UI state
     const skeleton = document.querySelector('#payment-skeleton');
     const paymentContainer = document.querySelector('#payment-element');
-    const predictiveStatus = document.querySelector('#predictive-status');
     
     if (skeleton) {
       skeleton.classList.remove('hidden');
@@ -1015,18 +993,6 @@ export const Checkout: CheckoutSectionComponent = {
     
     if (paymentContainer) {
       paymentContainer.classList.add('hidden');
-    }
-
-    // 🚀 OPTIMIZATION: Reset predictive payment status indicator
-    if (predictiveStatus) {
-      predictiveStatus.classList.add('hidden');
-      // Reset to original loading state
-      predictiveStatus.innerHTML = `
-        <div class="flex items-center gap-2 text-sm text-blue-700">
-          <div class="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
-          <span>Preparando pagamento em segundo plano...</span>
-        </div>
-      `;
     }
 
     // Reset UI to step 1
@@ -1045,5 +1011,191 @@ export const Checkout: CheckoutSectionComponent = {
     };
 
     return translations[message] || message;
+  },
+
+  handleAsyncPaymentRedirect(paymentIntent: unknown, paymentMethod: string): void {
+    // Enhanced redirect logic with better error handling and state management
+    // @ts-expect-error - Complex Stripe PaymentIntent type handling
+    const redirectDelay = this.getRedirectDelay(paymentMethod, paymentIntent);
+    
+    logger.info('Scheduling redirect for async payment', {
+      paymentMethod,
+      redirectDelay,
+      paymentIntentId: (paymentIntent as { id?: string })?.id || 'unknown'
+    });
+    
+    // Clear any existing timeout to prevent conflicts
+    if (this.redirectTimeoutId) {
+      clearTimeout(this.redirectTimeoutId);
+    }
+    
+    // Mark redirect as pending and store timeout reference
+    this.pendingRedirect = true;
+    
+    this.redirectTimeoutId = window.setTimeout(() => {
+      try {
+        // @ts-expect-error - Complex Stripe PaymentIntent type handling
+        const redirectUrl = this.buildRedirectUrl(paymentIntent, paymentMethod);
+        logger.info('Redirecting to thank-you page', { redirectUrl });
+        
+        // Clear redirect state before navigating
+        this.pendingRedirect = false;
+        this.redirectTimeoutId = null;
+        
+        window.location.href = redirectUrl;
+      } catch (error) {
+        logger.error('Error during async payment redirect', error);
+        
+        // Clear redirect state on error
+        this.pendingRedirect = false;
+        this.redirectTimeoutId = null;
+        
+        // Fallback to basic redirect
+        const paymentId = (paymentIntent as { id?: string })?.id || 'unknown';
+        window.location.href = `/thank-you?payment_intent=${paymentId}`;
+      }
+    }, redirectDelay);
+  },
+
+  getRedirectDelay(paymentMethod: string, paymentIntent: any): number {
+    // Determine appropriate redirect delay based on payment method and user needs
+    if (paymentMethod === 'multibanco' || paymentIntent.next_action?.type === 'multibanco_display_details') {
+      return 12000; // Extended delay for Multibanco to allow user to see/copy voucher details
+    }
+    return 5000; // Standard delay for other async methods
+  },
+
+  buildRedirectUrl(paymentIntent: any, paymentMethod: string): string {
+    const paymentId = paymentIntent?.id || 'unknown';
+    let redirectUrl = `/thank-you?payment_intent=${paymentId}`;
+    
+    // Always add payment method for proper detection
+    redirectUrl += `&payment_method=${encodeURIComponent(paymentMethod)}`;
+    
+    // Add payment status for better detection logic
+    if (paymentIntent.status) {
+      redirectUrl += `&payment_status=${encodeURIComponent(paymentIntent.status)}`;
+    }
+    
+    // Add redirect status for consistency with Stripe's patterns
+    if (paymentIntent.status === 'processing') {
+      redirectUrl += `&redirect_status=processing`;
+    } else if (paymentIntent.status === 'succeeded') {
+      redirectUrl += `&redirect_status=succeeded`;
+    }
+    
+    // Add lead ID for tracking
+    if (this.leadId) {
+      redirectUrl += `&lead_id=${encodeURIComponent(this.leadId)}`;
+    }
+    
+    // Add session ID for Multibanco payments (critical for fallback logic)
+    if (paymentMethod === 'multibanco' && paymentIntent?.latest_charge) {
+      // Try to extract session info from payment intent metadata or other sources
+      if (paymentIntent?.metadata?.session_id) {
+        redirectUrl += `&session_id=${encodeURIComponent(paymentIntent.metadata.session_id)}`;
+      }
+    }
+    
+    // Add Multibanco details to URL if available
+    if (paymentIntent?.next_action?.multibanco_display_details) {
+      const details = paymentIntent.next_action.multibanco_display_details;
+      if (details?.entity && details?.reference) {
+        redirectUrl += `&multibanco_entity=${encodeURIComponent(details.entity)}`;
+        redirectUrl += `&multibanco_reference=${encodeURIComponent(details.reference)}`;
+      }
+      // Add amount for display consistency
+      if (paymentIntent?.amount) {
+        redirectUrl += `&amount=${encodeURIComponent(paymentIntent.amount)}`;
+      }
+    }
+    
+    return redirectUrl;
+  },
+
+  showMultibancoInstructions(paymentIntent: unknown): void {
+    const pi = paymentIntent as { id?: string; next_action?: { type?: string } };
+    logger.info('Displaying Multibanco instructions in modal', {
+      paymentIntentId: pi.id,
+      hasNextAction: !!pi.next_action,
+      nextActionType: pi.next_action?.type
+    });
+    
+    // Hide competing elements to prevent stacking context issues
+    const modalHeader = document.querySelector('#checkoutModal header');
+    if (modalHeader) {
+      (modalHeader as HTMLElement).style.display = 'none';
+      logger.debug('Modal header hidden to prevent covering instructions');
+    }
+    
+    // Update success message for Multibanco
+    const successTitle = document.querySelector('#successTitle');
+    const successMessage = document.querySelector('#successMessage');
+    const multibancoInstructions = document.querySelector('#multibancoInstructions');
+    
+    if (successTitle) {
+      successTitle.textContent = 'Referência Multibanco gerada! 🏦';
+    }
+    
+    if (successMessage) {
+      successMessage.textContent = 'Complete o pagamento usando a referência abaixo:';
+    }
+    
+    // Show Multibanco instructions section with proper stacking context
+    if (multibancoInstructions) {
+      multibancoInstructions.classList.remove('hidden');
+      
+      // Add stacking context isolation to prevent z-index conflicts
+      multibancoInstructions.classList.add('relative', 'isolate');
+      
+      // Extract Multibanco details if available
+      const multibancoDetails = (pi.next_action as any)?.multibanco_display_details;
+      if (multibancoDetails) {
+        const details = multibancoDetails;
+        
+        const mbEntity = document.querySelector('#mbEntity');
+        const mbReference = document.querySelector('#mbReference');
+        const mbAmount = document.querySelector('#mbAmount');
+        
+        if (mbEntity && details.entity) {
+          mbEntity.textContent = details.entity;
+        }
+        
+        if (mbReference && details.reference) {
+          // Format reference in groups of 3 digits for better readability
+          const formattedRef = details.reference.replace(/(\d{3})(?=\d)/g, '$1 ');
+          mbReference.textContent = formattedRef;
+        }
+        
+        if (mbAmount) {
+          mbAmount.textContent = `€${basePrice.toFixed(2)}`;
+        }
+        
+        logger.info('Multibanco voucher details populated', {
+          entity: details.entity,
+          reference: details.reference,
+          amount: basePrice
+        });
+      } else {
+        logger.warn('Multibanco details not available in next_action', {
+          paymentIntentId: pi.id,
+          nextAction: pi.next_action
+        });
+      }
+      
+      // Ensure instructions are visible and scroll into view
+      requestAnimationFrame(() => {
+        multibancoInstructions.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+        logger.debug('Multibanco instructions scrolled into view');
+      });
+    }
+    
+    logger.debug('Multibanco instructions displayed', {
+      paymentIntentId: pi.id,
+      status: (pi as any).status
+    });
   }
 };

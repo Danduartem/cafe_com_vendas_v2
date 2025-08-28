@@ -7,7 +7,6 @@
 import Stripe from 'stripe';
 import type {
   FulfillmentRecord,
-  CircuitBreakerStatus,
   MailerLiteSubscriberData,
   TimeoutPromise
 } from './types';
@@ -40,10 +39,6 @@ interface MailerLiteSearchResponse {
   };
 }
 
-// Extended Stripe Invoice interface to include subscription property
-interface StripeInvoiceWithSubscription extends Stripe.Invoice {
-  subscription: string | Stripe.Subscription | null;
-}
 
 // Initialize Stripe with secret key and timeout configuration
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -80,114 +75,12 @@ const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID || 'cafe-com-vendas'
 const MAX_RETRIES = 3;
 const RETRY_DELAY_BASE = 1000; // 1 second base delay
 
-// Circuit breaker configuration
-interface CircuitBreakerConfig {
-  failureThreshold: number;
-  resetTimeout: number;
-  monitoringPeriod: number;
-}
-
-const CIRCUIT_BREAKER_CONFIG: CircuitBreakerConfig = {
-  failureThreshold: 5,
-  resetTimeout: 60000, // 1 minute
-  monitoringPeriod: 300000 // 5 minutes
-};
 
 // Fulfillment tracking to prevent duplicates with proper typing
 const fulfillmentStore = new Map<string, FulfillmentRecord>();
 const FULFILLMENT_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
-// Circuit breaker state management with proper typing
-const circuitBreakers = new Map<string, CircuitBreaker>();
 
-/**
- * Circuit Breaker Pattern Implementation
- */
-class CircuitBreaker {
-  public name: string;
-  public failureCount: number;
-  public lastFailureTime: number | null;
-  public state: 'CLOSED' | 'OPEN' | 'HALF_OPEN';
-  public config: CircuitBreakerConfig;
-  public successCount: number;
-  public totalCalls: number;
-
-  constructor(name: string, config: CircuitBreakerConfig = CIRCUIT_BREAKER_CONFIG) {
-    this.name = name;
-    this.failureCount = 0;
-    this.lastFailureTime = null;
-    this.state = 'CLOSED'; // CLOSED, OPEN, HALF_OPEN
-    this.config = config;
-    this.successCount = 0;
-    this.totalCalls = 0;
-  }
-  
-  async execute<T>(operation: () => Promise<T>): Promise<T> {
-    this.totalCalls++;
-    
-    if (this.state === 'OPEN') {
-      if (this.lastFailureTime && Date.now() - this.lastFailureTime < this.config.resetTimeout) {
-        throw new Error(`Circuit breaker is OPEN for ${this.name}`);
-      } else {
-        this.state = 'HALF_OPEN';
-        logWithCorrelation('info', `Circuit breaker transitioning to HALF_OPEN for ${this.name}`);
-      }
-    }
-    
-    try {
-      const result = await operation();
-      this.onSuccess();
-      return result;
-    } catch (error) {
-      this.onFailure();
-      throw error;
-    }
-  }
-  
-  onSuccess(): void {
-    this.successCount++;
-    this.failureCount = 0;
-    
-    if (this.state === 'HALF_OPEN') {
-      this.state = 'CLOSED';
-      logWithCorrelation('info', `Circuit breaker CLOSED for ${this.name}`);
-    }
-  }
-  
-  onFailure(): void {
-    this.failureCount++;
-    this.lastFailureTime = Date.now();
-    
-    if (this.failureCount >= this.config.failureThreshold) {
-      this.state = 'OPEN';
-      logWithCorrelation('warn', `Circuit breaker OPENED for ${this.name}`, {
-        failureCount: this.failureCount,
-        threshold: this.config.failureThreshold
-      });
-    }
-  }
-  
-  getStatus(): CircuitBreakerStatus {
-    return {
-      name: this.name,
-      state: this.state,
-      failureCount: this.failureCount,
-      successCount: this.successCount,
-      totalCalls: this.totalCalls,
-      lastFailureTime: this.lastFailureTime
-    };
-  }
-}
-
-/**
- * Get or create circuit breaker for a service
- */
-function getCircuitBreaker(serviceName: string): CircuitBreaker {
-  if (!circuitBreakers.has(serviceName)) {
-    circuitBreakers.set(serviceName, new CircuitBreaker(serviceName));
-  }
-  return circuitBreakers.get(serviceName)!; // Non-null assertion safe due to set above
-}
 
 /**
  * Fulfillment tracking utilities for idempotency
@@ -353,10 +246,6 @@ export default async (request: Request): Promise<Response> => {
         await handleChargeDispute(stripeEvent.data.object, correlationId);
         break;
 
-      case 'invoice.payment_succeeded':
-        await handleInvoicePaymentSucceeded(stripeEvent.data.object, correlationId);
-        break;
-
       case 'checkout.session.async_payment_succeeded':
         await handleCheckoutSessionAsyncPaymentSucceeded(stripeEvent.data.object, correlationId);
         break;
@@ -365,11 +254,10 @@ export default async (request: Request): Promise<Response> => {
         await handleCheckoutSessionAsyncPaymentFailed(stripeEvent.data.object, correlationId);
         break;
 
-      case 'customer.subscription.created':
-      case 'customer.subscription.updated':
-      case 'customer.subscription.deleted':
-        await handleSubscriptionChange(stripeEvent.data.object, stripeEvent.type, correlationId);
+      case 'checkout.session.completed':
+        await handleCheckoutSessionCompleted(stripeEvent.data.object, correlationId);
         break;
+
 
       default:
         logWithCorrelation('info', `Unhandled event type: ${stripeEvent.type}`, {
@@ -377,17 +265,6 @@ export default async (request: Request): Promise<Response> => {
         }, correlationId);
     }
 
-    // Log circuit breaker status for monitoring
-    const circuitBreakerStatuses = Array.from(circuitBreakers.entries()).map(([name, breaker]) => ({
-      service: name,
-      status: breaker.getStatus()
-    }));
-    
-    if (circuitBreakerStatuses.length > 0) {
-      logWithCorrelation('info', 'Circuit breaker statuses', {
-        circuitBreakers: circuitBreakerStatuses
-      }, correlationId);
-    }
     
     // Log fulfillment tracker stats for monitoring
     const fulfillmentStats = FulfillmentTracker.getStats();
@@ -728,31 +605,7 @@ async function handleChargeDispute(dispute: Stripe.Dispute, correlationId: strin
   }
 }
 
-/**
- * Handle invoice payment succeeded
- */
-async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice, correlationId: string): Promise<void> {
-  logWithCorrelation('info', `Invoice payment succeeded: ${invoice.id}`, {
-    invoiceId: invoice.id,
-    subscriptionId: (invoice as StripeInvoiceWithSubscription).subscription
-  }, correlationId);
-  
-  await Promise.resolve(); // Placeholder for future async invoice processing
-}
 
-/**
- * Handle subscription changes
- */
-async function handleSubscriptionChange(subscription: Stripe.Subscription, eventType: string, correlationId: string): Promise<void> {
-  logWithCorrelation('info', `Subscription event: ${eventType}`, {
-    subscriptionId: subscription.id,
-    customerId: subscription.customer,
-    status: subscription.status,
-    eventType
-  }, correlationId);
-  
-  await Promise.resolve(); // Placeholder for future async subscription handling
-}
 
 /**
  * Handle successful async payments (delayed payment methods like Multibanco)
@@ -892,6 +745,289 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session: Stripe.Checko
 }
 
 /**
+ * Handle checkout session completed (immediate processing for all payment methods)
+ * This handles the initial checkout completion before async payment resolution
+ */
+async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session, correlationId: string): Promise<void> {
+  logWithCorrelation('info', `Checkout session completed: ${session.id}`, {
+    sessionId: session.id,
+    paymentIntent: session.payment_intent,
+    paymentStatus: session.payment_status,
+    amount: session.amount_total,
+    currency: session.currency
+  }, correlationId);
+  
+  try {
+    // Retrieve full session with expanded data
+    const fullSession = await retryWithBackoff(() =>
+      stripe.checkout.sessions.retrieve(session.id, {
+        expand: ['line_items', 'payment_intent']
+      })
+    );
+
+    // Extract customer information from session
+    const customerEmail = fullSession.customer_details?.email || fullSession.metadata?.customer_email;
+    const customerName = fullSession.customer_details?.name || fullSession.metadata?.customer_name;
+    // Note: These variables are available for future use but not currently used in this code path
+    // const customerPhone = fullSession.metadata?.customer_phone;
+    // const leadId = fullSession.metadata?.lead_id;
+
+    if (!customerEmail || !customerName) {
+      logWithCorrelation('warn', 'Missing customer information in checkout session', {
+        sessionId: fullSession.id,
+        paymentStatus: fullSession.payment_status
+      }, correlationId);
+      return;
+    }
+
+    // Check fulfillment status to prevent duplicates
+    const fulfillmentKey = `checkout_session_${fullSession.id}`;
+    if (FulfillmentTracker.isAlreadyFulfilled(fulfillmentKey)) {
+      logWithCorrelation('info', `Session ${fullSession.id} already processed`, {
+        sessionId: fullSession.id
+      }, correlationId);
+      return;
+    }
+
+    // Handle based on payment status
+    switch (fullSession.payment_status) {
+      case 'paid':
+        // Payment completed immediately (e.g., cards with successful authorization)
+        await processImmediatePaymentSuccess(fullSession, correlationId);
+        break;
+        
+      case 'unpaid':
+        // Payment pending (e.g., Multibanco voucher generated but not yet paid)
+        await processPaymentPending(fullSession, correlationId);
+        break;
+        
+      case 'no_payment_required':
+        // Free order or promotional checkout
+        processFreeOrder(fullSession, correlationId);
+        break;
+        
+      default:
+        logWithCorrelation('info', `Unhandled payment status: ${String(fullSession.payment_status)}`, {
+          sessionId: fullSession.id,
+          paymentStatus: fullSession.payment_status
+        }, correlationId);
+    }
+
+  } catch (error) {
+    logWithCorrelation('error', 'Error processing checkout session completion', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      sessionId: session.id,
+      stack: error instanceof Error ? error.stack : undefined
+    }, correlationId);
+  }
+}
+
+/**
+ * Process immediate payment success (cards, instant payment methods)
+ */
+async function processImmediatePaymentSuccess(session: Stripe.Checkout.Session, correlationId: string): Promise<void> {
+  const customerEmail = session.customer_details?.email || session.metadata?.customer_email;
+  const customerName = session.customer_details?.name || session.metadata?.customer_name;
+  const customerPhone = session.metadata?.customer_phone;
+  const leadId = session.metadata?.lead_id;
+  const fulfillmentKey = `checkout_session_${session.id}`;
+
+  logWithCorrelation('info', `Processing immediate payment success for session ${session.id}`, {
+    sessionId: session.id,
+    customerEmail,
+    paymentIntent: typeof session.payment_intent === 'object' ? session.payment_intent?.id : session.payment_intent
+  }, correlationId);
+
+  try {
+    // Add customer to MailerLite immediately for successful payments
+    await retryWithBackoff(() => addToMailerLite({
+      email: customerEmail!,
+      name: customerName!,
+      phone: customerPhone,
+      fields: {
+        lead_id: leadId || '',
+        payment_status: 'paid',
+        payment_intent_id: typeof session.payment_intent === 'object' ? session.payment_intent?.id || 'unknown' : session.payment_intent || 'unknown',
+        session_id: session.id,
+        amount_paid: (session.amount_total || 0) / 100,
+        currency: session.currency?.toUpperCase() || 'EUR',
+        event_name: session.metadata?.event_name || 'Café com Vendas',
+        event_date: session.metadata?.event_date || '2024-09-20',
+        spot_type: session.metadata?.spot_type || 'first_lot_early_bird',
+        source: 'checkout_immediate_payment',
+        payment_date: new Date().toISOString(),
+        payment_method: 'card_or_instant',
+        utm_source: session.metadata?.utm_source || null,
+        utm_medium: session.metadata?.utm_medium || null,
+        utm_campaign: session.metadata?.utm_campaign || null,
+        fulfillment_trigger: 'checkout_session_completed_paid'
+      }
+    }));
+
+    // Send confirmation email
+    await triggerConfirmationEmail(customerEmail!, {
+      name: customerName,
+      amount: (session.amount_total || 0) / 100,
+      currency: session.currency?.toUpperCase() || 'EUR',
+      event_name: session.metadata?.event_name || 'Café com Vendas',
+      event_date: session.metadata?.event_date || '20/09/2024',
+      payment_method: 'immediate'
+    });
+
+    // Mark as fulfilled
+    FulfillmentTracker.markAsFulfilled(fulfillmentKey, {
+      customerEmail,
+      sessionId: session.id,
+      paymentIntentId: typeof session.payment_intent === 'object' ? session.payment_intent?.id : session.payment_intent,
+      fulfillmentType: 'checkout_session_completed_immediate',
+      fulfilledAt: new Date().toISOString()
+    });
+
+    logWithCorrelation('info', `Successfully processed immediate payment for ${customerEmail}`, {
+      sessionId: session.id,
+      fulfillmentKey
+    }, correlationId);
+
+  } catch (error) {
+    logWithCorrelation('error', 'Failed to process immediate payment success', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      sessionId: session.id,
+      customerEmail
+    }, correlationId);
+  }
+}
+
+/**
+ * Process payment pending state (Multibanco and other delayed payment methods)
+ */
+async function processPaymentPending(session: Stripe.Checkout.Session, correlationId: string): Promise<void> {
+  const customerEmail = session.customer_details?.email || session.metadata?.customer_email;
+  const customerName = session.customer_details?.name || session.metadata?.customer_name;
+  const customerPhone = session.metadata?.customer_phone;
+  const leadId = session.metadata?.lead_id;
+  const fulfillmentKey = `checkout_session_${session.id}`;
+
+  logWithCorrelation('info', `Processing payment pending for session ${session.id}`, {
+    sessionId: session.id,
+    customerEmail,
+    paymentIntent: typeof session.payment_intent === 'object' ? session.payment_intent?.id : session.payment_intent
+  }, correlationId);
+
+  try {
+    // Add customer to MailerLite with pending status - this creates the lead
+    // but doesn't trigger full fulfillment until payment completes
+    await retryWithBackoff(() => addToMailerLite({
+      email: customerEmail!,
+      name: customerName!,
+      phone: customerPhone,
+      fields: {
+        lead_id: leadId || '',
+        payment_status: 'pending_payment',
+        payment_intent_id: typeof session.payment_intent === 'object' ? session.payment_intent?.id || 'unknown' : session.payment_intent || 'unknown',
+        session_id: session.id,
+        amount_pending: (session.amount_total || 0) / 100,
+        currency: session.currency?.toUpperCase() || 'EUR',
+        event_name: session.metadata?.event_name || 'Café com Vendas',
+        event_date: session.metadata?.event_date || '2024-09-20',
+        spot_type: session.metadata?.spot_type || 'first_lot_early_bird',
+        source: 'checkout_pending_payment',
+        checkout_date: new Date().toISOString(),
+        payment_method: 'delayed_notification', // Likely Multibanco
+        utm_source: session.metadata?.utm_source || null,
+        utm_medium: session.metadata?.utm_medium || null,
+        utm_campaign: session.metadata?.utm_campaign || null,
+        fulfillment_trigger: 'checkout_session_completed_pending',
+        voucher_generated: 'true' // Indicates Multibanco voucher was created
+      }
+    }));
+
+    // Send voucher/instructions email for Multibanco
+    await triggerVoucherInstructionsEmail(customerEmail!, {
+      name: customerName,
+      amount: (session.amount_total || 0) / 100,
+      currency: session.currency?.toUpperCase() || 'EUR',
+      event_name: session.metadata?.event_name || 'Café com Vendas',
+      event_date: session.metadata?.event_date || '20/09/2024',
+      payment_method: 'Multibanco',
+      session_id: session.id
+    });
+
+    // Mark as processed (but not fully fulfilled - that happens on async_payment_succeeded)
+    FulfillmentTracker.markAsFulfilled(fulfillmentKey, {
+      customerEmail,
+      sessionId: session.id,
+      paymentIntentId: typeof session.payment_intent === 'object' ? session.payment_intent?.id : session.payment_intent,
+      fulfillmentType: 'checkout_session_completed_pending',
+      fulfilledAt: new Date().toISOString(),
+      awaitingPaymentCompletion: true // Flag to indicate partial processing
+    });
+
+    logWithCorrelation('info', `Successfully processed pending payment setup for ${customerEmail}`, {
+      sessionId: session.id,
+      fulfillmentKey,
+      awaitingPaymentCompletion: true
+    }, correlationId);
+
+  } catch (error) {
+    logWithCorrelation('error', 'Failed to process pending payment setup', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      sessionId: session.id,
+      customerEmail
+    }, correlationId);
+  }
+}
+
+/**
+ * Process free orders (no payment required)
+ */
+function processFreeOrder(session: Stripe.Checkout.Session, correlationId: string): void {
+  const customerEmail = session.customer_details?.email || session.metadata?.customer_email;
+  const customerName = session.customer_details?.name || session.metadata?.customer_name;
+  
+  if (!customerEmail || !customerName) {
+    return;
+  }
+
+  console.log(`Processing free order for session ${session.id}`, {
+    sessionId: session.id,
+    customerEmail,
+    correlationId
+  });
+
+  // TODO: Implement free order processing if needed
+  // Similar to immediate payment processing but for free orders
+  // Implementation would be similar to processImmediatePaymentSuccess
+  // but with payment_status: 'free' and different email templates
+}
+
+/**
+ * Trigger voucher instructions email (for Multibanco)
+ */
+async function triggerVoucherInstructionsEmail(email: string, data: Record<string, unknown>): Promise<void> {
+  if (!MAILERLITE_API_KEY) {
+    return;
+  }
+
+  try {
+    logWithCorrelation('info', `Triggered voucher instructions email for: ${email}`, {
+      email,
+      paymentMethod: data.payment_method,
+      sessionId: data.session_id
+    });
+    
+    // This would trigger a specific Multibanco instructions automation in MailerLite
+    // The automation would include the voucher details and payment instructions
+    await Promise.resolve(); // Placeholder for future async automation API calls
+    
+  } catch (error) {
+    logWithCorrelation('error', 'Error triggering voucher instructions email', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      email
+    });
+  }
+}
+
+/**
  * Handle failed async payments (delayed payment methods like Multibanco)
  */
 async function handleCheckoutSessionAsyncPaymentFailed(session: Stripe.Checkout.Session, correlationId: string): Promise<void> {
@@ -946,34 +1082,31 @@ async function handleCheckoutSessionAsyncPaymentFailed(session: Stripe.Checkout.
  */
 async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promise<MailerLiteSubscriberResponse | void> {
   if (!MAILERLITE_API_KEY) {
-    logWithCorrelation('warn', 'MailerLite API key not configured - skipping email integration');
+    console.log('MailerLite API key not configured - skipping email integration');
     return;
   }
-
-  const circuitBreaker = getCircuitBreaker('mailerlite');
   
   try {
-    return await circuitBreaker.execute(async () => {
-      const response = await withTimeout(
-        fetch('https://connect.mailerlite.com/api/subscribers', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${MAILERLITE_API_KEY}`
-          },
-          body: JSON.stringify({
-            email: subscriberData.email,
-            name: subscriberData.name,
-            fields: subscriberData.fields,
-            groups: [MAILERLITE_GROUP_ID],
-            status: 'active',
-            subscribed_at: new Date().toISOString()
-          })
-        }),
-        TIMEOUTS.mailerlite_api,
-        'MailerLite subscriber creation'
-      );
+    const response = await withTimeout(
+      fetch('https://connect.mailerlite.com/api/subscribers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${MAILERLITE_API_KEY}`
+        },
+        body: JSON.stringify({
+          email: subscriberData.email,
+          name: subscriberData.name,
+          fields: subscriberData.fields,
+          groups: [MAILERLITE_GROUP_ID],
+          status: 'active',
+          subscribed_at: new Date().toISOString()
+        })
+      }),
+      TIMEOUTS.mailerlite_api,
+      'MailerLite subscriber creation'
+    );
 
     if (!response.ok) {
       const error = await response.text();
@@ -981,29 +1114,13 @@ async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promis
     }
 
     const result = await response.json() as MailerLiteSubscriberResponse;
-    logWithCorrelation('info', `Added subscriber to MailerLite: ${subscriberData.email}`, {
-      email: subscriberData.email,
-      subscriberId: result.data.id
-    });
-      return result;
-    });
-
-  } catch (error) {
-    // Handle circuit breaker open state gracefully
-    if (error instanceof Error && error.message.includes('Circuit breaker is OPEN')) {
-      logWithCorrelation('warn', 'MailerLite circuit breaker is open - skipping email integration', {
-        email: subscriberData.email,
-        circuitBreakerStatus: circuitBreaker.getStatus()
-      });
-      return; // Fail gracefully, don't throw
-    }
+    console.log(`Added subscriber to MailerLite: ${subscriberData.email}`);
+    return result;
     
-    logWithCorrelation('error', 'MailerLite integration error', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      email: subscriberData.email,
-      circuitBreakerStatus: circuitBreaker.getStatus()
-    });
-    throw error;
+  } catch (error) {
+    console.error('MailerLite integration error:', error instanceof Error ? error.message : 'Unknown error');
+    // Fail gracefully for email integration errors
+    return;
   }
 }
 
@@ -1012,14 +1129,11 @@ async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promis
  */
 async function updateMailerLiteSubscriber(email: string, fields: Record<string, string | number>): Promise<void> {
   if (!MAILERLITE_API_KEY) {
-    logWithCorrelation('warn', 'MailerLite API key not configured - skipping email integration');
+    console.log('MailerLite API key not configured - skipping email integration');
     return;
   }
-
-  const circuitBreaker = getCircuitBreaker('mailerlite');
   
   try {
-    return await circuitBreaker.execute(async () => {
     // First, get the subscriber ID with timeout
     const searchResponse = await withTimeout(
       fetch(`https://connect.mailerlite.com/api/subscribers?filter[email]=${encodeURIComponent(email)}`, {
@@ -1068,28 +1182,12 @@ async function updateMailerLiteSubscriber(email: string, fields: Record<string, 
       throw new Error(`Failed to update subscriber: ${updateResponse.status} - ${error}`);
     }
 
-      logWithCorrelation('info', `Updated MailerLite subscriber: ${email}`, {
-        email,
-        subscriberId
-      });
-    });
-
-  } catch (error) {
-    // Handle circuit breaker open state gracefully
-    if (error instanceof Error && error.message.includes('Circuit breaker is OPEN')) {
-      logWithCorrelation('warn', 'MailerLite circuit breaker is open - skipping subscriber update', {
-        email,
-        circuitBreakerStatus: circuitBreaker.getStatus()
-      });
-      return; // Fail gracefully, don't throw
-    }
+    console.log(`Updated MailerLite subscriber: ${email}`);
     
-    logWithCorrelation('error', 'Error updating MailerLite subscriber', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      email,
-      circuitBreakerStatus: circuitBreaker.getStatus()
-    });
-    throw error;
+  } catch (error) {
+    console.error('Error updating MailerLite subscriber:', error instanceof Error ? error.message : 'Unknown error');
+    // Fail gracefully for email integration errors
+    return;
   }
 }
 
