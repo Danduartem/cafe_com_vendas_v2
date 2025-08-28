@@ -399,7 +399,7 @@ export const Checkout: CheckoutSectionComponent = {
       // This will automatically show payment methods configured in Stripe Dashboard
       this.paymentElement = this.elements.create('payment', {
         layout: {
-          type: 'accordion', // Modern layout pattern recommended by Stripe
+          type: 'tabs', // Show tabs for each payment method (cards, Multibanco, SEPA, etc.)
           defaultCollapsed: false,
           radios: false,
           spacedAccordionItems: false
@@ -759,14 +759,23 @@ export const Checkout: CheckoutSectionComponent = {
       return;
     }
 
-    try {
-      // Show loading state
-      const payBtn = document.querySelector('#payBtn');
-      const payBtnText = payBtn?.querySelector('#payBtnText') as HTMLElement | null;
-      const payBtnSpinner = payBtn?.querySelector('#payBtnSpinner') as HTMLElement | null;
+    // Show loading state
+    const payBtn = document.querySelector('#payBtn');
+    const payBtnText = payBtn?.querySelector('#payBtnText') as HTMLElement | null;
+    const payBtnSpinner = payBtn?.querySelector('#payBtnSpinner') as HTMLElement | null;
 
+    // Store original text to restore later
+    const originalText = payBtnText?.textContent || '';
+
+    try {
       if (payBtn) (payBtn as HTMLButtonElement).disabled = true;
-      if (payBtnText) payBtnText.classList.add('opacity-0');
+      if (payBtnText) {
+        payBtnText.textContent = 'Processando pagamento...';
+        // Ensure text is visible by explicitly setting opacity and display
+        payBtnText.style.opacity = '1';
+        payBtnText.style.display = 'inline';
+        logger.debug('Payment button text changed to:', payBtnText.textContent);
+      }
       if (payBtnSpinner) payBtnSpinner.classList.remove('hidden');
 
       // Confirm the payment with Stripe using the Payment Element
@@ -833,12 +842,14 @@ export const Checkout: CheckoutSectionComponent = {
       this.showError('payError', 'Erro no processamento do pagamento. Tente novamente.');
     } finally {
       // Reset loading state
-      const payBtn = document.querySelector('#payBtn');
-      const payBtnText = payBtn?.querySelector('#payBtnText') as HTMLElement | null;
-      const payBtnSpinner = payBtn?.querySelector('#payBtnSpinner') as HTMLElement | null;
-
       if (payBtn) (payBtn as HTMLButtonElement).disabled = false;
-      if (payBtnText) payBtnText.classList.remove('opacity-0');
+      if (payBtnText) {
+        payBtnText.textContent = originalText;
+        // Ensure text remains visible after reset
+        payBtnText.style.opacity = '1';
+        payBtnText.style.display = 'inline';
+        logger.debug('Payment button text restored to:', payBtnText.textContent);
+      }
       if (payBtnSpinner) payBtnSpinner.classList.add('hidden');
     }
   },
@@ -898,11 +909,9 @@ export const Checkout: CheckoutSectionComponent = {
     if (leadSubmitSpinner) leadSubmitSpinner.classList.add('hidden');
 
     const payBtn = safeQuery('#payBtn');
-    const payBtnText = safeQuery('#payBtnText');
     const payBtnSpinner = safeQuery('#payBtnSpinner');
 
     if (payBtn) (payBtn as HTMLButtonElement).disabled = true;
-    if (payBtnText) payBtnText.classList.remove('opacity-0');
     if (payBtnSpinner) payBtnSpinner.classList.add('hidden');
   },
 

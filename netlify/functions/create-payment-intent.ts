@@ -158,9 +158,9 @@ const VALIDATION_RULES: ValidationRules = {
   phone_regex: /^[+]?[0-9][\d\s\-()]{7,20}$/, // International format with spaces/dashes allowed
   name_min_length: 2,
   name_max_length: 100,
-  amount_min: 50, // 50 cents minimum
-  amount_max: 1000000, // €10,000 maximum
-  currency_allowed: ['eur', 'usd', 'gbp'],
+  amount_min: 50, // 50 cents minimum (Multibanco supports €0.50 minimum)
+  amount_max: 1000000, // €10,000 maximum (well within Multibanco's €99,999 limit)
+  currency_allowed: ['eur', 'usd', 'gbp'], // EUR required for Multibanco
   utm_params: ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
 };
 
@@ -608,6 +608,11 @@ export default async (request: Request): Promise<Response> => {
           },
           bancontact: {
             setup_future_usage: 'off_session'
+          },
+          multibanco: {
+            // Multibanco doesn't support setup_future_usage, so we explicitly set 'none'
+            // This prevents any future payment method attachment attempts
+            setup_future_usage: 'none'
           }
         }
       }, {
