@@ -107,3 +107,43 @@ Invoke the `@design-review` subagent for thorough design validation when:
 **Payments**
 1. See `docs/STRIPE_TEST_CARDS.md` and `docs/PAYMENT_TESTING_SUMMARY.md`
 2. Verify: `payment_completed` → GA4 `purchase` + webhook success
+
+---
+
+## 7) Browser Testing & UI Validation Protocol
+
+### Development Environment Investigation (Required First Step)
+* **Check running servers**: `lsof -ti:8888` vs `lsof -ti:8080`
+  - Port 8888 = Netlify dev (backend integration) ← **Use for payment/backend testing**
+  - Port 8080 = Vite dev (frontend only) ← Avoid for integration tests
+* **Verify setup**: Reference `netlify.toml` and `docs/SETUP.md` for configuration
+* **Always start with correct environment** before browser testing
+
+### Playwright MCP Tool Selection Strategy
+* **`browser_snapshot()`**: Primary tool for interactions (structured accessibility tree)
+  - Use for: element targeting, form filling, button clicking, navigation
+  - Returns: element references, text content, semantic structure
+  - Token efficient for interactions
+* **`browser_take_screenshot()`**: Visual confirmation and documentation only
+  - Use for: visual validation, design compliance, bug documentation
+  - Returns: visual image (cannot perform actions)
+  - Essential for UI/UX validation
+* **Decision Matrix**:
+  - **Interaction only** → `browser_snapshot()`
+  - **Visual documentation only** → `browser_take_screenshot()`
+  - **UI testing & validation** → **Both** (snapshot for interaction + screenshot for visual confirmation)
+
+### Optimal Testing Workflow
+1. **Navigate** to correct environment (8888 for backend integration)
+2. **Targeted snapshot** of component/modal (not full page landing content)
+3. **Perform interactions** using element references from snapshot
+4. **Visual confirmation** via screenshot of changes/results
+5. **Debug context** via `browser_console_messages()` when needed
+
+### Token Optimization Through Smart Targeting
+* **Component targeting**: Snapshot specific modals/forms instead of entire landing pages
+* **Reference reuse**: Use single snapshot for multiple interactions on same component
+* **Strategic combination**: Structured accessibility data + visual confirmation
+* **Focus areas**: Target checkout modals, forms, and interactive components rather than marketing content
+
+---
