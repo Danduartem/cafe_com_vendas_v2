@@ -3,24 +3,43 @@
   "enabled": true,
   "copy": {
     "badge": {
-      "text": "Pagamento confirmado"
+      "text": "🎉 Pagamento confirmado com sucesso"
     },
     "header": {
-      "title": "Falta só <em class=\"italic text-burgundy-600 font-black\">um</em> passo<br class=\"hidden sm:block\"/>\\n        <span class=\"text-navy-700\">para garantir a sua experiência</span>",
-      "subtitle": "Agora precisamos de algumas informações rápidas para personalizar a sua participação.\\n        <span class=\"font-semibold text-navy-700\">Você receberá um email com todos os detalhes em minutos.</span>"
+      "title": "<span class=\"text-gold-500\">Parabéns!</span> Falta só <em class=\"italic text-burgundy-600 font-black\">um</em> passo<br class=\"hidden sm:block\"/>\\n        <span class=\"text-navy-700\">para garantir a sua experiência premium</span>",
+      "subtitle": "Excelente decisão! Agora só precisamos de algumas informações rápidas para personalizar completamente a sua participação no <strong>Café com Vendas</strong>.\\n        <span class=\"font-semibold text-burgundy-700\">Em apenas 2 minutos, terá acesso completo ao evento.</span>"
     },
     "progress": {
-      "label": "Progresso",
-      "percentage": "80%",
-      "value": 80,
-      "message": "Quase lá — complete o formulário em apenas 2 minutos"
+      "label": "O seu percurso",
+      "milestones": [
+        {
+          "step": 1,
+          "title": "Pagamento",
+          "status": "completed",
+          "icon": "check"
+        },
+        {
+          "step": 2, 
+          "title": "Perfil",
+          "status": "current",
+          "icon": "user",
+          "time": "2 min"
+        },
+        {
+          "step": 3,
+          "title": "Acesso Completo",
+          "status": "pending", 
+          "icon": "star"
+        }
+      ],
+      "message": "Quase lá! Complete o seu perfil para acesso total ao evento."
     },
     "mainAction": {
       "stepNumber": "1",
-      "title": "Complete o formulário complementar",
-      "description": "Precisamos confirmar detalhes práticos (contatos, restrições e preferências) para preparar tudo para você.",
+      "title": "Garanta o seu lugar agora",
+      "description": "Complete o seu perfil personalizado em apenas 2 minutos. Estas informações garantem que preparamos tudo especificamente para si e que recebe todos os materiais exclusivos antes do evento.",
       "button": {
-        "text": "Completar formulário agora",
+        "text": "Completar o meu perfil →",
         "url": "https://formspree.io/f/xanbnrvp",
         "analytics": "cta_complete_form"
       }
@@ -28,32 +47,33 @@
     "steps": [
       {
         "number": "2",
-        "color": "burgundy",
-        "title": "Verifique o seu email",
-        "description": "Enviámos a confirmação com detalhes do evento e próximos passos. Verifique também \"Promoções\" ou \"Spam\" se não encontrar em 5 minutos."
+        "color": "navy",
+        "title": "Receba a confirmação por email",
+        "description": "Após completar o perfil, receberá automaticamente todos os detalhes do evento, incluindo localização, horários e materiais de preparação."
       },
       {
         "number": "3",
-        "color": "burgundy",
-        "title": "Adicione ao calendário",
-        "description": "Garanta que não vai esquecer — salve a data agora.",
+        "color": "navy", 
+        "title": "Adicione ao seu calendário",
+        "description": "Não perca esta oportunidade única. Adicione o evento ao seu calendário.",
         "button": {
-          "text": "Adicionar ao calendário",
+          "text": "📅 Adicionar ao calendário",
           "url": "/assets/evento.ics",
-          "classes": "inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-burgundy-700 bg-burgundy-50 hover:bg-burgundy-100 rounded-xl transition-colors duration-200",
+          "classes": "inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-navy-600 bg-navy-50 hover:bg-navy-100 rounded-lg transition-colors duration-200",
           "analytics": "add_to_calendar"
         }
       }
     ],
     "eventSummary": {
       "title": "Café com Vendas",
-      "subtitle": "Edição Portugal • 15 Fevereiro",
+      "subtitle": "Edição Exclusiva Portugal • 15 Fevereiro 2025",
       "features": [
-        "<span class=\"font-semibold\">Ambiente intimista</span> com conteúdo prático para vender mais trabalhando melhor",
-        "<span class=\"font-semibold\">Email confirmado</span> com instruções completas em minutos",
-        "<span class=\"font-semibold\">Suporte dedicado</span> via WhatsApp para qualquer dúvida"
+        "<span class=\"font-semibold text-gold-600\">Experiência premium</span> com estratégias comprovadas para liberdade empresarial",
+        "<span class=\"font-semibold text-gold-600\">Grupo seleto</span> de empreendedoras comprometidas com o crescimento inteligente",
+        "<span class=\"font-semibold text-gold-600\">Materiais exclusivos</span> e acesso prioritário a recursos avançados",
+        "<span class=\"font-semibold text-gold-600\">Suporte personalizado</span> durante e após o evento"
       ],
-      "important": "<span class=\"font-bold text-burgundy-700\">Importante:</span> Complete o formulário agora para garantir o seu lugar. Os detalhes do local serão enviados após o preenchimento."
+      "important": "<span class=\"font-bold text-burgundy-700\">⚡ Ação necessária:</span> Complete o seu perfil nos próximos minutos para receber todos os materiais de preparação e garantir o acesso completo a esta experiência transformadora."
     }
   }
 }
