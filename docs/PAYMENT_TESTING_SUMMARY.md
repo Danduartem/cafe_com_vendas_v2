@@ -125,30 +125,141 @@
 
 ## 8) Multibanco-specific testing
 
-Since Multibanco uses delayed notifications, additional verification is needed:
+### ⚠️ **IMPORTANT: Use Netlify Dev Environment**
+Multibanco testing requires the full backend integration. Always use:
+```bash
+npm run netlify:dev  # Port 8888 (NOT port 8080)
+```
 
-### A) Stripe Dashboard Testing
+### A) Stripe Dashboard Configuration
 1. **Enable Multibanco**: Payment methods → Enable Multibanco
-2. **Simulate completion**: Use Dashboard to manually complete test Multibanco payments
-3. **Check webhook delivery**: Verify `checkout.session.async_payment_succeeded` webhook fires
+2. **Verify webhook endpoints**: Ensure both events are configured:
+   - `checkout.session.completed` (immediate processing)
+   - `checkout.session.async_payment_succeeded` (delayed completion)
+3. **Test webhook delivery**: Use Stripe CLI to monitor webhook events
 
-### B) Delayed Payment Workflow
-* **Initial state**: Payment shows "processing" status
-* **Voucher display**: Customer sees entity/reference numbers for bank payment
-* **Webhook timing**: `async_payment_succeeded` fires when manually completed
-* **Fulfillment**: MailerLite integration triggers only after payment confirmation
+### B) Complete Multibanco Test Workflow
 
-### C) Expected Timeline
-* **Immediate**: Voucher generation + `checkout.session.completed` (processing status)
-* **Delayed**: Manual completion + `checkout.session.async_payment_succeeded` + fulfillment
+#### Step 1: Initiate Payment
+1. Open checkout modal on `localhost:8888`
+2. Fill lead form with test data
+3. Select **Multibanco** as payment method
+4. Submit payment form
+
+#### Step 2: Verify Immediate Processing
+- ✅ Modal shows "Referência Multibanco gerada!"
+- ✅ Entity and reference numbers are displayed
+- ✅ `checkout.session.completed` webhook fires (check Stripe CLI)
+- ✅ Redirect to `/thank-you` with Multibanco parameters
+- ✅ Thank-you page shows pending payment instructions
+
+#### Step 3: Simulate Payment Completion
+1. **In Stripe Dashboard**: Go to Payments → Find the processing payment
+2. **Manual completion**: Click "Simulate completion" or use test webhook
+3. **Webhook verification**: `checkout.session.async_payment_succeeded` should fire
+4. **MailerLite integration**: Customer should be added with `paid` status
+
+#### Step 4: Verify Final State
+- ✅ Webhook logs show successful fulfillment
+- ✅ No duplicate processing (idempotency check)
+- ✅ Customer receives confirmation email
+- ✅ Analytics events fire correctly
+
+### C) Expected Webhook Sequence
+```
+1. checkout.session.completed (status: processing)
+   → Customer added to MailerLite with "pending_payment"
+   → Voucher instructions email sent
+   
+2. checkout.session.async_payment_succeeded (status: paid)
+   → Customer updated to "paid" status
+   → Fulfillment triggers
+   → Confirmation email sent
+```
+
+### D) Common Issues & Solutions
+
+**Issue**: "Price mismatch" in thank-you page
+- **Solution**: Verify centralized pricing in `src/_data/site.ts`
+- **Check**: All components use `basePrice` from site data
+
+**Issue**: Webhook not firing
+- **Solution**: Verify Netlify dev server is running on port 8888
+- **Check**: Stripe webhook secret is configured in `.env`
+
+**Issue**: Duplicate fulfillment
+- **Solution**: Check fulfillment tracking logs
+- **Verify**: Idempotency keys are working correctly
+
+**Issue**: Missing Multibanco details
+- **Solution**: Check `next_action.multibanco_display_details` in payment intent
+- **Fallback**: Generic pending payment message should display
+
+### E) Manual Test Checklist
+
+**Multibanco Flow** ✅
+- [ ] Payment modal opens without errors
+- [ ] Multibanco option appears for Portuguese customers
+- [ ] Voucher details display correctly (entity + reference)
+- [ ] Redirect includes all necessary URL parameters
+- [ ] Thank-you page shows appropriate pending state
+- [ ] Webhook sequence completes successfully
+- [ ] Final fulfillment triggers without duplicates
+- [ ] Customer receives both instruction and confirmation emails
+
+**Error Handling** ✅
+- [ ] Missing voucher details show generic pending message
+- [ ] Failed payments display retry options
+- [ ] Network errors don't break the user experience
+- [ ] Webhook failures don't prevent duplicate processing
+
+**Analytics Tracking** ✅
+- [ ] `payment_processing` event fires on Multibanco initiation
+- [ ] `payment_completed` event fires only after async success
+- [ ] Lead ID and payment method are tracked correctly
 
 ---
 
-## 9) Notes for contributors
+## 9) Development Environment Setup
 
+### Required Environment Variables
+```bash
+# .env (ensure these are configured)
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_... # From Stripe CLI or webhook endpoint
+MAILERLITE_API_KEY=your_api_key # For fulfillment testing
+```
+
+### Stripe CLI Setup
+```bash
+# Terminal 1: Start development server
+npm run netlify:dev
+
+# Terminal 2: Forward webhooks to local server
+stripe listen --forward-to localhost:8888/.netlify/functions/stripe-webhook
+```
+
+### Browser DevTools Debugging
+
+**Console logs to monitor**:
+- `Payment processing initiated` (checkout component)
+- `Multibanco payment detected` (thank-you component)
+- `Webhook received` (Netlify function logs)
+- Analytics events in `dataLayer`
+
+**Network tab verification**:
+- Payment intent creation: `POST /.netlify/functions/create-payment-intent`
+- Webhook delivery: `POST /.netlify/functions/stripe-webhook`
+- MailerLite integration: `POST https://connect.mailerlite.com/api/subscribers`
+
+## 10) Notes for contributors
+
+* **Always test Multibanco on port 8888** - port 8080 lacks backend integration
 * Keep this page a **checklist**, not a card database—add new cards only to `STRIPE_TEST_CARDS.md`
 * If you change event names or payloads, update the GTM docs **in the same PR**
 * For Multibanco changes, test both immediate voucher generation and delayed confirmation
+* **Price changes**: Update only `basePrice` in `src/_data/site.ts` - all components inherit from this
 
 ---
 
