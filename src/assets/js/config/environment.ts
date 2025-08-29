@@ -27,7 +27,7 @@ const isDevelopment = isBrowser ? (
   window.location.hostname === 'localhost' ||
   window.location.hostname === '127.0.0.1' ||
   window.location.hostname.includes('netlify.app') ||
-  window.location.port === '8080'    // Unified Netlify dev server
+  ['8080', '8888'].includes(window.location.port)    // Eleventy dev (8080) or Netlify dev (8888)
 ) : (process.env.NODE_ENV !== 'production'); // Node.js fallback
 
 const isProduction = isBrowser ? 
@@ -80,7 +80,29 @@ const config: EnvironmentConfig = {
 
   // Stripe Configuration (Publishable keys only - Safe to expose)
   stripe: {
-    publishableKey: import.meta.env?.VITE_STRIPE_PUBLIC_KEY ?? ''
+    // Use a getter to allow dynamic evaluation for test environments
+    get publishableKey(): string {
+      // Proper fallback chain following Stripe best practices:
+      // 1. Environment variable (production/build-time)
+      // 2. Test-injected key (e2e testing only)
+      // 3. Empty string (graceful degradation)
+      
+      // First try environment variable
+      if (import.meta.env?.VITE_STRIPE_PUBLIC_KEY) {
+        return import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+      }
+      
+      // In test environment, check for injected test key
+      if (isBrowser && window.STRIPE_TEST_PUBLISHABLE_KEY) {
+        return window.STRIPE_TEST_PUBLISHABLE_KEY;
+      }
+      
+      // No key available - component should handle gracefully
+      if (isBrowser) {
+        console.warn('[Environment] No Stripe publishable key configured');
+      }
+      return '';
+    }
   },
 
   // Contact Information (Public)
@@ -103,9 +125,9 @@ const config: EnvironmentConfig = {
     // In development: detect if running under Netlify dev (port 54393) or Eleventy dev (port 8080)
     base: isProduction ? 'https://jucanamaximiliano.com.br' : (
       isBrowser ? (
-        // Check if Netlify dev server is available (functions on different port)
-        window.location.port === '8080' ? 'http://localhost:54393' : window.location.origin
-      ) : 'http://localhost:54393'
+        // Check if running under development server (both Eleventy 8080 and Netlify dev 8888)
+        ['8080', '8888'].includes(window.location.port) ? window.location.origin : window.location.origin
+      ) : 'http://localhost:8888'  // Default to Netlify dev port for backend
     ),
     thankYou: '/obrigado',
     instagram: '/instagram',
@@ -123,5 +145,6 @@ export default config;
 
 // Also make available globally for debugging (development only)
 if (isDevelopment && isBrowser) {
-  window.CONFIG = config;
+  // Cast to GlobalAppConfig for window assignment - both interfaces are structurally compatible
+  window.CONFIG = config as unknown as typeof window.CONFIG;
 }

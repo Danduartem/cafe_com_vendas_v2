@@ -56,6 +56,15 @@ declare global {
     ANALYTICS_EVENTS: Record<string, unknown>;
     CafeComVendas: CafeComVendasApp;
     CLOUDINARY_CLOUD_NAME: string;
+    // Test environment properties
+    STRIPE_TEST_PUBLISHABLE_KEY?: string;
+    import?: {
+      meta?: {
+        env?: {
+          VITE_STRIPE_PUBLIC_KEY?: string;
+        };
+      };
+    };
   }
 }
 
