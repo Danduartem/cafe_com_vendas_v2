@@ -2,25 +2,24 @@
   "id": "vision",
   "enabled": true,
   "copy": {
-    "eyebrow": "A sua nova realidade",
-    "headline": "Empreendedora que cresce com método, não com mais horas",
-    "description": "Descubra como transformar o seu negócio numa máquina de vendas que funciona mesmo quando está de férias.",
+    "headline": "O café com vendas foi feito para você que:",
     "vision_outcomes": [
-      "Sistemas de venda automáticos que trazem clientes enquanto dorme",
-      "Equipa treinada que resolve tudo sem precisar de si",
-      "Crescimento consistente sem trabalhar fins de semana",
-      "Mais tempo para a família e os seus projetos pessoais",
-      "Liberdade para viajar sem preocupações com o negócio"
+      "Sonha em tirar sua empresa das costas e finalmente conquistar liberdade",
+      "Deseja quebrar a barreira e ir para o próximo nível no seu negócio sem se matar em trabalhar",
+      "Tem muitos sonhos e busca um plano prático, claro e eficiente",
+      "Busca uma atmosfera de abundância, com conexões de alto valor",
+      "Visa destravar suas vendas e crescer de verdade",
+      "Está em busca de liberdade mas se vê cada vez mais presa"
     ],
-    "guarantee": "Depois do Café com Vendas, a sua empresa e a sua vida nunca mais serão a mesma",
+    "guarantee": "Eu te garanto: depois do Café com vendas, a sua empresa e a sua vida nunca mais serão a mesma",
     "cta": {
-      "label": "Garantir a minha nova rotina",
+      "label": "Quero a minha vaga",
       "href": "#s-solution",
       "variant": "gradient"
     }
   },
   "media": {
-    "image": "tablet_a3ewil",
+    "image": "EFA0730A-7678-4838-BB25-16A9B921B9E1_bguei3",
     "alt": "Empreendedora focada no crescimento do seu negócio através de método e estratégia inteligente",
     "aspect_ratio": "3/4"
   }

@@ -3,38 +3,38 @@
   "enabled": true,
   "copy": {
     "eyebrow": "O Método Seja Livre",
-    "headline": "Finalmente Tire Sua Empresa das Costas e Conquiste a Liberdade de Verdade",
+    "headline": "Por que eu criei o Método Seja Livre?",
     "subhead": "O sistema prático de 5 pilares que me levou de 16h/dia para 4h/semana, gerindo minha empresa à distância com mais resultados e muito menos esforço.",
     "description": "Para mim, o sucesso sempre foi inegociável. Mas trabalhar 16h por dia se tornou insustentável. Foi quando descobri que mais esforço não traz melhores resultados - pelo contrário, sabota o desempenho. <br><br>Em apenas um ano, estava gerindo minha empresa à distância, trabalhando 4 horas por semana. Finalmente consegui tirar minha empresa das costas. <br><br>Por isso criei a SEJA LIVRE - o método que me tirou do ciclo de burnout e pode fazer o mesmo por você.",
     "pillars": [
       {
         "number": "01",
         "title": "Mentalidade",
-        "description": "Quebre paradigmas e transforme seu jeito de empreender com estratégia inteligente.",
+        "description": "“Mude seus pensamentos e você mudará seu mundo.” – Norman Vincent Peale. Neste pilar, você vai quebrar paradigmas, soltar crenças e transformar seu jeito de empreender.",
         "icon": "lightbulb"
       },
       {
         "number": "02",
-        "title": "Estratégia de Marca",
-        "description": "Defina a alma da sua marca e crie uma presença memorável que encanta.",
+        "title": "Estrutura de Marca",
+        "description": "“Não se trata de vender produtos, mas de construir uma marca que venda por si mesma.” – Philip Kotler. Aqui, você vai definir a alma da sua marca e vender sem esforço.",
         "icon": "diamond"
       },
       {
         "number": "03",
         "title": "Estratégia de Vendas",
-        "description": "Domine o método para transformar leads em clientes e vendas em liberdade.",
+        "description": "“Vender é transferir entusiasmo.” – Zig Ziglar. Você vai descobrir que vender não é difícil, é uma habilidade que qualquer pessoa pode dominar com método.",
         "icon": "target"
       },
       {
         "number": "04",
         "title": "Social Seller",
-        "description": "Crie conexão e desperte desejo espontâneo pelos seus produtos.",
+        "description": "“Conteúdo constrói relacionamentos. Relacionamentos baseados em confiança geram receita.” – Andrew Davis. Transforme conteúdo em relacionamento para seu público comprar naturalmente. ",
         "icon": "heart"
       },
       {
         "number": "05",
         "title": "Alavanca",
-        "description": "Use métricas inteligentes para escalar sem desperdício de recursos.",
+        "description": "“Descobrir sua alavanca de negócios é encontrar onde um esforço mínimo produz um efeito máximo.” – Jay Abraham. Aprenda a usar dados e estratégias para multiplicar seus lucros.",
         "icon": "trending-up-chart"
       }
     ],
