@@ -31,7 +31,7 @@
         <summary class="flex items-start justify-between w-full cursor-pointer px-6 lg:px-8 py-6 lg:py-7 min-h-[60px] focus:outline-none focus:ring-2 focus:ring-{% if item.is_special %}gold{% else %}burgundy{% endif %}-400/50 focus:ring-offset-2 focus:ring-offset-white">
           <div class="pr-4">
             {% if item.is_special %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gold-100 text-gold-800 border border-gold-200 mb-3">{{ item.special_badge }}</span>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-century font-semibold bg-gold-100 text-gold-800 border border-gold-200 mb-3">{{ item.special_badge }}</span>
             {% endif %}
             <h3 class="font-lora text-xl lg:text-2xl font-semibold text-navy-800 leading-tight mb-2">{{ item.question }}</h3>
             {% if item.description %}
@@ -81,7 +81,7 @@
                 {% endif %}
               </div>
               <p class="font-century text-base text-navy-700 leading-relaxed">
-                <strong class="text-navy-800">{{ feature.label }}</strong> {{ feature.text }}
+                <strong class="text-navy-800 font-century">{{ feature.label }}</strong> {{ feature.text }}
               </p>
             </li>
             {% endfor %}
@@ -97,7 +97,7 @@
                 </svg>
               </div>
               <p class="font-century text-base text-navy-700 leading-relaxed">
-                <strong class="text-navy-800">{{ feature }}</strong>
+                <strong class="text-navy-800 font-century">{{ feature }}</strong>
               </p>
             </li>
             {% endfor %}
@@ -124,7 +124,7 @@
         <div class="flex flex-col items-center gap-4 mb-8">
           <a 
             href="{{ currentSection.contact.whatsapp_url }}" 
-            class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+            class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-century font-semibold py-3 px-8 rounded-full transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             target="_blank"
             rel="noopener noreferrer"
             data-analytics-event="faq_whatsapp_contact">
@@ -143,7 +143,7 @@
           {% for link in currentSection.legal_links %}
           <a 
             href="{{ link.url }}" 
-            class="text-navy-600 hover:text-burgundy-600 transition-colors duration-300 underline-offset-4 hover:underline"
+            class="text-navy-600 font-century hover:text-burgundy-600 transition-colors duration-300 underline-offset-4 hover:underline"
             data-analytics-event="faq_legal_link_{{ link.text | lower | replace(' ', '_') }}">
             {{ link.text }}
           </a>

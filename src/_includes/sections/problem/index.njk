@@ -31,12 +31,12 @@
 
         {# Main headline with enhanced typography hierarchy and refined scaling #}
         <h2 data-reveal class="opacity-0 translate-y-3 font-lora font-semibold tracking-[-0.02em] leading-[1.06] text-[clamp(2.5rem,4.5vw,3.75rem)] text-navy-900 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-100 max-w-[48ch] mb-7 lg:mb-9">
-          {{ currentSection.copy.headline | replace('método', '<span class="text-burgundy-700 relative"><span class="absolute -inset-x-1 -inset-y-0.5 bg-burgundy-50/40 rounded-md -z-10"></span>método</span>') | safe }}
+          {{ currentSection.copy.headline | replace('método', '<span class="text-burgundy-700 font-century relative"><span class="absolute -inset-x-1 -inset-y-0.5 bg-burgundy-50/40 rounded-md -z-10"></span>método</span>') | safe }}
         </h2>
 
         {# Supporting description with enhanced readability - moved before outcomes #}
         <p data-reveal class="opacity-0 translate-y-3 font-century text-neutral-650 max-w-[58ch] text-[1.0625rem] lg:text-[1.1875rem] leading-[1.6] transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-150 mb-8 italic">
-          {{ currentSection.copy.description | replace('máquina de vendas', '<span class="font-semibold text-burgundy-700 not-italic relative"><span class="absolute -inset-x-0.5 bottom-0 h-0.5 bg-burgundy-200 rounded-full"></span>máquina de vendas</span>') | safe }}
+          {{ currentSection.copy.description | replace('máquina de vendas', '<span class="font-semibold text-burgundy-700 font-century not-italic relative"><span class="absolute -inset-x-0.5 bottom-0 h-0.5 bg-burgundy-200 rounded-full"></span>máquina de vendas</span>') | safe }}
         </p>
 
         {# Vision outcomes list with enhanced visual hierarchy and micro-interactions #}
@@ -66,7 +66,7 @@
         {# Enhanced primary CTA with sophisticated gradient button #}
         <div class="opacity-0 translate-y-3 mt-6 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-300" data-reveal>
           <a href="#s-solution" data-analytics-event="click_vision_cta"
-             class="group inline-flex items-center gap-3 bg-gradient-to-r from-burgundy-700 to-burgundy-800 text-white font-semibold px-8 py-4 rounded-xl
+             class="group inline-flex items-center gap-3 bg-gradient-to-r from-burgundy-700 to-burgundy-800 text-white font-century font-semibold px-8 py-4 rounded-xl
                     transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]
                     hover:from-burgundy-800 hover:to-burgundy-900 hover:gap-4 hover:shadow-lg hover:shadow-burgundy-700/25
                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy-500 focus-visible:ring-offset-3 focus-visible:ring-offset-white
@@ -101,7 +101,7 @@
                   <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                   </svg>
-                  <span>Liberdade</span>
+                  <span class="font-century">Liberdade</span>
                 </span>
               </div>
             </div>

@@ -197,7 +197,7 @@
   <article>
     <header>
         <div>
-          <p class="text-xs tracking-widest uppercase font-medium text-neutral-600">
+          <p class="text-xs tracking-widest uppercase font-medium text-neutral-600 font-century">
             Inscrição
           </p>
           <h3 id="modalTitle" 
@@ -227,7 +227,7 @@
         <form id="leadForm" class="space-y-5 sm:space-y-6" novalidate>
           <div>
             <label for="fullName" 
-                   class="block text-sm font-medium mb-2 text-navy-700">
+                   class="block text-sm font-medium mb-2 text-navy-700 font-century">
               Nome completo *
             </label>
             <input id="fullName" 
@@ -241,7 +241,7 @@
           
           <div>
             <label for="email" 
-                   class="block text-sm font-medium mb-2 text-navy-700">
+                   class="block text-sm font-medium mb-2 text-navy-700 font-century">
               Email *
             </label>
             <input id="email" 
@@ -255,7 +255,7 @@
           
           <div>
             <label for="phone" 
-                   class="block text-sm font-medium mb-2 text-navy-700">
+                   class="block text-sm font-medium mb-2 text-navy-700 font-century">
               Telefone/WhatsApp *
             </label>
             <div class="relative flex">
@@ -285,7 +285,7 @@
 
           <button id="leadSubmit" 
                   type="submit" 
-                  class="w-full rounded-xl px-6 py-4 sm:py-4 text-white font-semibold text-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-gradient-to-r from-burgundy-700 to-burgundy-600 focus:ring-burgundy-700 touch-manipulation min-h-[3.5rem] mt-8">
+                  class="w-full rounded-xl px-6 py-4 sm:py-4 text-white font-century font-semibold text-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 bg-gradient-to-r from-burgundy-700 to-burgundy-600 focus:ring-burgundy-700 touch-manipulation min-h-[3.5rem] mt-8">
             <div class="inline-flex items-center justify-center gap-2 min-h-[1.5rem]">
               <span id="leadSubmitText" class="transition-opacity duration-200">Garantir minha vaga</span>
               <svg id="leadSubmitSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -307,26 +307,26 @@
               <svg class="h-4 w-4 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
               </svg>
-              <span class="text-sm font-medium text-neutral-700">
+              <span class="text-sm font-medium text-neutral-700 font-century">
                 Pagamento 100% seguro
               </span>
             </div>
-            <span class="text-xs text-neutral-500 font-medium">Powered by Stripe</span>
+            <span class="text-xs text-neutral-500 font-medium font-century">Powered by Stripe</span>
           </div>
 
           <div class="mb-4 p-4 rounded-xl bg-green-50 border border-green-200">
-            <h4 class="font-medium text-base mb-2 text-navy-800">
+            <h4 class="font-medium text-base mb-2 text-navy-800 font-century">
               {{ site.event.pricing.tiers[0].label }}
             </h4>
             <div class="flex justify-between items-center">
-              <span class="text-sm text-neutral-600">
+              <span class="text-sm text-neutral-600 font-century">
                 {{ site.event.date.local }} • {{ site.event.location.city }}
               </span>
-              <span class="font-semibold text-lg text-navy-800">
+              <span class="font-semibold text-lg text-navy-800 font-century">
                 €{{ site.event.pricing.tiers[0].price }}
               </span>
             </div>
-            <p class="text-xs mt-1 text-green-700">
+            <p class="text-xs mt-1 text-green-700 font-century">
               {{ site.event.pricing.tiers[0].notes }}
             </p>
           </div>
@@ -388,7 +388,7 @@
           <button id="payBtn" 
                   type="button"
                   disabled
-                  class="w-full rounded-2xl px-6 py-3 text-white font-semibold shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none bg-navy-800 focus:ring-navy-700 mt-6">
+                  class="w-full rounded-2xl px-6 py-3 text-white font-century font-semibold shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none bg-navy-800 focus:ring-navy-700 mt-6">
             <div class="inline-flex items-center justify-center gap-2 min-h-[1.5rem]">
               <span id="payBtnText">Confirmar pagamento • €{{ site.event.pricing.tiers[0].price }}</span>
               <svg id="payBtnSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -411,10 +411,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
               </svg>
             </div>
-            <h4 id="successTitle" class="text-xl font-semibold mb-2 text-navy-800">
+            <h4 id="successTitle" class="text-xl font-semibold mb-2 text-navy-800 font-century">
               Pagamento confirmado! 🎉
             </h4>
-            <p id="successMessage" class="text-base mb-4 text-neutral-700">
+            <p id="successMessage" class="text-base mb-4 text-neutral-700 font-century">
               Sua vaga está garantida. Redirecionando para os detalhes...
             </p>
             <!-- Multibanco-specific instructions (will be shown dynamically) -->
@@ -424,10 +424,10 @@
                   🏦
                 </div>
                 <div>
-                  <h5 class="font-bold text-lg text-blue-900">
+                  <h5 class="font-bold text-lg text-blue-900 font-century">
                     Referência Multibanco Gerada
                   </h5>
-                  <p class="text-sm text-blue-700">
+                  <p class="text-sm text-blue-700 font-century">
                     Complete o pagamento através do seu homebanking ou ATM
                   </p>
                 </div>
@@ -436,7 +436,7 @@
               <div class="bg-white p-4 rounded-xl border border-blue-200 shadow-sm mb-4">
                 <div class="grid grid-cols-1 gap-3">
                   <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span class="font-semibold text-gray-700">Entidade:</span>
+                    <span class="font-semibold text-gray-700 font-century">Entidade:</span>
                     <div class="flex items-center gap-2">
                       <span id="mbEntity" class="font-mono text-xl font-bold text-navy-800 bg-white px-3 py-1 rounded border select-all">-----</span>
                       <button type="button" onclick="copyMultibancoValue('mbEntity', 'Entidade copiada!')" class="p-1 text-gray-400 hover:text-blue-600 transition-colors" title="Copiar entidade">
@@ -447,7 +447,7 @@
                     </div>
                   </div>
                   <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span class="font-semibold text-gray-700">Referência:</span>
+                    <span class="font-semibold text-gray-700 font-century">Referência:</span>
                     <div class="flex items-center gap-2">
                       <span id="mbReference" class="font-mono text-xl font-bold text-navy-800 bg-white px-3 py-1 rounded border tracking-wider select-all">--- --- ---</span>
                       <button type="button" onclick="copyMultibancoValue('mbReference', 'Referência copiada!')" class="p-1 text-gray-400 hover:text-blue-600 transition-colors" title="Copiar referência">
@@ -458,7 +458,7 @@
                     </div>
                   </div>
                   <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span class="font-semibold text-gray-700">Valor:</span>
+                    <span class="font-semibold text-gray-700 font-century">Valor:</span>
                     <div class="flex items-center gap-2">
                       <span id="mbAmount" class="text-xl font-bold text-green-700 bg-green-50 px-3 py-1 rounded border border-green-200 select-all">€180,00</span>
                       <button type="button" onclick="copyMultibancoValue('mbAmount', 'Valor copiado!')" class="p-1 text-gray-400 hover:text-green-600 transition-colors" title="Copiar valor">
@@ -486,7 +486,7 @@
               
               <div class="flex items-center gap-2 mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                 <span class="text-amber-600 text-lg">⏰</span>
-                <p class="text-sm text-amber-800">
+                <p class="text-sm text-amber-800 font-century">
                   <strong>Importante:</strong> Esta referência é válida por 3 dias. Receberá confirmação por email após o pagamento.
                 </p>
               </div>
@@ -508,7 +508,7 @@
         </div>
 
         <div class="mt-6 pt-4 border-t border-neutral-200 text-center">
-          <p class="text-xs text-neutral-500">
+          <p class="text-xs text-neutral-500 font-century">
             Ao continuar, você concorda com nossos 
             <a href="/termos-condicoes/" class="underline hover:no-underline">termos de serviço</a>.
             <br>
