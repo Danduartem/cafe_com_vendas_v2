@@ -19,30 +19,14 @@
 
       {# Primary content column - optically aligned with constrained line length #}
       <div class="order-2 lg:order-1 lg:pt-2">
-        {# Eyebrow text with golden accent #}
-        <div data-reveal class="opacity-0 translate-y-3 transition-all duration-200 ease-out mb-4">
-          <p class="text-sm font-medium text-gold-600 uppercase tracking-[0.1em] font-century">{{ currentSection.copy.eyebrow }}</p>
-        </div>
-
-        {# Subtle accent line with golden gradient #}
-        <div data-reveal class="opacity-0 translate-y-3 transition-all duration-200 ease-out mb-8 delay-75">
-          <span class="inline-block h-[1.5px] w-20 rounded-full bg-gradient-to-r from-gold-400 to-gold-300"></span>
-        </div>
 
         {# Main headline with enhanced typography hierarchy and refined scaling #}
         <h2 data-reveal class="opacity-0 translate-y-3 font-lora font-semibold tracking-[-0.02em] leading-[1.06] text-[clamp(2.5rem,4.5vw,3.75rem)] text-navy-900 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-100 max-w-[48ch] mb-7 lg:mb-9">
-          {{ currentSection.copy.headline | replace('método', '<span class="text-burgundy-700 font-century relative"><span class="absolute -inset-x-1 -inset-y-0.5 bg-burgundy-50/40 rounded-md -z-10"></span>método</span>') | safe }}
+          {{ currentSection.copy.headline | replace('você', '<span class="text-burgundy-700 font-lora relative"><span class="absolute -inset-x-1 -inset-y-0.5 bg-burgundy-50/40 rounded-md -z-10"></span>você</span>') | safe }}
         </h2>
-
-        {# Supporting description with enhanced readability - moved before outcomes #}
-        <p data-reveal class="opacity-0 translate-y-3 font-century text-neutral-650 max-w-[58ch] text-[1.0625rem] lg:text-[1.1875rem] leading-[1.6] transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-150 mb-8 italic">
-          {{ currentSection.copy.description | replace('máquina de vendas', '<span class="font-semibold text-burgundy-700 font-century not-italic relative"><span class="absolute -inset-x-0.5 bottom-0 h-0.5 bg-burgundy-200 rounded-full"></span>máquina de vendas</span>') | safe }}
-        </p>
 
         {# Vision outcomes list with enhanced visual hierarchy and micro-interactions #}
         <div data-reveal class="opacity-0 translate-y-3 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-200 mb-9">
-          <h3 class="sr-only">Resultados da transformação empresarial</h3>
-          
           <ul role="list" class="space-y-3.5">
             {# Display all vision outcomes with enhanced interactivity #}
             {% for outcome in currentSection.copy.vision_outcomes %}
@@ -59,7 +43,7 @@
         <div data-reveal class="opacity-0 translate-y-3 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-250 mb-8">
           <p class="font-century text-navy-800 text-[1.0625rem] lg:text-[1.125rem] leading-[1.5] max-w-[58ch] font-medium relative">
             <span class="absolute -inset-x-2 -inset-y-1 bg-gold-50/60 rounded-md -z-10"></span>
-            {{ currentSection.copy.guarantee }}
+            {{ currentSection.copy.guarantee | replace('Eu te garanto', '<span class="text-burgundy-700 font-bold font-century relative"><span class="absolute -inset-x-1 -inset-y-0.5 bg-burgundy-50/40 rounded-md -z-10"></span>Eu te garanto</span>') | safe }}
           </p>
         </div>
 
@@ -94,44 +78,32 @@
             {# Subtle overlay to enhance aspirational feeling #}
             <div class="absolute inset-0 bg-gradient-to-br from-gold-500/8 via-transparent to-burgundy-700/5 pointer-events-none z-10"></div>
             
-            {# Freedom indicator - showing work-life balance #}
-            <div class="absolute top-4 right-4 z-20 opacity-70 group-hover:opacity-90 transition-opacity duration-300">
-              <div class="bg-gold-600/90 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1.5 rounded-md shadow-lg">
-                <span class="flex items-center gap-1.5">
-                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                  </svg>
-                  <span class="font-century">Liberdade</span>
-                </span>
-              </div>
-            </div>
-            
-            <div class="relative aspect-[3/4] min-h-[500px] lg:min-h-[600px]">
+            <div class="relative aspect-auto min-h-[500px] lg:min-h-[600px]">
             <picture>
               <!-- WebP/AVIF for modern browsers with 3:4 portrait aspect ratio -->
               <source type="image/avif"
-                      srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,ar_3:4,c_fill,q_auto:eco,f_avif,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 320w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_480,ar_3:4,c_fill,q_auto:eco,f_avif,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 480w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_3:4,c_fill,q_auto:good,f_avif,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 640w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_800,ar_3:4,c_fill,q_auto:good,f_avif,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 800w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,ar_3:4,c_fill,q_auto:good,f_avif,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 1024w"
+                      srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,c_fit,q_auto:eco,f_avif,dpr_auto/{{ currentSection.media.image }} 320w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_480,c_fit,q_auto:eco,f_avif,dpr_auto/{{ currentSection.media.image }} 480w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,c_fit,q_auto:good,f_avif,dpr_auto/{{ currentSection.media.image }} 640w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_800,c_fit,q_auto:good,f_avif,dpr_auto/{{ currentSection.media.image }} 800w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,c_fit,q_auto:good,f_avif,dpr_auto/{{ currentSection.media.image }} 1024w"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 45vw, 480px">
               
               <source type="image/webp"
-                      srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,ar_3:4,c_fill,q_auto:eco,f_webp,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 320w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_480,ar_3:4,c_fill,q_auto:eco,f_webp,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 480w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_3:4,c_fill,q_auto:good,f_webp,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 640w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_800,ar_3:4,c_fill,q_auto:good,f_webp,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 800w,
-                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,ar_3:4,c_fill,q_auto:good,f_webp,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 1024w"
+                      srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,c_fit,q_auto:eco,f_webp,dpr_auto/{{ currentSection.media.image }} 320w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_480,c_fit,q_auto:eco,f_webp,dpr_auto/{{ currentSection.media.image }} 480w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,c_fit,q_auto:good,f_webp,dpr_auto/{{ currentSection.media.image }} 640w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_800,c_fit,q_auto:good,f_webp,dpr_auto/{{ currentSection.media.image }} 800w,
+                              https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,c_fit,q_auto:good,f_webp,dpr_auto/{{ currentSection.media.image }} 1024w"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 45vw, 480px">
               
               <!-- Fallback JPEG with 3:4 portrait responsive srcset -->
-              <img src="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_480,ar_3:4,c_fill,q_auto:eco,f_auto,dpr_auto,g_auto:subject/{{ currentSection.media.image }}" 
-                   srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,ar_3:4,c_fill,q_auto:eco,f_auto,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 320w,
-                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_480,ar_3:4,c_fill,q_auto:eco,f_auto,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 480w,
-                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,ar_3:4,c_fill,q_auto:good,f_auto,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 640w,
-                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_800,ar_3:4,c_fill,q_auto:good,f_auto,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 800w,
-                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,ar_3:4,c_fill,q_auto:good,f_auto,dpr_auto,g_auto:subject/{{ currentSection.media.image }} 1024w"
+              <img src="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_480,c_fit,q_auto:eco,f_auto,dpr_auto/{{ currentSection.media.image }}" 
+                   srcset="https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_320,c_fit,q_auto:eco,f_auto,dpr_auto/{{ currentSection.media.image }} 320w,
+                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_480,c_fit,q_auto:eco,f_auto,dpr_auto/{{ currentSection.media.image }} 480w,
+                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_640,c_fit,q_auto:good,f_auto,dpr_auto/{{ currentSection.media.image }} 640w,
+                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_800,c_fit,q_auto:good,f_auto,dpr_auto/{{ currentSection.media.image }} 800w,
+                           https://res.cloudinary.com/{{ site.cloudinaryCloudName }}/image/upload/w_1024,c_fit,q_auto:good,f_auto,dpr_auto/{{ currentSection.media.image }} 1024w"
                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
                    alt="{{ currentSection.media.alt }}"
                    width="600" height="800"
@@ -142,17 +114,6 @@
             </picture>
             </div>
           </div>
-          
-          {# Aspirational caption with visual connection to content #}
-          <div class="mt-6 text-center opacity-80 group-hover:opacity-95 transition-opacity duration-300">
-            <p class="font-century text-neutral-600 text-sm italic leading-relaxed max-w-[30ch] mx-auto">
-              "Agora tenho um negócio que trabalha para mim, não o contrário."
-            </p>
-            <div class="mt-2 flex justify-center">
-              <div class="h-px w-12 bg-gradient-to-r from-transparent via-gold-400 to-transparent"></div>
-            </div>
-          </div>
-          
           <figcaption class="sr-only">Empreendedora confiante trabalhando num ambiente sereno e organizado, simbolizando liberdade e controlo do negócio, com indicador visual de sucesso e equilíbrio.</figcaption>
         </figure>
       </div>

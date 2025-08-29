@@ -105,48 +105,8 @@
           <span class="text-peach-300/60" aria-hidden="true">•</span>
           <em class="not-italic">{{ currentSection.copy.badge.venue }}</em>
         </div>
-
-        <!-- Limited Spots Notice Chip -->
-        <div 
-          class="text-[0.8125rem] text-white/80 font-century font-medium"
-          role="status"
-          aria-live="polite"
-          data-reveal
-        >
-          {{ currentSection.copy.notice }}
-        </div>
       </div>
-
-      <!-- Secondary CTA (Ghost/Link style) -->
-      <a 
-        href="#s-vision" 
-        class="text-white/85 underline underline-offset-4 text-[0.9375rem] 
-               font-century transition-all duration-200 hover:text-white hover:underline-offset-8 mt-4" 
-        data-analytics-event="click_hero_secondary"
-        data-reveal
-      >
-        {{ currentSection.copy.cta.secondary.label }}
-      </a>
     </div>
   </div>
-
-  <!-- Scroll Indicator Zone (auto-hides on short viewports) -->
-  <div class="relative z-20 flex justify-center pb-6">
-    <button 
-      class="hero-scroll-indicator text-white/90 bg-transparent border-none cursor-pointer transition-all duration-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-navy-900 hidden sm:flex"
-      id="scroll-indicator-btn" 
-      aria-label="Role para baixo para ver mais conteúdo" 
-      type="button"
-      data-reveal
-    >
-      <div class="flex flex-col items-center space-y-1 w-full">
-        <span class="font-lora text-xs">{{ currentSection.copy.scrollIndicator }}</span>
-        <svg class="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
-      </div>
-    </button>
-  </div>
-
 </section>
 <!-- Hero Section End -->
