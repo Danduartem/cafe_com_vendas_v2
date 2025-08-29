@@ -69,6 +69,7 @@ const RATE_LIMIT_MAX_REQUESTS = 8; // Max 8 lead submissions per 10 minutes per 
 
 // MailerLite configuration
 const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
+const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID;
 
 // Validation schemas for lead data
 const VALIDATION_RULES: ValidationRules = {
@@ -372,6 +373,7 @@ async function addLeadToMailerLite(leadData: MailerLiteSubscriberData): Promise<
             name: leadData.name,
             phone: leadData.phone,
             fields: leadData.fields,
+            groups: MAILERLITE_GROUP_ID ? [MAILERLITE_GROUP_ID] : undefined,
             status: 'active'
           })
         }),
