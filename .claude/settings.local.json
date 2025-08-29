@@ -46,7 +46,8 @@
       "mcp__firecrawl__firecrawl_scrape",
       "mcp__playwright-mcp__browser_fill_form",
       "Bash(timeout 300 npx playwright test tests/e2e/multibanco-complete-flow.test.ts --project=chromium)",
-      "WebFetch(domain:developers.mailerlite.com)"
+      "WebFetch(domain:developers.mailerlite.com)",
+      "Bash(find:*)"
     ]
   },
   "hooks": {
