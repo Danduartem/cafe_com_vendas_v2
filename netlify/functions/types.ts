@@ -61,16 +61,63 @@ export interface CustomerCacheEntry {
 
 // MailerLite Types
 export interface MailerLiteLeadRequest {
+  // Basic lead info (required)
   lead_id: string;
   full_name: string;
   email: string;
   phone: string;
   page?: string;
+  
+  // Core high-leverage fields
+  first_name?: string;
+  preferred_language?: string;
+  city?: string;
+  country?: string;
+  timezone?: string;
+  business_stage?: string;
+  business_type?: string;
+  primary_goal?: string;
+  main_challenge?: string;
+  
+  // Intent & lifecycle tracking
+  event_interest?: string;
+  intent_signal?: string;
+  lead_score?: number;
+  signup_page?: string;
+  referrer_domain?: string;
+  
+  // Attribution data
   utm_source?: string;
   utm_medium?: string;
   utm_campaign?: string;
   utm_term?: string;
   utm_content?: string;
+  first_utm_source?: string;
+  first_utm_campaign?: string;
+  referrer?: string;
+  landing_page?: string;
+  
+  // Device & browser data
+  device_type?: string;
+  device_brand?: string;
+  browser_name?: string;
+  browser_version?: string;
+  screen_resolution?: string;
+  viewport_size?: string;
+  
+  // Behavioral data
+  time_on_page?: number;
+  scroll_depth?: number;
+  sections_viewed?: string;
+  page_views?: number;
+  is_returning_visitor?: boolean;
+  session_duration?: number;
+  
+  // Technical data
+  online_status?: boolean;
+  cookie_enabled?: boolean;
+  javascript_enabled?: boolean;
+  
   [key: string]: unknown; // Needed for validation iteration
 }
 
@@ -78,7 +125,7 @@ export interface MailerLiteSubscriberData {
   email: string;
   name: string;
   phone?: string;
-  fields: Record<string, string | number | null>;
+  fields: Record<string, string | number | boolean | null>;
 }
 
 export interface MailerLiteSuccess {

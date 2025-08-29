@@ -83,6 +83,50 @@ const VALIDATION_RULES: ValidationRules = {
   utm_params: ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
 };
 
+// Enhanced field mapping for MailerLite custom fields
+const MAILERLITE_FIELD_MAPPING = {
+  // Core fields (direct mapping)
+  preferred_language: 'language',
+  city: 'city',
+  country: 'country',
+  timezone: 'timezone',
+  
+  // Business profile
+  business_stage: 'business_stage',
+  business_type: 'business_type', 
+  primary_goal: 'primary_goal',
+  main_challenge: 'main_challenge',
+  
+  // Intent & lifecycle
+  event_interest: 'event_interest',
+  intent_signal: 'intent_signal',
+  lead_score: 'lead_score',
+  signup_page: 'signup_page',
+  referrer_domain: 'referrer_domain',
+  
+  // Attribution (first touch)
+  first_utm_source: 'first_utm_source',
+  first_utm_campaign: 'first_utm_campaign',
+  referrer: 'referrer',
+  landing_page: 'landing_page',
+  
+  // Device & browser
+  device_type: 'device_type',
+  device_brand: 'device_brand', 
+  browser_name: 'browser_name',
+  browser_version: 'browser_version',
+  screen_resolution: 'screen_resolution',
+  viewport_size: 'viewport_size',
+  
+  // Behavioral data
+  time_on_page: 'time_on_page',
+  scroll_depth: 'scroll_depth',
+  sections_viewed: 'sections_viewed',
+  page_views: 'page_views',
+  is_returning_visitor: 'is_returning_visitor',
+  session_duration: 'session_duration'
+} as const;
+
 /**
  * Circuit Breaker Pattern Implementation for MailerLite API
  */
@@ -522,24 +566,47 @@ export default async (request: Request): Promise<Response> => {
     // Use sanitized data
     const { lead_id, full_name, email, phone } = validation.sanitized!;
 
-    // Prepare lead data for MailerLite
+    // Split full name into first name and last name
+    const nameParts = full_name.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+
+    // Prepare lead data for MailerLite with enriched fields
     const leadData = {
       email: email,
-      name: full_name,
+      name: firstName,        // MailerLite built-in field for first name
+      last_name: lastName,    // MailerLite built-in field for last name
       phone: phone,
       fields: {
+        // Core system fields
         lead_id: lead_id,
         payment_status: 'lead',
         lead_date: new Date().toISOString(),
-        source: 'checkout_form',
+        lead_source: 'checkout_form',
         event_name: 'Café com Vendas - Lisboa',
-        event_date: '2024-09-20',
+        event_date: '2025-09-20',
         page: requestBody.page || 'unknown',
         user_agent: request.headers.get('user-agent')?.substring(0, 255) || 'unknown'
-      } as Record<string, string | number | null>
+      } as Record<string, string | number | boolean | null>
     };
     
-    // Add validated UTM parameters
+    // Map enriched data to MailerLite custom fields
+    for (const [frontendField, mailerliteField] of Object.entries(MAILERLITE_FIELD_MAPPING)) {
+      const value = requestBody[frontendField];
+      
+      if (value !== undefined && value !== null && value !== '') {
+        // Handle different data types appropriately
+        if (typeof value === 'string') {
+          leadData.fields[mailerliteField] = value.toString().substring(0, 255);
+        } else if (typeof value === 'number') {
+          leadData.fields[mailerliteField] = value;
+        } else if (typeof value === 'boolean') {
+          leadData.fields[mailerliteField] = value.toString();
+        }
+      }
+    }
+    
+    // Add validated UTM parameters (current touch attribution)
     for (const utmParam of VALIDATION_RULES.utm_params) {
       if (requestBody[utmParam] && typeof requestBody[utmParam] === 'string') {
         leadData.fields[utmParam] = requestBody[utmParam].trim().substring(0, 255);
@@ -549,13 +616,21 @@ export default async (request: Request): Promise<Response> => {
     // Submit lead to MailerLite
     const mailerliteResult = await addLeadToMailerLite(leadData);
     
-    // Log the attempt for monitoring
-    console.log(`Lead capture attempt for ${email}`, {
+    // Log the attempt for monitoring with enriched data summary
+    console.log(`Enhanced lead capture attempt for ${email}`, {
       leadId: lead_id,
       clientIP: clientIP,
       success: mailerliteResult.success,
       action: mailerliteResult.success ? mailerliteResult.action : 'failed',
-      reason: mailerliteResult.reason
+      reason: mailerliteResult.reason,
+      enrichedFields: {
+        leadScore: requestBody.lead_score,
+        deviceType: requestBody.device_type,
+        utmSource: requestBody.utm_source,
+        intentSignal: requestBody.intent_signal,
+        timeOnPage: requestBody.time_on_page,
+        fieldsCount: Object.keys(leadData.fields).length
+      }
     });
 
     // Return success response regardless of MailerLite result 
