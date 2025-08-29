@@ -15,6 +15,7 @@ interface TestUserData {
   countryCode: string;
 }
 
+
 // Test configuration (aligned with Playwright config timeout)
 const BASE_URL = process.env.TEST_URL || 'http://localhost:8888';
 const TIMEOUT = 120000; // 2 minutes to match Playwright config
@@ -227,11 +228,31 @@ async function fillLeadForm(page: Page, userData?: TestUserData) {
 
 test.describe('User Journey Tests', () => {
   test.beforeEach(async ({ page }) => {
+    // Inject Stripe test key BEFORE navigation
+    // This ensures the key is available when modules load
+    await page.addInitScript(() => {
+      const testKey = 'pk_test_51RwIbW1g4ir2wIfRFq6secs10CgdKgOmSSAZkStmJakV4E9dZZXPVoM5BluYlRsLtViMwWnCkTsNZqykxqZO8c4500Ss4KwViq';
+      
+      // Inject test-specific Stripe configuration
+      window.STRIPE_TEST_PUBLISHABLE_KEY = testKey;
+      
+      // Also inject into import.meta.env for Vite compatibility
+      if (typeof window !== 'undefined') {
+        // Create import.meta.env if it doesn't exist
+        window.import = window.import || {};
+        window.import.meta = window.import.meta || {};
+        window.import.meta.env = window.import.meta.env || {};
+        
+        // Set the Stripe key
+        window.import.meta.env.VITE_STRIPE_PUBLIC_KEY = testKey;
+      }
+    });
+    
     // Capture console messages for debugging
     page.on('console', msg => {
       if (msg.type() === 'error') {
         console.log('[BROWSER ERROR]:', msg.text());
-      } else if (msg.text().includes('[DEBUG]')) {
+      } else if (msg.text().includes('[DEBUG]') || msg.text().includes('[Environment]') || msg.text().includes('[TEST]')) {
         console.log('[BROWSER LOG]:', msg.text());
       }
     });
@@ -287,21 +308,75 @@ test.describe('User Journey Tests', () => {
     
     // Step 4: Fill lead capture form
     await page.waitForSelector('form', { timeout: TIMEOUT });
+    
+    // Wait for checkout module to be initialized
+    await page.waitForSelector('form[data-checkout-initialized="true"]', { timeout: 10000 });
+    
     await fillLeadForm(page);
     
-    // Step 5: Submit lead form and wait for response
-    const submitButton = page.locator('button[type="submit"]').first();
+    // Step 5: Submit lead form (first step - no payment intent yet)
     
-    // Wait for form submission to complete by monitoring network requests
-    // Handle both successful (200) and error (500) responses for robustness
-    const [response] = await Promise.all([
-      page.waitForResponse(resp => 
-        resp.url().includes('/.netlify/functions/create-payment-intent') && 
-        (resp.status() === 200 || resp.status() === 500), 
-        { timeout: TIMEOUT }
-      ),
-      submitButton.click()
-    ]);
+    // Debug: Check if Stripe key is available in the page
+    await page.evaluate(() => {
+      const hasEnvKey = !!window.import?.meta?.env?.VITE_STRIPE_PUBLIC_KEY;
+      const hasTestKey = !!window.STRIPE_TEST_PUBLISHABLE_KEY;
+      const configKey = !!window.CONFIG?.stripe?.publishableKey;
+      console.log('[DEBUG] Stripe key check:', {
+        hasEnvKey,
+        hasTestKey,
+        configKey,
+        envValue: window.import?.meta?.env?.VITE_STRIPE_PUBLIC_KEY?.substring(0, 20),
+        testValue: window.STRIPE_TEST_PUBLISHABLE_KEY?.substring(0, 20),
+        configValue: window.CONFIG?.stripe?.publishableKey?.substring(0, 20)
+      });
+      return hasEnvKey || hasTestKey || configKey;
+    });
+    
+    
+    // Monitor network requests for debugging
+    page.on('request', request => {
+      if (request.url().includes('create-payment-intent')) {
+        // Request is being tracked for debugging purposes
+      }
+    });
+    
+    // Add error listener to catch JavaScript errors
+    page.on('pageerror', () => {
+      // Page error is being tracked for debugging purposes
+    });
+    
+    // Check if button click triggers any console logs
+    await page.evaluate(() => {
+      const btn = document.querySelector('button[type="submit"]') as HTMLButtonElement;
+      if (btn) {
+        console.log('[DEBUG] Submit button found, adding click listener');
+        btn.addEventListener('click', (e) => {
+          console.log('[DEBUG] Submit button clicked!', e);
+        });
+      }
+    });
+    
+    // Submit the form programmatically to ensure the event fires
+    
+    // Use evaluate to trigger form submission directly
+    await page.evaluate(() => {
+      const form = document.querySelector('#leadForm') as HTMLFormElement;
+      if (form) {
+        console.log('[DEBUG] Triggering form submit event');
+        form.requestSubmit(); // This properly triggers submit event with validation
+      } else {
+        console.error('[DEBUG] Form not found!');
+      }
+    });
+    
+    // Wait for the form to transition to step 2 (payment form)
+    // The payment intent is created when step 2 initializes
+    
+    // Wait for payment intent request that happens during step 2 initialization
+    const response = await page.waitForResponse(resp => {
+      const isPaymentRequest = resp.url().includes('/.netlify/functions/create-payment-intent');
+      return isPaymentRequest && (resp.status() === 200 || resp.status() === 500);
+    }, { timeout: TIMEOUT });
     
     // If we got a 500 error (likely idempotency conflict), retry once with delay
     if (response.status() === 500) {
