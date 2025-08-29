@@ -33,6 +33,7 @@ import {
   type UserEnvironment,
   type AttributionData 
 } from '../../../utils/browser-data.js';
+import { isValidEmail, isValidPhone } from '../../../utils/validation.js';
 
 // 🎯 Get centralized pricing data - SINGLE SOURCE OF TRUTH
 const site = siteData();
@@ -90,8 +91,6 @@ interface CheckoutSectionComponent extends Component {
   resetModalState(): void;
   generateUUID(): string;
   generateIdempotencyKey(): string;
-  isValidEmail(email: string): boolean;
-  isValidPhone(phone: string): boolean;
   translateStripeError(message: string): string;
   showMultibancoInstructions(paymentIntent: unknown): void;
   createBackdrop(): void;
@@ -631,12 +630,12 @@ export const Checkout: CheckoutSectionComponent = {
       return;
     }
 
-    if (!this.isValidEmail(leadData.email)) {
+    if (!isValidEmail(leadData.email)) {
       this.showError('leadError', 'Por favor, insira um email válido.');
       return;
     }
 
-    if (!this.isValidPhone(leadData.phone)) {
+    if (!isValidPhone(leadData.phone)) {
       this.showError('leadError', 'Por favor, insira um número de telefone válido (apenas números, espaços e traços).');
       return;
     }
@@ -1087,27 +1086,6 @@ export const Checkout: CheckoutSectionComponent = {
     return `${testPrefix}idm_${now}_${navCount}_${microTime}_${sessionId}_${randomSuffix}_${extraEntropy}`;
   },
 
-  isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  },
-
-  isValidPhone(phone: string): boolean {
-    if (!phone || typeof phone !== 'string') return false;
-
-    // Clean the phone number by removing spaces, dashes, and parentheses
-    const cleanPhone = phone.replace(/[\s\-()]/g, '');
-
-    // Check if it has only digits (optionally starting with +)
-    // Must be between 7 and 15 digits (international standard)
-    if (cleanPhone.length < 7 || cleanPhone.length > 15) {
-      return false;
-    }
-
-    // Must contain only digits (and optional + at start)
-    const phoneRegex = /^[+]?[0-9]+$/;
-    return phoneRegex.test(cleanPhone);
-  },
 
 
   resetModalState(): void {
