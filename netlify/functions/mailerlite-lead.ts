@@ -4,7 +4,7 @@
  * Works alongside Formspree to ensure complete lead capture
  */
 
-// Removed unused Context and Config imports - not needed for basic Netlify functions
+// Enhanced MailerLite integration with event-driven lifecycle management
 import type {
   MailerLiteLeadRequest,
   MailerLiteSubscriberData,
@@ -12,7 +12,18 @@ import type {
   ValidationResult,
   RateLimitResult,
   ValidationRules,
-  TimeoutPromise
+  TimeoutPromise,
+  EventCustomFields,
+  EventSubscriberData
+} from './types';
+
+// Import the new constants (values, not types)
+import {
+  MAILERLITE_EVENT_GROUPS,
+  MAILERLITE_CUSTOM_FIELDS,
+  EVENT_DATE,
+  EVENT_ADDRESS,
+  GOOGLE_MAPS_LINK
 } from './types';
 
 /**
@@ -67,18 +78,28 @@ const rateLimitStore = new Map<string, MailerLiteRateLimitEntry>();
 const RATE_LIMIT_WINDOW = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT_MAX_REQUESTS = 8; // Max 8 lead submissions per 10 minutes per IP
 
-// MailerLite configuration with proper Group IDs
+// MailerLite configuration with event-driven lifecycle groups
 const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
 
-// MailerLite Group IDs for customer lifecycle management
-const MAILERLITE_GROUPS = {
+// Event-specific Group Names (will be resolved to IDs)
+// Following naming convention: ccv-2025-09-20_lifecycle_state
+const EVENT_GROUPS = MAILERLITE_EVENT_GROUPS;
+
+// Legacy Group IDs for backward compatibility during transition
+const LEGACY_GROUPS = {
   LEADS: '164068163344925725',           // 2025 Café com Vendas Portugal - Leads
   BUYERS: '164071323193050164',         // 2025 Café com Vendas Portugal - Buyers  
   EVENT_ATTENDEES: '164071346948540099' // 2025 Café com Vendas Portugal - Event Attendees
 };
 
-// Legacy group ID support (keeping for backward compatibility in env vars)
-// const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID || MAILERLITE_GROUPS.LEADS;
+// TODO: Group name-to-ID mapping will be populated after creating groups in MailerLite
+// For now, using legacy groups as fallback
+const GROUP_ID_MAPPING: Record<string, string> = {
+  // Event lifecycle groups (to be populated after MailerLite setup)
+  [EVENT_GROUPS.CHECKOUT_STARTED]: LEGACY_GROUPS.LEADS, // Temporary fallback
+  [EVENT_GROUPS.BUYER_PAID]: LEGACY_GROUPS.BUYERS,      // Temporary fallback
+  // ... other mappings to be added
+};
 
 // Validation schemas for lead data
 const VALIDATION_RULES: ValidationRules = {
@@ -382,7 +403,7 @@ async function addLeadToMailerLite(leadData: MailerLiteSubscriberData): Promise<
             name: leadData.name,
             phone: leadData.phone,
             fields: leadData.fields,
-            groups: [MAILERLITE_GROUPS.LEADS], // Add to Leads group initially
+            groups: [GROUP_ID_MAPPING[EVENT_GROUPS.CHECKOUT_STARTED] || LEGACY_GROUPS.LEADS], // Add to checkout_started group
             status: 'active'
           })
         }),
@@ -577,48 +598,46 @@ export default async (request: Request): Promise<Response> => {
     // Use sanitized data
     const { lead_id, full_name, email, phone } = validation.sanitized!;
 
-    // Split full name into first name and last name
-    const nameParts = full_name.trim().split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+    // Extract first name for MailerLite built-in field
+    const firstName = full_name.trim().split(' ')[0] || '';
 
-    // Prepare lead data for MailerLite with enriched fields
-    const leadData = {
+    // Prepare lead data with comprehensive event-specific fields
+    const eventFields: EventCustomFields = {
+      // Core system fields following MailerLite best practices
+      [MAILERLITE_CUSTOM_FIELDS.first_name]: firstName,
+      [MAILERLITE_CUSTOM_FIELDS.phone]: phone,
+      [MAILERLITE_CUSTOM_FIELDS.checkout_started_at]: new Date().toISOString(),
+      [MAILERLITE_CUSTOM_FIELDS.payment_status]: 'lead' as const,
+      [MAILERLITE_CUSTOM_FIELDS.ticket_type]: (requestBody.ticket_type as 'Standard' | 'VIP') || 'Standard',
+      [MAILERLITE_CUSTOM_FIELDS.order_id]: null, // Will be set when payment intent is created
+      [MAILERLITE_CUSTOM_FIELDS.amount_paid]: null,
+      [MAILERLITE_CUSTOM_FIELDS.details_form_status]: 'pending' as const,
+      
+      // Event fields (consistent across all events)
+      [MAILERLITE_CUSTOM_FIELDS.event_date]: EVENT_DATE,
+      [MAILERLITE_CUSTOM_FIELDS.event_address]: EVENT_ADDRESS,
+      [MAILERLITE_CUSTOM_FIELDS.google_maps_link]: GOOGLE_MAPS_LINK,
+      
+      // Multibanco fields (initially null, set during payment)
+      [MAILERLITE_CUSTOM_FIELDS.mb_entity]: null,
+      [MAILERLITE_CUSTOM_FIELDS.mb_reference]: null,
+      [MAILERLITE_CUSTOM_FIELDS.mb_amount]: null,
+      [MAILERLITE_CUSTOM_FIELDS.mb_expires_at]: null,
+      
+      // Attribution fields (current touch)
+      [MAILERLITE_CUSTOM_FIELDS.utm_source]: requestBody.utm_source || null,
+      [MAILERLITE_CUSTOM_FIELDS.utm_medium]: requestBody.utm_medium || null,
+      [MAILERLITE_CUSTOM_FIELDS.utm_campaign]: requestBody.utm_campaign || null,
+      
+      // Marketing consent (defaulting to opt-in for checkout form)
+      [MAILERLITE_CUSTOM_FIELDS.marketing_opt_in]: 'yes' as const
+    };
+
+    const leadData: EventSubscriberData = {
       email: email,
       name: firstName,        // MailerLite built-in field for first name
-      last_name: lastName,    // MailerLite built-in field for last name
       phone: phone,
-      fields: {
-        // Core system fields (matching your CRM rules)
-        lead_id: lead_id,
-        first_name: firstName,
-        last_name: lastName,
-        email: email,
-        phone: phone,
-        checkout_started_at: new Date().toISOString(),
-        ticket_type: (requestBody.ticket_type as string) || 'Standard',
-        order_id: null, // Will be set when payment intent is created
-        payment_method: null, // Will be set during payment processing
-        payment_status: 'lead',
-        amount_paid: null,
-        details_form_status: 'pending',
-        event_date: '2025-09-20',
-        event_address: 'Lisboa, Portugal',
-        google_maps_link: 'https://maps.google.com/?q=Lisboa,Portugal',
-        
-        // Multibanco fields (initially null, set during payment)
-        mb_entity: null,
-        mb_reference: null,
-        mb_amount: null,
-        mb_expires_at: null,
-        
-        // System tracking fields
-        lead_date: new Date().toISOString(),
-        lead_source: 'checkout_form',
-        event_name: 'Café com Vendas - Lisboa',
-        page: requestBody.page || 'unknown',
-        user_agent: request.headers.get('user-agent')?.substring(0, 255) || 'unknown'
-      } as Record<string, string | number | boolean | null>
+      fields: eventFields
     };
     
     // Map enriched data to MailerLite custom fields

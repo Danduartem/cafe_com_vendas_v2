@@ -3,12 +3,20 @@
  * Handles payment confirmations and triggers MailerLite integration
  */
 
-// Removed unused Context and Config imports - not needed for basic Netlify functions
+// Enhanced Stripe webhook handler with event-driven lifecycle management
 import Stripe from 'stripe';
 import type {
   FulfillmentRecord,
   MailerLiteSubscriberData,
-  TimeoutPromise
+  TimeoutPromise,
+  EventCustomFields
+} from './types';
+import {
+  MAILERLITE_EVENT_GROUPS,
+  MAILERLITE_CUSTOM_FIELDS,
+  EVENT_DATE,
+  EVENT_ADDRESS,
+  GOOGLE_MAPS_LINK
 } from './types';
 import {
   isStripePaymentIntent,
@@ -72,17 +80,32 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Ope
   ]);
 }
 
-// MailerLite integration with proper Group IDs
+// MailerLite integration with event-driven lifecycle groups
 const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
-// MailerLite Group IDs for customer lifecycle management
-const MAILERLITE_GROUPS = {
+
+// Event-specific Group Names (following ccv-2025-09-20 naming convention)
+const EVENT_GROUPS = MAILERLITE_EVENT_GROUPS;
+
+// Legacy Group IDs for backward compatibility during transition
+const LEGACY_GROUPS = {
   LEADS: '164068163344925725',           // 2025 Café com Vendas Portugal - Leads
   BUYERS: '164071323193050164',         // 2025 Café com Vendas Portugal - Buyers  
   EVENT_ATTENDEES: '164071346948540099' // 2025 Café com Vendas Portugal - Event Attendees
 };
 
-// Legacy group ID support (keeping for backward compatibility in env vars)
-// const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID || MAILERLITE_GROUPS.BUYERS;
+// TODO: Group name-to-ID mapping will be populated after creating groups in MailerLite
+// For now, using legacy groups as fallback for critical paths
+const GROUP_ID_MAPPING: Record<string, string> = {
+  // Lifecycle state groups (to be populated after MailerLite setup)
+  [EVENT_GROUPS.CHECKOUT_STARTED]: LEGACY_GROUPS.LEADS,        // Temp fallback
+  [EVENT_GROUPS.ABANDONED_PAYMENT]: LEGACY_GROUPS.LEADS,       // Temp fallback
+  [EVENT_GROUPS.BUYER_PENDING]: LEGACY_GROUPS.BUYERS,          // Temp fallback
+  [EVENT_GROUPS.BUYER_PAID]: LEGACY_GROUPS.BUYERS,             // Temp fallback
+  [EVENT_GROUPS.DETAILS_PENDING]: LEGACY_GROUPS.BUYERS,        // Temp fallback
+  [EVENT_GROUPS.DETAILS_COMPLETE]: LEGACY_GROUPS.BUYERS,       // Temp fallback
+  [EVENT_GROUPS.ATTENDED]: LEGACY_GROUPS.EVENT_ATTENDEES,      // Temp fallback
+  [EVENT_GROUPS.NO_SHOW]: LEGACY_GROUPS.EVENT_ATTENDEES        // Temp fallback
+};
 
 // Webhook retry configuration
 const MAX_RETRIES = 3;
@@ -361,7 +384,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
     const customerEmail = metadata.customer_email;
     const customerName = metadata.customer_name;
     const customerPhone = metadata.customer_phone;
-    const leadId = metadata.lead_id;
+    // const leadId = metadata.lead_id; // Available but not needed in enhanced version
 
     if (!customerEmail || !customerName) {
       throw new Error('Missing customer information in payment metadata');
@@ -369,27 +392,42 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
 
     // Add customer to MailerLite with retry logic and circuit breaker
     try {
+      // Create comprehensive event-specific subscriber data
+      const eventFields: EventCustomFields = {
+        [MAILERLITE_CUSTOM_FIELDS.first_name]: customerName.split(' ')[0] || customerName,
+        [MAILERLITE_CUSTOM_FIELDS.phone]: customerPhone || '',
+        [MAILERLITE_CUSTOM_FIELDS.checkout_started_at]: metadata.created_at || new Date().toISOString(),
+        [MAILERLITE_CUSTOM_FIELDS.payment_status]: 'paid',
+        [MAILERLITE_CUSTOM_FIELDS.ticket_type]: (metadata.spot_type as 'Standard' | 'VIP') || 'Standard',
+        [MAILERLITE_CUSTOM_FIELDS.order_id]: paymentIntent.id,
+        [MAILERLITE_CUSTOM_FIELDS.amount_paid]: paymentIntent.amount / 100,
+        [MAILERLITE_CUSTOM_FIELDS.details_form_status]: 'pending', // Will be updated when form submitted
+        
+        // Event fields (static for this event)
+        [MAILERLITE_CUSTOM_FIELDS.event_date]: EVENT_DATE,
+        [MAILERLITE_CUSTOM_FIELDS.event_address]: EVENT_ADDRESS,
+        [MAILERLITE_CUSTOM_FIELDS.google_maps_link]: GOOGLE_MAPS_LINK,
+        
+        // Multibanco fields (initially null, updated if applicable)
+        [MAILERLITE_CUSTOM_FIELDS.mb_entity]: null,
+        [MAILERLITE_CUSTOM_FIELDS.mb_reference]: null,
+        [MAILERLITE_CUSTOM_FIELDS.mb_amount]: null,
+        [MAILERLITE_CUSTOM_FIELDS.mb_expires_at]: null,
+        
+        // Attribution fields
+        [MAILERLITE_CUSTOM_FIELDS.utm_source]: metadata.utm_source || null,
+        [MAILERLITE_CUSTOM_FIELDS.utm_medium]: metadata.utm_medium || null,
+        [MAILERLITE_CUSTOM_FIELDS.utm_campaign]: metadata.utm_campaign || null,
+        
+        // Marketing consent
+        [MAILERLITE_CUSTOM_FIELDS.marketing_opt_in]: 'yes' // Default for paid customers
+      };
+
       await retryWithBackoff(() => addToMailerLite({
         email: customerEmail,
         name: customerName,
         phone: customerPhone,
-        fields: {
-          lead_id: leadId || '',
-          payment_status: 'paid',
-          order_id: paymentIntent.id,
-          payment_method: 'card', // Default to card, will be updated if Multibanco
-          payment_intent_id: paymentIntent.id,
-          amount_paid: paymentIntent.amount / 100, // Convert from cents
-          currency: paymentIntent.currency.toUpperCase(),
-          event_name: metadata.event_name || 'Café com Vendas',
-          event_date: metadata.event_date || '2025-09-20',
-          ticket_type: metadata.spot_type || 'Standard',
-          source: metadata.source || 'checkout',
-          payment_date: new Date().toISOString(),
-          utm_source: metadata.utm_source || null,
-          utm_medium: metadata.utm_medium || null,
-          utm_campaign: metadata.utm_campaign || null
-        }
+        fields: eventFields
       }));
     } catch (error) {
       // Log error but don't fail the webhook processing
@@ -400,25 +438,27 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
       }, correlationId);
     }
 
-    // 🔄 CORE AUTOMATION: Move subscriber from Leads to Buyers group (implements your CRM rules)
+    // 🔄 ENHANCED LIFECYCLE MANAGEMENT: Implement complete state machine
     try {
       await retryWithBackoff(() => moveSubscriberBetweenGroups(
         customerEmail,
-        MAILERLITE_GROUPS.LEADS,    // From: Leads group
-        MAILERLITE_GROUPS.BUYERS    // To: Buyers group
+        GROUP_ID_MAPPING[EVENT_GROUPS.CHECKOUT_STARTED] || LEGACY_GROUPS.LEADS,    // From: checkout_started
+        GROUP_ID_MAPPING[EVENT_GROUPS.BUYER_PAID] || LEGACY_GROUPS.BUYERS         // To: buyer_paid
       ));
       
-      logWithCorrelation('info', 'Successfully moved subscriber to Buyers group', {
+      logWithCorrelation('info', 'Successfully executed payment success lifecycle transition', {
         customerEmail,
         paymentIntentId: paymentIntent.id,
-        transition: 'leads_to_buyers'
+        transition: `${EVENT_GROUPS.CHECKOUT_STARTED} → ${EVENT_GROUPS.BUYER_PAID}`,
+        lifecycleStage: 'buyer_paid'
       }, correlationId);
     } catch (error) {
-      // Log but don't fail webhook for group management errors
-      logWithCorrelation('error', 'Failed to move subscriber to Buyers group', {
+      // Log but don't fail webhook for lifecycle management errors
+      logWithCorrelation('error', 'Failed to execute lifecycle transition', {
         error: error instanceof Error ? error.message : 'Unknown error',
         customerEmail,
-        paymentIntentId: paymentIntent.id
+        paymentIntentId: paymentIntent.id,
+        lifecycleStage: 'buyer_paid_failed'
       }, correlationId);
     }
 
@@ -1151,10 +1191,10 @@ async function updateMultibancoFields(email: string, multibancoDetails: {
   try {
     await updateMailerLiteSubscriber(email, {
       payment_method: 'multibanco',
-      mb_entity: multibancoDetails.entity,
-      mb_reference: multibancoDetails.reference,
-      mb_amount: multibancoDetails.amount,
-      mb_expires_at: multibancoDetails.expiresAt || '',
+      [MAILERLITE_CUSTOM_FIELDS.mb_entity]: multibancoDetails.entity,
+      [MAILERLITE_CUSTOM_FIELDS.mb_reference]: multibancoDetails.reference,
+      [MAILERLITE_CUSTOM_FIELDS.mb_amount]: multibancoDetails.amount,
+      [MAILERLITE_CUSTOM_FIELDS.mb_expires_at]: multibancoDetails.expiresAt || '',
       voucher_generated_at: new Date().toISOString()
     });
     
@@ -1261,7 +1301,7 @@ async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promis
           email: subscriberData.email,
           name: subscriberData.name,
           fields: subscriberData.fields,
-          groups: [MAILERLITE_GROUPS.BUYERS], // Add paid customers to Buyers group
+          groups: [GROUP_ID_MAPPING[EVENT_GROUPS.BUYER_PAID] || LEGACY_GROUPS.BUYERS], // Add to buyer_paid lifecycle state
           status: 'active',
           subscribed_at: new Date().toISOString()
         })
