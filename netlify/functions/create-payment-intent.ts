@@ -341,6 +341,7 @@ export default async (request: Request): Promise<Response> => {
     'https://jucanamaximiliano.com',
     'https://www.jucanamaximiliano.com',
     'http://localhost:8080',
+    'http://localhost:8888',   // Netlify dev server (test environment)
     'https://netlify.app'
   ];
 

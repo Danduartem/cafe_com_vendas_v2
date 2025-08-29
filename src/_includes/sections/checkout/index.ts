@@ -158,11 +158,15 @@ export const Checkout: CheckoutSectionComponent = {
 
     // Lead form submission
     const leadForm = safeQuery('#leadForm');
-    leadForm?.addEventListener('submit', (event: Event) => {
-      this.handleLeadSubmit(event).catch(error => {
-        logger.error('Error handling lead submit:', error);
+    if (leadForm) {
+      leadForm.addEventListener('submit', (event: Event) => {
+        this.handleLeadSubmit(event).catch(error => {
+          logger.error('Error handling lead submit:', error);
+        });
       });
-    });
+      // Mark form as initialized for e2e tests
+      leadForm.setAttribute('data-checkout-initialized', 'true');
+    }
 
     // Payment button
     const payButton = safeQuery('#payBtn');
@@ -346,6 +350,23 @@ export const Checkout: CheckoutSectionComponent = {
 
   async initializeStripe(): Promise<void> {
     if (!ENV.stripe.publishableKey) {
+      // Graceful degradation for missing key (e.g., in test environments)
+      logger.error('❌ Stripe publishable key not configured');
+      
+      // Show user-friendly error message
+      const errorContainer = document.getElementById('checkout-error');
+      if (errorContainer) {
+        errorContainer.textContent = 'Payment system is currently unavailable. Please try again later.';
+        errorContainer.classList.remove('hidden');
+      }
+      
+      // Disable payment button
+      const submitButton = document.getElementById('submit-payment') as HTMLButtonElement;
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Payment Unavailable';
+      }
+      
       throw new Error('Stripe publishable key not configured');
     }
 
