@@ -25,6 +25,14 @@ import { safeQuery } from '@/utils/dom';
 import { logger } from '../../../utils/logger.js';
 import type { Component } from '../../../types/components/base.js';
 import siteData from '../../../_data/site.js';
+import { 
+  BehaviorTracker, 
+  getUserEnvironment, 
+  getAttributionData,
+  type BehaviorData,
+  type UserEnvironment,
+  type AttributionData 
+} from '../../../utils/browser-data.js';
 
 // 🎯 Get centralized pricing data - SINGLE SOURCE OF TRUTH
 const site = siteData();
@@ -60,6 +68,7 @@ interface CheckoutSectionComponent extends Component {
   stripeLoadPromise: Promise<Stripe | null> | null;
   pendingRedirect: boolean;
   redirectTimeoutId: number | null;
+  behaviorTracker: BehaviorTracker | null;
 
   initializeCheckout(): void;
   performInitialization(): void;
@@ -87,6 +96,7 @@ interface CheckoutSectionComponent extends Component {
   showMultibancoInstructions(paymentIntent: unknown): void;
   createBackdrop(): void;
   removeBackdrop(): void;
+  calculateLeadScore(behaviorData: BehaviorData, attributionData: AttributionData, userEnvironment: UserEnvironment): number;
 }
 
 export const Checkout: CheckoutSectionComponent = {
@@ -103,6 +113,7 @@ export const Checkout: CheckoutSectionComponent = {
   stripeLoadPromise: null,
   pendingRedirect: false,
   redirectTimeoutId: null,
+  behaviorTracker: null,
 
   init(): void {
     try {
@@ -121,6 +132,9 @@ export const Checkout: CheckoutSectionComponent = {
     this.initializeCheckout();
     this.setupCheckoutTriggers();
     this.setupModalBehavior();
+    
+    // Initialize behavior tracking
+    this.behaviorTracker = new BehaviorTracker();
   },
 
   initializeCheckout(): void {
@@ -635,8 +649,115 @@ export const Checkout: CheckoutSectionComponent = {
       if (submitBtn) (submitBtn as HTMLButtonElement).disabled = true;
       if (submitSpinner) submitSpinner.classList.remove('hidden');
 
-      // Simulate lead capture processing
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Submit lead to MailerLite for immediate capture
+      try {
+        // Collect rich user data
+        const userEnvironment = getUserEnvironment();
+        const attributionData = getAttributionData();
+        const behaviorData = this.behaviorTracker?.getBehaviorData() || {
+          timeOnPage: 0,
+          scrollDepth: 0,
+          sectionsViewed: [],
+          pageViews: 1,
+          isReturningVisitor: false,
+          sessionDuration: 0
+        };
+        
+        const mailerlitePayload = {
+          // Basic lead info
+          lead_id: this.leadId,
+          full_name: leadData.fullName,
+          email: leadData.email,
+          phone: `${leadData.countryCode}${leadData.phone}`,
+          page: 'checkout_modal',
+          
+          // Core high-leverage fields
+          preferred_language: userEnvironment.language,
+          city: 'unknown', // Will be enhanced with geolocation later
+          country: leadData.countryCode,
+          timezone: userEnvironment.timezone,
+          business_stage: 'unknown', // Future: add form field
+          business_type: 'unknown', // Future: add form field
+          primary_goal: 'unknown', // Future: add form field
+          main_challenge: 'unknown', // Future: add form field
+          
+          // Intent & lifecycle
+          event_interest: 'cafe_com_vendas_lisbon_2025-09-20',
+          intent_signal: 'started_checkout',
+          lead_score: this.calculateLeadScore(behaviorData, attributionData, userEnvironment),
+          signup_page: window.location.pathname,
+          referrer_domain: attributionData.referrer_domain,
+          
+          // Attribution data
+          utm_source: attributionData.utm_source,
+          utm_medium: attributionData.utm_medium,
+          utm_campaign: attributionData.utm_campaign,
+          utm_content: attributionData.utm_content,
+          utm_term: attributionData.utm_term,
+          first_utm_source: sessionStorage.getItem('first_utm_source'),
+          first_utm_campaign: sessionStorage.getItem('first_utm_campaign'),
+          referrer: attributionData.referrer,
+          landing_page: attributionData.landing_page,
+          
+          // Device & browser data
+          device_type: userEnvironment.deviceInfo.type,
+          device_brand: userEnvironment.deviceInfo.brand,
+          browser_name: userEnvironment.browserInfo.name,
+          browser_version: userEnvironment.browserInfo.version,
+          screen_resolution: userEnvironment.screenResolution,
+          viewport_size: userEnvironment.viewportSize,
+          
+          // Behavioral data
+          time_on_page: behaviorData.timeOnPage,
+          scroll_depth: behaviorData.scrollDepth,
+          sections_viewed: behaviorData.sectionsViewed.join(','),
+          page_views: behaviorData.pageViews,
+          is_returning_visitor: behaviorData.isReturningVisitor,
+          session_duration: behaviorData.sessionDuration
+        };
+
+        const mailerliteResponse = await fetch(`${ENV.urls.base}/.netlify/functions/mailerlite-lead`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(mailerlitePayload)
+        });
+
+        if (mailerliteResponse.ok) {
+          const mailerliteResult = await mailerliteResponse.json() as {
+            success: boolean;
+            leadId: string;
+            email: string;
+            mailerlite: {
+              success: boolean;
+              action?: string;
+              reason?: string;
+            };
+          };
+          logger.info('Lead successfully submitted to MailerLite', {
+            leadId: this.leadId,
+            email: leadData.email,
+            mailerliteSuccess: mailerliteResult.mailerlite.success
+          });
+        } else {
+          logger.warn('MailerLite lead submission failed', {
+            status: mailerliteResponse.status,
+            leadId: this.leadId,
+            email: leadData.email
+          });
+        }
+      } catch (mailerliteError) {
+        // Non-blocking error - don't prevent user from proceeding
+        logger.warn('MailerLite API call failed, continuing with checkout', {
+          error: mailerliteError instanceof Error ? mailerliteError.message : 'Unknown error',
+          leadId: this.leadId,
+          email: leadData.email
+        });
+      }
+
+      // Simulate brief processing delay for UX
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       this.setStep(2);
 
@@ -1249,5 +1370,37 @@ export const Checkout: CheckoutSectionComponent = {
       paymentIntentId: getPaymentIntentId(paymentIntent),
       status: getPaymentIntentStatus(paymentIntent)
     });
+  },
+
+  /**
+   * Calculate lead score based on behavior, attribution, and environment data
+   */
+  calculateLeadScore(behaviorData: BehaviorData, attributionData: AttributionData, userEnvironment: UserEnvironment): number {
+    let score = 0;
+    
+    // Engagement signals (0-40 points)
+    if (behaviorData.timeOnPage > 120) score += 10; // Spent 2+ minutes
+    if (behaviorData.scrollDepth > 75) score += 10; // Scrolled through most content
+    if (behaviorData.sectionsViewed.includes('testimonials')) score += 5; // Viewed social proof
+    if (behaviorData.sectionsViewed.includes('faq')) score += 5; // Engaged with FAQ
+    if (behaviorData.sectionsViewed.length > 3) score += 10; // Explored multiple sections
+    
+    // Attribution quality (0-30 points)
+    if (attributionData.utm_source === 'direct') score += 15; // Direct traffic = high intent
+    if (attributionData.utm_source === 'linkedin') score += 12; // Professional network
+    if (attributionData.utm_source === 'referral') score += 10; // Word of mouth
+    if (attributionData.utm_source === 'email') score += 8; // Email subscriber
+    if (attributionData.utm_campaign?.includes('retargeting')) score += 5; // Returning visitor
+    
+    // Behavioral patterns (0-20 points)
+    if (behaviorData.pageViews > 1) score += 5; // Multiple page views
+    if (behaviorData.isReturningVisitor) score += 10; // Returning visitor
+    if (behaviorData.sessionDuration > 300) score += 5; // Long session (5+ minutes)
+    
+    // Device and environment (0-10 points)
+    if (userEnvironment.deviceInfo.type === 'desktop') score += 5; // Desktop users often more serious
+    if (userEnvironment.timezone?.includes('Lisbon') || userEnvironment.timezone?.includes('Portugal')) score += 5; // Local audience
+    
+    return Math.min(score, 100); // Cap at 100
   }
 };
