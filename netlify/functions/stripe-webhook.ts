@@ -10,6 +10,11 @@ import type {
   MailerLiteSubscriberData,
   TimeoutPromise
 } from './types';
+import {
+  isStripePaymentIntent,
+  hasMultibancoDetails,
+  getMultibancoDetails
+} from '../../src/types/stripe.js';
 
 // MailerLite API response interfaces
 interface MailerLiteSubscriberResponse {
@@ -67,9 +72,17 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Ope
   ]);
 }
 
-// MailerLite integration
+// MailerLite integration with proper Group IDs
 const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
-const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID || 'cafe-com-vendas';
+// MailerLite Group IDs for customer lifecycle management
+const MAILERLITE_GROUPS = {
+  LEADS: '164068163344925725',           // 2025 Café com Vendas Portugal - Leads
+  BUYERS: '164071323193050164',         // 2025 Café com Vendas Portugal - Buyers  
+  EVENT_ATTENDEES: '164071346948540099' // 2025 Café com Vendas Portugal - Event Attendees
+};
+
+// Legacy group ID support (keeping for backward compatibility in env vars)
+// const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID || MAILERLITE_GROUPS.BUYERS;
 
 // Webhook retry configuration
 const MAX_RETRIES = 3;
@@ -363,12 +376,14 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
         fields: {
           lead_id: leadId || '',
           payment_status: 'paid',
+          order_id: paymentIntent.id,
+          payment_method: 'card', // Default to card, will be updated if Multibanco
           payment_intent_id: paymentIntent.id,
           amount_paid: paymentIntent.amount / 100, // Convert from cents
           currency: paymentIntent.currency.toUpperCase(),
           event_name: metadata.event_name || 'Café com Vendas',
-          event_date: metadata.event_date || '2024-09-20',
-          spot_type: metadata.spot_type || 'first_lot_early_bird',
+          event_date: metadata.event_date || '2025-09-20',
+          ticket_type: metadata.spot_type || 'Standard',
           source: metadata.source || 'checkout',
           payment_date: new Date().toISOString(),
           utm_source: metadata.utm_source || null,
@@ -379,6 +394,28 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
     } catch (error) {
       // Log error but don't fail the webhook processing
       logWithCorrelation('error', 'Failed to add customer to MailerLite after retries', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        customerEmail,
+        paymentIntentId: paymentIntent.id
+      }, correlationId);
+    }
+
+    // 🔄 CORE AUTOMATION: Move subscriber from Leads to Buyers group (implements your CRM rules)
+    try {
+      await retryWithBackoff(() => moveSubscriberBetweenGroups(
+        customerEmail,
+        MAILERLITE_GROUPS.LEADS,    // From: Leads group
+        MAILERLITE_GROUPS.BUYERS    // To: Buyers group
+      ));
+      
+      logWithCorrelation('info', 'Successfully moved subscriber to Buyers group', {
+        customerEmail,
+        paymentIntentId: paymentIntent.id,
+        transition: 'leads_to_buyers'
+      }, correlationId);
+    } catch (error) {
+      // Log but don't fail webhook for group management errors
+      logWithCorrelation('error', 'Failed to move subscriber to Buyers group', {
         error: error instanceof Error ? error.message : 'Unknown error',
         customerEmail,
         paymentIntentId: paymentIntent.id
@@ -436,6 +473,26 @@ async function handlePaymentProcessing(paymentIntent: Stripe.PaymentIntent, corr
         payment_status: 'processing',
         payment_intent_id: paymentIntent.id
       }));
+      
+      // 🏦 MULTIBANCO: If this is a Multibanco payment, extract and store voucher details
+      if (isStripePaymentIntent(paymentIntent) && hasMultibancoDetails(paymentIntent)) {
+        const multibancoDetails = getMultibancoDetails(paymentIntent);
+        if (multibancoDetails) {
+          await retryWithBackoff(() => updateMultibancoFields(customerEmail, {
+            entity: multibancoDetails.entity,
+            reference: multibancoDetails.reference,
+            amount: paymentIntent.amount / 100, // Convert from cents
+            expiresAt: multibancoDetails.expires_at ? new Date(multibancoDetails.expires_at * 1000).toISOString() : undefined
+          }));
+          
+          logWithCorrelation('info', 'Updated Multibanco voucher details', {
+            customerEmail,
+            entity: multibancoDetails.entity,
+            reference: multibancoDetails.reference,
+            paymentIntentId: paymentIntent.id
+          }, correlationId);
+        }
+      }
     }
     
   } catch (error) {
@@ -1078,6 +1135,111 @@ async function handleCheckoutSessionAsyncPaymentFailed(session: Stripe.Checkout.
 }
 
 /**
+ * Update subscriber with Multibanco voucher details
+ */
+async function updateMultibancoFields(email: string, multibancoDetails: {
+  entity: string;
+  reference: string;
+  amount: number;
+  expiresAt?: string;
+}): Promise<void> {
+  if (!MAILERLITE_API_KEY) {
+    console.log('MailerLite API key not configured - skipping Multibanco field updates');
+    return;
+  }
+  
+  try {
+    await updateMailerLiteSubscriber(email, {
+      payment_method: 'multibanco',
+      mb_entity: multibancoDetails.entity,
+      mb_reference: multibancoDetails.reference,
+      mb_amount: multibancoDetails.amount,
+      mb_expires_at: multibancoDetails.expiresAt || '',
+      voucher_generated_at: new Date().toISOString()
+    });
+    
+    console.log(`Updated Multibanco fields for ${email}`, {
+      entity: multibancoDetails.entity,
+      reference: multibancoDetails.reference
+    });
+  } catch (error) {
+    console.error('Error updating Multibanco fields:', error instanceof Error ? error.message : 'Unknown error');
+  }
+}
+
+/**
+ * Move subscriber from one group to another (Leads → Buyers transition)
+ */
+async function moveSubscriberBetweenGroups(email: string, fromGroupId: string, toGroupId: string): Promise<void> {
+  if (!MAILERLITE_API_KEY) {
+    console.log('MailerLite API key not configured - skipping group management');
+    return;
+  }
+  
+  try {
+    // First find the subscriber
+    const searchResponse = await withTimeout(
+      fetch(`https://connect.mailerlite.com/api/subscribers?filter[email]=${encodeURIComponent(email)}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${MAILERLITE_API_KEY}`
+        }
+      }),
+      TIMEOUTS.mailerlite_api,
+      'MailerLite subscriber search'
+    );
+
+    if (!searchResponse.ok) {
+      throw new Error(`Failed to find subscriber: ${searchResponse.status}`);
+    }
+
+    const searchResult = await searchResponse.json() as MailerLiteSearchResponse;
+    
+    if (!searchResult.data || searchResult.data.length === 0) {
+      console.log(`Subscriber not found in MailerLite: ${email}`);
+      return;
+    }
+
+    const subscriberId = searchResult.data[0].id;
+
+    // Remove from old group (Leads)
+    if (fromGroupId) {
+      await withTimeout(
+        fetch(`https://connect.mailerlite.com/api/subscribers/${subscriberId}/groups/${fromGroupId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${MAILERLITE_API_KEY}`
+          }
+        }),
+        TIMEOUTS.mailerlite_api,
+        'MailerLite group removal'
+      );
+      console.log(`Removed ${email} from group ${fromGroupId}`);
+    }
+
+    // Add to new group (Buyers)
+    await withTimeout(
+      fetch(`https://connect.mailerlite.com/api/subscribers/${subscriberId}/groups/${toGroupId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${MAILERLITE_API_KEY}`
+        }
+      }),
+      TIMEOUTS.mailerlite_api,
+      'MailerLite group assignment'
+    );
+
+    console.log(`Successfully moved ${email} from group ${fromGroupId} to ${toGroupId}`);
+    
+  } catch (error) {
+    console.error('Error moving subscriber between groups:', error instanceof Error ? error.message : 'Unknown error');
+    // Fail gracefully for group management errors
+    return;
+  }
+}
+
+/**
  * Add subscriber to MailerLite
  */
 async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promise<MailerLiteSubscriberResponse | void> {
@@ -1099,7 +1261,7 @@ async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promis
           email: subscriberData.email,
           name: subscriberData.name,
           fields: subscriberData.fields,
-          groups: [MAILERLITE_GROUP_ID],
+          groups: [MAILERLITE_GROUPS.BUYERS], // Add paid customers to Buyers group
           status: 'active',
           subscribed_at: new Date().toISOString()
         })

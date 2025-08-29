@@ -67,9 +67,18 @@ const rateLimitStore = new Map<string, MailerLiteRateLimitEntry>();
 const RATE_LIMIT_WINDOW = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT_MAX_REQUESTS = 8; // Max 8 lead submissions per 10 minutes per IP
 
-// MailerLite configuration
+// MailerLite configuration with proper Group IDs
 const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
-const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID;
+
+// MailerLite Group IDs for customer lifecycle management
+const MAILERLITE_GROUPS = {
+  LEADS: '164068163344925725',           // 2025 Café com Vendas Portugal - Leads
+  BUYERS: '164071323193050164',         // 2025 Café com Vendas Portugal - Buyers  
+  EVENT_ATTENDEES: '164071346948540099' // 2025 Café com Vendas Portugal - Event Attendees
+};
+
+// Legacy group ID support (keeping for backward compatibility in env vars)
+// const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID || MAILERLITE_GROUPS.LEADS;
 
 // Validation schemas for lead data
 const VALIDATION_RULES: ValidationRules = {
@@ -373,7 +382,7 @@ async function addLeadToMailerLite(leadData: MailerLiteSubscriberData): Promise<
             name: leadData.name,
             phone: leadData.phone,
             fields: leadData.fields,
-            groups: MAILERLITE_GROUP_ID ? [MAILERLITE_GROUP_ID] : undefined,
+            groups: [MAILERLITE_GROUPS.LEADS], // Add to Leads group initially
             status: 'active'
           })
         }),
@@ -580,13 +589,33 @@ export default async (request: Request): Promise<Response> => {
       last_name: lastName,    // MailerLite built-in field for last name
       phone: phone,
       fields: {
-        // Core system fields
+        // Core system fields (matching your CRM rules)
         lead_id: lead_id,
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        phone: phone,
+        checkout_started_at: new Date().toISOString(),
+        ticket_type: (requestBody.ticket_type as string) || 'Standard',
+        order_id: null, // Will be set when payment intent is created
+        payment_method: null, // Will be set during payment processing
         payment_status: 'lead',
+        amount_paid: null,
+        details_form_status: 'pending',
+        event_date: '2025-09-20',
+        event_address: 'Lisboa, Portugal',
+        google_maps_link: 'https://maps.google.com/?q=Lisboa,Portugal',
+        
+        // Multibanco fields (initially null, set during payment)
+        mb_entity: null,
+        mb_reference: null,
+        mb_amount: null,
+        mb_expires_at: null,
+        
+        // System tracking fields
         lead_date: new Date().toISOString(),
         lead_source: 'checkout_form',
         event_name: 'Café com Vendas - Lisboa',
-        event_date: '2025-09-20',
         page: requestBody.page || 'unknown',
         user_agent: request.headers.get('user-agent')?.substring(0, 255) || 'unknown'
       } as Record<string, string | number | boolean | null>
