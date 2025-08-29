@@ -731,4 +731,135 @@ test.describe('User Journey Tests', () => {
     expect(dataLayerStructure.hasGTMLoad).toBeTruthy();
     expect(dataLayerStructure.eventTypes.length).toBeGreaterThan(0);
   });
+
+  test('MailerLite Lead Capture Integration', async ({ page }) => {
+    console.log('[Test] Verifying MailerLite lead capture integration...');
+    
+    // Monitor network requests to capture MailerLite API calls
+    interface NetworkRequest {
+      url: string;
+      method: string;
+      response?: Record<string, unknown>;
+    }
+    
+    interface MailerliteRequestCapture {
+      url: string;
+      status: number;
+      body?: Record<string, unknown>;
+      error?: string;
+    }
+    
+    const networkRequests: NetworkRequest[] = [];
+    let mailerliteRequest: MailerliteRequestCapture | null = null;
+    
+    page.on('request', request => {
+      networkRequests.push({
+        url: request.url(),
+        method: request.method()
+      });
+    });
+    
+    page.on('response', async response => {
+      if (response.url().includes('mailerlite-lead')) {
+        try {
+          const responseBody = await response.json() as Record<string, unknown>;
+          mailerliteRequest = {
+            url: response.url(),
+            status: response.status(),
+            body: responseBody
+          };
+          console.log('[Test] MailerLite response captured:', mailerliteRequest);
+        } catch (error) {
+          console.log('[Test] Failed to parse MailerLite response:', error);
+          mailerliteRequest = {
+            url: response.url(),
+            status: response.status(),
+            error: 'Failed to parse response'
+          };
+        }
+      }
+    });
+
+    // Step 1: Navigate and open checkout
+    const ctaButton = page.locator('[data-checkout-trigger]').first();
+    await expect(ctaButton).toBeVisible({ timeout: TIMEOUT });
+    await ctaButton.click();
+    
+    // Step 2: Fill and submit lead form
+    await page.waitForSelector('form', { timeout: TIMEOUT });
+    await page.waitForSelector('form[data-checkout-initialized="true"]', { timeout: 10000 });
+    
+    await fillLeadForm(page);
+    
+    // Step 3: Submit form and wait for MailerLite call
+    await page.evaluate(() => {
+      const form = document.querySelector('#leadForm') as HTMLFormElement;
+      if (form) {
+        console.log('[DEBUG] About to submit lead form');
+        form.requestSubmit();
+        console.log('[DEBUG] Lead form submitted');
+      } else {
+        console.log('[DEBUG] Lead form not found!');
+      }
+    });
+    
+    // Wait for step transition first
+    await page.waitForSelector('#paymentStep:not(.hidden)', { timeout: 10000 }).catch(() => {
+      console.log('[Test] Payment step not visible - form may not have submitted successfully');
+    });
+    
+    // Wait for MailerLite API call to be made
+    await page.waitForTimeout(3000); // Give time for the API call to complete
+    
+    // Debug: Log all network requests to see what's happening
+    console.log('[Test] All network requests made:');
+    networkRequests.forEach(req => {
+      console.log(`[Test] - ${req.method} ${req.url}`);
+    });
+    
+    // Step 4: Verify MailerLite API was called
+    const mailerliteRequestMade = networkRequests.some(req => 
+      req.url.includes('mailerlite-lead') && req.method === 'POST'
+    );
+    
+    if (!mailerliteRequestMade) {
+      console.log('[Test] ❌ MailerLite API call was NOT made');
+      console.log('[Test] Looking for any function calls...');
+      const functionCalls = networkRequests.filter(req => req.url.includes('.netlify/functions/'));
+      functionCalls.forEach(req => {
+        console.log(`[Test] Function call found: ${req.method} ${req.url}`);
+      });
+    } else {
+      console.log('[Test] ✅ MailerLite API call was made');
+    }
+    
+    // The test should pass if the API call was attempted, regardless of whether MailerLite is configured
+    // This ensures our frontend integration is working correctly
+    if (!mailerliteRequestMade) {
+      console.log('[Test] ⚠️ MailerLite API call not detected - this might indicate a configuration issue');
+      // Still fail the test because the integration should be calling the API
+      expect(mailerliteRequestMade).toBeTruthy();
+    }
+    
+    // Step 5: Verify response if available
+    if (mailerliteRequest) {
+      const request = mailerliteRequest as MailerliteRequestCapture;
+      expect(request.status).toBeLessThan(500); // Should not be server error
+      console.log('[Test] ✅ MailerLite API responded with status:', request.status);
+      
+      // If successful, verify response structure
+      if (request.status === 200 && request.body) {
+        const responseBody = request.body;
+         
+        expect(responseBody).toHaveProperty('success');
+         
+        expect(responseBody).toHaveProperty('leadId');
+         
+        expect(responseBody).toHaveProperty('mailerlite');
+        console.log('[Test] ✅ MailerLite response has correct structure');
+      }
+    }
+    
+    console.log('[Test] ✅ MailerLite integration test completed successfully');
+  });
 });
