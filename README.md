@@ -48,21 +48,102 @@ npm run build             # Vite + Eleventy production build
 npm run preview           # Preview production build
 ```
 
+## ⚡ Performance Targets
+
+### Lighthouse Scores (Mobile)
+- **Performance**: ≥ 90 (Critical for conversions)
+- **Accessibility**: ≥ 95 (Legal compliance + UX)
+- **Best Practices**: ≥ 90 (Security + reliability)
+- **SEO**: ≥ 95 (Organic discovery)
+
+### Core Web Vitals
+- **LCP**: < 2.5s | **FID**: < 100ms | **CLS**: < 0.1 | **INP**: < 200ms
+
+```bash
+# Run performance audit
+npm run lighthouse -- https://your-url.com
+```
+
+---
+
+## 🛠 Quick Edit Guide
+
+### Content Changes
+- **Event details** (date, price): `src/_data/sections/hero.json`, `offer.json`
+- **Presenter bio**: `src/_data/sections/about.json`
+- **Testimonials/videos**: `src/_data/sections/social-proof.json`
+- **FAQ questions**: `src/_data/sections/faq.json`
+- **Payment amount**: `src/_data/site.ts` (single source of truth)
+- **Site metadata**: `src/_data/site.ts`
+
+### Code Changes
+- **Section templates**: `src/_includes/sections/{section}/index.njk`
+- **Section logic**: `src/_includes/sections/{section}/index.ts`
+- **UI components**: `src/components/ui/`
+- **Styling**: `src/assets/css/main.css` (Tailwind v4 theme)
+- **Analytics**: `src/assets/js/config/constants.ts`
+
+---
+
+## 🚨 Common Issues
+
+### TypeScript Errors
+```bash
+# Always use .js extensions for local imports (ESM requirement)
+# ✅ Correct
+import { initCheckout } from './checkout/index.js';
+
+# ❌ Wrong
+import { initCheckout } from './checkout/index.ts';
+
+# Check all errors
+npm run type-check
+```
+
+### Build Failures
+```bash
+# Clear caches and rebuild
+rm -rf node_modules _site .cache
+npm ci
+npm run build
+```
+
+### Node.js Version Issues
+```bash
+# Check version (requires 22.17.1+)
+node --version
+
+# Fix with nvm
+nvm install 22.17.1 && nvm use 22.17.1
+```
+
+### Environment Variables Not Loading
+```bash
+# Check .env file exists and has correct variables
+cp .env.example .env
+# Edit .env with your keys
+
+# For Netlify functions
+npm run netlify:dev  # Port 8888 (not 8080)
+```
+
+---
+
 ## 📖 Documentation
 
-### Core Docs (`docs/`)
-- **`SETUP.md`** - Environment variables, integrations, deployment
-- **`edit-map.md`** - File structure map for content & code edits
-- **`STRIPE_TEST_CARDS.md`** - Test card numbers for payment flows
-- **`PAYMENT_TESTING_SUMMARY.md`** - Payment testing checklist
-- **`TROUBLESHOOTING.md`** - Common issues and solutions
-- **`GTM_CONFIGURATION_REFERENCE.md`** - Google Tag Manager setup
-- **`PERFORMANCE.md`** - Lighthouse targets and optimization
-- **`DEPLOYMENT.md`** - Production deployment checklist
+### Core Docs
+- **`docs/SETUP.md`** - Environment setup & integrations
+- **`docs/DEVELOPMENT.md`** - File structure & development guide  
+- **`docs/STRIPE_TEST_CARDS.md`** - Payment testing cards
+- **`docs/PAYMENT_TESTING_SUMMARY.md`** - Payment flow testing
+- **`CLAUDE.md`** - AI coding guidelines
+- **`docs/design/`** - Design principles & section guides
 
-### Development
-- **`CLAUDE.md`** - AI coding guidelines & workflow
-- **`.env.example`** - Required environment variables template
+### Quick Reference
+- **Environment template**: `.env.example`
+- **Payment testing**: Use `docs/STRIPE_TEST_CARDS.md`
+- **Performance audit**: `npm run lighthouse`
+- **Type checking**: `npm run type-check`
 
 ### Project Structure
 ```

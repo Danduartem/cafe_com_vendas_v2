@@ -16,7 +16,7 @@ Act as an engineer in this repo. Favor **small, verifiable, type‑safe** diffs.
 ## 0) Start‑Here Checklist (always run)
 
 1. `npm run type-check && npm run lint`
-2. Check: `docs/SETUP.md` for configuration and `docs/edit-map.md` for file structure
+2. Check: `docs/SETUP.md` for configuration and `docs/DEVELOPMENT.md` for file structure
 3. **If working on payments**: open `docs/STRIPE_TEST_CARDS.md` and `docs/PAYMENT_TESTING_SUMMARY.md`
    **STOP** → propose a minimal plan before edits.
 
@@ -47,7 +47,7 @@ Act as an engineer in this repo. Favor **small, verifiable, type‑safe** diffs.
 
 ## 3) Repo Rules (non‑negotiable)
 
-* **TypeScript‑only** sources; **ESM imports use `.js` extensions** (TS emits ESM JS)
+* **TypeScript‑only** sources; **path aliases always** with `.js` extensions (ESM compliance)
 * **Tailwind v4 only** (CSS‑first, `@theme`); **no inline styles/handlers**
 * **Design tokens** → generated CSS variables; no hardcoded colors/spacing
 * **Accessibility**: semantic HTML, visible focus, keyboard support; see `docs/SETUP.md`
