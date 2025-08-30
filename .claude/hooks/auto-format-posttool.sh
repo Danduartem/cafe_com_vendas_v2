@@ -46,8 +46,14 @@ done
 if [ ${#JS_TS_FILES[@]} -gt 0 ]; then
   # Use the project's lint:fix script for consistency
   if command -v npm >/dev/null 2>&1; then
-    # Run ESLint fix on specific files to match project workflow
-    npx eslint --fix "${JS_TS_FILES[@]}" 2>/dev/null || true
+    # Parallel execution for better performance with many files
+    if [ ${#JS_TS_FILES[@]} -gt 10 ]; then
+      # Split files into chunks for parallel processing
+      printf '%s\n' "${JS_TS_FILES[@]}" | xargs -n 5 -P 4 -I {} npx eslint --fix {} 2>/dev/null || true
+    else
+      # Standard execution for smaller file counts
+      npx eslint --fix "${JS_TS_FILES[@]}" 2>/dev/null || true
+    fi
   fi
 fi
 

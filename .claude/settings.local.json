@@ -54,7 +54,8 @@
       "Bash(git rev-list:*)",
       "Bash(git push:*)",
       "Read(/Users/danielmenezes/.claude/**)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(chmod:*)"
     ]
   },
   "hooks": {
@@ -63,11 +64,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/check-library-versions.sh"
-          },
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/external-apis-check.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-info.sh"
           }
         ]
       }
@@ -79,16 +76,6 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/context7-reminder.sh"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/notify-waiting.sh"
           }
         ]
       }
