@@ -2,7 +2,6 @@
   "id": "social-proof",
   "enabled": true,
   "copy": {
-    "eyebrow": "O que dizem os participantes",
     "headline": "Eu poderia passar horas falando sobre o Café com Vendas. Mas sabe de uma coisa?",
     "subhead": "Vou deixar meus alunos falarem por mim.",
     "footer_text": "O próximo depoimento será o seu.",
