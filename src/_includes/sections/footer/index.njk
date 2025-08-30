@@ -21,20 +21,6 @@
     <div class="absolute bottom-16 right-8 w-20 h-20 bg-gradient-to-r from-gold-500/10 to-burgundy-600/10 rounded-full blur-sm animate-pulse"></div>
   </div>
 
-  {# Top Stats Section #}
-  <div class="relative py-8 border-b border-white/10" data-reveal>
-    <div class="container mx-auto px-8 md:px-12 max-w-7xl">
-      <div class="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16">
-        {% for stat in currentSection.copy.stats %}
-        <div class="text-center">
-          <div class="text-3xl font-lora font-bold text-gold-400 mb-1">{{ stat.value }}</div>
-          <div class="text-sm font-century text-neutral-300">{{ stat.label }}</div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-
   {# Main Footer Content #}
   <div class="relative py-16" data-reveal>
     <div class="container mx-auto px-8 md:px-12 max-w-7xl">
@@ -189,15 +175,6 @@
         <div class="text-sm font-century text-white">
           © {{ currentSection.copyright.year }} {{ currentSection.copyright.owner }}. {{ currentSection.copyright.text }}.
         </div>
-        
-        <div class="flex items-center space-x-2 text-sm font-century text-white">
-          <span>Feito com</span>
-          <svg class="w-4 h-4 text-burgundy-400 animate-pulse" fill="currentColor" viewBox="0 0 20 20" aria-label="coração">
-            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
-          </svg>
-          <span>em Portugal</span>
-        </div>
-        
       </div>
     </div>
   </div>
