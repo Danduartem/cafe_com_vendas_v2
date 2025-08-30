@@ -8,18 +8,19 @@
     
     {# Premium Headline Section #}
     <div class="text-center mb-16 md:mb-20">
-      <h2 class="font-serif font-bold text-navy-800 mb-8 leading-none">
-        <span class="block text-4xl md:text-5xl lg:text-6xl bg-gradient-to-r from-burgundy-700 via-burgundy-600 to-burgundy-500 bg-clip-text text-transparent font-lora">
-          {{ currentSection.copy.headline }}
+      <h2 class="font-bold text-navy-800 mb-8 leading-none">
+        <span class="block text-4xl md:text-5xl lg:text-6xl font-lora">{{ currentSection.copy.headline_part1 }}</span>
+        <span class="block text-4xl md:text-5xl lg:text-6xl bg-gradient-to-r from-burgundy-700 via-burgundy-600 to-burgundy-500 bg-clip-text text-transparent mt-2 font-lora">
+          {{ currentSection.copy.headline_part2 }}
         </span>
         <div class="mx-auto mt-4 h-1 w-24 bg-gradient-to-r from-burgundy-600 to-burgundy-700 rounded-full"></div>
       </h2>
       
       <div class="max-w-4xl mx-auto space-y-4">
-        <p class="text-xl md:text-2xl text-navy-700 font-medium">
+        <p class="text-xl md:text-2xl text-navy-700 font-medium font-century">
           {{ currentSection.copy.subhead }}
         </p>
-        <p class="text-lg text-navy-600 leading-relaxed">
+        <p class="text-lg text-navy-600 leading-relaxed font-century">
           {{ currentSection.copy.description }}
           <span class="inline-flex items-center px-3 py-1 bg-burgundy-100 text-burgundy-700 rounded-full font-semibold text-sm">
             {{ site.event.capacity.totalCapacity }} empreendedoras
@@ -53,7 +54,7 @@
           {# Price Display - FIXED #}
           <div class="text-center mb-12">
             <div class="price-container mb-4">
-              <div class="text-7xl md:text-8xl font-serif font-bold">
+              <div class="text-7xl md:text-8xl font-lora font-bold">
                 <span class="bg-gradient-to-br from-burgundy-700 to-burgundy-800 bg-clip-text text-transparent">
                   {{ currentSection.copy.pricing.first_lot.discounted_price }}
                 </span>
@@ -81,7 +82,7 @@
 
           {# Premium Deliverables Grid (simplified DOM) #}
           <div class="mb-12">
-            <h3 class="text-center text-2xl font-century font-bold text-navy-800 mb-8">
+            <h3 class="text-center text-2xl font-lora font-bold text-navy-800 mb-8">
               O que está incluído
             </h3>
 
@@ -165,7 +166,7 @@
 
             {# Alternative Payment Button - Enhanced with accessibility #}
             <button id="mbway-button"
-                    class="w-full py-4 px-6 bg-white/90 border-2 border-neutral-300 hover:border-neutral-400 text-navy-700 font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-burgundy-500 focus:ring-offset-2"
+                    class="w-full py-4 px-6 bg-white/90 border-2 border-neutral-300 hover:border-neutral-400 text-navy-700 font-medium font-century rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-burgundy-500 focus:ring-offset-2"
                     aria-expanded="false"
                     aria-controls="mbway-info"
                     data-analytics-event="mbway_toggle">
@@ -193,7 +194,7 @@
                     </svg>
                   </div>
                   <div>
-                    <p class="font-semibold text-navy-800 mb-2">
+                    <p class="font-semibold font-century text-navy-800 mb-2">
                       MBWay: <span class="text-burgundy-700 font-century">{{ site.event.payments.alternative.mbway.phone }}</span>
                     </p>
                     <p class="text-navy-600 text-sm">
