@@ -30,7 +30,10 @@
       "@sections/*": ["src/_includes/sections/*"],
       "@components/*": ["src/components/*"],
       "@assets/*": ["src/assets/*"],
-      "@types/*": ["src/types/*"],
+      "@app-types/*": ["src/types/*"],
+      "@utils/*": ["src/utils/*"],
+      "@data/*": ["src/_data/*"],
+      "@test-mocks/*": ["tests/mocks/*"],
       "@/*": ["src/assets/js/*"]
     },
 
