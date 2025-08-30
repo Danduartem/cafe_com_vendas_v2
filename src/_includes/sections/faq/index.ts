@@ -4,10 +4,10 @@
  * Handles FAQ accordion interactions using platform components
  */
 
-import { PlatformAccordion } from '../../../components/ui';
+import { PlatformAccordion } from '../../../components/ui/index.js';
+import type { Component } from '../../../types/components/base.js';
 import { safeQuery } from '../../../utils/dom.js';
 import { logger } from '../../../utils/logger.js';
-import type { Component } from '../../../types/components/base.js';
 
 interface FAQSectionComponent extends Component {
   initializeFAQ(): void;
