@@ -23,8 +23,6 @@
       "id": 2,
       "name": "Geisciane Roberta",
       "profession": "Nutricionista",
-      "location": "Porto",
-      "result": "Funil que converte em 90 dias",
       "video_id": "eUUPGwc9amQ",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/eUUPGwc9amQ/maxresdefault.jpg"
     },
@@ -32,8 +30,6 @@
       "id": 3,
       "name": "Daniela Tavares",
       "profession": "Massoterapeuta",
-      "location": "Braga",
-      "result": "Resultados em 2 semanas",
       "video_id": "lk6V36FwGSc",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/lk6V36FwGSc/maxresdefault.jpg"
     },
@@ -41,8 +37,6 @@
       "id": 4,
       "name": "Laura Fátima",
       "profession": "Fundadora Guarani Piscicultura",
-      "location": "Coimbra",
-      "result": "Dobrei as vendas em 3 meses",
       "video_id": "82k-aK9KaX4",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/82k-aK9KaX4/maxresdefault.jpg"
     },
@@ -50,8 +44,6 @@
       "id": 5,
       "name": "Angélica de Cássia Barbosa",
       "profession": "Terapeuta Ayurvédica e instrutora de yoga",
-      "location": "Faro",
-      "result": "Finalmente tenho tempo livre",
       "video_id": "kh0pKpZzIJI",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/kh0pKpZzIJI/maxresdefault.jpg"
     },
@@ -59,8 +51,6 @@
       "id": 6,
       "name": "Edineia Lampert",
       "profession": "Empresária na área da beleza",
-      "location": "Aveiro",
-      "result": "Processo de vendas automatizado",
       "video_id": "n6IDHv8nMAU",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/n6IDHv8nMAU/maxresdefault.jpg"
     },
@@ -68,8 +58,6 @@
       "id": 7,
       "name": "Daisy Mariana Henn",
       "profession": "Terapeuta energética",
-      "location": "Viseu",
-      "result": "Clareza total na estratégia",
       "video_id": "1wPMvyiUU_8",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/1wPMvyiUU_8/maxresdefault.jpg"
     },
@@ -77,8 +65,6 @@
       "id": 8,
       "name": "Larissa Manzan",
       "profession": "Vendedora",
-      "location": "Setúbal",
-      "result": "Trabalho 4 dias por semana",
       "video_id": "irnlC9Krsdo",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/irnlC9Krsdo/maxresdefault.jpg"
     },
@@ -86,8 +72,6 @@
       "id": 9,
       "name": "Vanessa Trumseiser",
       "profession": "Empresária na  área fitness",
-      "location": "Évora",
-      "result": "Método mudou tudo",
       "video_id": "w3EmeJpzQG4",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/w3EmeJpzQG4/maxresdefault.jpg"
     },
@@ -95,8 +79,6 @@
       "id": 10,
       "name": "Marcus Negri",
       "profession": "Fundador Composta Rua",
-      "location": "Évora",
-      "result": "Dobrou a receita em 4 meses",
       "video_id": "HMupKZLJdw4",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/HMupKZLJdw4/maxresdefault.jpg"
     },
@@ -104,8 +86,6 @@
       "id": 11,
       "name": "Thalyta Maia",
       "profession": "Terapeuta",
-      "location": "Leiria",
-      "result": "+12h livres e 25% mais receita",
       "video_id": "hP7CWX-PcXY",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/hP7CWX-PcXY/maxresdefault.jpg"
     },
@@ -113,8 +93,6 @@
       "id": 12,
       "name": "Luis Fernando Leier",
       "profession": "Fundador Respira Humano",
-      "location": "Santarém",
-      "result": "Equipa de 5 pessoas em 1 ano",
       "video_id": "kKPHUg3t7tI",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/kKPHUg3t7tI/maxresdefault.jpg"
     },
@@ -122,8 +100,6 @@
       "id": 13,
       "name": "Daiane Della Pasqua",
       "profession": "Vendedora",
-      "location": "Guarda",
-      "result": "Sistema 100% automatizado",
       "video_id": "6yZcVeu-Zl4",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/6yZcVeu-Zl4/maxresdefault.jpg"
     },
@@ -131,8 +107,6 @@
       "id": 14,
       "name": "Juliana Hornbrug",
       "profession": "Empresária no ramo de chocolates",
-      "location": "Cascais",
-      "result": "+20h/semana e clientes premium",
       "video_id": "30A1DLPcQc4",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/30A1DLPcQc4/maxresdefault.jpg"
     },
@@ -140,8 +114,6 @@
       "id": 15,
       "name": "Helena dos Santos Förster",
       "profession": "Fundadora da Casa Ayurveda",
-      "location": "Viana do Castelo",
-      "result": "Clínica referência na região",
       "video_id": "9H7A-KLOi9Q",
       "thumbnail": "https://res.cloudinary.com/ds4dhbneq/image/fetch/w_384,h_216,c_fill,q_auto,f_auto/https%3A//img.youtube.com/vi/9H7A-KLOi9Q/maxresdefault.jpg"
     }
