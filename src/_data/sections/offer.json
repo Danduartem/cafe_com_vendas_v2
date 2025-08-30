@@ -2,7 +2,8 @@
   "id": "offer",
   "enabled": true,
   "copy": {
-    "headline": "O seu lugar na mesa está à sua espera",
+    "headline_part1": "Preço é o que você paga, ",
+    "headline_part2": "Valor é o que você leva",
     "subhead": "Isto é mais do que um evento: é um ponto de viragem.",
     "description": "Um dia inteiro de imersão estratégica, material de apoio prático, almoço de networking e acesso a um plano de ação de 90 dias. Ambiente exclusivo para apenas 20 empreendedoras",
     "pricing": {
@@ -26,17 +27,17 @@
       }
     },
     "includes": [
+      "Plano de ação claro e aplicável",
+      "Acesso aos 5 pilares da mentoria Seja Livre",
+      "Cronograma de 90 dias",
+      "Material de apoio (Trello)",
+      "Acesso com desconto ao treinamento Expresso",
       "7 horas de conteúdo prático",
       "Roundtable de networking e cocriação",
       "Ambiente intimista na Mesa Corrida",
       "Fotos profissionais (instagramáveis)",
       "Suporte via WhatsApp após o evento",
       "Clube do livro após o evento",
-      "Plano de ação claro e aplicável",
-      "Acesso aos 5 pilares da mentoria Seja Livre",
-      "Cronograma de 90 dias",
-      "Material de apoio (Trello)",
-      "Acesso com desconto ao treinamento Expresso",
       "Almoço com sobremesa e bebidas",
       "Coquetel especial de encerramento"
     ],
