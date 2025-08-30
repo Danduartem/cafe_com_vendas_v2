@@ -3,8 +3,8 @@
  * Centralized state for the entire application
  */
 
-import { normalizeEventPayload } from '@/utils/gtm-normalizer';
-import type { AppState, StateManager as StateManagerInterface } from '@app-types/components/state.js';
+import { normalizeEventPayload } from '../utils/gtm-normalizer.js';
+import type { AppState, StateManager as StateManagerInterface } from '../../../types/components/state.js';
 
 /**
  * FAQ open times tracking

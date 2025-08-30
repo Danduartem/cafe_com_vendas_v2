@@ -3,9 +3,9 @@
  * Reusable accordion patterns for FAQ and expandable content
  */
 
-import { safeQuery, safeQueryAll } from '@utils/dom.js';
-import { logger } from '@utils/logger.js';
-import { Animations } from '@components/ui/animations/index.js';
+import { safeQuery, safeQueryAll } from '../../../utils/dom.js';
+import { logger } from '../../../utils/logger.js';
+import { Animations } from '../animations/index.js';
 
 interface AccordionConfig {
   containerSelector: string;
@@ -98,7 +98,7 @@ export const PlatformAccordion = {
           const questionText = item.querySelector('summary')?.textContent?.trim() || `FAQ ${itemNumber}`;
 
           // Import analytics dynamically to avoid circular dependency
-          import('../analytics').then(({ PlatformAnalytics }) => {
+          import('../analytics/index.js').then(({ PlatformAnalytics }) => {
             PlatformAnalytics.trackFAQ(itemNumber, isOpen, questionText);
           }).catch(() => {
             logger.debug('FAQ analytics tracking unavailable');

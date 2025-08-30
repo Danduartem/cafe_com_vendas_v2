@@ -3,9 +3,9 @@
  * Handles thank you page animations, progress bar, and celebration effects
  */
 
-import { safeQuery } from '@utils/dom.js';
-import { logger } from '@utils/logger.js';
-import { Animations } from '@components/ui/animations/index.js';
+import { safeQuery } from '../../../utils/dom.js';
+import { logger } from '../../../utils/logger.js';
+import { Animations } from '../animations/index.js';
 
 interface ThankYouConfig {
   progressTarget?: number;
@@ -72,7 +72,7 @@ export const PlatformThankYou = {
       }
 
       // Track animation
-      import('../analytics').then(({ PlatformAnalytics }) => {
+      import('../analytics/index.js').then(({ PlatformAnalytics }) => {
         PlatformAnalytics.track('ui_interaction', {
           interaction: 'progress_bar_animated',
           progress_value: targetProgress
@@ -127,7 +127,7 @@ export const PlatformThankYou = {
       sessionStorage.setItem('thankYouCelebrationShown', 'true');
 
       // Track event
-      import('../analytics').then(({ PlatformAnalytics }) => {
+      import('../analytics/index.js').then(({ PlatformAnalytics }) => {
         PlatformAnalytics.track('ui_interaction', {
           interaction: 'celebration_shown',
           page: 'thank_you'
@@ -180,7 +180,7 @@ export const PlatformThankYou = {
       heading.innerHTML = updatedHtml;
 
       // Track personalization
-      import('../analytics').then(({ PlatformAnalytics }) => {
+      import('../analytics/index.js').then(({ PlatformAnalytics }) => {
         PlatformAnalytics.track('personalization', {
           type: 'greeting_personalized',
           page: 'thank_you'
@@ -195,7 +195,7 @@ export const PlatformThankYou = {
    * Track thank you page conversion
    */
   trackPageView(): void {
-    import('../analytics').then(({ PlatformAnalytics }) => {
+    import('../analytics/index.js').then(({ PlatformAnalytics }) => {
       // Track page view
       PlatformAnalytics.track('page_view', {
         page: 'thank_you',

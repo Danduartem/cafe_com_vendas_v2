@@ -8,7 +8,7 @@ import type {
   RevealConfig,
   ObserverConfig,
   SafeElement
-} from '@app-types/components/dom.js';
+} from '../../../types/components/dom.js';
 
 /**
  * Configuration for reveal animations

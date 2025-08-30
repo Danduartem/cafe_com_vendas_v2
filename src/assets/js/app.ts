@@ -3,41 +3,41 @@
  * Orchestrates all components and manages application lifecycle
  */
 
-import { CONFIG } from '@/config/constants';
-import { state, StateManager } from '@/core/state';
-import { Analytics } from '@/core/analytics';
-import { ScrollTracker, throttle, debounce, safeQuery, safeQueryAll } from '@/utils/index.js';
+import { CONFIG } from './config/constants.js';
+import { state, StateManager } from './core/state.js';
+import { Analytics } from './core/analytics.js';
+import { ScrollTracker } from './utils/index.js';
 import type {
   ComponentRegistration,
   ComponentHealthStatus,
   ComponentStatus
-} from '@app-types/components/base.js';
+} from '../../types/components/base.js';
 import type {
   AppInitializedEvent,
   ComponentsInitializedEvent,
   AnalyticsEvent
-} from '@app-types/components/analytics.js';
-import type { AppState } from '@app-types/components/state.js';
-import type { Constants } from '@app-types/components/config.js';
+} from '../../types/components/analytics.js';
+import type { AppState } from '../../types/components/state.js';
+import type { Constants } from '../../types/components/config.js';
 
 // Import utility components
 import {
   PlatformThankYou
-} from '@components/ui';
+} from '../../components/ui/index.js';
 
 // Import co-located section components (new approach)
-import { Hero } from '@sections/hero/index';
-import { Vision } from '@sections/problem/index';
-import { Solution } from '@sections/solution/index';
-import { About } from '@sections/about/index';
-import { SocialProof } from '@sections/social-proof/index';
-import { Offer } from '@sections/offer/index';
-import { FAQ } from '@sections/faq/index';
-import { FinalCTA } from '@sections/final-cta/index';
-import { Footer } from '@sections/footer/index';
-import { TopBanner } from '@sections/top-banner/index';
-import { ThankYou } from '@sections/thank-you/index';
-import { Checkout } from '@sections/checkout/index';
+import { Hero } from '../../_includes/sections/hero/index.js';
+import { Vision } from '../../_includes/sections/problem/index.js';
+import { Solution } from '../../_includes/sections/solution/index.js';
+import { About } from '../../_includes/sections/about/index.js';
+import { SocialProof } from '../../_includes/sections/social-proof/index.js';
+import { Offer } from '../../_includes/sections/offer/index.js';
+import { FAQ } from '../../_includes/sections/faq/index.js';
+import { FinalCTA } from '../../_includes/sections/final-cta/index.js';
+import { Footer } from '../../_includes/sections/footer/index.js';
+import { TopBanner } from '../../_includes/sections/top-banner/index.js';
+import { ThankYou } from '../../_includes/sections/thank-you/index.js';
+import { Checkout } from '../../_includes/sections/checkout/index.js';
 
 /**
  * Main application interface - matches global CafeComVendasApp type
@@ -47,8 +47,6 @@ interface CafeComVendasInterface {
     track: (event: string, data?: Record<string, unknown>) => void;
     trackError: (type: string, error: Error, context?: Record<string, unknown>) => void;
   };
-  Components: Record<string, unknown>;
-  Utils: Record<string, unknown>;
   components: ComponentRegistration[] | undefined;
   init(): void;
   setupGlobalErrorHandling(): void;
@@ -81,18 +79,6 @@ export const CafeComVendas: CafeComVendasInterface = {
       Analytics.track(event, data as Omit<AnalyticsEvent, 'event'>);
     },
     trackError: Analytics.trackError.bind(Analytics)
-  },
-
-  // Expose Components (will be populated after initialization)
-  Components: {},
-
-  // Expose Utils
-  Utils: {
-    throttle,
-    debounce,
-    safeQuery,
-    safeQueryAll,
-    ScrollTracker
   },
 
   components: undefined,
@@ -244,12 +230,6 @@ export const CafeComVendas: CafeComVendasInterface = {
     Analytics.track('components_initialized', componentsEvent);
 
     this.components = components;
-    
-    // Populate Components for global access
-    this.Components = components.reduce((acc, { name, component }) => {
-      acc[name] = component;
-      return acc;
-    }, {} as Record<string, unknown>);
   },
 
   /**

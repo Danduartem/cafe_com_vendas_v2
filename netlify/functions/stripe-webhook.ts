@@ -22,7 +22,7 @@ import {
   isStripePaymentIntent,
   hasMultibancoDetails,
   getMultibancoDetails
-} from '@app-types/stripe.js';
+} from '../../src/types/stripe.js';
 
 // MailerLite API response interfaces
 interface MailerLiteSubscriberResponse {

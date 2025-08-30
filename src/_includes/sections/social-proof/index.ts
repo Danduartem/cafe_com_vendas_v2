@@ -4,12 +4,12 @@
  * Handles testimonials carousel and video functionality
  */
 
-import { safeQuery, safeQueryAll } from '@utils/dom.js';
-import { Animations } from '@components/ui/index.js';
-import { debounce } from '@/utils/throttle';
-import { embedYouTubeVideo } from '@utils/youtube.js';
-import { logger } from '@utils/logger.js';
-import type { Component } from '@app-types/components/base.js';
+import { safeQuery, safeQueryAll } from '../../../utils/dom.js';
+import { Animations } from '../../../components/ui/index.js';
+import { debounce } from '../../../assets/js/utils/throttle.js';
+import { embedYouTubeVideo } from '../../../utils/youtube.js';
+import { logger } from '../../../utils/logger.js';
+import type { Component } from '../../../types/components/base.js';
 
 // Constants for carousel layout
 const CAROUSEL_GAP_DEFAULT = 24;
@@ -205,7 +205,7 @@ export const SocialProof: SocialProofComponent = {
     const testimonialId = this.carouselElements.slides[this.currentIndex]?.getAttribute('data-testimonial-id') ??
                          `tst_${String(this.currentIndex + 1).padStart(2, '0')}`;
 
-    import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
+    import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
       PlatformAnalytics.track('section_engagement', {
         section: 'testimonials',
         action: 'slide_view',
@@ -306,7 +306,7 @@ export const SocialProof: SocialProofComponent = {
     });
 
     // Track analytics for video interaction
-    import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
+    import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
       PlatformAnalytics.track('section_engagement', {
         section: 'testimonials',
         action: 'video_embed_started',
@@ -320,7 +320,7 @@ export const SocialProof: SocialProofComponent = {
   trackSectionView(): void {
     const observer = Animations.createObserver({
       callback: () => {
-        import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
+        import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
           PlatformAnalytics.track('section_engagement', {
             section: 'testimonials',
             action: 'section_view'

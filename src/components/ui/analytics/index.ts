@@ -3,7 +3,7 @@
  * Simple, maintainable event tracking
  */
 
-import { normalizeEventPayload } from '@/utils/gtm-normalizer.js';
+import { normalizeEventPayload } from '../../../assets/js/utils/gtm-normalizer.js';
 
 export const PlatformAnalytics = {
   /**

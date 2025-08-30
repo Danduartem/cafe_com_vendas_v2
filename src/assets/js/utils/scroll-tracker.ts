@@ -3,7 +3,7 @@
  * Tracks scroll depth at 10%, 25%, 50%, 75%, and 90% thresholds
  */
 
-import { throttle } from './throttle';
+import { throttle } from './throttle.js';
 
 export const ScrollTracker = {
   // Track which thresholds have already fired

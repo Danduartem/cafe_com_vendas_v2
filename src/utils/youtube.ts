@@ -12,7 +12,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
-import { logger } from './logger';
+import { logger } from './logger.js';
 
 // Global YouTube API types
 declare global {
@@ -184,7 +184,7 @@ export const YouTube: YouTubeUtility = {
    */
   trackVideoPlay(videoId: string): void {
     // Import analytics dynamically to avoid circular dependencies
-    import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
+    import('../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
       PlatformAnalytics.track('section_engagement', {
         section: 'testimonials',
         action: 'video_play',

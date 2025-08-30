@@ -3,10 +3,10 @@
  * Handles MBWay toggle and deliverable animations
  */
 
-import { CONFIG } from '@/config/constants';
-import { Analytics } from '@/core/analytics';
-import { safeQuery, safeQueryAll } from '@/utils/index';
-import { Animations } from '@components/ui/index.js';
+import { CONFIG } from '../../../assets/js/config/constants.js';
+import { Analytics } from '../../../assets/js/core/analytics.js';
+import { safeQuery, safeQueryAll } from '../../../utils/dom.js';
+import { Animations } from '../../../components/ui/index.js';
 
 export const Offer = {
   init() {

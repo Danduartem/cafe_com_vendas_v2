@@ -6,7 +6,7 @@
  */
 
 import { CafeComVendas } from './app.js';
-import { ENV } from '@/config/constants';
+import { ENV } from './config/constants.js';
 import '../../types/global/index.js'; // Import global types
 
 // Set global Cloudinary configuration

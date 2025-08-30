@@ -3,14 +3,14 @@
  * Centralized tracking through Google Tag Manager dataLayer
  */
 
-import { ENV } from '@/config/constants';
-import { StateManager } from './state';
-import { logger } from '@utils/logger.js';
+import { ENV } from '../config/constants.js';
+import { StateManager } from './state.js';
+import { logger } from '../../../utils/logger.js';
 import type {
   AnalyticsEvent,
   ErrorEvent,
   PerformanceEvent
-} from '@app-types/components/analytics.js';
+} from '../../../types/components/analytics.js';
 
 /**
  * Performance navigation timing interface
