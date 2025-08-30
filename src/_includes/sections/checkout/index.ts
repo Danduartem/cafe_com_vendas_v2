@@ -19,12 +19,12 @@ import {
   isStripePaymentIntent,
   hasMultibancoDetails,
   getMultibancoDetails
-} from '../../../types/stripe.js';
+} from '@app-types/stripe.js';
 import { ENV } from '@/config/constants';
-import { safeQuery } from '../../../utils/dom.js';
-import { logger } from '../../../utils/logger.js';
-import type { Component } from '../../../types/components/base.js';
-import siteData from '../../../_data/site.js';
+import { safeQuery } from '@utils/dom.js';
+import { logger } from '@utils/logger.js';
+import type { Component } from '@app-types/components/base.js';
+import siteData from '@data/site.js';
 import { 
   BehaviorTracker, 
   getUserEnvironment, 
@@ -32,8 +32,8 @@ import {
   type BehaviorData,
   type UserEnvironment,
   type AttributionData 
-} from '../../../utils/browser-data.js';
-import { isValidEmail, isValidPhone } from '../../../utils/validation.js';
+} from '@utils/browser-data.js';
+import { isValidEmail, isValidPhone } from '@utils/validation.js';
 
 // 🎯 Get centralized pricing data - SINGLE SOURCE OF TRUTH
 const site = siteData();
@@ -234,7 +234,7 @@ export const Checkout: CheckoutSectionComponent = {
     });
 
     // Track checkout opened (GTM production event + test alias)
-    import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+    import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
       // Use new method that fires both events
       PlatformAnalytics.trackCTAClick(this.getSourceSection(), {
         trigger_location: this.getSourceSection(),
@@ -769,7 +769,7 @@ export const Checkout: CheckoutSectionComponent = {
       await this.initializePaymentElement();
 
       // Track lead conversion (GTM production event + test alias)
-      import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+      import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
         // Fire the GTM production event
         PlatformAnalytics.trackConversion('lead_form_submitted', {
           lead_id: this.leadId,
@@ -848,7 +848,7 @@ export const Checkout: CheckoutSectionComponent = {
         this.showError('payError', errorMessage);
 
         // Track payment error
-        import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+        import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
           PlatformAnalytics.track('section_engagement', {
             section: 'checkout',
             action: 'payment_error',
@@ -863,7 +863,7 @@ export const Checkout: CheckoutSectionComponent = {
         this.setStep('success');
 
         // Track payment success immediately since we know it succeeded
-        import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+        import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
           PlatformAnalytics.trackConversion('payment_completed', {
             transaction_id: paymentIntent.id,
             value: basePrice, // 🎯 From centralized pricing
@@ -920,7 +920,7 @@ export const Checkout: CheckoutSectionComponent = {
         }
 
         // Track payment initiation (not completion yet)
-        import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+        import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
           PlatformAnalytics.track('section_engagement', {
             section: 'checkout',
             action: 'payment_processing',

@@ -3,9 +3,9 @@
  * Reusable accordion patterns for FAQ and expandable content
  */
 
-import { safeQuery, safeQueryAll } from '../../../utils/dom.js';
-import { logger } from '../../../utils/logger.js';
-import { Animations } from '../animations';
+import { safeQuery, safeQueryAll } from '@utils/dom.js';
+import { logger } from '@utils/logger.js';
+import { Animations } from '@components/ui/animations/index.js';
 
 interface AccordionConfig {
   containerSelector: string;

@@ -184,7 +184,7 @@ export const YouTube: YouTubeUtility = {
    */
   trackVideoPlay(videoId: string): void {
     // Import analytics dynamically to avoid circular dependencies
-    import('../components/ui/analytics').then(({ PlatformAnalytics }) => {
+    import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
       PlatformAnalytics.track('section_engagement', {
         section: 'testimonials',
         action: 'video_play',

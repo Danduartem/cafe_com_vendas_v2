@@ -3,9 +3,9 @@
  * Handles interactive behaviors for the about/authority section
  */
 
-import { Analytics } from '../../../assets/js/core/analytics.js';
-import { safeQuery } from '../../../utils/dom.js';
-import type { Component } from '../../../types/components/base.js';
+import { Analytics } from '@/core/analytics.js';
+import { safeQuery } from '@utils/dom.js';
+import type { Component } from '@app-types/components/base.js';
 
 interface AboutComponent extends Component {
   bindEvents(): void;

@@ -3,9 +3,9 @@
  * Handles interactive behaviors for the solution section
  */
 
-import type { Component } from '../../../types/components/base.js';
-import { safeQuery } from '../../../utils/dom.js';
-import { Analytics } from '../../../assets/js/core/analytics.js';
+import type { Component } from '@app-types/components/base.js';
+import { safeQuery } from '@utils/dom.js';
+import { Analytics } from '@/core/analytics.js';
 
 interface SolutionComponent extends Component {
   bindEvents(): void;

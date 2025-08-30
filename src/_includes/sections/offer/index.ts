@@ -6,7 +6,7 @@
 import { CONFIG } from '@/config/constants';
 import { Analytics } from '@/core/analytics';
 import { safeQuery, safeQueryAll } from '@/utils/index';
-import { Animations } from '../../../components/ui';
+import { Animations } from '@components/ui/index.js';
 
 export const Offer = {
   init() {

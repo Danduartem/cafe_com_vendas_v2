@@ -4,10 +4,10 @@
  * Handles FAQ accordion interactions using platform components
  */
 
-import { PlatformAccordion } from '../../../components/ui/index.js';
-import type { Component } from '../../../types/components/base.js';
-import { safeQuery } from '../../../utils/dom.js';
-import { logger } from '../../../utils/logger.js';
+import { PlatformAccordion } from '@components/ui/index.js';
+import type { Component } from '@app-types/components/base.js';
+import { safeQuery } from '@utils/dom.js';
+import { logger } from '@utils/logger.js';
 
 interface FAQSectionComponent extends Component {
   initializeFAQ(): void;
@@ -42,7 +42,7 @@ export const FAQ: FAQSectionComponent = {
       (entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+            import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
               PlatformAnalytics.track('section_engagement', {
                 section: 'faq',
                 action: 'section_view'

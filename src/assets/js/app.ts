@@ -11,14 +11,14 @@ import type {
   ComponentRegistration,
   ComponentHealthStatus,
   ComponentStatus
-} from '../../types/components/base.js';
+} from '@app-types/components/base.js';
 import type {
   AppInitializedEvent,
   ComponentsInitializedEvent,
   AnalyticsEvent
-} from '../../types/components/analytics.js';
-import type { AppState } from '../../types/components/state.js';
-import type { Constants } from '../../types/components/config.js';
+} from '@app-types/components/analytics.js';
+import type { AppState } from '@app-types/components/state.js';
+import type { Constants } from '@app-types/components/config.js';
 
 // Import utility components
 import {
@@ -26,18 +26,18 @@ import {
 } from '@components/ui';
 
 // Import co-located section components (new approach)
-import { Hero } from '../../_includes/sections/hero/index';
-import { Vision } from '../../_includes/sections/problem/index';
-import { Solution } from '../../_includes/sections/solution/index';
-import { About } from '../../_includes/sections/about/index';
-import { SocialProof } from '../../_includes/sections/social-proof/index';
-import { Offer } from '../../_includes/sections/offer/index';
-import { FAQ } from '../../_includes/sections/faq/index';
-import { FinalCTA } from '../../_includes/sections/final-cta/index';
-import { Footer } from '../../_includes/sections/footer/index';
-import { TopBanner } from '../../_includes/sections/top-banner/index';
-import { ThankYou } from '../../_includes/sections/thank-you/index';
-import { Checkout } from '../../_includes/sections/checkout/index';
+import { Hero } from '@sections/hero/index';
+import { Vision } from '@sections/problem/index';
+import { Solution } from '@sections/solution/index';
+import { About } from '@sections/about/index';
+import { SocialProof } from '@sections/social-proof/index';
+import { Offer } from '@sections/offer/index';
+import { FAQ } from '@sections/faq/index';
+import { FinalCTA } from '@sections/final-cta/index';
+import { Footer } from '@sections/footer/index';
+import { TopBanner } from '@sections/top-banner/index';
+import { ThankYou } from '@sections/thank-you/index';
+import { Checkout } from '@sections/checkout/index';
 
 /**
  * Main application interface - matches global CafeComVendasApp type

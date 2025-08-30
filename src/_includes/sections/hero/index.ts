@@ -3,9 +3,9 @@
  * Handles hero section animations, interactions, and scroll indicator
  */
 
-import { CONFIG } from '../../../assets/js/config/constants';
-import { safeQuery } from '../../../utils/dom.js';
-import { Animations } from '../../../components/ui/index';
+import { CONFIG } from '@/config/constants';
+import { safeQuery } from '@utils/dom.js';
+import { Animations } from '@components/ui/index.js';
 
 export const Hero = {
   init() {

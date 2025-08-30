@@ -3,10 +3,10 @@
  * Handles thank-you page animations, milestone progress, and premium interactions
  */
 
-import { safeQuery } from '../../../utils/dom.js';
-import { Animations } from '../../../components/ui';
-import { logger } from '../../../utils/logger.js';
-import siteData from '../../../_data/site.js';
+import { safeQuery } from '@utils/dom.js';
+import { Animations } from '@components/ui/index.js';
+import { logger } from '@utils/logger.js';
+import siteData from '@data/site.js';
 
 // 🎯 Get centralized pricing data - SINGLE SOURCE OF TRUTH
 const site = siteData();
@@ -21,7 +21,7 @@ import {
   detectUserPlatform,
   type CalendarUrls,
   type CalendarEvent
-} from '../../../utils/calendar.js';
+} from '@utils/calendar.js';
 
 export const ThankYou = {
   init() {
@@ -398,7 +398,7 @@ export const ThankYou = {
   },
 
   trackCalendarInteraction(provider: string, method: string) {
-    import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+    import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
       PlatformAnalytics.track('ui_interaction', {
         interaction: 'calendar_add',
         calendar_provider: provider,
@@ -530,7 +530,7 @@ export const ThankYou = {
   }) {
     const { paymentIntent, hasEntity, hasReference, paymentMethod, amount } = data;
     
-    import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+    import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
       // Track voucher display event
       PlatformAnalytics.track('payment_flow', {
         event_type: 'multibanco_voucher_displayed',
@@ -571,7 +571,7 @@ export const ThankYou = {
   }) {
     const { paymentIntent, paymentMethod, amount, source } = data;
     
-    import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+    import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
       // Track the main conversion event
       PlatformAnalytics.trackConversion('payment_completed', {
         transaction_id: paymentIntent,
@@ -613,7 +613,7 @@ export const ThankYou = {
   }) {
     const { paymentIntent, paymentMethod, reason, source } = data;
     
-    import('../../../components/ui/analytics').then(({ PlatformAnalytics }) => {
+    import('@components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
       // Track payment failure
       PlatformAnalytics.track('payment_flow', {
         event_type: 'payment_failed',
