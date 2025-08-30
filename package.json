@@ -20,7 +20,6 @@
     "test": "vitest run",
     "test:e2e": "npx playwright test",
     "test:e2e:report": "npx playwright show-report reports/playwright/html",
-    "verify-apis": "tsx scripts/verify-apis.ts",
     "lighthouse": "mkdir -p reports && npx lighthouse --output=json,html --output-path=reports/lighthouse"
   },
   "keywords": [
@@ -34,7 +33,6 @@
   "author": "Café com Vendas",
   "license": "ISC",
   "dependencies": {
-    "@netlify/functions": "^4.2.2",
     "@stripe/stripe-js": "^7.8.0",
     "stripe": "^18.4.0"
   },
