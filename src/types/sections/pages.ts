@@ -1,18 +1,18 @@
-import type { SectionSlug } from './base';
+import type { SectionSlug } from './base.js';
 
 // Re-export SectionSlug for convenience
-export type { SectionSlug } from './base';
-import type { HeroSection } from './hero';
-import type { ProblemSection } from './problem';
-import type { SolutionSection } from './solution';
-import type { AboutSection } from './about';
-import type { SocialProofSection } from './social-proof';
-import type { OfferSection } from './offer';
-import type { FAQSection } from './faq';
-import type { FinalCTASection } from './final-cta';
-import type { FooterSection } from './footer';
-import type { TopBannerSection } from './top-banner';
-import type { ThankYouContentSection } from './thank-you';
+export type { SectionSlug } from './base.js';
+import type { HeroSection } from './hero.js';
+import type { ProblemSection } from './problem.js';
+import type { SolutionSection } from './solution.js';
+import type { AboutSection } from './about.js';
+import type { SocialProofSection } from './social-proof.js';
+import type { OfferSection } from './offer.js';
+import type { FAQSection } from './faq.js';
+import type { FinalCTASection } from './final-cta.js';
+import type { FooterSection } from './footer.js';
+import type { TopBannerSection } from './top-banner.js';
+import type { ThankYouContentSection } from './thank-you.js';
 
 // Union type for all sections
 export type Section =

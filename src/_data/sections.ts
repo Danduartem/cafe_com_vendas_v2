@@ -2,7 +2,7 @@ import type {
   Section,
   SectionSlug,
   LoadedPageSection,
-} from '@app-types/sections/pages.js';
+} from '../types/sections/pages.js';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 

@@ -1,6 +1,6 @@
 // Component types
-export * from './base';
-export * from './analytics';
-export * from './dom';
-export * from './config';
-export * from './state';
+export * from './base.js';
+export * from './analytics.js';
+export * from './dom.js';
+export * from './config.js';
+export * from './state.js';

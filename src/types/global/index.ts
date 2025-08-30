@@ -36,8 +36,6 @@ export interface CafeComVendasApp {
     track: (event: string, data?: Record<string, unknown>) => void;
     trackError: (type: string, error: Error, context?: Record<string, unknown>) => void;
   };
-  Components: Record<string, unknown>;
-  Utils: Record<string, unknown>;
   init(): void;
 }
 

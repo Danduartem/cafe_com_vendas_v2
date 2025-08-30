@@ -1,4 +1,4 @@
-import type { PagesData } from '@app-types/sections/pages.js';
+import type { PagesData } from '../types/sections/pages.js';
 
 /**
  * Page metadata configuration

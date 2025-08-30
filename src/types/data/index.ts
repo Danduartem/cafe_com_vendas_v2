@@ -1,5 +1,5 @@
 // Data-related types
-export * from './site';
-export * from './event';
-export * from './presenter';
-export * from './content';
+export * from './site.js';
+export * from './event.js';
+export * from './presenter.js';
+export * from './content.js';
