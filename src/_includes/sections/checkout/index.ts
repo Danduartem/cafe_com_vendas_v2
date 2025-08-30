@@ -1,7 +1,7 @@
 /**
  * Checkout Section Component for Café com Vendas
  * Co-located checkout behavior using platform modal components
- * Two-step modal checkout: Lead capture (Formspree) + Stripe Payment Elements
+ * Two-step modal checkout: Lead capture (MailerLite) + Stripe Payment Elements
  */
 
 import { loadStripe } from '@stripe/stripe-js';
