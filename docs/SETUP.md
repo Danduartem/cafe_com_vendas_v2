@@ -198,7 +198,7 @@ npm run lighthouse -- https://your-url.com
 - **Target**: ES2023 (Node 22+ features)
 - **Module**: ES2022 with ESM imports
 - **Strict**: Full strict mode enabled
-- **Paths**: Aliased imports (`@components/*`, `@assets/*`)
+- **Imports**: Ultra-Simple Standard (relative paths with `.js` extensions)
 
 ### Import Rules
 - Always use `.js` extensions for local imports

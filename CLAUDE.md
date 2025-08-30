@@ -47,12 +47,37 @@ Act as an engineer in this repo. Favor **small, verifiable, type‑safe** diffs.
 
 ## 3) Repo Rules (non‑negotiable)
 
-* **TypeScript‑only** sources; **path aliases always** with `.js` extensions (ESM compliance)
+* **TypeScript‑only** sources; **Ultra-Simple Import Standard**: External packages (no extension), all internal files (relative paths with `.js` extensions)
 * **Tailwind v4 only** (CSS‑first, `@theme`); **no inline styles/handlers**
 * **Design tokens** → generated CSS variables; no hardcoded colors/spacing
 * **Accessibility**: semantic HTML, visible focus, keyboard support; see `docs/SETUP.md`
 * **Analytics**: use typed helper → **`dataLayer`** (no raw `gtag()`); event canon: **`payment_completed` → GA4 `purchase`**
 * Keep diffs small; prefer native/web APIs over heavy libs
+
+### Ultra-Simple Import Standard (2025)
+
+**Two Rules Only - Zero Mental Overhead:**
+1. **External packages**: No extension → `import { test } from 'vitest'`
+2. **All internal files**: Relative path with `.js` → `import { utils } from './utils.js'`
+
+**Examples:**
+```typescript
+// ✅ External packages - no extension
+import { defineConfig } from 'vite';
+import Stripe from 'stripe';
+
+// ✅ All internal files - relative with .js
+import { logger } from '../../utils/logger.js';
+import { BaseSection } from './base.js';
+import { CafeComVendas } from './app.js';
+import type { Component } from '../types/components/base.js';
+
+// ✅ Barrel exports - relative with .js
+export { throttle } from './throttle.js';
+export { Animations } from './animations/index.js';
+```
+
+**Benefits**: Universal compatibility, zero decision-making overhead, explicit dependencies, future-proof ESM compliance.
 
 ---
 

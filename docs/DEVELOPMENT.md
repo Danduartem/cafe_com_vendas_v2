@@ -258,31 +258,33 @@ netlify deploy --prod
 - **Data**: `.json` or `.ts` in `_data` folder
 
 ### Import Rules (Critical)
-**Always use path aliases with `.js` extensions** for ESM compliance:
+**Ultra-Simple Import Standard (2025)** - Two rules only:
 
 ```typescript
-// ✅ Correct (path aliases + ESM extensions)
-import { initCheckout } from '@sections/checkout/index.js';
-import { PlatformAccordion } from '@components/ui/index.js';
-import { siteData } from '@data/site.js';
-import { throttle } from '@utils/throttle.js';
-import type { BaseComponent } from '@app-types/components/base.js';
+// ✅ Correct (Ultra-Simple Standard)
+// Rule 1: External packages - no extension
+import { describe, test, expect } from 'vitest';
+import { loadStripe } from '@stripe/stripe-js';
 
-// ❌ Wrong (relative imports, missing extensions, .ts extensions)
-import { initCheckout } from './checkout/index.ts';
+// Rule 2: All internal files - relative paths with .js extensions
+import { initCheckout } from '../../_includes/sections/checkout/index.js';
+import { PlatformAccordion } from '../../../components/ui/index.js';
+import { siteData } from '../../../_data/site.js';
+import { throttle } from '../../../utils/throttle.js';
+import type { BaseComponent } from '../../../types/components/base.js';
+
+// ❌ Wrong (path aliases, missing extensions, .ts extensions)
+import { initCheckout } from '@sections/checkout/index.js';
 import { siteData } from '../../../_data/site';
-import { throttle } from '../../../utils/throttle';
+import { throttle } from '../../../utils/throttle.ts';
 ```
 
-**Available Path Aliases**:
-- `@/` → `src/assets/js/` (core utilities)
-- `@components/` → `src/components/`
-- `@sections/` → `src/_includes/sections/`
-- `@utils/` → `src/utils/`
-- `@data/` → `src/_data/`
-- `@app-types/` → `src/types/`
-- `@test-mocks/` → `tests/mocks/`
-- `@styles/` → `src/assets/css/`
+**Benefits of Ultra-Simple Standard**:
+- ✅ **Zero Mental Overhead**: Only 2 rules to remember
+- ✅ **Universal Compatibility**: Works across all bundlers and Node.js
+- ✅ **Explicit Dependencies**: Clear file relationships in imports
+- ✅ **Future Proof**: No path alias configuration dependencies
+- ✅ **Editor Support**: Perfect IntelliSense and go-to-definition
 
 ### CSS & Styling
 - **Framework**: Tailwind CSS v4 (CSS-first configuration)
