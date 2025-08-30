@@ -3,7 +3,7 @@
  * Handles thank you page animations, progress bar, and celebration effects
  */
 
-import { safeQuery } from '@/utils/dom';
+import { safeQuery } from '../../../utils/dom.js';
 import { logger } from '../../../utils/logger.js';
 import { Animations } from '../animations';
 

@@ -242,6 +242,11 @@ html, body {
   background-image: var(--gradient-accent-line);
 }
 
+/* Film grain noise effect utility */
+@utility bg-noise-grain {
+  background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" /%3E%3C/svg%3E');
+}
+
 /* Design tokens are now managed natively via Tailwind v4 @theme directive above. */
 /* Tailwind v4 Enhanced Font Loading - integrated with theme system */
 /* Lora: complete weight and style variants - primary display font */

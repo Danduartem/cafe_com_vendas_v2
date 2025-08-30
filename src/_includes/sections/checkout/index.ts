@@ -21,7 +21,7 @@ import {
   getMultibancoDetails
 } from '../../../types/stripe.js';
 import { ENV } from '@/config/constants';
-import { safeQuery } from '@/utils/dom';
+import { safeQuery } from '../../../utils/dom.js';
 import { logger } from '../../../utils/logger.js';
 import type { Component } from '../../../types/components/base.js';
 import siteData from '../../../_data/site.js';

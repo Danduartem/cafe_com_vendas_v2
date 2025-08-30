@@ -4,7 +4,7 @@
  */
 
 import type { Component } from '../../../types/components/base.js';
-import { safeQuery } from '../../../assets/js/utils/dom.js';
+import { safeQuery } from '../../../utils/dom.js';
 import { Analytics } from '../../../assets/js/core/analytics.js';
 
 interface SolutionComponent extends Component {
@@ -25,7 +25,6 @@ export const Solution: SolutionComponent = {
   bindEvents(): void {
     const section = safeQuery('#s-solution');
     if (!section) {
-      console.warn('Solution section not found');
       return;
     }
 

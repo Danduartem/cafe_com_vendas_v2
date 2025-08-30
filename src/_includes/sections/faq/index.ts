@@ -5,7 +5,7 @@
  */
 
 import { PlatformAccordion } from '../../../components/ui';
-import { safeQuery } from '../../../assets/js/utils/dom';
+import { safeQuery } from '../../../utils/dom.js';
 import { logger } from '../../../utils/logger.js';
 import type { Component } from '../../../types/components/base.js';
 

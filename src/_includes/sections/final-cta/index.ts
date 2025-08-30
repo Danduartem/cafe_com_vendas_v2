@@ -4,7 +4,7 @@
  */
 
 import type { Component } from '../../../types/components/base.js';
-import { safeQuery } from '../../../assets/js/utils/dom.js';
+import { safeQuery } from '../../../utils/dom.js';
 import { Analytics } from '../../../assets/js/core/analytics.js';
 
 interface FinalCTAComponent extends Component {
@@ -27,7 +27,6 @@ export const FinalCTA: FinalCTAComponent = {
   bindEvents(): void {
     const section = safeQuery('#s-final-cta');
     if (!section) {
-      console.warn('Final CTA section not found');
       return;
     }
 

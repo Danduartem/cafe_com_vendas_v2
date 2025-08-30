@@ -4,7 +4,7 @@
  */
 
 import { Analytics } from '../../../assets/js/core/analytics.js';
-import { safeQuery } from '../../../assets/js/utils/dom.js';
+import { safeQuery } from '../../../utils/dom.js';
 import type { Component } from '../../../types/components/base.js';
 
 interface AboutComponent extends Component {
@@ -25,7 +25,6 @@ export const About: AboutComponent = {
   bindEvents(): void {
     const section = safeQuery('#s-about');
     if (!section) {
-      console.warn('About section not found');
       return;
     }
 

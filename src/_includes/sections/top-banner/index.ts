@@ -4,7 +4,7 @@
  */
 
 import type { Component } from '../../../types/components/base.js';
-import { safeQuery } from '../../../assets/js/utils/dom.js';
+import { safeQuery } from '../../../utils/dom.js';
 import { Analytics } from '../../../assets/js/core/analytics.js';
 
 interface TopBannerComponent extends Component {
@@ -34,7 +34,6 @@ export const TopBanner: TopBannerComponent = {
   bindEvents(): void {
     const section = safeQuery('#s-top-banner');
     if (!section) {
-      console.warn('Top banner section not found');
       return;
     }
 

@@ -4,7 +4,7 @@
  * Handles testimonials carousel and video functionality
  */
 
-import { safeQuery, safeQueryAll } from '@/utils/dom';
+import { safeQuery, safeQueryAll } from '../../../utils/dom.js';
 import { Animations } from '../../../components/ui';
 import { debounce } from '@/utils/throttle';
 import { embedYouTubeVideo } from '../../../utils/youtube.js';
@@ -69,11 +69,11 @@ export const SocialProof: SocialProofComponent = {
 
   getCarouselElements(): CarouselElements {
     return {
-      carousel: safeQuery('.testimonials-carousel') as HTMLElement | null,
+      carousel: safeQuery<HTMLElement>('.testimonials-carousel'),
       slides: Array.from(safeQueryAll('.carousel-slide')).filter((el): el is HTMLElement => el instanceof HTMLElement),
-      prevButton: safeQuery('[data-carousel-prev]') as HTMLElement | null,
-      nextButton: safeQuery('[data-carousel-next]') as HTMLElement | null,
-      paginationContainer: safeQuery('[data-carousel-pagination]') as HTMLElement | null
+      prevButton: safeQuery<HTMLElement>('[data-carousel-prev]'),
+      nextButton: safeQuery<HTMLElement>('[data-carousel-next]'),
+      paginationContainer: safeQuery<HTMLElement>('[data-carousel-pagination]')
     };
   },
 

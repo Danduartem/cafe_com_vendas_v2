@@ -3,7 +3,7 @@
  * Handles thank-you page animations, milestone progress, and premium interactions
  */
 
-import { safeQuery } from '../../../assets/js/utils/dom';
+import { safeQuery } from '../../../utils/dom.js';
 import { Animations } from '../../../components/ui';
 import { logger } from '../../../utils/logger.js';
 import siteData from '../../../_data/site.js';

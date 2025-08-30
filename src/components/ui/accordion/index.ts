@@ -3,7 +3,7 @@
  * Reusable accordion patterns for FAQ and expandable content
  */
 
-import { safeQuery, safeQueryAll } from '@/utils/dom';
+import { safeQuery, safeQueryAll } from '../../../utils/dom.js';
 import { logger } from '../../../utils/logger.js';
 import { Animations } from '../animations';
 
@@ -21,7 +21,7 @@ export const PlatformAccordion = {
    */
   initializeNative(config: AccordionConfig): void {
     const container = safeQuery(config.containerSelector);
-    const items = safeQueryAll(config.itemSelector) as NodeListOf<HTMLDetailsElement>;
+    const items = safeQueryAll<HTMLDetailsElement>(config.itemSelector);
 
     if (!container || !items.length) {
       logger.warn(`Accordion elements not found for ${config.containerSelector}`);

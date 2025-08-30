@@ -4,7 +4,7 @@
  */
 
 import type { Component } from '../../../types/components/base.js';
-import { safeQuery } from '../../../assets/js/utils/dom.js';
+import { safeQuery } from '../../../utils/dom.js';
 import { Analytics } from '../../../assets/js/core/analytics.js';
 
 interface VisionComponent extends Component {
@@ -161,7 +161,6 @@ export const Vision: VisionComponent = {
   bindEvents(): void {
     const section = safeQuery('#s-vision');
     if (!section) {
-      console.warn('Vision section not found');
       return;
     }
 

@@ -4,7 +4,7 @@
  */
 
 import { CONFIG } from '../../../assets/js/config/constants';
-import { safeQuery } from '../../../assets/js/utils/dom';
+import { safeQuery } from '../../../utils/dom.js';
 import { Animations } from '../../../components/ui/index';
 
 export const Hero = {

@@ -161,31 +161,6 @@ export interface FooterData {
   copyright: FooterCopyright;
 }
 
-// Presenter structure
-export interface PresenterSchema {
-  '@context': string;
-  '@type': string;
-  name: string;
-  jobTitle: string;
-  url: string;
-  sameAs: string[];
-}
-
-export interface PresenterData {
-  name: string;
-  subtitle: string;
-  bio: string;
-  photoAlt: string;
-  highlights: string[];
-  microStory: string;
-  social: {
-    instagram: string;
-  };
-  schema: PresenterSchema;
-}
-
-// JSON file loading utility type
-export type JSONFileLoader<T> = () => T;
 
 // Section-based content structure
 export interface SectionCTA {
@@ -494,32 +469,6 @@ export interface SectionPropsBase extends Record<string, unknown> {
   enabled?: boolean;
 }
 
-// Runtime Validation Utilities
-export function isValidSectionSlug(value: unknown): value is SectionSlug {
-  const validSlugs: SectionSlug[] = [
-    'top-banner', 'hero', 'problem', 'solution', 'about',
-    'social-proof', 'offer', 'faq', 'final-cta', 'footer',
-    'thank-you-content'
-  ];
-  return typeof value === 'string' && validSlugs.includes(value as SectionSlug);
-}
-
-export function validateSectionBase(data: unknown): data is SectionPropsBase {
-  if (!data || typeof data !== 'object') return false;
-  const section = data as Record<string, unknown>;
-
-  return (
-    isValidSectionSlug(section.id) &&
-    (section.variant === undefined || typeof section.variant === 'string') &&
-    (section.enabled === undefined || typeof section.enabled === 'boolean')
-  );
-}
-
-export function assertSectionBase(data: unknown, sectionName: string): void {
-  if (!validateSectionBase(data)) {
-    throw new Error(`Invalid section base properties for ${sectionName}: ${JSON.stringify(data)}`);
-  }
-}
 
 // Page Composition Types (moved from pages.ts)
 export interface PageSection {
