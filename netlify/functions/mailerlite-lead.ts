@@ -1,7 +1,7 @@
 /**
  * Netlify Function: MailerLite Lead Capture
  * Captures leads from checkout forms and sends them to MailerLite
- * Works alongside Formspree to ensure complete lead capture
+ * Primary lead capture system for the application
  */
 
 // Enhanced MailerLite integration with event-driven lifecycle management
@@ -684,7 +684,7 @@ export default async (request: Request): Promise<Response> => {
     });
 
     // Return success response regardless of MailerLite result 
-    // (this is a secondary capture, primary is Formspree)
+    // to ensure checkout flow continues smoothly
     return new Response(JSON.stringify({
       success: true,
       leadId: lead_id,
@@ -718,7 +718,7 @@ export default async (request: Request): Promise<Response> => {
     // Generic error response
     return new Response(JSON.stringify({ 
       error: 'Internal server error. Lead capture failed.',
-      message: 'This is a secondary lead capture. Primary submission may have succeeded.'
+      message: 'Please try again or contact support if the issue persists.'
     }), {
       status: 500,
       headers: responseHeaders

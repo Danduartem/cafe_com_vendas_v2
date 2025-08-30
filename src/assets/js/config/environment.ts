@@ -8,7 +8,6 @@
  */
 
 interface ImportMetaEnv {
-  readonly VITE_FORMSPREE_FORM_ID?: string;
   readonly VITE_STRIPE_PUBLIC_KEY?: string;
   readonly VITE_CLOUDINARY_CLOUD_NAME?: string;
 }
@@ -41,10 +40,6 @@ export interface EnvironmentConfig {
   environment: 'development' | 'production';
   isDevelopment: boolean;
   isProduction: boolean;
-  formspree: {
-    endpoint: string;
-    formId: string;
-  };
   stripe: {
     publishableKey: string;
   };
@@ -71,12 +66,6 @@ const config: EnvironmentConfig = {
   environment: isDevelopment ? 'development' : 'production',
   isDevelopment,
   isProduction,
-
-  // Formspree Configuration (Public - Safe to expose)
-  formspree: {
-    endpoint: `https://formspree.io/f/${import.meta.env?.VITE_FORMSPREE_FORM_ID ?? 'xanbnrvp'}`,
-    formId: import.meta.env?.VITE_FORMSPREE_FORM_ID ?? 'xanbnrvp'
-  },
 
   // Stripe Configuration (Publishable keys only - Safe to expose)
   stripe: {

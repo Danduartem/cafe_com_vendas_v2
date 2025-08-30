@@ -11,10 +11,6 @@ export interface GlobalAppConfig {
   environment: 'development' | 'production';
   isDevelopment: boolean;
   isProduction: boolean;
-  formspree: {
-    endpoint: string;
-    formId: string;
-  };
   stripe: {
     publishableKey: string;
   };
