@@ -37,11 +37,7 @@
     "mainAction": {
       "title": "Garanta o seu lugar agora",
       "description": "Complete o seu perfil personalizado em apenas 2 minutos. Estas informações garantem que preparamos tudo especificamente para si e que recebe todos os materiais exclusivos antes do evento.",
-      "button": {
-        "text": "Completar o meu perfil",
-        "url": "https://formspree.io/f/xanbnrvp",
-        "analytics": "cta_complete_form"
-      }
+      "note": "Receberá um email com instruções para completar o seu perfil."
     },
     "steps": [
       {
