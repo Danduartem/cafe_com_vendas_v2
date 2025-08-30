@@ -23,19 +23,7 @@
     // Runtime environment
     "types": ["node"],
 
-    // Module resolution
-    "baseUrl": ".",
-    "paths": {
-      "@content/*": ["content/*"],
-      "@sections/*": ["src/_includes/sections/*"],
-      "@components/*": ["src/components/*"],
-      "@assets/*": ["src/assets/*"],
-      "@app-types/*": ["src/types/*"],
-      "@utils/*": ["src/utils/*"],
-      "@data/*": ["src/_data/*"],
-      "@test-mocks/*": ["tests/mocks/*"],
-      "@/*": ["src/assets/js/*"]
-    },
+    // Module resolution - Ultra-Simple Standard (no path aliases needed)
 
     // Performance optimizations
     "incremental": true,

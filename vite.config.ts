@@ -5,18 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   publicDir: resolve(__dirname, 'public'),
   
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src/assets/js'),
-      '@sections': resolve(__dirname, 'src/_includes/sections'), 
-      '@components': resolve(__dirname, 'src/components'),
-      '@assets': resolve(__dirname, 'src/assets'),
-      '@utils': resolve(__dirname, 'src/utils'),
-      '@app-types': resolve(__dirname, 'src/types'),
-      '@data': resolve(__dirname, 'src/_data'),
-      '@test-mocks': resolve(__dirname, 'tests/mocks')
-    }
-  },
+  // Ultra-Simple Import Standard - no path aliases needed
   
   plugins: [
     tailwindcss()
