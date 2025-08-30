@@ -8,8 +8,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { setupMockServer, mockApiResponse } from '../../mocks/server';
-import { createCustomHandler } from '../../mocks/mailerlite';
+import { setupMockServer, mockApiResponse } from '@test-mocks/server';
+import { createCustomHandler } from '@test-mocks/mailerlite';
 
 // Since we can't directly import from the Netlify function (it's a default export),
 // we'll test the function behavior through API calls

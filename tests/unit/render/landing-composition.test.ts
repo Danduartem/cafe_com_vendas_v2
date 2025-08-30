@@ -4,7 +4,7 @@
  */
 
 import { describe, test, expect, beforeEach } from 'vitest';
-import type { LoadedPageSection } from '../../../src/_data/types.ts';
+import type { LoadedPageSection } from '@data/types.js';
 
 describe('Landing Page Composition', () => {
   beforeEach(() => {

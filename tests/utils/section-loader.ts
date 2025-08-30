@@ -17,7 +17,7 @@ import type {
   FinalCTASection,
   FooterSection,
   TopBannerSection
-} from '../../src/_data/types.ts';
+} from '@data/types.js';
 
 // Type definitions for design configuration
 interface DesignConfigs {

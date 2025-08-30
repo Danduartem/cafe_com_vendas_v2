@@ -7,8 +7,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { setupMockServer, mockApiResponse } from '../../mocks/server';
-import { createCustomHandler } from '../../mocks/mailerlite';
+import { setupMockServer, mockApiResponse } from '@test-mocks/server';
+import { createCustomHandler } from '@test-mocks/mailerlite';
 
 // Setup MSW server
 setupMockServer();
