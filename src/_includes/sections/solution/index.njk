@@ -22,11 +22,11 @@
 
 </h2>     
       
-      <p class="font-century text-navy-800 text-[--text-lead] leading-[--leading-base] mb-8 max-w-[65ch] mx-auto font-medium">
+      <p class="font-century text-navy-800 text-[length:var(--text-lead)] leading-[length:var(--leading-base)] mb-8 max-w-[65ch] mx-auto font-medium">
         {{ currentSection.copy.subhead }}
       </p>
       
-      <div class="font-century text-navy-800/70 text-[--text-body] leading-[--leading-relaxed] max-w-[65ch] mx-auto mb-16">
+      <div class="font-century text-navy-800/70 text-[length:var(--text-body)] leading-[length:var(--leading-relaxed)] max-w-[65ch] mx-auto mb-16">
         {{ currentSection.copy.description | safe }}
       </div>
     </div>
@@ -51,11 +51,11 @@
                 {{ pillarIcon(pillar.icon) }}
               </div>
               
-              <h3 class="font-lora font-bold text-[1.25rem] text-navy-800 mb-4 leading-[--leading-heading] transition-colors duration-300 group-hover:text-burgundy-700">
+              <h3 class="font-lora font-bold text-[1.25rem] text-navy-800 mb-4 leading-[length:var(--leading-heading)] transition-colors duration-300 group-hover:text-burgundy-700">
                 {{ pillar.title }}
               </h3>
               
-              <p class="font-century text-navy-800/70 text-[--text-body] leading-[--leading-base] max-w-[30ch]">
+              <p class="font-century text-navy-800/70 text-[length:var(--text-body)] leading-[length:var(--leading-base)] max-w-[30ch]">
                 {{ pillar.description }}
               </p>
             </div>
@@ -80,11 +80,11 @@
                 {{ pillarIcon(pillar.icon) }}
               </div>
               
-              <h3 class="font-lora font-bold text-[1.25rem] text-navy-800 mb-4 leading-[--leading-heading] transition-colors duration-300 group-hover:text-burgundy-700">
+              <h3 class="font-lora font-bold text-[1.25rem] text-navy-800 mb-4 leading-[length:var(--leading-heading)] transition-colors duration-300 group-hover:text-burgundy-700">
                 {{ pillar.title }}
               </h3>
               
-              <p class="font-century text-navy-800/70 text-[--text-body] leading-[--leading-base] max-w-[30ch]">
+              <p class="font-century text-navy-800/70 text-[length:var(--text-body)] leading-[length:var(--leading-base)] max-w-[30ch]">
                 {{ pillar.description }}
               </p>
             </div>
@@ -112,7 +112,7 @@
         </button>
         
         <div class="mt-8 relative">
-          <p class="font-century text-navy-800/70 text-[--text-body] leading-[--leading-relaxed] max-w-[65ch] mx-auto">
+          <p class="font-century text-navy-800/70 text-[length:var(--text-body)] leading-[length:var(--leading-relaxed)] max-w-[65ch] mx-auto">
             {{ currentSection.copy.supportingText | safe }}
           </p>
           </div>
