@@ -59,7 +59,6 @@
     "node_modules",
     "_site",
     "dist",
-    "debug-gtm.ts",
     "netlify/edge-functions/**/*"
   ]
 }

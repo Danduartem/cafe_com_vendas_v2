@@ -40,16 +40,6 @@ export interface StateManager {
   getFAQEngagementTime(faqId: string): number;
 }
 
-/**
- * State change event
- */
-export interface StateChangeEvent {
-  type: 'state_change';
-  property: keyof AppState;
-  oldValue: unknown;
-  newValue: unknown;
-  timestamp: number;
-}
 
 /**
  * Viewport change event
