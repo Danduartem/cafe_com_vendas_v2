@@ -17,7 +17,7 @@ Update dependencies and refactor code to use latest features.
 2. **Outdated Analysis**: `npm run outdated` to identify update candidates
 3. **Documentation Sync**: Context7 fetches exact-version docs for major dependencies
 4. **Safe Updates**: `npm run update` for minor/patch versions only
-5. **API Validation**: `npm run verify-apis` to catch deprecated patterns
+5. **Build Validation**: TypeScript compilation catches API compatibility issues
 6. **Quality Gates**: `npm run type-check && npm run lint && npm run test`
 7. **Build Verification**: `npm run build` to ensure production compatibility
 8. **Change Summary**: Documents what was updated and any breaking changes
@@ -25,7 +25,7 @@ Update dependencies and refactor code to use latest features.
 ### Code Refactoring
 1. Scans for deprecated API patterns
 2. Updates to latest syntax based on fetched docs
-3. Removes deprecated patterns identified by verify-apis
+3. Removes deprecated patterns identified by TypeScript compilation
 4. Optimizes imports using modern patterns
 5. Improves performance patterns per latest docs
 6. Validates all changes with TypeScript

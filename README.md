@@ -41,7 +41,6 @@ npm run netlify:dev       # With serverless functions
 npm run type-check        # TypeScript validation
 npm run lint              # ESLint validation  
 npm test                  # Vitest unit tests
-npm run verify-apis       # API compatibility check
 
 # Production build
 npm run build             # Vite + Eleventy production build

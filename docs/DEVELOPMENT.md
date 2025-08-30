@@ -93,8 +93,7 @@ netlify/functions/
 ├── stripe-webhook.ts         # Handle payment confirmation
 ├── mailerlite-lead.ts        # Add lead to email list
 ├── mailerlite-helpers.ts     # MailerLite utilities
-├── types.ts                  # Shared function types
-└── types/mailerlite-api.ts   # MailerLite API definitions
+└── types.ts                  # Shared function types
 ```
 
 ---
@@ -131,12 +130,10 @@ tests/
 ├── setup.ts                    # Global test configuration
 ├── unit/                       # Unit tests (Vitest)
 │   ├── functions/              # Serverless function tests
-│   │   ├── mailerlite-api.test.ts
 │   │   └── mailerlite-helpers.test.ts
 │   └── render/
 │       └── landing-composition.test.ts
 ├── integration/                # Integration tests
-│   └── mailerlite-api.test.ts
 ├── e2e/                       # End-to-end tests (Playwright)
 │   ├── mailerlite-flow.test.ts
 │   ├── multibanco-complete-flow.test.ts
@@ -357,7 +354,6 @@ npm run preview                # Serve production build
 npm run type-check             # TypeScript validation
 npm run lint                   # ESLint validation
 npm test                       # Unit tests
-npm run verify-apis            # API compatibility check
 npm run lighthouse             # Performance audit
 ```
 

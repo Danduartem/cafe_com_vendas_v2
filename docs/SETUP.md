@@ -72,7 +72,6 @@ npm run netlify:dev  # http://localhost:8888
 npm run type-check   # TypeScript validation
 npm run lint         # ESLint rules
 npm test             # Vitest unit tests
-npm run verify-apis  # API compatibility
 
 # E2E Testing (requires Playwright browsers)
 npx playwright install  # Install browsers (first time only)
