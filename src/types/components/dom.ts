@@ -3,15 +3,6 @@
  */
 export type SafeElement<T extends Element = Element> = T | null;
 
-/**
- * Safe query all result that returns an array
- */
-export type SafeElements<T extends Element = Element> = T[];
-
-/**
- * Common HTML element type for type safety
- */
-export type SafeHTMLElement = SafeElement<HTMLElement>;
 
 /**
  * Animation configuration

@@ -1,4 +1,4 @@
-import type { BaseSection, SectionCopy } from './base';
+import type { BaseSection, SectionCopy } from './base.js';
 
 export interface ThankYouContentSection extends BaseSection {
   id: 'thank-you-content';
