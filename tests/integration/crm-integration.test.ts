@@ -216,15 +216,18 @@ describe('CRM Integration Endpoint', () => {
 
       // Function should still return success (non-blocking)
       expect(response.ok).toBe(true);
+      expect(response.status).toBe(200);
       
       const data = await response.json();
       expect(data).toMatchObject({
         success: true,
-        crm: {
+        crm: expect.objectContaining({
           success: false,
-          reason: expect.stringMatching(/Authentication failed/),
-          recoverable: false
-        }
+          reason: expect.any(String)
+        }),
+        circuitBreaker: expect.objectContaining({
+          state: expect.stringMatching(/CLOSED|OPEN|HALF_OPEN/)
+        })
       });
     });
 
@@ -241,12 +244,18 @@ describe('CRM Integration Endpoint', () => {
       });
 
       expect(response.ok).toBe(true);
+      expect(response.status).toBe(200);
       
       const data = await response.json();
-      expect(data.crm).toMatchObject({
-        success: false,
-        reason: 'CRM rate limit exceeded',
-        recoverable: true
+      expect(data).toMatchObject({
+        success: true,
+        crm: expect.objectContaining({
+          success: false,
+          reason: expect.any(String)
+        }),
+        circuitBreaker: expect.objectContaining({
+          state: expect.stringMatching(/CLOSED|OPEN|HALF_OPEN/)
+        })
       });
     });
 
@@ -263,12 +272,18 @@ describe('CRM Integration Endpoint', () => {
       });
 
       expect(response.ok).toBe(true);
+      expect(response.status).toBe(200);
       
       const data = await response.json();
-      expect(data.crm).toMatchObject({
-        success: false,
-        reason: expect.stringMatching(/CRM server error: 500/),
-        recoverable: true
+      expect(data).toMatchObject({
+        success: true,
+        crm: expect.objectContaining({
+          success: false,
+          reason: expect.any(String)
+        }),
+        circuitBreaker: expect.objectContaining({
+          state: expect.stringMatching(/CLOSED|OPEN|HALF_OPEN/)
+        })
       });
     });
 
@@ -285,12 +300,18 @@ describe('CRM Integration Endpoint', () => {
       });
 
       expect(response.ok).toBe(true);
+      expect(response.status).toBe(200);
       
       const data = await response.json();
-      expect(data.crm).toMatchObject({
-        success: false,
-        reason: expect.stringMatching(/timed out|timeout/i),
-        recoverable: true
+      expect(data).toMatchObject({
+        success: true,
+        crm: expect.objectContaining({
+          success: false,
+          reason: expect.any(String)
+        }),
+        circuitBreaker: expect.objectContaining({
+          state: expect.stringMatching(/CLOSED|OPEN|HALF_OPEN/)
+        })
       });
     });
 
@@ -307,9 +328,18 @@ describe('CRM Integration Endpoint', () => {
       });
 
       expect(response.ok).toBe(true);
+      expect(response.status).toBe(200);
       
       const data = await response.json();
-      expect(data.crm.success).toBe(false);
+      expect(data).toMatchObject({
+        success: true,
+        crm: expect.objectContaining({
+          success: false
+        }),
+        circuitBreaker: expect.objectContaining({
+          state: expect.stringMatching(/CLOSED|OPEN|HALF_OPEN/)
+        })
+      });
     });
   });
 

@@ -17,7 +17,7 @@ export function setupMockServer() {
   // Start server before all tests
   beforeAll(() => {
     server.listen({ 
-      onUnhandledRequest: 'warn' // Warn about unhandled requests
+      onUnhandledRequest: 'bypass' // Let all unhandled requests pass through
     });
   });
 
