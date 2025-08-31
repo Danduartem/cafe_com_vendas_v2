@@ -1,0 +1,41 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "MAILERLITE",
+    "mailerlite",
+    "MailerLite",
+    "MULTIBANCO", 
+    "multibanco",
+    "Multibanco",
+    "VENDAS",
+    "vendas", 
+    "Vendas",
+    "livemode",
+    "idempotency",
+    "Stripe",
+    "Netlify",
+    "webhooks",
+    "multicut",
+    "ccv",
+    "Lisboa",
+    "Portugal",
+    "Cloudinary",
+    "Formspree",
+    "GTM"
+  ],
+  "ignorePaths": [
+    "node_modules/**",
+    "_site/**", 
+    "dist/**",
+    "coverage/**",
+    "test-results/**",
+    "playwright-report/**",
+    "**/*.css.map",
+    "**/*.min.js",
+    "**/*.json"
+  ],
+  "flagWords": [],
+  "allowCompoundWords": true,
+  "caseSensitive": false
+}
