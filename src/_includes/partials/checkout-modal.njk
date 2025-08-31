@@ -261,6 +261,8 @@
             <div class="relative flex">
               <select id="countryCode" 
                       name="countryCode"
+                      autocomplete="tel-country-code"
+                      aria-label="Country code"
                       class="rounded-l-xl rounded-r-none border border-neutral-300 border-r-0 pl-3 pr-8 py-3 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700 bg-white focus:z-10 touch-manipulation min-w-[120px]">
                 <option value="+351" selected>🇵🇹 +351</option>
                 <option value="+55">🇧🇷 +55</option>
@@ -275,6 +277,7 @@
                      name="phone" 
                      type="tel" 
                      required 
+                     autocomplete="tel-national"
                      inputmode="tel" 
                      pattern="[0-9\s\-\(\)]{7,15}"
                      title="Apenas números, espaços, traços e parênteses (7-15 dígitos)"
