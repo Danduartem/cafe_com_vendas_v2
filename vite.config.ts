@@ -54,7 +54,7 @@ export default defineConfig({
         },
         // Manual chunks for better code splitting
         manualChunks: {
-          'vendor': ['stripe']
+          'vendor': ['@stripe/stripe-js']
         }
       }
     }
