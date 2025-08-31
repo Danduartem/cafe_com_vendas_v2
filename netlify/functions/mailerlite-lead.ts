@@ -630,7 +630,7 @@ export default async (request: Request): Promise<Response> => {
 
     const leadData: EventSubscriberData = {
       email: email,
-      name: firstName,        // MailerLite built-in field for first name
+      name: full_name,        // MailerLite built-in field for full name
       phone: phone,
       fields: eventFields
     };
