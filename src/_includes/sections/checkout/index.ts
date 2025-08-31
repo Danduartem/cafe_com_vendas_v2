@@ -51,7 +51,12 @@ interface PaymentIntentResponse {
 
 interface PaymentErrorResponse {
   error: string;
-  details?: Record<string, unknown>;
+  details?: string[] | Record<string, unknown>;
+  fieldErrors?: { field: string; message: string }[];
+  debugInfo?: {
+    receivedData?: Record<string, unknown>;
+    validationRules?: Record<string, unknown>;
+  };
 }
 
 
@@ -78,7 +83,7 @@ interface CheckoutSectionComponent extends Component {
   loadStripeScript(): Promise<Stripe | null>;
   preloadStripe(): Promise<void>;
   initializeStripe(): Promise<void>;
-  initializePaymentElement(): Promise<void>;
+  initializePaymentElement(): void;
   handleLeadSubmit(event: Event): Promise<void>;
   handlePayment(): Promise<void>;
   handleOpenClick(event: Event): void;
@@ -96,6 +101,14 @@ interface CheckoutSectionComponent extends Component {
   createBackdrop(): void;
   removeBackdrop(): void;
   calculateLeadScore(behaviorData: BehaviorData, attributionData: AttributionData, userEnvironment: UserEnvironment): number;
+  setupFieldValidation(): void;
+  validateField(fieldName: string, value: string): { isValid: boolean; message: string };
+  showFieldError(fieldName: string, message: string): void;
+  clearFieldError(fieldName: string): void;
+  sanitizeInput(value: string, type: 'name' | 'email' | 'phone'): string;
+  handleValidationErrors(errors: string[]): void;
+  handleStructuredValidationErrors(fieldErrors: { field: string; message: string }[]): void;
+  validateAndCreatePaymentIntent(): Promise<void>;
 }
 
 export const Checkout: CheckoutSectionComponent = {
@@ -202,6 +215,9 @@ export const Checkout: CheckoutSectionComponent = {
 
     // Close on backdrop click (native dialog behavior)
     this.modal.addEventListener('click', this.handleBackdropClick.bind(this));
+    
+    // Setup field validation
+    this.setupFieldValidation();
   },
 
   handleOpenClick(event: Event): void {
@@ -393,64 +409,19 @@ export const Checkout: CheckoutSectionComponent = {
     }
   },
 
-  async initializePaymentElement(): Promise<void> {
+  initializePaymentElement(): void {
     if (!this.stripe) {
       throw new Error('Stripe not initialized');
     }
 
     try {
-      // Ensure we have lead data
+      // Ensure we have lead data and client secret (should be created by validateAndCreatePaymentIntent)
       if (!this.leadData) {
         throw new Error('Lead data not available');
       }
 
-      // Create PaymentIntent for this checkout
       if (!this.clientSecret) {
-        
-        // Generate fresh idempotency key for each payment attempt to avoid conflicts during testing
-        this.idempotencyKey = this.generateIdempotencyKey();
-        
-        // Prepare request payload
-        const requestPayload = {
-          // Required fields for Netlify Function
-          lead_id: this.leadId,
-          full_name: this.leadData.fullName,
-          email: this.leadData.email,
-          phone: `${this.leadData.countryCode}${this.leadData.phone}`,
-          amount: priceInCents, // From centralized pricing
-          currency: 'eur',
-          idempotency_key: this.idempotencyKey
-        };
-
-        // Prepare headers with proper type handling
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json'
-        };
-
-        if (this.idempotencyKey) {
-          headers['X-Idempotency-Key'] = this.idempotencyKey;
-        }
-
-        // Create PaymentIntent on demand
-        const response = await fetch(`${ENV.urls.base}/.netlify/functions/create-payment-intent`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(requestPayload)
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ error: 'Network error' })) as PaymentErrorResponse;
-
-          // If validation failed, show specific validation errors to user
-          if (errorData.error === 'Validation failed' && errorData.details) {
-            logger.error('Validation errors:', errorData.details);
-          }
-
-          throw new Error(`Payment service error: ${errorData.error || response.statusText}`);
-        }
-
-        const data = await response.json() as PaymentIntentResponse;
-        this.clientSecret = data.clientSecret;
+        throw new Error('Client secret not available - payment intent must be created first');
       }
 
       // Create Elements instance with proper Dashboard integration
@@ -627,19 +598,33 @@ export const Checkout: CheckoutSectionComponent = {
     // Store lead data for use in payment intent creation
     this.leadData = leadData;
 
-    // Basic validation
-    if (!leadData.fullName || !leadData.email || !leadData.phone) {
-      this.showError('leadError', 'Por favor, preencha todos os campos obrigatórios.');
-      return;
+    // Comprehensive client-side validation using our new validation methods
+    let hasValidationErrors = false;
+    
+    // Clear any previous errors
+    ['fullName', 'email', 'phone'].forEach(field => this.clearFieldError(field));
+    
+    // Validate each field and show specific errors
+    const fullNameValidation = this.validateField('fullName', leadData.fullName);
+    if (!fullNameValidation.isValid) {
+      this.showFieldError('fullName', fullNameValidation.message);
+      hasValidationErrors = true;
     }
-
-    if (!isValidEmail(leadData.email)) {
-      this.showError('leadError', 'Por favor, insira um email válido.');
-      return;
+    
+    const emailValidation = this.validateField('email', leadData.email);
+    if (!emailValidation.isValid) {
+      this.showFieldError('email', emailValidation.message);
+      hasValidationErrors = true;
     }
-
-    if (!isValidPhone(leadData.phone)) {
-      this.showError('leadError', 'Por favor, insira um número de telefone válido (apenas números, espaços e traços).');
+    
+    const phoneValidation = this.validateField('phone', leadData.phone);
+    if (!phoneValidation.isValid) {
+      this.showFieldError('phone', phoneValidation.message);
+      hasValidationErrors = true;
+    }
+    
+    // If any validation failed, stop here - don't make any API calls
+    if (hasValidationErrors) {
       return;
     }
 
@@ -651,6 +636,11 @@ export const Checkout: CheckoutSectionComponent = {
       if (submitBtn) (submitBtn as HTMLButtonElement).disabled = true;
       if (submitSpinner) submitSpinner.classList.remove('hidden');
 
+      // STEP 1: Create PaymentIntent first to validate with server
+      // This validates all data server-side before proceeding
+      await this.validateAndCreatePaymentIntent();
+
+      // If we reach here, server validation passed - now do the other API calls and advance
       // Submit lead to MailerLite for immediate capture
       try {
         // Collect rich user data
@@ -827,7 +817,7 @@ export const Checkout: CheckoutSectionComponent = {
       }
 
       // Initialize Stripe Elements for payment form
-      await this.initializePaymentElement();
+      this.initializePaymentElement();
 
       // Track lead conversion (GTM production event + test alias)
       import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
@@ -849,7 +839,18 @@ export const Checkout: CheckoutSectionComponent = {
       });
     } catch (error: unknown) {
       logger.error('Lead submission error:', error);
-      this.showError('leadError', 'Erro ao processar inscrição. Tente novamente.');
+      
+      // Handle different types of errors
+      if (error instanceof Error) {
+        if (error.message === 'Server validation failed') {
+          // Server validation already handled field-specific errors, don't show generic message
+          logger.info('Server validation failed - field-specific errors already shown');
+        } else {
+          this.showError('leadError', 'Erro ao processar inscrição. Tente novamente.');
+        }
+      } else {
+        this.showError('leadError', 'Erro ao processar inscrição. Tente novamente.');
+      }
     } finally {
       // Reset loading state
       const submitBtn = form.querySelector('#leadSubmit');
@@ -1441,5 +1442,302 @@ export const Checkout: CheckoutSectionComponent = {
     if (userEnvironment.timezone?.includes('Lisbon') || userEnvironment.timezone?.includes('Portugal')) score += 5; // Local audience
     
     return Math.min(score, 100); // Cap at 100
+  },
+
+  setupFieldValidation(): void {
+    const fields = ['fullName', 'email', 'phone'];
+    
+    fields.forEach(fieldName => {
+      const field = safeQuery(`#${fieldName}`) as HTMLInputElement;
+      if (!field) return;
+
+      // Input event for real-time validation
+      field.addEventListener('input', (e) => {
+        const target = e.target as HTMLInputElement;
+        const sanitizedValue = this.sanitizeInput(target.value, fieldName as 'name' | 'email' | 'phone');
+        
+        // Update field with sanitized value if different
+        if (target.value !== sanitizedValue) {
+          target.value = sanitizedValue;
+        }
+        
+        // Validate and show/hide errors
+        const validation = this.validateField(fieldName, sanitizedValue);
+        if (validation.isValid) {
+          this.clearFieldError(fieldName);
+        } else if (sanitizedValue.trim()) { // Only show errors if user has entered something
+          this.showFieldError(fieldName, validation.message);
+        }
+      });
+
+      // Blur event for final validation
+      field.addEventListener('blur', (e) => {
+        const target = e.target as HTMLInputElement;
+        const validation = this.validateField(fieldName, target.value);
+        if (!validation.isValid && target.value.trim()) {
+          this.showFieldError(fieldName, validation.message);
+        }
+      });
+
+      // Focus event to clear errors
+      field.addEventListener('focus', () => {
+        this.clearFieldError(fieldName);
+      });
+
+      // Paste event to sanitize pasted content
+      field.addEventListener('paste', (e) => {
+        setTimeout(() => {
+          const target = e.target as HTMLInputElement;
+          const sanitizedValue = this.sanitizeInput(target.value, fieldName as 'name' | 'email' | 'phone');
+          target.value = sanitizedValue;
+          
+          const validation = this.validateField(fieldName, sanitizedValue);
+          if (!validation.isValid) {
+            this.showFieldError(fieldName, validation.message);
+          }
+        }, 10);
+      });
+    });
+  },
+
+  validateField(fieldName: string, value: string): { isValid: boolean; message: string } {
+    const trimmedValue = value.trim();
+    
+    if (!trimmedValue) {
+      return { isValid: false, message: 'Este campo é obrigatório.' };
+    }
+
+    switch (fieldName) {
+      case 'fullName':
+        if (trimmedValue.length < 2) {
+          return { isValid: false, message: 'Nome deve ter pelo menos 2 caracteres.' };
+        }
+        if (trimmedValue.length > 100) {
+          return { isValid: false, message: 'Nome muito longo (máximo 100 caracteres).' };
+        }
+        if (!/^[a-zA-ZÀ-ÿ\u0100-\u017F\s\-'.]+$/.test(trimmedValue)) {
+          return { isValid: false, message: 'Nome contém caracteres inválidos. Apenas letras, espaços e hífens são permitidos.' };
+        }
+        // Check for email-like patterns in name field
+        if (trimmedValue.includes('@') || /\d/.test(trimmedValue)) {
+          return { isValid: false, message: 'Parece que você digitou um email no campo do nome. Por favor, digite apenas seu nome.' };
+        }
+        break;
+
+      case 'email':
+        if (!isValidEmail(trimmedValue)) {
+          return { isValid: false, message: 'Por favor, insira um email válido.' };
+        }
+        if (trimmedValue.length > 254) {
+          return { isValid: false, message: 'Email muito longo.' };
+        }
+        break;
+
+      case 'phone': {
+        if (!isValidPhone(trimmedValue)) {
+          return { isValid: false, message: 'Por favor, insira um número de telefone válido.' };
+        }
+        const cleanPhone = trimmedValue.replace(/[\s\-()]/g, '');
+        if (cleanPhone.length < 7 || cleanPhone.length > 15) {
+          return { isValid: false, message: 'Telefone deve ter entre 7 e 15 dígitos.' };
+        }
+        break;
+      }
+    }
+
+    return { isValid: true, message: '' };
+  },
+
+  showFieldError(fieldName: string, message: string): void {
+    const errorElement = safeQuery(`#${fieldName}Error`);
+    const fieldElement = safeQuery(`#${fieldName}`) as HTMLInputElement;
+    
+    if (errorElement) {
+      errorElement.textContent = message;
+      errorElement.classList.remove('hidden');
+    }
+    
+    if (fieldElement) {
+      fieldElement.classList.add('border-burgundy-700', 'ring-burgundy-700');
+      fieldElement.classList.remove('border-neutral-300');
+    }
+  },
+
+  clearFieldError(fieldName: string): void {
+    const errorElement = safeQuery(`#${fieldName}Error`);
+    const fieldElement = safeQuery(`#${fieldName}`) as HTMLInputElement;
+    
+    if (errorElement) {
+      errorElement.classList.add('hidden');
+      errorElement.textContent = '';
+    }
+    
+    if (fieldElement) {
+      fieldElement.classList.remove('border-burgundy-700', 'ring-burgundy-700');
+      fieldElement.classList.add('border-neutral-300');
+    }
+  },
+
+  sanitizeInput(value: string, type: 'name' | 'email' | 'phone'): string {
+    switch (type) {
+      case 'name':
+        // Remove any characters that aren't letters, spaces, hyphens, apostrophes, or dots
+        // Also remove numbers and @ symbols that might indicate email confusion
+        return value.replace(/[^a-zA-ZÀ-ÿ\u0100-\u017F\s\-'.]/g, '');
+        
+      case 'email':
+        // Basic email sanitization - remove spaces and convert to lowercase
+        return value.trim().toLowerCase();
+        
+      case 'phone':
+        // Keep only digits, spaces, hyphens, and parentheses
+        return value.replace(/[^0-9\s\-()]/g, '');
+        
+      default:
+        return value;
+    }
+  },
+
+  handleValidationErrors(errors: string[]): void {
+    // Clear all previous errors
+    ['fullName', 'email', 'phone'].forEach(field => this.clearFieldError(field));
+    
+    // Map server errors to specific fields
+    errors.forEach(error => {
+      const errorMessage = error.toLowerCase();
+      
+      if (errorMessage.includes('name contains invalid characters') || 
+          errorMessage.includes('invalid required field: full_name') ||
+          errorMessage.includes('name must be between')) {
+        this.showFieldError('fullName', 'Nome contém caracteres inválidos ou não atende aos requisitos. Verifique se digitou apenas seu nome (sem email ou números).');
+      } else if (errorMessage.includes('invalid email') || 
+                 errorMessage.includes('email') ||
+                 errorMessage.includes('invalid required field: email')) {
+        this.showFieldError('email', 'Por favor, verifique se o email está correto.');
+      } else if (errorMessage.includes('phone') || 
+                 errorMessage.includes('telefone') ||
+                 errorMessage.includes('invalid required field: phone')) {
+        this.showFieldError('phone', 'Por favor, verifique se o telefone está correto.');
+      } else {
+        // Generic error - show in the main lead error area
+        this.showError('leadError', `Erro de validação: ${error}`);
+      }
+    });
+
+    // Also ensure we're back on step 1 so user can see and fix the errors
+    this.setStep(1);
+  },
+
+  handleStructuredValidationErrors(fieldErrors: { field: string; message: string }[]): void {
+    // Clear all previous errors
+    ['fullName', 'email', 'phone'].forEach(field => this.clearFieldError(field));
+    
+    // Display errors directly using the structured field mapping
+    fieldErrors.forEach(({ field, message }) => {
+      if (field === 'fullName' || field === 'email' || field === 'phone') {
+        // Convert server field names to client field names if needed
+        const clientFieldName = field;
+        
+        // Provide user-friendly messages for common validation errors
+        let userMessage = message;
+        if (message.includes('Name contains invalid characters')) {
+          userMessage = 'Nome contém caracteres inválidos. Por favor, digite apenas seu nome (sem números, @ ou outros símbolos).';
+        } else if (message.includes('Invalid email format')) {
+          userMessage = 'Por favor, verifique se o email está correto.';
+        } else if (message.includes('Phone number')) {
+          userMessage = 'Por favor, verifique se o telefone está correto.';
+        }
+        
+        this.showFieldError(clientFieldName, userMessage);
+      } else if (field === 'general') {
+        // Generic errors go to the main error area
+        this.showError('leadError', message);
+      }
+    });
+
+    // Also ensure we're back on step 1 so user can see and fix the errors
+    this.setStep(1);
+  },
+
+  async validateAndCreatePaymentIntent(): Promise<void> {
+    try {
+      // Ensure we have lead data
+      if (!this.leadData) {
+        throw new Error('Lead data not available');
+      }
+
+      // Only create PaymentIntent if we don't already have one
+      if (!this.clientSecret) {
+        
+        // Generate fresh idempotency key for each payment attempt to avoid conflicts during testing
+        this.idempotencyKey = this.generateIdempotencyKey();
+        
+        // Prepare request payload
+        const requestPayload = {
+          // Required fields for Netlify Function
+          lead_id: this.leadId,
+          full_name: this.leadData.fullName,
+          email: this.leadData.email,
+          phone: `${this.leadData.countryCode}${this.leadData.phone}`,
+          amount: priceInCents, // From centralized pricing
+          currency: 'eur',
+          idempotency_key: this.idempotencyKey
+        };
+
+        // Prepare headers with proper type handling
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json'
+        };
+
+        if (this.idempotencyKey) {
+          headers['X-Idempotency-Key'] = this.idempotencyKey;
+        }
+
+        // Create PaymentIntent with server validation
+        const response = await fetch(`${ENV.urls.base}/.netlify/functions/create-payment-intent`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(requestPayload)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Network error' })) as PaymentErrorResponse;
+
+          // If validation failed, show specific validation errors to user
+          if (errorData.error === 'Validation failed') {
+            logger.error('Server validation errors:', errorData.details);
+            
+            // Use structured field errors if available, otherwise fall back to details array
+            if (errorData.fieldErrors && Array.isArray(errorData.fieldErrors)) {
+              this.handleStructuredValidationErrors(errorData.fieldErrors);
+            } else if (errorData.details) {
+              this.handleValidationErrors(errorData.details as string[]);
+            }
+            
+            // Log debug info in development
+            if (errorData.debugInfo) {
+              logger.debug('Server validation debug info:', errorData.debugInfo);
+            }
+            
+            // Throw error to stop the submission flow
+            throw new Error('Server validation failed');
+          }
+
+          throw new Error(`Payment service error: ${errorData.error || response.statusText}`);
+        }
+
+        const data = await response.json() as PaymentIntentResponse;
+        this.clientSecret = data.clientSecret;
+        
+        logger.info('Payment intent created successfully', { 
+          leadId: this.leadId,
+          paymentIntentId: data.id 
+        });
+      }
+    } catch (error) {
+      logger.error('Failed to validate and create payment intent:', error);
+      // Re-throw the error to be handled by the calling function
+      throw error;
+    }
   }
 };

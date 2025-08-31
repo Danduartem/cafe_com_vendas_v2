@@ -420,9 +420,37 @@ export default async (request: Request): Promise<Response> => {
     const validation = validatePaymentRequest(requestBody);
 
     if (!validation.isValid) {
+      // Enhanced error response with field mapping for better client-side handling
       return new Response(JSON.stringify({
         error: 'Validation failed',
-        details: validation.errors
+        details: validation.errors,
+        fieldErrors: validation.errors.map(error => {
+          // Map specific errors to fields for better client-side error display
+          const lowerError = error.toLowerCase();
+          if (lowerError.includes('name') && lowerError.includes('invalid characters')) {
+            return { field: 'fullName', message: error };
+          } else if (lowerError.includes('email')) {
+            return { field: 'email', message: error };
+          } else if (lowerError.includes('phone')) {
+            return { field: 'phone', message: error };
+          }
+          return { field: 'general', message: error };
+        }),
+        debugInfo: isDevelopmentRequest(origin || undefined) ? {
+          receivedData: {
+            lead_id: requestBody.lead_id,
+            full_name: requestBody.full_name,
+            email: requestBody.email,
+            phone: requestBody.phone
+          },
+          validationRules: {
+            name_regex: '/^[a-zA-ZÀ-ÿ\\u0100-\\u017F\\s\\-\'.]+$/',
+            name_min_length: VALIDATION_RULES.name_min_length,
+            name_max_length: VALIDATION_RULES.name_max_length,
+            email_regex: VALIDATION_RULES.email_regex.toString(),
+            phone_regex: VALIDATION_RULES.phone_regex.toString()
+          }
+        } : undefined
       }), {
         status: 400,
         headers: responseHeaders

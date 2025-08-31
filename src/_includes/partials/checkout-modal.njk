@@ -235,8 +235,15 @@
                    type="text"
                    required 
                    autocomplete="name"
-                   placeholder="Digite seu nome completo"
+                   autocorrect="off"
+                   spellcheck="false"
+                   pattern="[a-zA-ZÀ-ÿ\u0100-\u017F\s\-'.]+"
+                   title="Apenas letras, espaços, hífens e apostrofes são permitidos"
+                   placeholder="Ex: Maria Silva"
+                   maxlength="100"
+                   data-validate="name"
                    class="w-full rounded-xl border border-neutral-300 px-4 py-3 sm:py-3 text-base sm:text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700 touch-manipulation"/>
+            <div id="fullNameError" class="hidden mt-1 text-xs text-burgundy-700"></div>
           </div>
           
           <div>
@@ -249,8 +256,14 @@
                    type="email" 
                    required 
                    autocomplete="email"
-                   placeholder="seu@email.com"
+                   autocorrect="off"
+                   autocapitalize="off"
+                   spellcheck="false"
+                   maxlength="254"
+                   data-validate="email"
+                   placeholder="exemplo@email.com"
                    class="w-full rounded-xl border border-neutral-300 px-4 py-3 sm:py-3 text-base sm:text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700 touch-manipulation"/>
+            <div id="emailError" class="hidden mt-1 text-xs text-burgundy-700"></div>
           </div>
           
           <div>
@@ -282,8 +295,11 @@
                      pattern="[0-9\s\-\(\)]{7,15}"
                      title="Apenas números, espaços, traços e parênteses (7-15 dígitos)"
                      placeholder="912 345 678"
+                     maxlength="20"
+                     data-validate="phone"
                      class="flex-1 rounded-l-none rounded-r-xl border border-neutral-300 px-4 py-3 text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-navy-800 focus:border-burgundy-700 focus:ring-burgundy-700 focus:z-10 touch-manipulation"/>
             </div>
+            <div id="phoneError" class="hidden mt-1 text-xs text-burgundy-700"></div>
           </div>
 
           <button id="leadSubmit" 
