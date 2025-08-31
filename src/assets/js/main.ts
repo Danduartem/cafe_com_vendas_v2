@@ -7,6 +7,16 @@
 
 import { CafeComVendas } from './app.js';
 import { ENV } from './config/constants.js';
+import { logger } from '../../utils/logger.js';
+
+// 2025 Best Practice: Vite preload error handling for dynamic imports
+window.addEventListener('vite:preloadError', (event): void => {
+  logger.warn('Chunk loading failed, implementing fallback...', event);
+  // For production, consider more sophisticated error handling
+  if (ENV.isProduction) {
+    window.location.reload();
+  }
+});
 
 // Set global Cloudinary configuration
 window.CLOUDINARY_CLOUD_NAME = ENV.cloudinary.cloudName;

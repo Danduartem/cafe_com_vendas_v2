@@ -1,6 +1,10 @@
 /**
  * Analytics Module for Café com Vendas
  * Centralized tracking through Google Tag Manager dataLayer
+ * 
+ * Note: Console warnings about hCaptcha passive event listeners from 
+ * Stripe Payment Elements are expected and harmless - they're part of
+ * Stripe's fraud prevention system and cannot be disabled.
  */
 
 import { ENV } from '../config/constants.js';
@@ -143,7 +147,10 @@ export const Analytics: AnalyticsInterface = {
         });
         lcpObserver.observe({entryTypes: ['largest-contentful-paint']});
 
-        // Cumulative Layout Shift (CLS)
+        // Cumulative Layout Shift (CLS) with smart batching
+        let clsAccumulator = 0;
+        let clsTimeoutId: number | null = null;
+        
         const clsObserver = new PerformanceObserver((list) => {
           let clsValue = 0;
           for (const entry of list.getEntries()) {
@@ -151,17 +158,33 @@ export const Analytics: AnalyticsInterface = {
               clsValue += (entry as CLSPerformanceEntry).value ?? 0;
             }
           }
-          if (clsValue > 0) {
-            const performanceEvent: PerformanceEvent = {
-              event: 'performance_metric',
-              event_category: 'Core Web Vitals',
-              event_label: 'CLS',
-              metric_name: 'cumulative_layout_shift',
-              metric_value: Math.round(clsValue * 1000),
-              metric_unit: 'count'
-            };
-            this.track('performance_metric', performanceEvent);
+          
+          // Accumulate CLS values
+          clsAccumulator += clsValue;
+          
+          // Clear existing timeout
+          if (clsTimeoutId) {
+            clearTimeout(clsTimeoutId);
           }
+          
+          // Debounce and only report significant shifts
+          clsTimeoutId = window.setTimeout(() => {
+            // Only report if CLS is significant (> 0.1 is Google's "needs improvement" threshold)
+            if (clsAccumulator > 0.1) {
+              const performanceEvent: PerformanceEvent = {
+                event: 'performance_metric',
+                event_category: 'Core Web Vitals',
+                event_label: 'CLS',
+                metric_name: 'cumulative_layout_shift',
+                metric_value: Math.round(clsAccumulator * 1000),
+                metric_unit: 'count'
+              };
+              this.track('performance_metric', performanceEvent);
+            }
+            // Reset accumulator
+            clsAccumulator = 0;
+            clsTimeoutId = null;
+          }, 500); // Batch events over 500ms
         });
         clsObserver.observe({entryTypes: ['layout-shift']});
 
