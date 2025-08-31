@@ -12,7 +12,6 @@ import type {
   ValidationResult,
   RateLimitResult,
   ValidationRules,
-  TimeoutPromise,
   EventCustomFields,
   EventSubscriberData
 } from './types';
@@ -62,7 +61,7 @@ const TIMEOUTS = {
 /**
  * Timeout wrapper for async operations
  */
-function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Operation'): TimeoutPromise<T> {
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Operation'): Promise<T> {
   return Promise.race([
     promise,
     new Promise<T>((_, reject) => {

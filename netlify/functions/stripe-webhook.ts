@@ -8,7 +8,6 @@ import Stripe from 'stripe';
 import type {
   FulfillmentRecord,
   MailerLiteSubscriberData,
-  TimeoutPromise,
   EventCustomFields
 } from './types';
 import {
@@ -23,6 +22,7 @@ import {
   hasMultibancoDetails,
   getMultibancoDetails
 } from '../../src/types/stripe.js';
+import { SHARED_TIMEOUTS, withTimeout, retryWithBackoff } from './shared-utils.js';
 
 // MailerLite API response interfaces
 interface MailerLiteSubscriberResponse {
@@ -59,57 +59,39 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   maxNetworkRetries: 2
 });
 
-// Timeout configuration
-const TIMEOUTS = {
-  mailerlite_api: 15000,
-  external_api: 10000,
-  webhook_processing: 25000
-};
+// Use shared timeout configuration
+const TIMEOUTS = SHARED_TIMEOUTS;
 
-/**
- * Timeout wrapper for async operations
- */
-function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Operation'): TimeoutPromise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) => {
-      setTimeout(() => {
-        reject(new Error(`${operation} timed out after ${timeoutMs}ms`));
-      }, timeoutMs);
-    })
-  ]);
-}
+// Using shared withTimeout from shared-utils.js
 
 // MailerLite integration with event-driven lifecycle groups
 const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
 
-// Event-specific Group Names (following ccv-2025-09-20 naming convention)
-const EVENT_GROUPS = MAILERLITE_EVENT_GROUPS;
+// 100% lifecycle group automation for sophisticated email marketing
 
-// Legacy Group IDs for backward compatibility during transition
-const LEGACY_GROUPS = {
-  LEADS: '164068163344925725',           // 2025 Café com Vendas Portugal - Leads
-  BUYERS: '164071323193050164',         // 2025 Café com Vendas Portugal - Buyers  
-  EVENT_ATTENDEES: '164071346948540099' // 2025 Café com Vendas Portugal - Event Attendees
-};
+// Helper to validate and retrieve lifecycle group ID
+function getLifecycleGroupId(groupName: keyof typeof MAILERLITE_EVENT_GROUPS): string {
+  const groupId = GROUP_ID_MAPPING[MAILERLITE_EVENT_GROUPS[groupName]];
+  if (!groupId) {
+    throw new Error(`Lifecycle group not configured: ${groupName} (${MAILERLITE_EVENT_GROUPS[groupName]})`);
+  }
+  return groupId;
+}
 
-// TODO: Group name-to-ID mapping will be populated after creating groups in MailerLite
-// For now, using legacy groups as fallback for critical paths
+// Direct Group ID mapping to actual MailerLite lifecycle groups
+// These IDs correspond exactly to the groups created in MailerLite admin
 const GROUP_ID_MAPPING: Record<string, string> = {
-  // Lifecycle state groups (to be populated after MailerLite setup)
-  [EVENT_GROUPS.CHECKOUT_STARTED]: LEGACY_GROUPS.LEADS,        // Temp fallback
-  [EVENT_GROUPS.ABANDONED_PAYMENT]: LEGACY_GROUPS.LEADS,       // Temp fallback
-  [EVENT_GROUPS.BUYER_PENDING]: LEGACY_GROUPS.BUYERS,          // Temp fallback
-  [EVENT_GROUPS.BUYER_PAID]: LEGACY_GROUPS.BUYERS,             // Temp fallback
-  [EVENT_GROUPS.DETAILS_PENDING]: LEGACY_GROUPS.BUYERS,        // Temp fallback
-  [EVENT_GROUPS.DETAILS_COMPLETE]: LEGACY_GROUPS.BUYERS,       // Temp fallback
-  [EVENT_GROUPS.ATTENDED]: LEGACY_GROUPS.EVENT_ATTENDEES,      // Temp fallback
-  [EVENT_GROUPS.NO_SHOW]: LEGACY_GROUPS.EVENT_ATTENDEES        // Temp fallback
+  [MAILERLITE_EVENT_GROUPS.CHECKOUT_STARTED]: '164084418309260989',
+  [MAILERLITE_EVENT_GROUPS.ABANDONED_PAYMENT]: '164084418758051029',
+  [MAILERLITE_EVENT_GROUPS.BUYER_PENDING]: '164084419130295829',
+  [MAILERLITE_EVENT_GROUPS.BUYER_PAID]: '164084419571745998',
+  [MAILERLITE_EVENT_GROUPS.DETAILS_PENDING]: '164084420038362902',
+  [MAILERLITE_EVENT_GROUPS.DETAILS_COMPLETE]: '164084420444161819',
+  [MAILERLITE_EVENT_GROUPS.ATTENDED]: '164084420929652588',
+  [MAILERLITE_EVENT_GROUPS.NO_SHOW]: '164084421314479574'
 };
 
-// Webhook retry configuration
-const MAX_RETRIES = 3;
-const RETRY_DELAY_BASE = 1000; // 1 second base delay
+// Using shared retry configuration from shared-utils.js
 
 
 // Fulfillment tracking to prevent duplicates with proper typing
@@ -118,9 +100,7 @@ const FULFILLMENT_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 
 
-/**
- * Fulfillment tracking utilities for idempotency
- */
+// Fulfillment tracking utilities for idempotency
 class FulfillmentTracker {
   static cleanExpiredEntries() {
     const now = Date.now();
@@ -332,32 +312,9 @@ export default async (request: Request): Promise<Response> => {
   }
 };
 
-/**
- * Retry wrapper with exponential backoff
- */
-async function retryWithBackoff<T>(fn: () => Promise<T>, maxRetries = MAX_RETRIES, baseDelay = RETRY_DELAY_BASE): Promise<T> {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      if (attempt === maxRetries) throw error;
-      
-      const delay = baseDelay * Math.pow(2, attempt - 1) + Math.random() * 1000;
-      logWithCorrelation('warn', `Retry attempt ${attempt} failed, retrying in ${delay}ms`, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        attempt,
-        maxRetries
-      });
-      
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-  throw new Error('Maximum retries exceeded');
-}
+// Using shared retryWithBackoff from shared-utils.js
 
-/**
- * Handle successful payment
- */
+// Handle successful payment
 async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Payment succeeded: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id,
@@ -442,14 +399,14 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
     try {
       await retryWithBackoff(() => moveSubscriberBetweenGroups(
         customerEmail,
-        GROUP_ID_MAPPING[EVENT_GROUPS.CHECKOUT_STARTED] || LEGACY_GROUPS.LEADS,    // From: checkout_started
-        GROUP_ID_MAPPING[EVENT_GROUPS.BUYER_PAID] || LEGACY_GROUPS.BUYERS         // To: buyer_paid
+        getLifecycleGroupId('CHECKOUT_STARTED'),    // From: checkout_started
+        getLifecycleGroupId('BUYER_PAID')           // To: buyer_paid
       ));
       
       logWithCorrelation('info', 'Successfully executed payment success lifecycle transition', {
         customerEmail,
         paymentIntentId: paymentIntent.id,
-        transition: `${EVENT_GROUPS.CHECKOUT_STARTED} → ${EVENT_GROUPS.BUYER_PAID}`,
+        transition: `${MAILERLITE_EVENT_GROUPS.CHECKOUT_STARTED} → ${MAILERLITE_EVENT_GROUPS.BUYER_PAID}`,
         lifecycleStage: 'buyer_paid'
       }, correlationId);
     } catch (error) {
@@ -495,9 +452,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
   }
 }
 
-/**
- * Handle payment processing (async payments like bank transfers)
- */
+// Handle payment processing (async payments like bank transfers)
 async function handlePaymentProcessing(paymentIntent: Stripe.PaymentIntent, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Payment processing: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id
@@ -543,9 +498,7 @@ async function handlePaymentProcessing(paymentIntent: Stripe.PaymentIntent, corr
   }
 }
 
-/**
- * Handle failed payment
- */
+// Handle failed payment
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent, correlationId: string): Promise<void> {
   logWithCorrelation('warn', `Payment failed: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id,
@@ -582,9 +535,7 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent, correlat
   }
 }
 
-/**
- * Handle canceled payment
- */
+// Handle canceled payment
 async function handlePaymentCanceled(paymentIntent: Stripe.PaymentIntent, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Payment canceled: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id
@@ -611,9 +562,7 @@ async function handlePaymentCanceled(paymentIntent: Stripe.PaymentIntent, correl
   }
 }
 
-/**
- * Handle payment that requires action (3D Secure, etc.)
- */
+// Handle payment that requires action (3D Secure, etc.)
 async function handlePaymentRequiresAction(paymentIntent: Stripe.PaymentIntent, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Payment requires action: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id,
@@ -640,9 +589,7 @@ async function handlePaymentRequiresAction(paymentIntent: Stripe.PaymentIntent, 
   }
 }
 
-/**
- * Handle partially funded payment
- */
+// Handle partially funded payment
 async function handlePaymentPartiallyFunded(paymentIntent: Stripe.PaymentIntent, correlationId: string): Promise<void> {
   logWithCorrelation('warn', `Payment partially funded: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id,
@@ -670,9 +617,7 @@ async function handlePaymentPartiallyFunded(paymentIntent: Stripe.PaymentIntent,
   }
 }
 
-/**
- * Handle charge dispute
- */
+// Handle charge dispute
 async function handleChargeDispute(dispute: Stripe.Dispute, correlationId: string): Promise<void> {
   logWithCorrelation('error', `Charge dispute created: ${dispute.id}`, {
     disputeId: dispute.id,
@@ -704,9 +649,7 @@ async function handleChargeDispute(dispute: Stripe.Dispute, correlationId: strin
 
 
 
-/**
- * Handle successful async payments (delayed payment methods like Multibanco)
- */
+// Handle successful async payments (delayed payment methods like Multibanco)
 async function handleCheckoutSessionAsyncPaymentSucceeded(session: Stripe.Checkout.Session, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Async payment succeeded: ${session.id}`, {
     sessionId: session.id,
@@ -841,10 +784,8 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session: Stripe.Checko
   }
 }
 
-/**
- * Handle checkout session completed (immediate processing for all payment methods)
- * This handles the initial checkout completion before async payment resolution
- */
+// Handle checkout session completed (immediate processing for all payment methods)
+// This handles the initial checkout completion before async payment resolution
 async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session, correlationId: string): Promise<void> {
   logWithCorrelation('info', `Checkout session completed: ${session.id}`, {
     sessionId: session.id,
@@ -865,9 +806,6 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session, 
     // Extract customer information from session
     const customerEmail = fullSession.customer_details?.email || fullSession.metadata?.customer_email;
     const customerName = fullSession.customer_details?.name || fullSession.metadata?.customer_name;
-    // Note: These variables are available for future use but not currently used in this code path
-    // const customerPhone = fullSession.metadata?.customer_phone;
-    // const leadId = fullSession.metadata?.lead_id;
 
     if (!customerEmail || !customerName) {
       logWithCorrelation('warn', 'Missing customer information in checkout session', {
@@ -1301,7 +1239,7 @@ async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promis
           email: subscriberData.email,
           name: subscriberData.name,
           fields: subscriberData.fields,
-          groups: [GROUP_ID_MAPPING[EVENT_GROUPS.BUYER_PAID] || LEGACY_GROUPS.BUYERS], // Add to buyer_paid lifecycle state
+          groups: [getLifecycleGroupId('BUYER_PAID')], // Add to buyer_paid lifecycle state
           status: 'active',
           subscribed_at: new Date().toISOString()
         })

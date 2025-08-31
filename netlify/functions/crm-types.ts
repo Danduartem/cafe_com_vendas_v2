@@ -3,10 +3,7 @@
  * Types for the CRM contact card integration
  */
 
-/**
- * CRM Contact Card Payload
- * Structure required by the CRM API endpoint
- */
+// CRM Contact Card Payload
 export interface CRMContactPayload {
   company_id: string;
   board_id: string;
@@ -19,9 +16,7 @@ export interface CRMContactPayload {
   contact_tags: string[];
 }
 
-/**
- * Internal CRM Request (includes additional tracking fields)
- */
+// Internal CRM Request (includes additional tracking fields)
 export interface CRMIntegrationRequest extends CRMContactPayload {
   lead_id: string;
   email: string;
@@ -33,9 +28,7 @@ export interface CRMIntegrationRequest extends CRMContactPayload {
   lead_score?: number;
 }
 
-/**
- * CRM API Response
- */
+// CRM API Response
 export interface CRMApiResponse {
   success: boolean;
   id?: string;
@@ -44,9 +37,7 @@ export interface CRMApiResponse {
   details?: Record<string, unknown>;
 }
 
-/**
- * CRM Integration Result
- */
+// CRM Integration Result
 export interface CRMResult {
   success: boolean;
   contactId?: string;
@@ -54,9 +45,7 @@ export interface CRMResult {
   recoverable?: boolean;
 }
 
-/**
- * CRM Configuration
- */
+// CRM Configuration
 export interface CRMConfig {
   companyId: string;
   boardId: string;
@@ -65,18 +54,14 @@ export interface CRMConfig {
   apiKey?: string;
 }
 
-/**
- * Rate limit entry for CRM requests
- */
+// Rate limit entry for CRM requests
 export interface CRMRateLimitEntry {
   count: number;
   firstRequest: number;
   lastRequest: number;
 }
 
-/**
- * Validation rules for CRM data
- */
+// Validation rules for CRM data
 export interface CRMValidationRules {
   required_fields: readonly string[];
   name_min_length: number;
@@ -86,9 +71,7 @@ export interface CRMValidationRules {
   amount_pattern: RegExp;
 }
 
-/**
- * CRM Circuit Breaker Status
- */
+// CRM Circuit Breaker Status
 export interface CircuitBreakerStatus {
   name: string;
   state: 'CLOSED' | 'OPEN' | 'HALF_OPEN';
@@ -98,10 +81,8 @@ export interface CircuitBreakerStatus {
   lastFailureTime: number | null;
 }
 
-/**
- * Unvalidated request body from client
- * Used for input validation before converting to CRMContactPayload
- */
+// Unvalidated request body from client
+// Used for input validation before converting to CRMContactPayload
 export interface UnvalidatedCRMRequest {
   // Required fields (strings that may be empty/invalid)
   name?: unknown;

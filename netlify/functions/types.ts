@@ -4,12 +4,9 @@
  * Following event-driven lifecycle management best practices
  */
 
-// Modern Netlify Functions use Web Standards API (Request/Response)
-// Legacy AWS Lambda-style interfaces removed in favor of standard web APIs
+// Modern Netlify Functions using Web Standards API (Request/Response)
 
-// ========================================
-// EVENT-SPECIFIC CONSTANTS
-// ========================================
+// Event-specific constants
 
 // Event naming convention: ccv-2025-09-20 (event slug)
 export const EVENT_SLUG = 'ccv-2025-09-20' as const;
@@ -18,9 +15,7 @@ export const EVENT_NAME = 'Café com Vendas - Lisboa' as const;
 export const EVENT_ADDRESS = 'Lisboa, Portugal' as const;
 export const GOOGLE_MAPS_LINK = 'https://maps.google.com/?q=Lisboa,Portugal' as const;
 
-// ========================================
-// MAILERLITE GROUP HIERARCHY
-// ========================================
+// MailerLite group hierarchy
 
 // Lifecycle state groups following MailerLite best practices
 export const MAILERLITE_EVENT_GROUPS = {
@@ -29,7 +24,7 @@ export const MAILERLITE_EVENT_GROUPS = {
   ABANDONED_PAYMENT: `${EVENT_SLUG}_abandoned_payment`,
   
   // Payment processing states
-  BUYER_PENDING: `${EVENT_SLUG}_buyer_pending`, // Multibanco generated
+  BUYER_PENDING: `${EVENT_SLUG}_buyer_pending`,
   BUYER_PAID: `${EVENT_SLUG}_buyer_paid`,
   
   // Post-purchase lifecycle
@@ -41,18 +36,9 @@ export const MAILERLITE_EVENT_GROUPS = {
   NO_SHOW: `${EVENT_SLUG}_no_show`
 } as const;
 
-// Legacy groups for backward compatibility
-export const MAILERLITE_LEGACY_GROUPS = {
-  LEADS: '164068163344925725',
-  BUYERS: '164071323193050164', 
-  EVENT_ATTENDEES: '164071346948540099'
-} as const;
 
-// ========================================
-// MAILERLITE CUSTOM FIELDS SCHEMA
-// ========================================
+// MailerLite custom fields schema
 
-// All 21 custom fields as specified in requirements
 export const MAILERLITE_CUSTOM_FIELDS = {
   // Core fields
   first_name: 'first_name',
@@ -84,35 +70,8 @@ export const MAILERLITE_CUSTOM_FIELDS = {
   marketing_opt_in: 'marketing_opt_in'
 } as const;
 
-// Field types for validation
-export const MAILERLITE_FIELD_TYPES = {
-  // Text fields
-  first_name: 'text',
-  phone: 'text',
-  payment_status: 'text',
-  ticket_type: 'text',
-  order_id: 'text',
-  details_form_status: 'text',
-  event_address: 'text',
-  google_maps_link: 'text',
-  mb_entity: 'text',
-  mb_reference: 'text',
-  utm_source: 'text',
-  utm_medium: 'text',
-  utm_campaign: 'text',
-  marketing_opt_in: 'text',
-  
-  // Date fields
-  checkout_started_at: 'date',
-  event_date: 'date',
-  mb_expires_at: 'date',
-  
-  // Number fields
-  amount_paid: 'number',
-  mb_amount: 'number'
-} as const;
 
-// Valid values for enum-like fields
+// Valid enum values
 export const FIELD_VALUES = {
   payment_status: ['lead', 'pending', 'paid'] as const,
   ticket_type: ['Standard', 'VIP'] as const,
@@ -120,30 +79,7 @@ export const FIELD_VALUES = {
   marketing_opt_in: ['yes', 'no'] as const
 } as const;
 
-// ========================================
-// SEGMENT DEFINITIONS
-// ========================================
 
-// Dynamic segment rules for targeting (created in MailerLite UI)
-export const MAILERLITE_SEGMENTS = {
-  // Top-of-funnel segments
-  LEADS_NEVER_PAID_7D: 'ccv Leads — Never Paid (7d)',
-  ABANDONED_PAYMENT_HOT_48H: 'ccv Abandoned Payment — Hot (48h)',
-  MB_PENDING_EXPIRES_TODAY: 'ccv MB Pending — Expires Today', 
-  HIGH_INTENT_CLICKED_2_NURTURE: 'ccv High Intent — Clicked ≥2 nurture',
-  
-  // Buyer segments
-  BUYERS_DETAILS_MISSING: 'ccv Buyers — Details Missing',
-  BUYERS_EVENT_IN_9_DAYS: 'ccv Buyers — Event in ≤9 days',
-  BUYERS_EVENT_IN_10_DAYS: 'ccv Buyers — Event in ≥10 days',
-  BUYERS_VIP: 'ccv Buyers — VIP',
-  
-  // Hygiene/compliance segments
-  SUPPRESSION_NO_MARKETING: 'ccv Suppression — No Marketing',
-  COLD_90D_NOT_BUYER: 'ccv Cold 90d (not buyer)'
-} as const;
-
-// Payment Intent Request/Response Types
 export interface PaymentIntentRequest {
   lead_id: string;
   full_name: string;
@@ -157,7 +93,7 @@ export interface PaymentIntentRequest {
   utm_campaign?: string;
   utm_term?: string;
   utm_content?: string;
-  [key: string]: unknown; // Needed for validation iteration
+  [key: string]: unknown;
 }
 
 export interface ValidationResult {
@@ -197,11 +133,8 @@ export interface CustomerCacheEntry {
   lastAccessed: number;
 }
 
-// ========================================
-// ENHANCED MAILERLITE INTERFACES
-// ========================================
+// Enhanced MailerLite interfaces
 
-// Complete event-specific subscriber data interface
 export interface EventSubscriberData {
   email: string;
   name: string;
@@ -209,12 +142,11 @@ export interface EventSubscriberData {
   fields: EventCustomFields;
 }
 
-// All 21 custom fields with proper typing (compatible with MailerLite API)
 export interface EventCustomFields extends Record<string, string | number | boolean | null> {
   // Core system fields
   first_name: string;
   phone: string;
-  checkout_started_at: string; // ISO date string
+  checkout_started_at: string;
   payment_status: 'lead' | 'pending' | 'paid';
   ticket_type: 'Standard' | 'VIP';
   order_id: string | null;
@@ -222,15 +154,15 @@ export interface EventCustomFields extends Record<string, string | number | bool
   details_form_status: 'pending' | 'submitted';
   
   // Event fields (seeded/static)
-  event_date: string; // '2025-09-20'
-  event_address: string; // 'Lisboa, Portugal'
+  event_date: string;
+  event_address: string;
   google_maps_link: string;
   
   // Multibanco fields (set by Stripe/webhook)
   mb_entity: string | null;
   mb_reference: string | null;
   mb_amount: number | null;
-  mb_expires_at: string | null; // ISO date string
+  mb_expires_at: string | null;
   
   // Attribution fields
   utm_source: string | null;
@@ -241,7 +173,6 @@ export interface EventCustomFields extends Record<string, string | number | bool
   marketing_opt_in: 'yes' | 'no';
 }
 
-// State transition interface for lifecycle management
 export interface SubscriberStateTransition {
   subscriberId: string;
   email: string;
@@ -251,7 +182,6 @@ export interface SubscriberStateTransition {
   metadata?: Record<string, unknown>;
 }
 
-// Automation trigger data
 export interface AutomationTriggerData {
   subscriberId: string;
   email: string;
@@ -260,7 +190,7 @@ export interface AutomationTriggerData {
   customData?: Record<string, unknown>;
 }
 
-// MailerLite Types (Legacy + Enhanced)
+// MailerLite Types
 export interface MailerLiteLeadRequest {
   // Basic lead info (required)
   lead_id: string;
@@ -319,7 +249,7 @@ export interface MailerLiteLeadRequest {
   cookie_enabled?: boolean;
   javascript_enabled?: boolean;
   
-  [key: string]: unknown; // Needed for validation iteration
+  [key: string]: unknown;
 }
 
 export interface MailerLiteSubscriberData {
@@ -329,10 +259,9 @@ export interface MailerLiteSubscriberData {
   fields: Record<string, string | number | boolean | null>;
 }
 
-// Enhanced subscriber data with lifecycle management
 export interface MailerLiteEventSubscriber extends MailerLiteSubscriberData {
   fields: EventCustomFields;
-  groups: string[]; // Group IDs to assign
+  groups: string[];
   status: 'active' | 'unsubscribed' | 'unconfirmed';
 }
 
@@ -351,7 +280,6 @@ export interface MailerLiteError {
 
 export type MailerLiteResult = MailerLiteSuccess | MailerLiteError;
 
-// Stripe webhook types are now handled by official Stripe.Event from stripe package
 
 export interface FulfillmentRecord {
   timestamp: number;
@@ -365,8 +293,6 @@ export interface FulfillmentRecord {
 }
 
 
-// Timeout promise wrapper type
-export type TimeoutPromise<T> = Promise<T>;
 
 // Validation rules interface
 export interface ValidationRules {
@@ -388,34 +314,32 @@ export interface APIError extends Error {
   type?: string;
 }
 
-// ========================================
-// WEBHOOK & INTEGRATION INTERFACES 
-// ========================================
+// Webhook & integration interfaces
 
 // Enhanced payment metadata for event tracking
 export interface EventPaymentMetadata extends PaymentIntentMetadata {
   event_slug: typeof EVENT_SLUG;
   marketing_opt_in: 'yes' | 'no';
-  lead_score?: string; // String type required by Stripe metadata
-  attribution_data?: string; // JSON string of attribution object
+  lead_score?: string;
+  attribution_data?: string;
 }
 
 // Multibanco payment details
 export interface MultibancoPaymentDetails {
   entity: string;
   reference: string;
-  amount: number; // In euros (not cents)
-  expiresAt?: string; // ISO date string
-  generatedAt: string; // ISO date string
+  amount: number;
+  expiresAt?: string;
+  generatedAt: string;
 }
 
 // Webhook processing result
 export interface WebhookProcessingResult {
   success: boolean;
   subscriberId?: string;
-  groupTransitions: string[]; // List of group changes made
-  fieldsUpdated: string[]; // List of fields updated
-  automationsTriggered: string[]; // List of automations triggered
+  groupTransitions: string[];
+  fieldsUpdated: string[];
+  automationsTriggered: string[];
   error?: string;
 }
 
@@ -437,14 +361,11 @@ export interface PaymentIntentMetadata {
   utm_campaign?: string;
   utm_term?: string;
   utm_content?: string;
-  [key: string]: string | undefined; // Index signature for metadata
+  [key: string]: string | undefined;
 }
 
-// ========================================
-// UTILITY TYPES
-// ========================================
+// Utility types
 
-// Type helpers for better type safety
 export type EventGroupNames = keyof typeof MAILERLITE_EVENT_GROUPS;
 export type EventFieldNames = keyof typeof MAILERLITE_CUSTOM_FIELDS;
 export type PaymentStatus = typeof FIELD_VALUES.payment_status[number];
@@ -452,14 +373,12 @@ export type TicketType = typeof FIELD_VALUES.ticket_type[number];
 export type DetailsFormStatus = typeof FIELD_VALUES.details_form_status[number];
 export type MarketingOptIn = typeof FIELD_VALUES.marketing_opt_in[number];
 
-// API response types for better error handling
 export interface MailerLiteApiResponse<T = unknown> {
   data?: T;
   message?: string;
   errors?: Record<string, string[]>;
 }
 
-// Comprehensive error tracking
 export interface MailerLiteOperationError extends Error {
   operation: 'subscriber_create' | 'group_assign' | 'field_update' | 'automation_trigger';
   subscriberEmail?: string;

@@ -5,7 +5,7 @@
 
 import {
   MAILERLITE_CUSTOM_FIELDS,
-  MAILERLITE_LEGACY_GROUPS
+  MAILERLITE_EVENT_GROUPS
 } from './types';
 
 // API configuration
@@ -15,9 +15,7 @@ const MAILERLITE_API_BASE = 'https://connect.mailerlite.com/api';
 // Timeout configuration
 const API_TIMEOUT = 15000; // 15 seconds
 
-/**
- * Helper to make MailerLite API calls with timeout
- */
+// Helper to make MailerLite API calls with timeout
 async function mailerliteApiCall(
   endpoint: string,
   options: RequestInit,
@@ -43,10 +41,7 @@ async function mailerliteApiCall(
   }
 }
 
-/**
- * Trigger confirmation email through MailerLite automation
- * Creates or updates subscriber and triggers the confirmation automation
- */
+// Trigger confirmation email through MailerLite automation
 export async function triggerConfirmationEmail(
   email: string,
   data: {
@@ -80,9 +75,8 @@ export async function triggerConfirmationEmail(
         confirmation_sent_at: new Date().toISOString()
       },
       groups: [
-        MAILERLITE_LEGACY_GROUPS.BUYERS, // Add to buyers group
-        // TODO: Add automation trigger group when configured in MailerLite
-        // 'trigger_confirmation_email'
+        // Add to buyer_paid lifecycle group for post-purchase automation
+        MAILERLITE_EVENT_GROUPS.BUYER_PAID
       ],
       status: 'active'
     };
@@ -129,9 +123,7 @@ export async function triggerConfirmationEmail(
   }
 }
 
-/**
- * Update existing subscriber for confirmation
- */
+// Update existing subscriber for confirmation
 async function updateSubscriberForConfirmation(
   email: string,
   fields: Record<string, unknown>
@@ -162,7 +154,7 @@ async function updateSubscriberForConfirmation(
         method: 'PUT',
         body: JSON.stringify({
           fields,
-          groups: [MAILERLITE_LEGACY_GROUPS.BUYERS]
+          groups: [MAILERLITE_EVENT_GROUPS.BUYER_PAID] // Use buyer_paid lifecycle group
         })
       }
     );
@@ -183,10 +175,7 @@ async function updateSubscriberForConfirmation(
   }
 }
 
-/**
- * Trigger abandoned cart email sequence
- * Adds subscriber to abandoned cart automation group
- */
+// Trigger abandoned cart email sequence
 export async function triggerAbandonedCartEmail(
   email: string,
   data: {
@@ -220,9 +209,8 @@ export async function triggerAbandonedCartEmail(
           cart_expires_at: data.expires_at || ''
         },
         groups: [
-          MAILERLITE_LEGACY_GROUPS.LEADS,
-          // TODO: Add abandoned cart automation group
-          // MAILERLITE_EVENT_GROUPS.ABANDONED_PAYMENT
+          // Add to abandoned payment lifecycle group for targeted automation
+          MAILERLITE_EVENT_GROUPS.ABANDONED_PAYMENT
         ],
         status: 'active'
       })
@@ -255,10 +243,7 @@ export async function triggerAbandonedCartEmail(
   }
 }
 
-/**
- * Trigger Multibanco voucher email
- * Sends payment instructions for Multibanco
- */
+// Trigger Multibanco voucher email
 export async function triggerMultibancoVoucherEmail(
   email: string,
   data: {
@@ -292,9 +277,8 @@ export async function triggerMultibancoVoucherEmail(
           voucher_sent_at: new Date().toISOString()
         },
         groups: [
-          MAILERLITE_LEGACY_GROUPS.LEADS,
-          // TODO: Add Multibanco pending group
-          // MAILERLITE_EVENT_GROUPS.BUYER_PENDING
+          // Add to buyer pending lifecycle group for Multibanco payment tracking
+          MAILERLITE_EVENT_GROUPS.BUYER_PENDING
         ],
         status: 'active'
       })
@@ -329,10 +313,7 @@ export async function triggerMultibancoVoucherEmail(
   }
 }
 
-/**
- * Trigger event reminder email
- * Sends reminder emails as event approaches
- */
+// Trigger event reminder email
 export async function triggerEventReminderEmail(
   email: string,
   data: {
@@ -362,8 +343,11 @@ export async function triggerEventReminderEmail(
           reminder_count: 1 // Increment this on each reminder
         },
         groups: [
-          MAILERLITE_LEGACY_GROUPS.BUYERS,
-          MAILERLITE_LEGACY_GROUPS.EVENT_ATTENDEES
+          // Use buyer_paid for confirmed purchasers receiving event reminders
+          MAILERLITE_EVENT_GROUPS.BUYER_PAID,
+          // Also add to details_complete if they've filled required info
+          // This enables sophisticated reminder automation targeting
+          ...(data.days_until_event <= 7 ? [MAILERLITE_EVENT_GROUPS.DETAILS_COMPLETE] : [])
         ],
         status: 'active'
       })
@@ -389,10 +373,7 @@ export async function triggerEventReminderEmail(
   }
 }
 
-/**
- * Add subscriber to specific automation workflow
- * Generic function to trigger any automation by adding to trigger group
- */
+// Add subscriber to specific automation workflow
 export async function addToAutomationWorkflow(
   email: string,
   workflowGroupId: string,
@@ -434,10 +415,7 @@ export async function addToAutomationWorkflow(
   }
 }
 
-/**
- * Log automation trigger for monitoring
- * Helps track email automation performance
- */
+// Log automation trigger for monitoring
 function logAutomationTrigger(
   email: string,
   automationType: string,
@@ -455,9 +433,7 @@ function logAutomationTrigger(
   console.log('Automation triggered:', JSON.stringify(logEntry));
 }
 
-/**
- * Check if subscriber exists in MailerLite
- */
+// Check if subscriber exists in MailerLite
 export async function checkSubscriberExists(
   email: string
 ): Promise<{ exists: boolean; subscriberId?: string; error?: string }> {
@@ -495,10 +471,7 @@ export async function checkSubscriberExists(
   }
 }
 
-/**
- * Get subscriber groups
- * Returns list of groups the subscriber belongs to
- */
+// Get subscriber groups
 export async function getSubscriberGroups(
   email: string
 ): Promise<{ success: boolean; groups?: string[]; error?: string }> {

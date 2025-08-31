@@ -8,14 +8,11 @@ import type {
   PaymentIntentMetadata,
   PaymentIntentRequest,
   RateLimitResult,
-  TimeoutPromise,
   ValidationResult,
   ValidationRules
 } from './types';
 
-/**
- * Cache and rate limiting interfaces following TypeScript best practices
- */
+// Cache and rate limiting interfaces
 interface CustomerCacheEntry {
   customer: Stripe.Customer;
   timestamp: number;
@@ -41,10 +38,8 @@ const TIMEOUTS = {
   default: 10000
 };
 
-/**
- * Timeout wrapper for async operations
- */
-function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Operation'): TimeoutPromise<T> {
+// Timeout wrapper for async operations
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Operation'): Promise<T> {
   return Promise.race([
     promise,
     new Promise<T>((_, reject) => {
@@ -86,9 +81,7 @@ const customerCache = new Map<string, CustomerCacheEntry>();
 const CUSTOMER_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 const MAX_CACHE_SIZE = 1000; // Maximum number of cached customers
 
-/**
- * Customer cache management
- */
+// Customer cache management
 class CustomerCacheManager {
   static cleanExpiredEntries() {
     const now = Date.now();
@@ -164,9 +157,7 @@ const VALIDATION_RULES: ValidationRules = {
   utm_params: ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
 };
 
-/**
- * Comprehensive input validation middleware
- */
+// Comprehensive input validation middleware
 function validatePaymentRequest(requestBody: PaymentIntentRequest): ValidationResult {
   const errors = [];
 
@@ -265,9 +256,7 @@ function validatePaymentRequest(requestBody: PaymentIntentRequest): ValidationRe
   };
 }
 
-/**
- * Rate limiting middleware with environment-aware configuration
- */
+// Rate limiting middleware with environment-aware configuration
 function checkRateLimit(clientIP: string, origin: string | undefined): RateLimitResult {
   const now = Date.now();
   const key = `ratelimit:${clientIP}`;
