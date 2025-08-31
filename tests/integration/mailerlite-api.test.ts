@@ -359,82 +359,195 @@ describe('MailerLite Lead Endpoint Integration', () => {
     });
   });
 
-  describe('MailerLite API Integration', () => {
-    it('should handle MailerLite API timeout', () => {
+  describe('MailerLite API Integration - Real Error Testing', () => {
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    const apiUrl = 'http://localhost:8888/.netlify/functions/mailerlite-lead';
+
+    it('should handle actual MailerLite API timeout', async () => {
       // Use custom handler for timeout scenario
       mockApiResponse(createCustomHandler('timeout'));
 
-      const _response = {
-        status: 504,
-        body: {
-          error: 'Request timed out. Please try again.',
-          code: 'request_timeout'
-        }
-      };
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': 'http://localhost:8080'
+        },
+        body: JSON.stringify({
+          ...validLeadData,
+          email: 'timeout-test@example.com'
+        })
+      });
 
-      expect(_response.status).toBe(504);
-      expect(_response.body.code).toBe('request_timeout');
+      expect(response.ok).toBe(true); // Should still return success (non-blocking)
+      
+      const data = await response.json();
+      expect(data.success).toBe(true);
+      expect(data.mailerlite).toMatchObject({
+        success: false,
+        reason: expect.stringMatching(/timeout|timed out/i),
+        recoverable: true
+      });
     });
 
-    it('should handle MailerLite API rate limiting', () => {
-      // Test data for rate limiting:
-      // const rateLimitedData = {
-      //   ...validLeadData,
-      //   email: 'ratelimit@example.com'
-      // };
+    it('should handle actual MailerLite API rate limiting', async () => {
+      mockApiResponse(createCustomHandler('rate-limit'));
 
-      const _response = {
-        success: true,
-        mailerlite: {
-          success: false,
-          reason: 'MailerLite rate limit exceeded',
-          recoverable: true
-        }
-      };
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': 'http://localhost:8080'
+        },
+        body: JSON.stringify({
+          ...validLeadData,
+          email: 'ratelimit-test@example.com'
+        })
+      });
 
-      expect(_response.success).toBe(true); // Still success (secondary capture)
-      expect(_response.mailerlite.success).toBe(false);
-      expect(_response.mailerlite.recoverable).toBe(true);
+      expect(response.ok).toBe(true);
+      
+      const data = await response.json();
+      expect(data.success).toBe(true); // Still success (secondary capture)
+      expect(data.mailerlite).toMatchObject({
+        success: false,
+        reason: expect.stringMatching(/rate limit|429/i),
+        recoverable: true
+      });
     });
 
-    it('should handle MailerLite server errors', () => {
-      // Test data for server error:
-      // const serverErrorData = {
-      //   ...validLeadData,
-      //   email: 'error@example.com'
-      // };
+    it('should handle actual MailerLite server errors', async () => {
+      mockApiResponse(createCustomHandler('server-error'));
 
-      const _response = {
-        success: true,
-        mailerlite: {
-          success: false,
-          reason: 'MailerLite server error: 500',
-          recoverable: true
-        }
-      };
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': 'http://localhost:8080'
+        },
+        body: JSON.stringify({
+          ...validLeadData,
+          email: 'servererror-test@example.com'
+        })
+      });
 
-      expect(_response.mailerlite.success).toBe(false);
-      expect(_response.mailerlite.recoverable).toBe(true);
+      expect(response.ok).toBe(true);
+      
+      const data = await response.json();
+      expect(data.mailerlite).toMatchObject({
+        success: false,
+        reason: expect.stringMatching(/server error|500/i),
+        recoverable: true
+      });
     });
 
-    it('should handle MailerLite authentication errors', () => {
-      // Temporarily clear API key
+    it('should handle actual MailerLite authentication errors', async () => {
+      // Temporarily clear API key to trigger auth error
       const originalKey = process.env.MAILERLITE_API_KEY;
-      delete process.env.MAILERLITE_API_KEY;
+      vi.stubEnv('MAILERLITE_API_KEY', '');
 
-      const _response = {
-        success: true,
-        mailerlite: {
-          success: false,
-          reason: 'API key not configured'
-        }
-      };
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': 'http://localhost:8080'
+        },
+        body: JSON.stringify({
+          ...validLeadData,
+          email: 'auth-test@example.com'
+        })
+      });
 
-      expect(_response.mailerlite.success).toBe(false);
-      expect(_response.mailerlite.reason).toMatch(/API key/i);
+      expect(response.ok).toBe(true);
+      
+      const data = await response.json();
+      expect(data.mailerlite).toMatchObject({
+        success: false,
+        reason: expect.stringMatching(/API key|not configured/i)
+      });
 
       // Restore API key
-      process.env.MAILERLITE_API_KEY = originalKey;
+      vi.stubEnv('MAILERLITE_API_KEY', originalKey);
+    });
+
+    it('should handle invalid group ID errors (the recent fix)', async () => {
+      // This test specifically validates the "groups.0 is invalid" fix
+      // by testing with real group assignment logic
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': 'http://localhost:8080'
+        },
+        body: JSON.stringify({
+          ...validLeadData,
+          email: 'group-test@example.com',
+          ticket_type: 'Standard'
+        })
+      });
+
+      expect(response.ok).toBe(true);
+      
+      const data = await response.json();
+      
+      // Should either succeed or fail with a clear reason (not "groups.0 is invalid")
+      if (!data.mailerlite.success) {
+        expect(data.mailerlite.reason).not.toMatch(/groups\.0 is invalid/i);
+        // Should have a meaningful error message
+        expect(data.mailerlite.reason).toMatch(/\w+/); // Non-empty error message
+      } else {
+        // If successful, should have subscriber ID
+        expect(data.mailerlite.subscriberId).toBeDefined();
+      }
+    });
+
+    it('should properly assign event-specific groups', async () => {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': 'http://localhost:8080'
+        },
+        body: JSON.stringify({
+          ...validLeadData,
+          email: 'group-assignment-test@example.com',
+          ticket_type: 'Standard'
+        })
+      });
+
+      expect(response.ok).toBe(true);
+      
+      const data = await response.json();
+      
+      // Check if group assignment works with real group IDs
+      if (data.mailerlite.success) {
+        expect(data.mailerlite.action).toMatch(/created|skipped/);
+      } else {
+        // If it fails, it shouldn't be due to invalid group format
+        expect(data.mailerlite.reason).not.toMatch(/invalid group|groups\.0/i);
+      }
+    });
+
+    it('should handle network errors gracefully', async () => {
+      mockApiResponse(createCustomHandler('network-error'));
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': 'http://localhost:8080'
+        },
+        body: JSON.stringify({
+          ...validLeadData,
+          email: 'network-error-test@example.com'
+        })
+      });
+
+      expect(response.ok).toBe(true);
+      
+      const data = await response.json();
+      expect(data.success).toBe(true); // Non-blocking
+      expect(data.mailerlite.success).toBe(false);
     });
   });
 
