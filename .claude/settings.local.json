@@ -93,5 +93,6 @@
       }
     ]
   },
-  "outputStyle": "Explanatory"
+  "outputStyle": "Explanatory",
+  "enabledMcpjsonServers": ["playwright-mcp"]
 }

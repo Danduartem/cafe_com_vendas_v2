@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "playwright-mcp": {
+      "command": "npx",
+      "args": [
+        "@microsoft/playwright-mcp",
+        "--headless",
+        "--isolated", 
+        "--image-responses=omit",
+        "--debug=false",
+        "--max-console-messages=10"
+      ],
+      "env": {
+        "PLAYWRIGHT_BROWSERS_PATH": "0"
+      }
+    }
+  }
+}
