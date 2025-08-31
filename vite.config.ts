@@ -21,7 +21,7 @@ export default defineConfig({
   },
   
   build: {
-    outDir: '_site/assets',
+    outDir: '_site',
     emptyOutDir: true,
     target: 'es2023',
     minify: 'esbuild',
@@ -42,13 +42,16 @@ export default defineConfig({
         chunkFileNames: 'js/[name]-[hash].js',
         assetFileNames: (assetInfo) => {
           // Optimize asset file naming for better caching
-          const info = assetInfo.name?.split('.');
-          const ext = info?.[info.length - 1];
+          if (!assetInfo.names || assetInfo.names.length === 0) {
+            return `assets/[name][extname]`;
+          }
+          const name = assetInfo.names[0];
+          const ext = name.split('.').pop()?.toLowerCase();
           if (ext && /png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
-            return `images/[name][extname]`;
+            return `assets/images/[name][extname]`;
           }
           if (ext === 'css') {
-            return `css/[name][extname]`;
+            return `assets/css/[name][extname]`;
           }
           return `assets/[name][extname]`;
         },

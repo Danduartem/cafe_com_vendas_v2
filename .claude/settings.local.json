@@ -57,7 +57,9 @@
       "WebSearch",
       "Bash(chmod:*)",
       "Bash(./context7-reminder.sh:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "WebFetch(domain:vite.dev)",
+      "mcp__context7__get-library-docs"
     ]
   },
   "enabledMcpjsonServers": [
