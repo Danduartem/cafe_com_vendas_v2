@@ -85,20 +85,16 @@ const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
 // Following naming convention: ccv-2025-09-20_lifecycle_state
 const EVENT_GROUPS = MAILERLITE_EVENT_GROUPS;
 
-// Legacy Group IDs for backward compatibility during transition
-const LEGACY_GROUPS = {
-  LEADS: '164068163344925725',           // 2025 Café com Vendas Portugal - Leads
-  BUYERS: '164071323193050164',         // 2025 Café com Vendas Portugal - Buyers  
-  EVENT_ATTENDEES: '164071346948540099' // 2025 Café com Vendas Portugal - Event Attendees
-};
-
-// TODO: Group name-to-ID mapping will be populated after creating groups in MailerLite
-// For now, using legacy groups as fallback
+// Direct Group ID mapping to actual MailerLite groups
 const GROUP_ID_MAPPING: Record<string, string> = {
-  // Event lifecycle groups (to be populated after MailerLite setup)
-  [EVENT_GROUPS.CHECKOUT_STARTED]: LEGACY_GROUPS.LEADS, // Temporary fallback
-  [EVENT_GROUPS.BUYER_PAID]: LEGACY_GROUPS.BUYERS,      // Temporary fallback
-  // ... other mappings to be added
+  [EVENT_GROUPS.CHECKOUT_STARTED]: '164084418309260989',
+  [EVENT_GROUPS.BUYER_PENDING]: '164084419130295829',
+  [EVENT_GROUPS.BUYER_PAID]: '164084419571745998',
+  [EVENT_GROUPS.DETAILS_PENDING]: '164084420038362902',
+  [EVENT_GROUPS.DETAILS_COMPLETE]: '164084420444161819',
+  [EVENT_GROUPS.ATTENDED]: '164084420929652588',
+  [EVENT_GROUPS.NO_SHOW]: '164084421314479574',
+  [EVENT_GROUPS.ABANDONED_PAYMENT]: '164084418758051029'
 };
 
 // Validation schemas for lead data
@@ -403,7 +399,7 @@ async function addLeadToMailerLite(leadData: MailerLiteSubscriberData): Promise<
             name: leadData.name,
             phone: leadData.phone,
             fields: leadData.fields,
-            groups: [GROUP_ID_MAPPING[EVENT_GROUPS.CHECKOUT_STARTED] || LEGACY_GROUPS.LEADS], // Add to checkout_started group
+            groups: [GROUP_ID_MAPPING[EVENT_GROUPS.CHECKOUT_STARTED]], // Add to checkout_started group
             status: 'active'
           })
         }),

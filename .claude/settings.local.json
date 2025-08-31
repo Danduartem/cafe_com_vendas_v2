@@ -56,9 +56,13 @@
       "Read(/Users/danielmenezes/.claude/**)",
       "WebSearch",
       "Bash(chmod:*)",
-      "Bash(./context7-reminder.sh:*)"
+      "Bash(./context7-reminder.sh:*)",
+      "Bash(npm test:*)"
     ]
   },
+  "enabledMcpjsonServers": [
+    "playwright-mcp"
+  ],
   "hooks": {
     "SessionStart": [
       {
@@ -93,6 +97,5 @@
       }
     ]
   },
-  "outputStyle": "Explanatory",
-  "enabledMcpjsonServers": ["playwright-mcp"]
+  "outputStyle": "Explanatory"
 }
