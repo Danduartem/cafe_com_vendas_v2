@@ -50,6 +50,12 @@ export interface EnvironmentConfig {
   cloudinary: {
     cloudName: string;
   };
+  crm: {
+    companyId: string;
+    boardId: string;
+    columnId: string;
+    apiUrl: string;
+  };
   // Note: API endpoints can be added here when needed
   urls: {
     base: string;
@@ -103,6 +109,14 @@ const config: EnvironmentConfig = {
   // Cloudinary Configuration (Public)
   cloudinary: {
     cloudName: import.meta.env?.VITE_CLOUDINARY_CLOUD_NAME ?? 'ds4dhbneq'
+  },
+
+  // CRM Configuration (URL only - IDs are server-side)
+  crm: {
+    companyId: '', // Server-side only (set via CRM_COMPANY_ID env var)
+    boardId: '',   // Server-side only (set via CRM_BOARD_ID env var)
+    columnId: '',  // Server-side only (set via CRM_COLUMN_ID env var)
+    apiUrl: 'https://mocha-smoky.vercel.app/api/integrations/contact-card'
   },
 
   // Note: API endpoints can be added here when needed

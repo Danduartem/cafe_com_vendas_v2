@@ -610,6 +610,9 @@ export const Checkout: CheckoutSectionComponent = {
 
   async handleLeadSubmit(event: Event): Promise<void> {
     event.preventDefault();
+    
+    // Debug: Log method entry
+    logger.info('handleLeadSubmit method called');
 
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
@@ -752,6 +755,64 @@ export const Checkout: CheckoutSectionComponent = {
           error: mailerliteError instanceof Error ? mailerliteError.message : 'Unknown error',
           leadId: this.leadId,
           email: leadData.email
+        });
+      }
+
+
+      // CRM Integration - Non-blocking with dynamic pricing
+      try {
+        // Prepare CRM payload with exact structure as specified
+        const crmPayload = {
+          company_id: ENV.crm?.companyId || 'b3f9a7c2-f20e-4e12-bc72-a75450240b98',
+          board_id: ENV.crm?.boardId || 'becd6fb7-74a6-4517-b60e-4be31d9942c3',
+          column_id: ENV.crm?.columnId || 'fbfa2479-c495-4a37-8d84-9c1109ddafc5',
+          name: leadData.fullName.trim(),
+          phone: `${leadData.countryCode}${leadData.phone}`,
+          title: leadData.fullName.trim(),
+          amount: `${basePrice}.00`, // Format as "180.00"
+          obs: `Lead interessado no produto ${eventName} - Lisboa 2025`,
+          contact_tags: [
+            `${eventName} - Lisboa 2025`,
+            'Lead'
+          ]
+        };
+
+        // Non-blocking CRM submission - don't await
+        fetch(`${ENV.urls.base}/.netlify/functions/crm-integration`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(crmPayload)
+        }).then(response => {
+          if (response.ok) {
+            response.json().then(result => {
+              logger.info('CRM integration successful', {
+                leadId: this.leadId,
+                crmSuccess: (result as { crm?: { success?: boolean } }).crm?.success
+              });
+            }).catch(() => {
+              logger.debug('CRM response parsing failed');
+            });
+          } else {
+            logger.warn('CRM integration returned error status', {
+              status: response.status,
+              leadId: this.leadId
+            });
+          }
+        }).catch(crmError => {
+          // Non-blocking error - don't prevent checkout
+          logger.warn('CRM integration failed (non-blocking)', {
+            error: crmError instanceof Error ? crmError.message : 'Unknown error',
+            leadId: this.leadId,
+            email: leadData.email
+          });
+        });
+      } catch (crmError) {
+        // Catch any synchronous errors in payload preparation
+        logger.warn('CRM payload preparation failed', {
+          error: crmError instanceof Error ? crmError.message : 'Unknown error',
+          leadId: this.leadId
         });
       }
 
