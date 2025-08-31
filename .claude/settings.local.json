@@ -55,7 +55,8 @@
       "Bash(git push:*)",
       "Read(/Users/danielmenezes/.claude/**)",
       "WebSearch",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(./context7-reminder.sh:*)"
     ]
   },
   "hooks": {
