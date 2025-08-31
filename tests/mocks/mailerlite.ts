@@ -307,7 +307,7 @@ export const mailerliteHandlers = [
 ];
 
 // Helper to create custom handlers for specific test scenarios
-export function createCustomHandler(scenario: 'timeout' | 'network-error' | 'slow-response') {
+export function createCustomHandler(scenario: 'timeout' | 'network-error' | 'slow-response' | 'rate-limit' | 'server-error') {
   switch (scenario) {
     case 'timeout':
       return http.post('https://connect.mailerlite.com/api/subscribers', async () => {
@@ -325,6 +325,22 @@ export function createCustomHandler(scenario: 'timeout' | 'network-error' | 'slo
         // Simulate slow response
         await new Promise(resolve => setTimeout(resolve, 3000));
         return HttpResponse.json(mockResponses.subscriberCreated);
+      });
+
+    case 'rate-limit':
+      return http.post('https://connect.mailerlite.com/api/subscribers', () => {
+        return new HttpResponse(
+          JSON.stringify(mockResponses.rateLimitError),
+          { status: 429 }
+        );
+      });
+
+    case 'server-error':
+      return http.post('https://connect.mailerlite.com/api/subscribers', () => {
+        return new HttpResponse(
+          JSON.stringify(mockResponses.serverError),
+          { status: 500 }
+        );
       });
     
     default:

@@ -4,10 +4,11 @@
  */
 
 import { setupServer } from 'msw/node';
-import mailerliteHandlers from './mailerlite';
+import mailerliteHandlers from './mailerlite.js';
+import crmHandlers from './crm.js';
 
-// Create server instance with MailerLite handlers
-export const server = setupServer(...mailerliteHandlers);
+// Create server instance with all integration handlers
+export const server = setupServer(...mailerliteHandlers, ...crmHandlers);
 
 import { beforeAll, afterEach, afterAll } from 'vitest';
 
