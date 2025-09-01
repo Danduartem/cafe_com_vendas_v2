@@ -43,6 +43,7 @@ export interface CRMResult {
   contactId?: string;
   reason?: string;
   recoverable?: boolean;
+  action?: string; // Action taken (e.g., 'created', 'skipped', 'updated')
 }
 
 // CRM Configuration

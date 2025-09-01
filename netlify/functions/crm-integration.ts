@@ -318,7 +318,24 @@ async function sendToCRM(payload: CRMContactPayload): Promise<CRMResult> {
         const errorText = await response.text();
 
         // Handle specific error cases
-        if (response.status === 401) {
+        if (response.status === 409) {
+          // Contact already exists in CRM - this is actually success for our use case
+          console.log(`Contact already exists in CRM for ${payload.name} (${payload.phone}) - treating as success`);
+          
+          // Try to extract existing contact ID from the error response
+          try {
+            const errorData = JSON.parse(errorText);
+            const existingContactId = errorData.existing_card?.contact?.id;
+            return { 
+              success: true, 
+              contactId: existingContactId, 
+              reason: 'Contact already exists',
+              action: 'skipped'
+            };
+          } catch {
+            return { success: true, reason: 'Contact already exists', action: 'skipped' };
+          }
+        } else if (response.status === 401) {
           console.error('CRM authentication failed');
           return { success: false, reason: 'Authentication failed', recoverable: false };
         } else if (response.status === 429) {
