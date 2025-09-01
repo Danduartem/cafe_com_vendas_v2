@@ -86,31 +86,43 @@ npm run type-check && npm run lint && npm test
 
 ## Third-Party Integrations
 
-### Google Tag Manager (GTM)
+### Analytics System (Modern Plugin Architecture)
 - **Container ID**: `GTM-T63QRLFT`
-- **Implementation**: `src/_includes/partials/gtm.njk`
-- **Event Flow**: JavaScript → `window.dataLayer` → GTM → GA4
+- **Implementation**: `src/analytics/` (unified plugin-based system)
+- **Event Flow**: AnalyticsHelpers → GTM Plugin → `window.dataLayer` → GTM → GA4
 
 **Key Events (Revenue Critical)**:
 ```javascript
-// Payment completion
-window.dataLayer.push({
-  event: 'payment_completed',
+// Import the unified analytics system
+import { AnalyticsHelpers } from '../analytics/index.js';
+
+// Payment completion (recommended approach)
+AnalyticsHelpers.trackConversion('payment_completed', {
   transaction_id: 'pi_abc123...',
   value: 180,
   currency: 'EUR'
 });
 
-// Lead capture
-window.dataLayer.push({
-  event: 'lead_generated',
+// Lead capture (recommended approach)
+AnalyticsHelpers.trackConversion('lead_generated', {
   email: 'user@example.com',
   source_section: 'hero'
 });
+
+// Section tracking (automatic with IntersectionObserver)
+AnalyticsHelpers.initSectionTracking('hero');
 ```
 
+**Core Plugins Available**:
+- **GTM Plugin**: Google Tag Manager integration with event normalization
+- **Performance Plugin**: Core Web Vitals tracking (LCP, FID, CLS, INP)
+- **Section Tracking Plugin**: IntersectionObserver-based section visibility
+- **Error Plugin**: Global error handling with deduplication
+- **Scroll Tracking Plugin**: Scroll depth milestone tracking
+
 **Testing**:
-- Browser console: `window.dataLayer`
+- Browser console: `window.dataLayer` (events flow through GTM plugin)
+- Browser console: `window.analytics` (analytics instance for debugging)
 - GTM Preview Mode for debugging
 - GA4 Debug View for event validation
 

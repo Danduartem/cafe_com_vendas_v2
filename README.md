@@ -24,7 +24,7 @@ Premium landing page for an intimate business transformation event in Lisbon, de
 - **Payments**: Stripe 18.4.0 + Netlify Functions
 - **Email**: MailerLite API integration
 - **Testing**: Vitest 3.2.4 + Playwright 1.55.0
-- **Analytics**: GTM/GA4 with typed dataLayer
+- **Analytics**: Unified plugin-based system (GTM/GA4, Core Web Vitals, section tracking)
 - **Deployment**: Netlify (Functions + static hosting)
 
 ## 🚀 Quick Start
@@ -80,7 +80,7 @@ npm run lighthouse -- https://your-url.com
 - **Section logic**: `src/_includes/sections/{section}/index.ts`
 - **UI components**: `src/components/ui/`
 - **Styling**: `src/assets/css/main.css` (Tailwind v4 theme)
-- **Analytics**: `src/assets/js/config/constants.ts`
+- **Analytics**: `src/analytics/` (unified plugin-based system)
 
 ---
 
@@ -154,11 +154,16 @@ src/
 ├── _includes/          # Templates & components
 │   ├── sections/       # Section templates + logic
 │   └── partials/       # Reusable template parts
+├── analytics/          # Modern analytics system
+│   ├── core/           # Plugin-based analytics engine
+│   ├── plugins/        # GTM, performance, tracking plugins
+│   ├── types/          # TypeScript definitions
+│   └── index.ts        # Unified API & helpers
 ├── assets/             # Static assets
 │   ├── css/            # Tailwind CSS entry
-│   └── js/             # TypeScript utilities
+│   └── js/             # TypeScript app & utilities
 ├── components/         # UI components
-│   └── ui/             # Accordion, analytics, animations
+│   └── ui/             # Accordion, animations, thank-you
 └── pages/              # Page templates (privacy, terms, etc.)
 
 netlify/functions/      # Serverless functions

@@ -63,23 +63,37 @@ src/_includes/sections/{section}/
 src/components/ui/
 ├── index.ts            # Component exports
 ├── accordion/          # FAQ accordion (PlatformAccordion)
-├── analytics/          # GTM integration (PlatformAnalytics)
 ├── animations/         # Intersection observers (Animations)
 └── thank-you/          # Thank you page logic (PlatformThankYou)
+```
+
+### Modern Analytics System
+```
+src/analytics/
+├── core/
+│   └── analytics.ts    # Plugin-based analytics engine
+├── plugins/            # Specialized analytics plugins
+│   ├── gtm.ts         # Google Tag Manager integration
+│   ├── performance.ts  # Core Web Vitals & performance monitoring
+│   ├── section-tracking.ts # IntersectionObserver section tracking
+│   ├── scroll-tracking.ts  # Scroll depth events
+│   └── error.ts        # Error tracking with deduplication
+├── types/
+│   ├── index.ts        # Plugin interfaces & types
+│   └── events.ts       # Event type definitions
+└── index.ts            # Unified API & AnalyticsHelpers
 ```
 
 ### Core Utilities
 ```
 src/assets/js/
 ├── config/
-│   ├── constants.ts    # App constants, analytics events
+│   ├── constants.ts    # App constants, configuration
 │   └── environment.ts  # Environment configuration
 ├── core/
-│   ├── analytics.ts    # Comprehensive analytics & performance
 │   └── state.ts        # State management
 ├── utils/
 │   ├── gtm-normalizer.ts # Analytics event formatting
-│   ├── scroll-tracker.ts # Scroll position tracking
 │   ├── throttle.ts      # Performance utilities
 │   └── index.ts         # Utility exports
 ├── app.ts              # Application initialization
@@ -301,36 +315,131 @@ import { throttle } from '../../../utils/throttle.ts';
 
 ---
 
-## 📊 Analytics Integration
+## 📊 Modern Analytics System
+
+### Plugin-Based Architecture
+The analytics system uses a modern plugin-based architecture inspired by industry best practices, providing:
+
+- **Unified API**: Single initialization with `AnalyticsHelpers` for common patterns
+- **Specialized Plugins**: Each concern handled by a focused plugin
+- **Type Safety**: Full TypeScript support with event type definitions
+- **Performance**: Optimized initialization and memory usage
+- **Extensibility**: Easy to add new plugins or modify behavior
 
 ### Event Flow
 ```
-JavaScript Code → window.dataLayer → GTM → GA4 + other platforms
+JavaScript Code → Analytics Plugin → window.dataLayer → GTM → GA4 + other platforms
 ```
+
+### Core Plugins
+
+1. **GTM Plugin** (`src/analytics/plugins/gtm.ts`)
+   - Google Tag Manager integration
+   - Event normalization and validation
+   - GA4-compliant event structure
+
+2. **Performance Plugin** (`src/analytics/plugins/performance.ts`)
+   - Core Web Vitals tracking (LCP, FID, CLS, INP)
+   - Page load performance monitoring
+   - Smart batching to reduce overhead
+
+3. **Section Tracking Plugin** (`src/analytics/plugins/section-tracking.ts`)
+   - IntersectionObserver-based section visibility
+   - One-time section view events
+   - Configurable visibility thresholds
+
+4. **Error Plugin** (`src/analytics/plugins/error.ts`)
+   - Global error handling setup
+   - Error deduplication
+   - Context-rich error reporting
+
+5. **Scroll Tracking Plugin** (`src/analytics/plugins/scroll-tracking.ts`)
+   - Scroll depth milestone tracking
+   - Throttled for performance
+   - Configurable thresholds
 
 ### Key Events (Revenue Critical)
 ```javascript
-// Payment completion
-window.dataLayer.push({
-  event: 'payment_completed',
+// Payment completion (via AnalyticsHelpers)
+AnalyticsHelpers.trackConversion('payment_completed', {
   transaction_id: 'pi_abc123...',
   value: 180,
   currency: 'EUR'
 });
 
-// Lead generation  
-window.dataLayer.push({
-  event: 'lead_generated',
+// Lead generation (via AnalyticsHelpers)
+AnalyticsHelpers.trackConversion('lead_generated', {
   email: 'user@example.com',
   source_section: 'hero'
 });
+
+// Section tracking (automatic)
+AnalyticsHelpers.initSectionTracking('hero');
 ```
 
 ### Implementation Files
-- **Event Definitions**: `src/assets/js/config/constants.ts`
-- **Platform Analytics**: `src/components/ui/analytics/index.ts` (simple tracking)
-- **Core Analytics**: `src/assets/js/core/analytics.ts` (comprehensive + performance)
+- **Main API**: `src/analytics/index.ts` (AnalyticsHelpers & initialization)
+- **Plugin Engine**: `src/analytics/core/analytics.ts`
+- **Event Types**: `src/analytics/types/events.ts`
+- **Plugin Interfaces**: `src/analytics/types/index.ts`
 - **Event Normalization**: `src/assets/js/utils/gtm-normalizer.ts`
+
+### Analytics Initialization
+
+The analytics system is initialized automatically in the main application (`src/assets/js/app.ts`):
+
+```typescript
+import { initializeAnalytics, AnalyticsHelpers } from '../../analytics/index.js';
+
+// Automatic initialization during app startup
+export const CafeComVendas = {
+  async init() {
+    // Initialize unified analytics system with all plugins
+    await initializeAnalytics();
+    
+    // Analytics is now available globally
+    // window.analytics contains the plugin instance
+    // AnalyticsHelpers provides convenient wrapper methods
+  }
+}
+```
+
+### Common Usage Patterns
+
+**Section Tracking** (most common):
+```typescript
+// In section component init() method
+AnalyticsHelpers.initSectionTracking('hero');
+// Automatically tracks when section becomes visible
+```
+
+**CTA Tracking**:
+```typescript
+// Button click handlers
+AnalyticsHelpers.trackCTAClick('hero', {
+  button_text: 'Reserve My Spot',
+  button_location: 'above_fold'
+});
+```
+
+**Error Tracking**:
+```typescript
+// Error boundaries or catch blocks
+AnalyticsHelpers.trackError('payment_failed', error, {
+  user_email: 'user@example.com',
+  payment_amount: 180
+});
+```
+
+**Advanced Plugin Usage**:
+```typescript
+// Direct plugin access for custom needs
+const analytics = (window as any).analytics;
+const performancePlugin = analytics.getPlugin('performance');
+if (performancePlugin?.methods) {
+  performancePlugin.methods.trackCustomMetric('checkout_time', 1250);
+}
+```
 
 ---
 
