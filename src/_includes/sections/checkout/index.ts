@@ -27,8 +27,7 @@ import type { Component } from '../../../types/components/base.js';
 import siteData from '../../../_data/site.js';
 import { 
   BehaviorTracker, 
-  getUserEnvironment, 
-  getAttributionData,
+  getUserEnvironment,
   type BehaviorData,
   type UserEnvironment,
   type AttributionData 
@@ -37,9 +36,7 @@ import { isValidEmail, isValidPhone } from '../../../utils/validation.js';
 import { 
   getEventData
 } from '../../../utils/event-tracking.js';
-import type { 
-  EnhancedMailerLitePayload
-} from '../../../types/enhanced-tracking.js';
+// Type imports removed - using plain object for MailerLite request
 
 // 🎯 Get centralized pricing data - SINGLE SOURCE OF TRUTH
 const site = siteData();
@@ -669,211 +666,178 @@ export const Checkout: CheckoutSectionComponent = {
       if (submitBtn) (submitBtn as HTMLButtonElement).disabled = true;
       if (submitSpinner) submitSpinner.classList.remove('hidden');
 
-      // STEP 1: Create PaymentIntent first to validate with server
-      // This validates all data server-side before proceeding
+      // PERFORMANCE OPTIMIZATION: Create PaymentIntent first for server validation
       await this.validateAndCreatePaymentIntent();
 
-      // If we reach here, server validation passed - now do the other API calls and advance
-      // Submit lead to MailerLite for immediate capture
-      try {
-        // Collect rich user data
-        const userEnvironment = getUserEnvironment();
-        const attributionData = getAttributionData();
-        const behaviorData = this.behaviorTracker?.getBehaviorData() || {
-          timeOnPage: 0,
-          scrollDepth: 0,
-          sectionsViewed: [],
-          pageViews: 1,
-          isReturningVisitor: false,
-          sessionDuration: 0
-        };
-        
-        // === PHASE 1 ENHANCEMENT: Enhanced MailerLite payload ===
-        const mailerlitePayload: EnhancedMailerLitePayload = {
-          email: leadData.email,
-          
-          fields: {
-            // Basic contact info
-            name: leadData.fullName.split(' ')[0] || leadData.fullName,
-            last_name: leadData.fullName.split(' ').slice(1).join(' ') || '',
-            phone: `${leadData.countryCode}${leadData.phone}`,
-            country: leadData.countryCode,
-            
-            // === PHASE 1 ENHANCED FIELDS ===
-            // Event tracking (NEW - unified across all systems)
-            event_id: completeEventData.context.event_id,
-            user_session_id: completeEventData.context.user_session_id,
-            lead_created_at: completeEventData.context.created_at,
-            checkout_started_at: completeEventData.context.created_at,
-            
-            // Payment lifecycle (NEW - enables targeted campaigns)
-            payment_status: 'lead', // Lead stage
-            
-            // Attribution data (ENHANCED - complete UTM tracking)
-            utm_source: completeEventData.attribution.utm_source,
-            utm_medium: completeEventData.attribution.utm_medium,
-            utm_campaign: completeEventData.attribution.utm_campaign,
-            utm_content: completeEventData.attribution.utm_content,
-            utm_term: completeEventData.attribution.utm_term,
-            first_utm_source: sessionStorage.getItem('first_utm_source') || undefined,
-            first_utm_campaign: sessionStorage.getItem('first_utm_campaign') || undefined,
-            referrer: completeEventData.attribution.referrer,
-            referrer_domain: completeEventData.attribution.referrer_domain,
-            landing_page: completeEventData.attribution.landing_page,
-            
-            // Behavioral data (ENHANCED)
-            time_on_page: behaviorData.timeOnPage,
-            scroll_depth: behaviorData.scrollDepth,
-            sections_viewed: behaviorData.sectionsViewed.join(','),
-            page_views: behaviorData.pageViews,
-            is_returning_visitor: behaviorData.isReturningVisitor,
-            session_duration: behaviorData.sessionDuration,
-            
-            // Device & browser (NEW - for segmentation)
-            device_type: userEnvironment.deviceInfo.type,
-            device_brand: userEnvironment.deviceInfo.brand,
-            browser_name: userEnvironment.browserInfo.name,
-            browser_version: userEnvironment.browserInfo.version,
-            screen_resolution: userEnvironment.screenResolution,
-            viewport_size: userEnvironment.viewportSize,
-            
-            // Business context (NEW - prepared for Phase 2)
-            preferred_language: userEnvironment.language,
-            timezone: userEnvironment.timezone,
-            event_interest: 'cafe_com_vendas_lisbon_2025-09-20',
-            intent_signal: 'started_checkout',
-            lead_score: this.calculateLeadScore(behaviorData, attributionData, userEnvironment),
-            signup_page: window.location.pathname,
-            
-            // === PHASE 2 PREPARATION FIELDS ===
-            // Consent management (prepared for Phase 2)
-            marketing_consent: completeEventData.consent.marketing_consent,
-            consent_method: completeEventData.consent.consent_method,
-            consent_timestamp: completeEventData.consent.consent_timestamp,
-            
-            // Business qualification (prepared for future)
-            business_stage: 'unknown', // Future: add form field
-            business_type: 'unknown', // Future: add form field
-            primary_goal: 'unknown', // Future: add form field
-            main_challenge: 'unknown' // Future: add form field
-          },
-          
-          // Status and timestamps following 2025 MailerLite API best practices
-          status: 'active',
-          subscribed_at: completeEventData.context.created_at,
-          ip_address: undefined, // Will be determined by server
-          opted_in_at: completeEventData.context.created_at,
-          optin_ip: undefined // Will be determined by server
-        };
-
-        const mailerliteResponse = await fetch(`${ENV.urls.base}/.netlify/functions/mailerlite-lead`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(mailerlitePayload)
-        });
-
-        if (mailerliteResponse.ok) {
-          const mailerliteResult = await mailerliteResponse.json() as {
-            success: boolean;
-            leadId: string;
-            email: string;
-            mailerlite: {
-              success: boolean;
-              action?: string;
-              reason?: string;
-            };
-          };
-          logger.info('Lead successfully submitted to MailerLite', {
-            leadId: this.leadId,
-            email: leadData.email,
-            mailerliteSuccess: mailerliteResult.mailerlite.success
-          });
-        } else {
-          logger.warn('MailerLite lead submission failed', {
-            status: mailerliteResponse.status,
-            leadId: this.leadId,
-            email: leadData.email
-          });
+      // PERFORMANCE OPTIMIZATION: Initialize Stripe Elements early while APIs run in background
+      const stripeInitPromise = (async () => {
+        if (!this.stripeLoaded) {
+          await this.initializeStripe();
         }
-      } catch (mailerliteError) {
-        // Non-blocking error - don't prevent user from proceeding
-        logger.warn('MailerLite API call failed, continuing with checkout', {
-          error: mailerliteError instanceof Error ? mailerliteError.message : 'Unknown error',
-          leadId: this.leadId,
-          email: leadData.email
-        });
-      }
+      })();
 
+      // Collect rich user data for API calls
+      const userEnvironment = getUserEnvironment();
+      const behaviorData = this.behaviorTracker?.getBehaviorData() || {
+        timeOnPage: 0,
+        scrollDepth: 0,
+        sectionsViewed: [],
+        pageViews: 1,
+        isReturningVisitor: false,
+        sessionDuration: 0
+      };
 
-      // CRM Integration - Non-blocking with dynamic pricing
-      try {
-        // Prepare CRM payload with exact structure as specified
-        const crmPayload = {
-          company_id: ENV.crm?.companyId || 'b3f9a7c2-f20e-4e12-bc72-a75450240b98',
-          board_id: ENV.crm?.boardId || 'becd6fb7-74a6-4517-b60e-4be31d9942c3',
-          column_id: ENV.crm?.columnId || 'fbfa2479-c495-4a37-8d84-9c1109ddafc5',
-          name: leadData.fullName.trim(),
-          phone: `${leadData.countryCode}${leadData.phone}`,
-          email: leadData.email,
-          title: leadData.fullName.trim(),
-          amount: `${basePrice}.00`, // Format as "180.00"
-          obs: `Lead interessado no produto ${eventName} - Lisboa 2025`,
-          contact_tags: [
-            `${eventName} - Lisboa 2025`,
-            'Lead'
-          ]
-        };
+      // PERFORMANCE OPTIMIZATION: Run MailerLite and CRM in parallel (non-blocking)
+      const backgroundAPIPromises = [
+        // MailerLite API call
+        (async () => {
+          try {
+            const mailerlitePayload = {
+              // Core required fields that backend expects
+              lead_id: completeEventData.context.event_id,
+              full_name: leadData.fullName,
+              email: leadData.email,
+              phone: `${leadData.countryCode}${leadData.phone}`,
+              
+              // Event tracking (required)
+              event_id: completeEventData.context.event_id,
+              user_session_id: completeEventData.context.user_session_id,
+              
+              // Attribution data 
+              utm_source: completeEventData.attribution.utm_source,
+              utm_medium: completeEventData.attribution.utm_medium,
+              utm_campaign: completeEventData.attribution.utm_campaign,
+              utm_content: completeEventData.attribution.utm_content,
+              utm_term: completeEventData.attribution.utm_term,
+              
+              // Behavioral data
+              time_on_page: behaviorData.timeOnPage,
+              scroll_depth: behaviorData.scrollDepth,
+              page_views: behaviorData.pageViews,
+              is_returning_visitor: behaviorData.isReturningVisitor,
+              session_duration: behaviorData.sessionDuration,
+              
+              // Device & browser
+              device_type: userEnvironment.deviceInfo.type,
+              device_brand: userEnvironment.deviceInfo.brand,
+              browser_name: userEnvironment.browserInfo.name,
+              browser_version: userEnvironment.browserInfo.version,
+              screen_resolution: userEnvironment.screenResolution,
+              viewport_size: userEnvironment.viewportSize,
+              
+              // Business context
+              preferred_language: userEnvironment.language,
+              timezone: userEnvironment.timezone,
+              
+              // Timestamps
+              lead_created_at: completeEventData.context.created_at,
+              checkout_started_at: completeEventData.context.created_at,
+              
+              // Consent
+              marketing_consent: completeEventData.consent.marketing_consent,
+              consent_method: completeEventData.consent.consent_method,
+              consent_timestamp: completeEventData.consent.consent_timestamp
+            };
 
-        // Non-blocking CRM submission - don't await
-        fetch(`${ENV.urls.base}/.netlify/functions/crm-integration`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(crmPayload)
-        }).then(response => {
-          if (response.ok) {
-            response.json().then(result => {
-              logger.info('CRM integration successful', {
-                leadId: this.leadId,
-                crmSuccess: (result as { crm?: { success?: boolean } }).crm?.success
-              });
-            }).catch(() => {
-              logger.debug('CRM response parsing failed');
+            const mailerliteResponse = await fetch(`${ENV.urls.base}/.netlify/functions/mailerlite-lead`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(mailerlitePayload)
             });
-          } else {
-            logger.warn('CRM integration returned error status', {
-              status: response.status,
-              leadId: this.leadId
+
+            if (mailerliteResponse.ok) {
+              const mailerliteResult = await mailerliteResponse.json() as {
+                success: boolean;
+                leadId: string;
+                email: string;
+                mailerlite: {
+                  success: boolean;
+                  action?: string;
+                  reason?: string;
+                };
+              };
+              logger.info('Lead successfully submitted to MailerLite', {
+                leadId: this.leadId,
+                email: leadData.email,
+                mailerliteSuccess: mailerliteResult.mailerlite.success
+              });
+            } else {
+              logger.warn('MailerLite lead submission failed', {
+                status: mailerliteResponse.status,
+                leadId: this.leadId,
+                email: leadData.email
+              });
+            }
+          } catch (mailerliteError) {
+            logger.warn('MailerLite API call failed (non-blocking)', {
+              error: mailerliteError instanceof Error ? mailerliteError.message : 'Unknown error',
+              leadId: this.leadId,
+              email: leadData.email
             });
           }
-        }).catch(crmError => {
-          // Non-blocking error - don't prevent checkout
-          logger.warn('CRM integration failed (non-blocking)', {
-            error: crmError instanceof Error ? crmError.message : 'Unknown error',
-            leadId: this.leadId,
-            email: leadData.email
-          });
-        });
-      } catch (crmError) {
-        // Catch any synchronous errors in payload preparation
-        logger.warn('CRM payload preparation failed', {
-          error: crmError instanceof Error ? crmError.message : 'Unknown error',
-          leadId: this.leadId
-        });
-      }
+        })(),
 
-      // Simulate brief processing delay for UX
-      await new Promise(resolve => setTimeout(resolve, 500));
+        // CRM Integration - Non-blocking
+        (async () => {
+          try {
+            const crmPayload = {
+              company_id: ENV.crm?.companyId || 'b3f9a7c2-f20e-4e12-bc72-a75450240b98',
+              board_id: ENV.crm?.boardId || 'becd6fb7-74a6-4517-b60e-4be31d9942c3',
+              column_id: ENV.crm?.columnId || 'fbfa2479-c495-4a37-8d84-9c1109ddafc5',
+              name: leadData.fullName.trim(),
+              phone: `${leadData.countryCode}${leadData.phone}`,
+              email: leadData.email,
+              title: leadData.fullName.trim(),
+              amount: `${basePrice}.00`, // Format as "180.00"
+              obs: `Lead interessado no produto ${eventName} - Lisboa 2025`,
+              contact_tags: [
+                `${eventName} - Lisboa 2025`,
+                'Lead'
+              ]
+            };
 
+            const crmResponse = await fetch(`${ENV.urls.base}/.netlify/functions/crm-integration`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(crmPayload)
+            });
+
+            if (crmResponse.ok) {
+              const result = await crmResponse.json() as { crm?: { success?: boolean } };
+              logger.info('CRM integration successful', {
+                leadId: this.leadId,
+                crmSuccess: result.crm?.success
+              });
+            } else {
+              logger.warn('CRM integration returned error status', {
+                status: crmResponse.status,
+                leadId: this.leadId
+              });
+            }
+          } catch (crmError) {
+            logger.warn('CRM integration failed (non-blocking)', {
+              error: crmError instanceof Error ? crmError.message : 'Unknown error',
+              leadId: this.leadId,
+              email: leadData.email
+            });
+          }
+        })()
+      ];
+
+      // Don't await background API calls - let them complete in parallel
+      Promise.all(backgroundAPIPromises).catch(() => {
+        logger.debug('Background API calls completed with some errors (non-blocking)');
+      });
+
+      // Wait for Stripe initialization to complete before transitioning
+      await stripeInitPromise;
+
+      // Transition to step 2 immediately after Stripe is ready
       this.setStep(2);
-
-      // Initialize Stripe if not already loaded
-      if (!this.stripeLoaded) {
-        await this.initializeStripe();
-      }
 
       // Initialize Stripe Elements for payment form
       this.initializePaymentElement();
@@ -896,6 +860,7 @@ export const Checkout: CheckoutSectionComponent = {
       }).catch(() => {
         logger.debug('Lead submission analytics tracking unavailable');
       });
+
     } catch (error: unknown) {
       logger.error('Lead submission error:', error);
       
