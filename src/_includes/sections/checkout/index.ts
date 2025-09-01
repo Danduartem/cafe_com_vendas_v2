@@ -36,7 +36,6 @@ import { isValidEmail, isValidPhone } from '../../../utils/validation.js';
 import { 
   getEventData
 } from '../../../utils/event-tracking.js';
-// Type imports removed - using plain object for MailerLite request
 
 // 🎯 Get centralized pricing data - SINGLE SOURCE OF TRUTH
 const site = siteData();
@@ -56,8 +55,6 @@ interface PaymentIntentResponse {
   crm_deal_id?: string;
   metadata_keys: string[];
 }
-
-// Removed unused interface to fix TypeScript warning
 
 interface PaymentErrorResponse {
   error: string;
@@ -253,8 +250,7 @@ export const Checkout: CheckoutSectionComponent = {
       }
     });
 
-    // 🚀 OPTIMIZATION: Preload Stripe.js immediately when modal opens
-    // This eliminates 200-500ms delay later when transitioning to payment step
+    // Preload Stripe.js immediately when modal opens
     this.preloadStripe().catch((error) => {
       logger.warn('Stripe preloading failed, will fallback to lazy loading:', error);
     });
@@ -346,7 +342,7 @@ export const Checkout: CheckoutSectionComponent = {
       return Promise.resolve(this.stripe);
     }
 
-    // Enhanced error handling following Context7 patterns
+    // Enhanced error handling
     try {
       this.stripeLoadPromise = loadStripe(ENV.stripe.publishableKey);
       this.stripe = await this.stripeLoadPromise;
@@ -360,7 +356,7 @@ export const Checkout: CheckoutSectionComponent = {
     } catch (error) {
       this.stripeLoadPromise = null;
       
-      // Enhanced error context for debugging
+      // Enhanced error context
       const errorMessage = error instanceof Error ? error.message : 'Unknown error during Stripe.js loading';
       logger.error('Stripe.js loading failed:', { error: errorMessage, publishableKey: ENV.stripe.publishableKey?.substring(0, 12) + '...' });
       
@@ -369,8 +365,7 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   async preloadStripe(): Promise<void> {
-    // 🚀 OPTIMIZATION: Preload Stripe.js without waiting for it to complete
-    // This starts the download early while user is interacting with step 1
+    // Preload Stripe.js without waiting for it to complete
     if (!this.stripeLoaded && !this.stripeLoadPromise) {
       
       if (!ENV.stripe.publishableKey) {
@@ -380,8 +375,6 @@ export const Checkout: CheckoutSectionComponent = {
 
       // Start loading Stripe but don't await - let it load in background
       this.stripeLoadPromise = loadStripe(ENV.stripe.publishableKey);
-      
-      // Optionally await to ensure it's loaded (non-blocking for modal open)
       try {
         this.stripe = await this.stripeLoadPromise;
         this.stripeLoaded = true;
@@ -598,7 +591,6 @@ export const Checkout: CheckoutSectionComponent = {
   async handleLeadSubmit(event: Event): Promise<void> {
     event.preventDefault();
     
-    // Debug: Log method entry
     logger.info('handleLeadSubmit method called');
 
     const form = event.target as HTMLFormElement;
@@ -666,10 +658,10 @@ export const Checkout: CheckoutSectionComponent = {
       if (submitBtn) (submitBtn as HTMLButtonElement).disabled = true;
       if (submitSpinner) submitSpinner.classList.remove('hidden');
 
-      // PERFORMANCE OPTIMIZATION: Create PaymentIntent first for server validation
+      // Create PaymentIntent first for server validation
       await this.validateAndCreatePaymentIntent();
 
-      // PERFORMANCE OPTIMIZATION: Initialize Stripe Elements early while APIs run in background
+      // Initialize Stripe Elements early while APIs run in background
       const stripeInitPromise = (async () => {
         if (!this.stripeLoaded) {
           await this.initializeStripe();
@@ -687,7 +679,7 @@ export const Checkout: CheckoutSectionComponent = {
         sessionDuration: 0
       };
 
-      // PERFORMANCE OPTIMIZATION: Run MailerLite and CRM in parallel (non-blocking)
+      // Run MailerLite and CRM in parallel (non-blocking)
       const backgroundAPIPromises = [
         // MailerLite API call
         (async () => {
@@ -903,11 +895,9 @@ export const Checkout: CheckoutSectionComponent = {
     try {
       if (payBtn) (payBtn as HTMLButtonElement).disabled = true;
       if (payBtnText) {
-        payBtnText.textContent = 'A processar pagamento...'; // Portuguese European form
-        // Ensure text is visible by explicitly setting opacity and display
+        payBtnText.textContent = 'A processar pagamento...';
         payBtnText.style.opacity = '1';
         payBtnText.style.display = 'inline';
-        logger.debug('Payment button text changed to:', payBtnText.textContent);
       }
       if (payBtnSpinner) payBtnSpinner.classList.remove('hidden');
 
@@ -931,17 +921,13 @@ export const Checkout: CheckoutSectionComponent = {
       const { error, paymentIntent } = confirmationResult;
 
       if (error) {
-        // Enhanced error handling with Context7 patterns
         const errorMessage = this.translateStripeError(error.message || 'Erro no pagamento');
         this.showError('payError', errorMessage);
 
-        // Enhanced error logging with more context
         logger.error('Stripe payment confirmation failed:', {
           errorType: error.type,
           errorCode: error.code,
-          errorMessage: error.message,
-          leadId: this.leadId,
-          paymentMethodTypes: paymentIntent ? [] : undefined
+          leadId: this.leadId
         });
 
         // Track payment error with enhanced data
@@ -961,12 +947,9 @@ export const Checkout: CheckoutSectionComponent = {
         // Payment succeeded without redirect (no 3DS required)
         this.setStep('success');
 
-        // Enhanced success logging
         logger.info('Payment completed successfully:', {
           paymentIntentId: paymentIntent.id,
-          leadId: this.leadId,
-          amount: basePrice,
-          currency: 'EUR'
+          leadId: this.leadId
         });
 
         // Track payment success immediately since we know it succeeded
@@ -992,18 +975,13 @@ export const Checkout: CheckoutSectionComponent = {
         const paymentMethodTypes = (paymentIntent as { payment_method_types?: string[] }).payment_method_types;
         const paymentMethod = paymentMethodTypes?.[0] || 'unknown';
         
-        logger.info('Payment processing initiated', {
-          paymentMethod,
-          paymentIntentId: paymentIntent.id,
-          hasNextAction: !!paymentIntent.next_action,
-          nextActionType: paymentIntent.next_action?.type
-        });
+        logger.info('Payment processing initiated', { paymentMethod, paymentIntentId: paymentIntent.id });
         
         // For Multibanco, display voucher details in our modal following Stripe best practices
         if (paymentMethod === 'multibanco' || paymentIntent.next_action?.type === 'multibanco_display_details') {
-          // Add a visual indicator that we're transitioning to voucher display
+          // Update button text for Multibanco generation
           if (payBtnText) {
-            payBtnText.textContent = 'A gerar referência Multibanco...'; // Portuguese European progressive form
+            payBtnText.textContent = 'A gerar referência Multibanco...';
           }
           
           // Small delay to ensure payment step cleanup before showing voucher
@@ -1014,7 +992,7 @@ export const Checkout: CheckoutSectionComponent = {
             // Display Multibanco voucher details using the dedicated method
             this.showMultibancoInstructions(paymentIntent);
             
-            logger.info('Multibanco payment initiated - displaying voucher details in checkout modal');
+            logger.info('Multibanco payment initiated');
           }, 200);
         } else {
           // For other async methods, show success state in our modal
@@ -1040,8 +1018,8 @@ export const Checkout: CheckoutSectionComponent = {
           logger.debug('Payment processing analytics tracking unavailable');
         });
 
-        // Enhanced redirect logic with better URL parameter handling
-        // @ts-expect-error - Complex Stripe response type handling
+        // Handle async payment redirect
+        // @ts-expect-error - Stripe PaymentIntent type compatibility
         this.handleAsyncPaymentRedirect(paymentIntent, paymentMethod || 'unknown');
       } else {
         // Payment requires additional action (3DS, SEPA redirect, etc.)
@@ -1056,10 +1034,8 @@ export const Checkout: CheckoutSectionComponent = {
       if (payBtn) (payBtn as HTMLButtonElement).disabled = false;
       if (payBtnText) {
         payBtnText.textContent = originalText;
-        // Ensure text remains visible after reset
         payBtnText.style.opacity = '1';
         payBtnText.style.display = 'inline';
-        logger.debug('Payment button text restored to:', payBtnText.textContent);
       }
       if (payBtnSpinner) payBtnSpinner.classList.add('hidden');
     }
@@ -1237,20 +1213,20 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   translateStripeError(message: string): string {
-    // Enhanced error translation for Portuguese market following Context7 patterns
+    // Error translation for Portuguese market
     const translations: Record<string, string> = {
-      // Card errors - Portuguese European localization
+      // Card errors
       'Your card was declined.': 'O seu cartão foi recusado. Experimente outro método de pagamento ou use Multibanco.',
       'Your card has insufficient funds.': 'Saldo insuficiente no cartão. Verifique o seu limite ou use Multibanco.',
       'Your card has expired.': 'Cartão expirado. Use outro cartão ou escolha Multibanco.',
       'Your card number is incorrect.': 'Número do cartão incorreto. Verifique os dados ou use Multibanco.',
       'Your card\'s security code is incorrect.': 'Código de segurança incorreto. Confirme o CVV.',
       
-      // Multibanco specific errors (Portugal's preferred payment method)
+      // Multibanco specific errors
       'Multibanco payment failed.': 'Pagamento via Multibanco falhou. Tente gerar uma nova referência.',
       'Invalid Multibanco reference.': 'Referência Multibanco inválida. Contacte o nosso suporte.',
       
-      // SEPA specific errors (European context)
+      // SEPA specific errors
       'Your bank account details are incorrect.': 'Os dados da conta bancária estão incorretos.',
       'SEPA payment requires additional verification.': 'Pagamento SEPA requer verificação adicional.',
       
@@ -1262,36 +1238,30 @@ export const Checkout: CheckoutSectionComponent = {
       'Network error': 'Erro de conexão. Verifique sua internet e tente novamente.',
       'API error': 'Erro temporário no sistema. Tente novamente em instantes.',
       
-      // Payment method specific - Portuguese market context
+      // Payment method specific errors
       'Your payment method is not available.': 'Este método de pagamento não está disponível. Recomendamos Multibanco - é seguro e instantâneo.',
       'Payment declined by issuer.': 'Pagamento recusado pelo banco emissor. O Multibanco pode ser uma alternativa.',
       'Transaction limit exceeded.': 'Limite de transação excedido. O Multibanco permite valores até €20.000.',
       
-      // General fallbacks - European Portuguese tone
+      // General fallbacks
       'Something went wrong.': 'Algo correu mal. Por favor, tente novamente.',
       'Unable to process payment.': 'Não foi possível processar o pagamento. Experimente outro método ou contacte-nos.'
     };
 
-    // Return translated message or fallback with Portuguese customer service tone
+    // Return translated message or fallback
     return translations[message] || `Erro: ${message}. Se o problema persistir, contacte-nos através do email suporte@cafecomvendas.com.`;
   },
 
   handleAsyncPaymentRedirect(paymentIntent: unknown, paymentMethod: string): void {
-    // Enhanced redirect logic with better error handling and state management
-    // Validate payment intent and get safe values
+    // Handle redirect for async payments
     const paymentIntentId = getPaymentIntentId(paymentIntent);
      
-    // @ts-expect-error - Safe unknown parameter handling with type guards
+    // @ts-expect-error - PaymentIntent type compatibility
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const redirectDelay = this.getRedirectDelay(paymentMethod, paymentIntent);
     
      
-    logger.info('Scheduling redirect for async payment', {
-      paymentMethod,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      redirectDelay,
-      paymentIntentId
-    });
+    logger.info('Scheduling redirect for async payment', { paymentMethod, paymentIntentId });
     
     // Clear any existing timeout to prevent conflicts
     if (this.redirectTimeoutId) {
@@ -1303,8 +1273,7 @@ export const Checkout: CheckoutSectionComponent = {
     
     this.redirectTimeoutId = window.setTimeout(() => {
       try {
-         
-        // @ts-expect-error - Safe unknown parameter handling with type guards  
+        // @ts-expect-error - PaymentIntent type compatibility
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const redirectUrl = this.buildRedirectUrl(paymentIntent, paymentMethod);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -1331,8 +1300,7 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   getRedirectDelay(paymentMethod: string, paymentIntent: unknown): number {
-    // Determine appropriate redirect delay based on payment method and user needs
-    // Safe type checking for payment intent
+    // Determine appropriate redirect delay based on payment method
     const isMultibancoPayment = paymentMethod === 'multibanco' || 
       (isStripePaymentIntent(paymentIntent) && hasMultibancoDetails(paymentIntent));
     
@@ -1343,7 +1311,6 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   buildRedirectUrl(paymentIntent: unknown, paymentMethod: string): string {
-    // Safe extraction of payment intent properties
     const paymentId = getPaymentIntentId(paymentIntent);
     const status = getPaymentIntentStatus(paymentIntent);
     
@@ -1396,17 +1363,11 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   showMultibancoInstructions(paymentIntent: unknown): void {
-    logger.info('Displaying Multibanco instructions in modal', {
-      paymentIntentId: getPaymentIntentId(paymentIntent),
-      hasNextAction: isStripePaymentIntent(paymentIntent) && paymentIntent.next_action !== undefined,
-      nextActionType: isStripePaymentIntent(paymentIntent) ? paymentIntent.next_action?.type : undefined
-    });
     
-    // Hide competing elements to prevent stacking context issues
+    // Hide modal header to prevent covering instructions
     const modalHeader = document.querySelector('#checkoutModal header');
     if (modalHeader) {
       (modalHeader as HTMLElement).style.display = 'none';
-      logger.debug('Modal header hidden to prevent covering instructions');
     }
     
     // Update success message for Multibanco - Portuguese market optimization
@@ -1487,17 +1448,10 @@ export const Checkout: CheckoutSectionComponent = {
             }
           }
           
-          logger.info('Multibanco voucher details populated', {
-            entity: details.entity,
-            reference: details.reference,
-            amount: getPaymentIntentAmount(paymentIntent)
-          });
+          logger.info('Multibanco voucher details populated');
         }
       } else {
-        logger.warn('Multibanco details not available in next_action', {
-          paymentIntentId: getPaymentIntentId(paymentIntent),
-          hasPaymentIntent: isStripePaymentIntent(paymentIntent)
-        });
+        logger.warn('Multibanco details not available in next_action');
       }
       
       // Ensure instructions are visible and scroll into view
@@ -1506,14 +1460,8 @@ export const Checkout: CheckoutSectionComponent = {
           behavior: 'smooth', 
           block: 'start' 
         });
-        logger.debug('Multibanco instructions scrolled into view');
       });
     }
-    
-    logger.debug('Multibanco instructions displayed', {
-      paymentIntentId: getPaymentIntentId(paymentIntent),
-      status: getPaymentIntentStatus(paymentIntent)
-    });
   },
 
   /**
@@ -1776,8 +1724,7 @@ export const Checkout: CheckoutSectionComponent = {
         // Generate fresh idempotency key for each payment attempt to avoid conflicts during testing
         this.idempotencyKey = this.generateIdempotencyKey();
         
-        // === PHASE 1 ENHANCEMENT: Enhanced Payment Intent Payload ===
-        // Get the event data that was generated earlier in handleLeadSubmit
+        // Get the event data that was generated earlier
         const completeEventData = getEventData({
           marketing_consent: true, // Assume consent for now, Phase 2 will add consent modal
           consent_method: 'implied'
@@ -1787,7 +1734,7 @@ export const Checkout: CheckoutSectionComponent = {
         const userEnvironment = getUserEnvironment();
         // Note: attributionData and behaviorData embedded in completeEventData below
 
-        // Enhanced payload matching EnhancedPaymentIntentPayload interface
+        // Enhanced payload for payment intent creation
         const requestPayload = {
           // Phase 1 required fields
           event_id: completeEventData.context.event_id,
@@ -1876,11 +1823,9 @@ export const Checkout: CheckoutSectionComponent = {
         // Handle clean enhanced response format
         this.clientSecret = data.client_secret;
         
-        logger.info('Enhanced payment intent created successfully', { 
+        logger.info('Payment intent created successfully', { 
           eventId: data.event_id,
-          paymentIntentId: data.payment_intent_id,
-          crmContactId: data.crm_contact_id,
-          metadataFields: data.metadata_keys?.length || 0
+          paymentIntentId: data.payment_intent_id
         });
       }
     } catch (error) {
