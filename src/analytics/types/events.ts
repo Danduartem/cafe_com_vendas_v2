@@ -1,4 +1,10 @@
 /**
+ * Analytics Event Type Definitions
+ * Consolidated from src/types/components/analytics.ts following DDD principles
+ * All analytics-related event interfaces in one domain-specific location
+ */
+
+/**
  * Base analytics event interface
  */
 export interface AnalyticsEvent {
@@ -66,6 +72,17 @@ export interface FormSubmissionEvent extends AnalyticsEvent {
   form_name: string;
   form_method: 'POST' | 'GET';
   form_action?: string;
+}
+
+/**
+ * Section view tracking event (GA4 2025 compliant)
+ */
+export interface SectionViewEvent extends AnalyticsEvent {
+  event: 'section_view';
+  section_name: string;
+  section_id: string;
+  percent_visible?: number;
+  timestamp: string;
 }
 
 /**

@@ -42,7 +42,9 @@ document.addEventListener('DOMContentLoaded', (): void => {
   window.addEventListener('orientationchange', setVhVariable);
   
   // Initialize main application
-  CafeComVendas.init();
+  CafeComVendas.init().catch(error => {
+    console.error('Failed to initialize application:', error);
+  });
 });
 
 /**

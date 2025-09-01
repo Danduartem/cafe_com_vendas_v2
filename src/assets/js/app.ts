@@ -5,8 +5,7 @@
 
 import { CONFIG } from './config/constants.js';
 import { state, StateManager } from './core/state.js';
-import { Analytics } from './core/analytics.js';
-import { ScrollTracker } from './utils/index.js';
+import analytics, { initializeAnalytics, AnalyticsHelpers } from '../../analytics/index.js';
 import type {
   ComponentRegistration,
   ComponentHealthStatus,
@@ -14,9 +13,8 @@ import type {
 } from '../../types/components/base.js';
 import type {
   AppInitializedEvent,
-  ComponentsInitializedEvent,
-  AnalyticsEvent
-} from '../../types/components/analytics.js';
+  ComponentsInitializedEvent
+} from '../../analytics/types/events.js';
 import type { AppState } from '../../types/components/state.js';
 import type { Constants } from '../../types/components/config.js';
 
@@ -48,7 +46,7 @@ interface CafeComVendasInterface {
     trackError: (type: string, error: Error, context?: Record<string, unknown>) => void;
   };
   components: ComponentRegistration[] | undefined;
-  init(): void;
+  init(): Promise<void>;
   setupGlobalErrorHandling(): void;
   initializeComponents(): void;
   getComponentCount(): number;
@@ -75,10 +73,10 @@ export const CafeComVendas: CafeComVendasInterface = {
   // Expose Analytics module with compatible interface
   Analytics: {
     track: (event: string, data?: Record<string, unknown>) => {
-      // Type-safe wrapper for analytics tracking
-      Analytics.track(event, data as Omit<AnalyticsEvent, 'event'>);
+      // Type-safe wrapper for analytics tracking with proper type assertion
+      analytics.track(event as any, data as any);
     },
-    trackError: Analytics.trackError.bind(Analytics)
+    trackError: AnalyticsHelpers.trackError
   },
 
   components: undefined,
@@ -86,7 +84,7 @@ export const CafeComVendas: CafeComVendasInterface = {
   /**
    * Initialize all components and functionality with enhanced error handling
    */
-  init(): void {
+  async init(): Promise<void> {
     if (state.isInitialized) {
       console.warn('CafeComVendas already initialized');
       return;
@@ -95,16 +93,12 @@ export const CafeComVendas: CafeComVendasInterface = {
     try {
       // Initializing Café com Vendas landing page...
 
-      // Set up global error handling
-      this.setupGlobalErrorHandling();
+      // Global error handling is now set up by the error plugin
 
       // CSS now loaded directly in HTML for reliability
 
-      // Initialize analytics first
-      Analytics.initPerformanceTracking();
-
-      // Initialize scroll depth tracking
-      ScrollTracker.init();
+      // Initialize unified analytics system
+      await initializeAnalytics();
 
       // Initialize all components
       this.initializeComponents();
@@ -113,8 +107,7 @@ export const CafeComVendas: CafeComVendasInterface = {
       // Café com Vendas initialized successfully
 
       // Track page view (standard GA4 event for E2E tests)
-      Analytics.track('page_view', {
-        event_category: 'Page',
+      analytics.page({
         page_title: document.title,
         page_location: window.location.href
       });
@@ -125,10 +118,10 @@ export const CafeComVendas: CafeComVendasInterface = {
         event_category: 'Application',
         components_count: this.getComponentCount()
       };
-      Analytics.track('app_initialized', initEvent);
+      analytics.track('app_initialized', initEvent);
 
     } catch (error) {
-      Analytics.trackError('app_initialization_failed', error as Error);
+      AnalyticsHelpers.trackError('app_initialization_failed', error as Error);
       console.error('Failed to initialize Café com Vendas:', error);
     }
   },
@@ -151,7 +144,7 @@ export const CafeComVendas: CafeComVendasInterface = {
         colno: undefined,
         component_name: undefined
       };
-      Analytics.trackError('unhandled_promise_rejection', new Error(errorContext.message), errorContext);
+      AnalyticsHelpers.trackError('unhandled_promise_rejection', new Error(errorContext.message), errorContext);
     });
 
     // Handle JavaScript errors
@@ -168,7 +161,7 @@ export const CafeComVendas: CafeComVendasInterface = {
         stack: errorStack,
         component_name: undefined
       };
-      Analytics.trackError('global_javascript_error', errorToPass, errorContext);
+      AnalyticsHelpers.trackError('global_javascript_error', errorToPass, errorContext);
     });
   },
 
@@ -212,7 +205,7 @@ export const CafeComVendas: CafeComVendasInterface = {
         }
       } catch (error) {
         console.error(`✗ Failed to initialize ${name} component:`, error);
-        Analytics.trackError('component_initialization_failed', error as Error, {
+        AnalyticsHelpers.trackError('component_initialization_failed', error as Error, {
           component_name: name
         });
         failureCount++;
@@ -227,7 +220,7 @@ export const CafeComVendas: CafeComVendasInterface = {
       failure_count: failureCount,
       total_components: components.length
     };
-    Analytics.track('components_initialized', componentsEvent);
+    analytics.track('components_initialized', componentsEvent);
 
     this.components = components;
   },
