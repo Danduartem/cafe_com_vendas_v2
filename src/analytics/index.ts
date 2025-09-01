@@ -1,10 +1,6 @@
 /**
- * Unified Analytics System for Café com Vendas
- * Modern plugin-based architecture following industry best practices (2025)
- * 
- * Replaces both:
- * - src/assets/js/core/analytics.ts (Core Web Vitals, error tracking)
- * - src/components/ui/analytics/index.ts (component tracking)
+ * Unified Analytics System
+ * Plugin-based architecture with GTM, performance tracking, and error handling
  */
 
 import { createAnalytics } from './core/analytics.js';
@@ -22,10 +18,7 @@ import type {
   ErrorPluginMethods
 } from './types/index.js';
 
-/**
- * Main Analytics Instance
- * Configured with all necessary plugins
- */
+// Main analytics instance with all plugins configured
 export const analytics = createAnalytics({
   app: 'cafe-com-vendas',
   version: 1,
@@ -65,10 +58,7 @@ export const analytics = createAnalytics({
   ]
 });
 
-/**
- * Initialize analytics and setup global error handling
- * Call this once in your app initialization
- */
+// Initialize analytics and setup global error handling
 export async function initializeAnalytics(): Promise<void> {
   try {
     await analytics.init();
@@ -95,14 +85,8 @@ export async function initializeAnalytics(): Promise<void> {
   }
 }
 
-/**
- * Convenience methods for common tracking patterns
- * Maintains backward compatibility while using modern plugin architecture
- */
+// Convenience methods for common tracking patterns
 export const AnalyticsHelpers = {
-  /**
-   * Track section view - modern IntersectionObserver-based implementation
-   */
   initSectionTracking(sectionName: string, threshold?: number): void {
     const plugin = analytics.getPlugin('section-tracking');
     if (plugin?.methods && 'initSectionTracking' in plugin.methods) {
@@ -110,9 +94,6 @@ export const AnalyticsHelpers = {
     }
   },
 
-  /**
-   * Track CTA clicks with GA4-compliant event structure
-   */
   trackCTAClick(location: string, data?: Record<string, unknown>): void {
     const plugin = analytics.getPlugin('gtm');
     if (plugin?.methods && 'trackCTAClick' in plugin.methods) {
@@ -120,9 +101,6 @@ export const AnalyticsHelpers = {
     }
   },
 
-  /**
-   * Track conversions with enhanced event tracking
-   */
   trackConversion(event: string, data: Record<string, unknown>): void {
     const plugin = analytics.getPlugin('gtm');
     if (plugin?.methods && 'trackConversion' in plugin.methods) {
@@ -130,9 +108,6 @@ export const AnalyticsHelpers = {
     }
   },
 
-  /**
-   * Track FAQ interactions and accordion engagement
-   */
   trackFAQ(itemNumber: string, isOpen: boolean, question: string): void {
     const plugin = analytics.getPlugin('gtm');
     if (plugin?.methods && 'trackFAQ' in plugin.methods) {
@@ -140,9 +115,6 @@ export const AnalyticsHelpers = {
     }
   },
 
-  /**
-   * Track errors with context and deduplication
-   */
   trackError(errorType: string, error: Error, context?: Record<string, unknown>): void {
     const plugin = analytics.getPlugin('error');
     if (plugin?.methods && 'trackError' in plugin.methods) {
@@ -150,13 +122,38 @@ export const AnalyticsHelpers = {
     }
   },
 
-  /**
-   * Track section engagement
-   */
   trackSectionEngagement(sectionName: string, action: string, data?: Record<string, unknown>): void {
     const plugin = analytics.getPlugin('section-tracking');
     if (plugin?.methods && 'trackSectionEngagement' in plugin.methods) {
       (plugin.methods as unknown as SectionTrackingPluginMethods).trackSectionEngagement(sectionName, action, data);
+    }
+  },
+
+  trackFAQMeaningfulEngagement(toggleCount: number, data?: Record<string, unknown>): void {
+    const plugin = analytics.getPlugin('gtm');
+    if (plugin?.methods && 'trackFAQMeaningfulEngagement' in plugin.methods) {
+      (plugin.methods as unknown as GTMPluginMethods).trackFAQMeaningfulEngagement(toggleCount, data);
+    }
+  },
+
+  trackTestimonialSlide(testimonialId: string, position: number, data?: Record<string, unknown>): void {
+    const plugin = analytics.getPlugin('gtm');
+    if (plugin?.methods && 'trackTestimonialSlide' in plugin.methods) {
+      (plugin.methods as unknown as GTMPluginMethods).trackTestimonialSlide(testimonialId, position, data);
+    }
+  },
+
+  trackWhatsAppClick(linkUrl: string, linkText: string, location: string, data?: Record<string, unknown>): void {
+    const plugin = analytics.getPlugin('gtm');
+    if (plugin?.methods && 'trackWhatsAppClick' in plugin.methods) {
+      (plugin.methods as unknown as GTMPluginMethods).trackWhatsAppClick(linkUrl, linkText, location, data);
+    }
+  },
+
+  trackVideoProgress(videoTitle: string, percentPlayed: number, data?: Record<string, unknown>): void {
+    const plugin = analytics.getPlugin('gtm');
+    if (plugin?.methods && 'trackVideoProgress' in plugin.methods) {
+      (plugin.methods as unknown as GTMPluginMethods).trackVideoProgress(videoTitle, percentPlayed, data);
     }
   }
 };

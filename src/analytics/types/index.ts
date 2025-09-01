@@ -5,7 +5,7 @@
 
 // Import all event types from local domain
 export * from './events.js';
-import type { AnalyticsEvent } from './events.js';
+import type { AnalyticsEvent, GTMEventPayload } from './events.js';
 
 /**
  * Analytics configuration
@@ -125,6 +125,13 @@ export interface GTMPluginMethods {
   trackCTAClick(location: string, data?: Record<string, unknown>): void;
   trackConversion(event: string, data: Record<string, unknown>): void;
   trackFAQ(itemNumber: string, isOpen: boolean, question: string): void;
+  trackFAQMeaningfulEngagement(toggleCount: number, data?: Record<string, unknown>): void;
+  trackTestimonialSlide(testimonialId: string, position: number, data?: Record<string, unknown>): void;
+  trackWhatsAppClick(linkUrl: string, linkText: string, location: string, data?: Record<string, unknown>): void;
+  trackVideoProgress(videoTitle: string, percentPlayed: number, data?: Record<string, unknown>): void;
+  pushToDataLayer(data: GTMEventPayload): void;
+  getPluginState(): Record<string, unknown>;
+  resetState(): void;
 }
 
 export interface SectionTrackingPluginMethods {
