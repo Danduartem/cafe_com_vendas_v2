@@ -2,8 +2,8 @@
   "id": "social-proof",
   "enabled": true,
   "copy": {
-    "headline": "Eu poderia passar horas falando sobre o Café com Vendas. Mas sabe de uma coisa?",
-    "subhead": "Vou deixar meus alunos falarem por mim.",
+    "headline": "Eu poderia passar horas falando sobre o Café com Vendas…",
+    "subhead": "Mas sabe de uma coisa? Vou deixar meus alunos falarem por mim.",
     "footer_text": "O próximo depoimento será o seu.",
     "cta": {
       "label": "Eu quero ser livre",

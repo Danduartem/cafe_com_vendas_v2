@@ -3,8 +3,8 @@
   "enabled": true,
   "copy": {
     "headline_part1": "Preço é o que você paga, ",
-    "headline_part2": "Valor é o que você leva",
-    "subhead": "Isto é mais do que um evento: é um ponto de viragem.",
+    "headline_part2": "VALOR é o que você leva",
+    "subhead": "Quanto valeria ter um sistema comprovado que realmente funciona para fundadores ocupados como você?",
     "description": "Um dia inteiro de imersão estratégica, material de apoio prático, almoço de networking e acesso a um plano de ação de 90 dias. Ambiente exclusivo para apenas 20 empreendedoras",
     "pricing": {
       "first_lot": {
@@ -27,25 +27,26 @@
       }
     },
     "includes": [
-      "Plano de ação claro e aplicável",
-      "Acesso aos 5 pilares da mentoria Seja Livre",
-      "Cronograma de 90 dias",
-      "Material de apoio (Trello)",
-      "Acesso com desconto ao treinamento Expresso",
-      "7 horas de conteúdo prático",
-      "Roundtable de networking e cocriação",
-      "Ambiente intimista na Mesa Corrida",
-      "Fotos profissionais (instagramáveis)",
-      "Suporte via WhatsApp após o evento",
-      "Clube do livro após o evento",
-      "Almoço com sobremesa e bebidas",
-      "Coquetel especial de encerramento"
+      "7 horas de conteúdo prático para você colocar a mão na massa, destravar suas vendas, tirar sua empresa das costas e SER LIVRE",
+      "Plano prático que foi testado e validado em vários setores e empresas",
+      "Acesso aos 5 pilares da mentoria SEJA LIVRE",
+      "Almoço com sobremesa e bebidas exclusivas",
+      "Coquetel especial de encerramento com lanches, doces e bebidas exclusivas",
+      "Cronograma de atividades de 90 dias para reestruturar sua empresa e vender mais",
+      "Ambiente intimista na histórica Mesa Corrida, um casarão secular de mais de 150 anos, envolto por um jardim encantador",
+      "Acesso com desconto exclusivo ao Expresso (meu treinamento que transforma sua empresa em um verdadeiro caixa eletrônico)",
+      "Acesso ao material de apoio no Trello",
+      "Networking poderoso para você destravar sua vendas em tempo real",
+      "Roundtable para trocar experiências, debater temas e cocriar soluções",
+      "Suporte humanizado via WhatsApp após o evento",
+      "Pingente delicado banhado a ouro; (somente para as 8 primeiras)",
+      "Assento VIP no evento; (somente para as 8 primeiras)"
     ],
     "guarantee": {
       "type": "performance",
       "claim": "Aumento de pelo menos 20% nas vendas",
       "period": "90 dias",
-      "policy": "Se aplicar o método e todas as atividades propostas e não aumentar as vendas em pelo menos 20%, reembolsamos o valor do convite."
+      "policy": "GARANTIA EXTRA: Se você comprovar que aplicou o método do Café com Vendas e fez todas as atividades propostas e não tiver aumentado suas vendas em pelo menos 20%, devolvemos o seu valor investido em seu convite."
     },
     "cta": {
       "label": "Garantir minha vaga no primeiro lote",
