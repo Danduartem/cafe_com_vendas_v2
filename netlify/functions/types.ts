@@ -345,6 +345,54 @@ export interface APIError extends Error {
   type?: string;
 }
 
+// CRM error response types
+export interface CRMExistingContact {
+  contact?: {
+    id?: string;
+  };
+}
+
+export interface CRMErrorResponse {
+  existing_card?: CRMExistingContact;
+  message?: string;
+  error?: string;
+}
+
+// Type guard for CRM error responses
+export function isCRMErrorResponse(obj: unknown): obj is CRMErrorResponse {
+  return typeof obj === 'object' && obj !== null;
+}
+
+// Type guard for existing contact data
+export function hasExistingContactId(obj: unknown): obj is { existing_card: { contact: { id: string } } } {
+  if (typeof obj !== 'object' || obj === null) {
+    return false;
+  }
+
+  const record = obj as Record<string, unknown>;
+  if (!('existing_card' in record)) {
+    return false;
+  }
+
+  const existingCard = record.existing_card;
+  if (typeof existingCard !== 'object' || existingCard === null) {
+    return false;
+  }
+
+  const existingCardRecord = existingCard as Record<string, unknown>;
+  if (!('contact' in existingCardRecord)) {
+    return false;
+  }
+
+  const contact = existingCardRecord.contact;
+  if (typeof contact !== 'object' || contact === null) {
+    return false;
+  }
+
+  const contactRecord = contact as Record<string, unknown>;
+  return 'id' in contactRecord && typeof contactRecord.id === 'string';
+}
+
 // Webhook & integration interfaces
 
 // Enhanced payment metadata for event tracking

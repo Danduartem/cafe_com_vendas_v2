@@ -13,6 +13,7 @@ import type {
   CircuitBreakerStatus,
   UnvalidatedCRMRequest
 } from './crm-types';
+import { hasExistingContactId } from './types.js';
 
 // Environment configuration
 const CRM_CONFIG = {
@@ -352,14 +353,17 @@ async function sendToCRM(payload: CRMContactPayload): Promise<CRMResult> {
           
           // Try to extract existing contact ID from the error response
           try {
-            const errorData = JSON.parse(errorText);
-            const existingContactId = errorData.existing_card?.contact?.id;
-            return { 
-              success: true, 
-              contactId: existingContactId, 
-              reason: 'Contact already exists',
-              action: 'skipped'
-            };
+            const errorData: unknown = JSON.parse(errorText);
+            if (hasExistingContactId(errorData)) {
+              const existingContactId = errorData.existing_card.contact.id;
+              return { 
+                success: true, 
+                contactId: existingContactId, 
+                reason: 'Contact already exists',
+                action: 'skipped'
+              };
+            }
+            return { success: true, reason: 'Contact already exists', action: 'skipped' };
           } catch {
             return { success: true, reason: 'Contact already exists', action: 'skipped' };
           }

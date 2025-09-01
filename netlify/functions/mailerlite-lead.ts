@@ -15,6 +15,7 @@ import type {
   EventCustomFields,
   EventSubscriberData
 } from './types';
+import { hasExistingContactId } from './types.js';
 
 // Import enhanced tracking types for Phase 1
 import type {
@@ -454,14 +455,17 @@ async function sendToCRM(payload: EnhancedCRMPayload): Promise<CRMResult> {
         
         // Try to extract existing contact ID from the error response
         try {
-          const errorData = JSON.parse(errorText);
-          const existingContactId = errorData.existing_card?.contact?.id;
-          return { 
-            success: true, 
-            contactId: existingContactId, 
-            reason: 'Contact already exists',
-            action: 'skipped'
-          };
+          const errorData: unknown = JSON.parse(errorText);
+          if (hasExistingContactId(errorData)) {
+            const existingContactId = errorData.existing_card.contact.id;
+            return { 
+              success: true, 
+              contactId: existingContactId, 
+              reason: 'Contact already exists',
+              action: 'skipped'
+            };
+          }
+          return { success: true, reason: 'Contact already exists', action: 'skipped' };
         } catch {
           return { success: true, reason: 'Contact already exists', action: 'skipped' };
         }
