@@ -7,8 +7,8 @@
 ## 0) Scope
 
 * Flow: **open checkout → confirm (3DS when required) → success / friendly error**
-* Tech: Netlify Functions (`create-payment-intent`, `stripe-webhook`), Stripe test keys, GTM/GA4 mapping
-* Event canon: push **`payment_completed`** to `dataLayer` → GTM maps to GA4 **`purchase`**
+* Tech: Enhanced Netlify Functions (`create-payment-intent`, `stripe-webhook`, `server-gtm`), Stripe test keys, advanced GTM/GA4 integration with server-side tracking
+* Event canon: push **`payment_completed`** to `dataLayer` + server-side GTM tracking → GTM maps to GA4 **`purchase`** with enhanced attribution
 
 ---
 
@@ -70,11 +70,13 @@
     }
     ```
   * GTM maps **`payment_completed` → GA4 `purchase`**
-* **Backend**
+* **Enhanced Backend Processing**
 
-  * `payment_intent.succeeded` received by `stripe-webhook`
-  * For Multibanco: `checkout.session.async_payment_succeeded` received
-  * No unhandled errors in function logs
+  * `payment_intent.succeeded` received by `stripe-webhook` with CRM integration
+  * For Multibanco: `checkout.session.async_payment_succeeded` received with async processing
+  * Server-side GTM tracking via `server-gtm` function for accurate attribution
+  * CRM integration and lead enrichment via `crm-integration` function
+  * No unhandled errors in enhanced function logs (13 total functions)
 
 ---
 
@@ -85,34 +87,43 @@
 * **Payments**: intent shows `Succeeded` (or relevant failure)
 * **Developers → Webhooks**: deliveries to your endpoint are **2xx**
 
-### B) Local logs
+### B) Enhanced Function Logs
 
-* **Create PI** function prints request + amount (no secrets)
-* **Webhook** function logs `payment_intent.succeeded` with the PI id
+* **Create PI** function prints request + amount with enhanced metadata (no secrets)
+* **Webhook** function logs `payment_intent.succeeded` with PI id, CRM integration, and server-side tracking
+* **Server GTM** function logs conversion events sent to GTM Measurement Protocol
+* **CRM Integration** function logs lead enrichment and scoring updates
+* **Health Check** function monitors all payment system components
 
-### C) GTM / GA4
+### C) Enhanced Analytics Tracking
 
-* **GTM Preview**: event `payment_completed` fires with payload above
-* **GA4 Realtime**: event **`purchase`** appears with matching `transaction_id` and value
+* **GTM Preview**: event `payment_completed` fires with enhanced payload and attribution data
+* **GA4 Realtime**: event **`purchase`** appears with matching `transaction_id`, value, and enhanced attribution
+* **Server-side GTM**: Measurement Protocol events sent directly from backend for accurate tracking
+* **Analytics Dashboard**: Plugin-based analytics system captures conversion with full context
 
 ---
 
 ## 5) Success criteria (pass/fail)
 
-* ✅ 3DS flows complete; cancel shows recoverable UI
-* ✅ `payment_completed` fired once per successful purchase
-* ✅ GA4 `purchase` received with `transaction_id`, `value`, `currency`, `items`
-* ✅ Webhook processed `payment_intent.succeeded` with **2xx**
-* ✅ Mobile form is usable; no major CLS; no console errors
+* ✅ 3DS flows complete; cancel shows recoverable UI with enhanced error handling
+* ✅ `payment_completed` fired once per successful purchase with enhanced attribution data
+* ✅ GA4 `purchase` received with `transaction_id`, `value`, `currency`, `items`, and attribution context
+* ✅ Webhook processed `payment_intent.succeeded` with **2xx** including CRM integration and server-side tracking
+* ✅ Server-side GTM events sent successfully via Measurement Protocol
+* ✅ CRM integration completed with lead scoring and enrichment
+* ✅ Mobile form is usable; no major CLS; no console errors; admin dashboard shows metrics
 
 ---
 
 ## 6) Troubleshooting
 
-* **No `purchase` in GA4** → check GTM trigger for `payment_completed`; confirm GA4 event name is `purchase`
-* **Webhook 400/401** → verify `STRIPE_WEBHOOK_SECRET` and endpoint path in Netlify/Stripe settings
-* **3DS hangs** → ensure you’re in **Test mode** and using the correct 3DS card
-* **Duplicate analytics** → ensure the `payment_completed` push happens **after** confirmation and only once
+* **No `purchase` in GA4** → check GTM trigger for `payment_completed`; verify server-side GTM events; confirm GA4 event name is `purchase`
+* **Webhook 400/401** → verify `STRIPE_WEBHOOK_SECRET` and endpoint path; check enhanced function logs for CRM integration errors
+* **3DS hangs** → ensure you're in **Test mode** and using the correct 3DS card; check analytics error plugin for tracking issues
+* **Duplicate analytics** → ensure the `payment_completed` push happens **after** confirmation and only once; verify plugin-based system deduplication
+* **Server-side tracking issues** → check `server-gtm` function logs; verify GTM Measurement Protocol configuration
+* **CRM integration failures** → check `crm-integration` function logs; verify MailerLite API connectivity and credentials
 
 ---
 

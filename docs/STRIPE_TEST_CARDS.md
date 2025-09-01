@@ -39,7 +39,7 @@
 3. Complete the flow:
 
    * For **3DS** cards, approve or cancel the challenge to test both outcomes.
-   * On success, ensure we push `payment_completed` to `dataLayer` (GTM maps to GA4 `purchase`).
+   * On success, ensure we push `payment_completed` to `dataLayer` + server-side GTM tracking (enhanced plugin system maps to GA4 `purchase` with attribution).
 
 > Need the exact run‑sheet? See `docs/PAYMENT_TESTING_SUMMARY.md`.
 
@@ -77,7 +77,7 @@
 * **Generic decline** → `4000 0000 0000 0002`
   Expect a clear error message and a visible retry CTA.
 * **Insufficient funds** → `4000 0000 0000 9995`
-  Same handling as above; ensure analytics **does not** fire on failure.
+  Same handling as above; ensure analytics **does not** fire on failure (plugin system includes error tracking for debugging).
 
 > Keep failure handling **polite** and **actionable**. Do not surface raw Stripe error codes to users.
 

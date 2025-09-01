@@ -51,7 +51,7 @@ Act as an engineer in this repo. Favor **small, verifiable, type‑safe** diffs.
 * **Tailwind v4 only** (CSS‑first, `@theme`); **no inline styles/handlers**
 * **Design tokens** → generated CSS variables; no hardcoded colors/spacing
 * **Accessibility**: semantic HTML, visible focus, keyboard support; see `docs/SETUP.md`
-* **Analytics**: use typed helper → **`dataLayer`** (no raw `gtag()`); event canon: **`payment_completed` → GA4 `purchase`**
+* **Analytics**: use AnalyticsHelpers from plugin system → **`dataLayer`** + server-side GTM (no raw `gtag()`); event canon: **`payment_completed` → GA4 `purchase`** with enhanced attribution
 * Keep diffs small; prefer native/web APIs over heavy libs
 
 ### Ultra-Simple Import Standard (2025)
@@ -87,7 +87,7 @@ export { Animations } from './animations/index.js';
 * `npm run type-check && npm run lint && npm test` → all pass
 * UI/Perf touched → quick Lighthouse: Perf ≥ 90 (mobile), A11y ≥ 95  
   - **Use**: `npm run lighthouse -- https://your-url.com` (saves to `reports/` folder)
-* Analytics respected → **`payment_completed`** fires once on success; GTM maps to GA4 **`purchase`**
+* Analytics respected → **`payment_completed`** fires once on success with enhanced attribution; plugin system + server-side GTM maps to GA4 **`purchase`**
 
 ---
 

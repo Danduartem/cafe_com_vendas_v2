@@ -24,7 +24,7 @@ Premium landing page for an intimate business transformation event in Lisbon, de
 - **Payments**: Stripe 18.4.0 + Netlify Functions
 - **Email**: MailerLite API integration
 - **Testing**: Vitest 3.2.4 + Playwright 1.55.0
-- **Analytics**: Unified plugin-based system (GTM/GA4, Core Web Vitals, section tracking)
+- **Analytics**: Advanced plugin-based architecture with GTM, Performance, Section Tracking, Error Handling, and Scroll Tracking plugins
 - **Deployment**: Netlify (Functions + static hosting)
 
 ## 🚀 Quick Start
@@ -149,29 +149,103 @@ npm run netlify:dev  # Port 8888 (not 8080)
 src/
 ├── _data/              # JSON/TS data files
 │   ├── sections/       # Section content (hero, about, etc.)
-│   ├── site.ts         # Site metadata
-│   └── pages.ts        # Page configurations
+│   ├── site.ts         # Site metadata & centralized pricing
+│   ├── pages.ts        # Page configurations
+│   └── types.ts        # Data type definitions
 ├── _includes/          # Templates & components
-│   ├── sections/       # Section templates + logic
+│   ├── sections/       # Section templates + logic (co-located)
 │   └── partials/       # Reusable template parts
-├── analytics/          # Modern analytics system
-│   ├── core/           # Plugin-based analytics engine
-│   ├── plugins/        # GTM, performance, tracking plugins
-│   ├── types/          # TypeScript definitions
-│   └── index.ts        # Unified API & helpers
+├── admin/              # Admin dashboard system
+│   └── dashboard/      # Admin interface components
+├── analytics/          # Advanced plugin-based analytics system
+│   ├── core/           # Analytics engine with plugin architecture
+│   ├── plugins/        # GTM, Performance, Section, Error, Scroll plugins
+│   ├── types/          # TypeScript definitions & event schemas
+│   ├── utils/          # Debug utilities and helpers
+│   └── index.ts        # Unified API & AnalyticsHelpers
 ├── assets/             # Static assets
 │   ├── css/            # Tailwind CSS entry
-│   └── js/             # TypeScript app & utilities
+│   └── js/             # TypeScript app, config, and utilities
 ├── components/         # UI components
-│   └── ui/             # Accordion, animations, thank-you
+│   └── ui/             # Accordion, animations, thank-you modal
+├── types/              # Comprehensive TypeScript definitions
+│   ├── components/     # Component interfaces
+│   ├── data/           # Data type definitions
+│   ├── sections/       # Section-specific types
+│   └── global/         # Global type definitions
+├── utils/              # Utility functions
+│   ├── browser-data.ts # Enhanced tracking & attribution
+│   ├── event-tracking.ts # Event tracking utilities
+│   ├── monitoring.ts   # Performance monitoring
+│   ├── youtube.ts      # YouTube API integration
+│   └── validation.ts   # Form validation utilities
 └── pages/              # Page templates (privacy, terms, etc.)
 
-netlify/functions/      # Serverless functions
-├── create-payment-intent.ts
-├── mailerlite-lead.ts
-└── stripe-webhook.ts
+netlify/functions/      # Advanced serverless functions (13 total)
+├── create-payment-intent.ts   # Payment initialization
+├── stripe-webhook.ts          # Payment confirmation
+├── mailerlite-lead.ts         # Lead capture integration
+├── mailerlite-helpers.ts      # MailerLite utilities
+├── crm-integration.ts         # CRM system integration
+├── crm-types.ts              # CRM type definitions
+├── server-gtm.ts             # Server-side GTM tracking
+├── metrics-collection.ts      # Performance metrics
+├── health-check.ts           # System health monitoring
+├── dlq-handler.ts            # Dead letter queue processing
+├── pii-hash.ts              # Privacy-compliant data hashing
+├── shared-utils.ts           # Shared function utilities
+└── types.ts                  # Function type definitions
 ```
 
 ---
 
-**Note**: Conversion-optimized landing page for female entrepreneurs in Lisbon, following direct marketing principles with elegant design.
+## 🔧 Advanced Features
+
+### Admin Dashboard
+- **Location**: `src/admin/dashboard/index.ts`
+- **Purpose**: Internal dashboard for monitoring event metrics, payments, and analytics
+- **Access**: Requires proper authentication (see docs/SETUP.md)
+- **Features**: Real-time metrics, payment status, attendee management
+
+### Enhanced Analytics System
+- **Architecture**: Plugin-based system with 5+ specialized plugins
+- **Core Plugins**:
+  - **GTM Plugin**: Google Tag Manager integration with event normalization
+  - **Performance Plugin**: Core Web Vitals tracking (LCP, FID, CLS, INP)
+  - **Section Tracking Plugin**: IntersectionObserver-based section visibility
+  - **Error Plugin**: Global error handling with deduplication
+  - **Scroll Tracking Plugin**: Scroll depth milestone tracking
+- **API**: Unified AnalyticsHelpers interface for common tracking patterns
+- **Initialization**: Automatic setup with `initializeAnalytics()` in main app
+
+### Advanced Netlify Functions (13 total)
+**Payment & Commerce**:
+- `create-payment-intent.ts` - Stripe payment initialization
+- `stripe-webhook.ts` - Payment confirmation and fulfillment
+
+**CRM & Lead Management**:
+- `mailerlite-lead.ts` - Lead capture integration
+- `mailerlite-helpers.ts` - MailerLite API utilities  
+- `crm-integration.ts` - Advanced CRM system integration
+- `crm-types.ts` - CRM type definitions
+
+**Analytics & Monitoring**:
+- `server-gtm.ts` - Server-side Google Tag Manager
+- `metrics-collection.ts` - Performance metrics collection
+- `health-check.ts` - System health monitoring
+
+**Infrastructure**:
+- `dlq-handler.ts` - Dead letter queue processing
+- `pii-hash.ts` - Privacy-compliant data hashing
+- `shared-utils.ts` - Common function utilities
+- `types.ts` - Shared function type definitions
+
+### Enhanced Monitoring
+- **Browser Data Collection**: Advanced attribution and behavior tracking
+- **Performance Monitoring**: Real-time Core Web Vitals and custom metrics
+- **Event Tracking**: Sophisticated event tracking with enhanced context
+- **Error Handling**: Comprehensive error tracking with deduplication
+
+---
+
+**Note**: Conversion-optimized landing page for female entrepreneurs in Lisbon, following direct marketing principles with elegant design and enterprise-grade technical architecture.

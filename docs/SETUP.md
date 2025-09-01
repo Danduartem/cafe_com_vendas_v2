@@ -24,6 +24,14 @@ MAILERLITE_API_KEY=your_api_key
 
 # Analytics (Production ID)
 VITE_GTM_CONTAINER_ID=GTM-T63QRLFT
+
+# Admin Dashboard (Optional)
+ADMIN_ACCESS_TOKEN=your_secure_token
+ADMIN_DASHBOARD_PASSWORD=your_secure_password
+
+# Advanced Monitoring (Optional)
+METRICS_COLLECTION_ENABLED=true
+HEALTH_CHECK_ENABLED=true
 ```
 
 ### Optional
@@ -86,62 +94,131 @@ npm run type-check && npm run lint && npm test
 
 ## Third-Party Integrations
 
-### Analytics System (Modern Plugin Architecture)
+### Advanced Analytics System (Plugin-Based Architecture)
 - **Container ID**: `GTM-T63QRLFT`
-- **Implementation**: `src/analytics/` (unified plugin-based system)
-- **Event Flow**: AnalyticsHelpers → GTM Plugin → `window.dataLayer` → GTM → GA4
+- **Implementation**: `src/analytics/` (sophisticated plugin-based system)
+- **Architecture**: Plugin-based engine with specialized modules for different concerns
+- **Event Flow**: AnalyticsHelpers → Plugin System → `window.dataLayer` → GTM → GA4/other platforms
 
-**Key Events (Revenue Critical)**:
+#### Plugin System Overview
+The analytics system uses a modern plugin architecture with these core plugins:
+
+1. **GTM Plugin** (`src/analytics/plugins/gtm.ts`)
+   - Google Tag Manager integration
+   - Event normalization and validation
+   - GA4-compliant event structure
+
+2. **Performance Plugin** (`src/analytics/plugins/performance.ts`)
+   - Core Web Vitals tracking (LCP, FID, CLS, INP)
+   - Page load performance monitoring
+   - Smart batching to reduce overhead
+
+3. **Section Tracking Plugin** (`src/analytics/plugins/section-tracking.ts`)
+   - IntersectionObserver-based section visibility
+   - One-time section view events
+   - Configurable visibility thresholds
+
+4. **Error Plugin** (`src/analytics/plugins/error.ts`)
+   - Global error handling setup
+   - Error deduplication
+   - Context-rich error reporting
+
+5. **Scroll Tracking Plugin** (`src/analytics/plugins/scroll-tracking.ts`)
+   - Scroll depth milestone tracking
+   - Throttled for performance
+   - Configurable thresholds
+
+#### Initialization & Usage
+**Automatic Initialization**:
+```javascript
+// In src/assets/js/app.ts - automatically called during app startup
+import { initializeAnalytics, AnalyticsHelpers } from '../../analytics/index.js';
+await initializeAnalytics();
+```
+
+**Common Usage Patterns**:
 ```javascript
 // Import the unified analytics system
 import { AnalyticsHelpers } from '../analytics/index.js';
 
-// Payment completion (recommended approach)
+// Payment completion (revenue critical)
 AnalyticsHelpers.trackConversion('payment_completed', {
   transaction_id: 'pi_abc123...',
   value: 180,
   currency: 'EUR'
 });
 
-// Lead capture (recommended approach)
+// Lead generation tracking
 AnalyticsHelpers.trackConversion('lead_generated', {
   email: 'user@example.com',
   source_section: 'hero'
 });
 
-// Section tracking (automatic with IntersectionObserver)
+// Section visibility tracking (automatic)
 AnalyticsHelpers.initSectionTracking('hero');
+
+// CTA click tracking
+AnalyticsHelpers.trackCTAClick('hero', {
+  button_text: 'Reserve My Spot',
+  button_location: 'above_fold'
+});
+
+// Error tracking with context
+AnalyticsHelpers.trackError('payment_failed', error, {
+  user_email: 'user@example.com',
+  payment_amount: 180
+});
+
+// FAQ interaction tracking
+AnalyticsHelpers.trackFAQ('1', true, 'How much does it cost?');
+
+// Video progress tracking  
+AnalyticsHelpers.trackVideoProgress('Testimonial Video', 50);
+
+// WhatsApp click tracking (automatic)
+AnalyticsHelpers.trackWhatsAppClick(linkUrl, linkText, location);
 ```
 
-**Core Plugins Available**:
-- **GTM Plugin**: Google Tag Manager integration with event normalization
-- **Performance Plugin**: Core Web Vitals tracking (LCP, FID, CLS, INP)
-- **Section Tracking Plugin**: IntersectionObserver-based section visibility
-- **Error Plugin**: Global error handling with deduplication
-- **Scroll Tracking Plugin**: Scroll depth milestone tracking
+#### Testing & Debugging
+- **Global Analytics Instance**: `window.analytics` (for debugging and direct plugin access)
+- **Data Layer**: `window.dataLayer` (events flow through GTM plugin)
+- **Plugin Access**: `window.analytics.getPlugin('pluginName')` for direct plugin methods
+- **GTM Preview Mode**: For debugging event flow to GTM
+- **GA4 Debug View**: For validating final GA4 events
+- **Debug Mode**: Set `ENV.isDevelopment = true` for comprehensive logging
 
-**Testing**:
-- Browser console: `window.dataLayer` (events flow through GTM plugin)
-- Browser console: `window.analytics` (analytics instance for debugging)
-- GTM Preview Mode for debugging
-- GA4 Debug View for event validation
-
-### Stripe Payments
+### Stripe Payments (Enhanced Integration)
 - **Mode**: Test mode for development
 - **Integration**: 
   - Client: `@stripe/stripe-js` in checkout modal
-  - Server: Netlify Functions for payment intents
-- **Functions**:
-  - `create-payment-intent.ts` - Payment initialization
-  - `stripe-webhook.ts` - Payment confirmation
+  - Server: Advanced Netlify Functions with enhanced tracking
+- **Enhanced Functions**:
+  - `create-payment-intent.ts` - Payment initialization with enhanced metadata
+  - `stripe-webhook.ts` - Payment confirmation with CRM integration
+  - `server-gtm.ts` - Server-side conversion tracking
+- **Features**: 
+  - Multibanco support for Portuguese customers
+  - Enhanced payment tracking with attribution data
+  - Server-side GTM integration for accurate conversion tracking
 - **Testing**: See `docs/STRIPE_TEST_CARDS.md`
 - **Dashboard**: https://dashboard.stripe.com/test
 
-### MailerLite
-- **Purpose**: Lead capture and email marketing
-- **Function**: `mailerlite-lead.ts`
-- **Fields**: email, name, pricing_tier
-- **Groups**: Configured in MailerLite dashboard
+### MailerLite (Advanced Integration)
+- **Purpose**: Lead capture, email marketing, and CRM integration
+- **Enhanced Functions**:
+  - `mailerlite-lead.ts` - Lead capture with enhanced tracking
+  - `mailerlite-helpers.ts` - MailerLite API utilities and helpers
+  - `crm-integration.ts` - Advanced CRM system integration
+  - `crm-types.ts` - CRM type definitions and interfaces
+- **Enhanced Fields**: 
+  - Basic: email, name, pricing_tier
+  - Enhanced: attribution data, behavior tracking, conversion context
+- **Features**:
+  - Automatic lead scoring and segmentation
+  - Enhanced attribution tracking with UTM parameters
+  - Behavioral data collection for better targeting
+  - CRM synchronization and data enrichment
+- **Groups**: Dynamically managed based on behavior and conversion data
 
 ### Cloudinary CDN
 - **Cloud Name**: `ds4dhbneq`
@@ -156,6 +233,48 @@ AnalyticsHelpers.initSectionTracking('hero');
   - Hero: `hero-bg-2_vjkcsn`
   - About: `sobre3_pnikcv`
   - Problem: `problem-overworked_p5ntju`
+
+### Advanced Netlify Functions (13 Total)
+
+#### Payment & Commerce Functions
+- **`create-payment-intent.ts`**: Enhanced Stripe payment initialization with metadata tracking
+- **`stripe-webhook.ts`**: Payment confirmation with CRM integration and server-side tracking
+
+#### CRM & Lead Management Functions  
+- **`mailerlite-lead.ts`**: Lead capture with enhanced behavioral tracking
+- **`mailerlite-helpers.ts`**: MailerLite API utilities and helper functions
+- **`crm-integration.ts`**: Advanced CRM system integration with data synchronization
+- **`crm-types.ts`**: TypeScript type definitions for CRM integration
+
+#### Analytics & Monitoring Functions
+- **`server-gtm.ts`**: Server-side Google Tag Manager integration for accurate tracking
+- **`metrics-collection.ts`**: Performance metrics collection and reporting
+- **`health-check.ts`**: System health monitoring and status reporting
+
+#### Infrastructure & Utility Functions
+- **`dlq-handler.ts`**: Dead letter queue processing for failed operations
+- **`pii-hash.ts`**: Privacy-compliant data hashing for sensitive information
+- **`shared-utils.ts`**: Common utilities shared across functions
+- **`types.ts`**: Shared TypeScript type definitions for all functions
+
+### Admin Dashboard System
+- **Location**: `src/admin/dashboard/index.ts`
+- **Purpose**: Internal dashboard for monitoring event metrics, payments, and analytics
+- **Features**:
+  - Real-time payment status monitoring
+  - Attendee registration tracking
+  - Analytics performance overview
+  - System health monitoring
+  - Event capacity and registration metrics
+- **Access Control**: Secured with environment-based authentication
+- **Setup**: Configure `ADMIN_ACCESS_TOKEN` and `ADMIN_DASHBOARD_PASSWORD` in environment variables
+
+### Enhanced Monitoring & Observability
+- **Performance Monitoring**: Real-time Core Web Vitals tracking via `metrics-collection.ts`
+- **Error Tracking**: Comprehensive error handling with deduplication via analytics error plugin
+- **System Health**: Automated health checks for all critical systems
+- **Attribution Tracking**: Advanced visitor attribution and behavior analysis
+- **Privacy Compliance**: PII data hashing and privacy-compliant tracking
 
 ---
 
