@@ -98,35 +98,17 @@ const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
 const EVENT_GROUPS = MAILERLITE_EVENT_GROUPS;
 
 // Direct Group ID mapping to actual MailerLite groups
-// Using environment variables for production group IDs with fallback to test group
-// Note: For testing, we'll create a test group with a shorter ID to avoid precision issues
-const DEFAULT_TEST_GROUP_ID = '164068163'; // Shortened ID to avoid JavaScript precision loss
-
-// Helper function to safely convert group ID string to number without precision loss
-function safeGroupIdToNumber(groupIdStr: string): number {
-  // For very large integers that exceed JavaScript's safe integer range,
-  // we need to be careful about precision loss
-  const num = Number(groupIdStr);
-  
-  // Check if the conversion maintained precision
-  if (!Number.isSafeInteger(num) || num.toString() !== groupIdStr) {
-    // If precision would be lost, we need to use the fallback ID
-    console.warn(`Group ID ${groupIdStr} exceeds JavaScript safe integer range, using fallback ID ${DEFAULT_TEST_GROUP_ID}`);
-    return parseInt(DEFAULT_TEST_GROUP_ID, 10);
-  }
-  
-  return num;
-}
-
+// IMPORTANT: Group IDs MUST remain as strings to avoid JavaScript precision loss
+// These are the actual group IDs from your MailerLite account
 const GROUP_ID_MAPPING: Record<string, string> = {
-  [EVENT_GROUPS.CHECKOUT_STARTED]: process.env.MAILERLITE_CHECKOUT_STARTED_GROUP_ID || DEFAULT_TEST_GROUP_ID,
-  [EVENT_GROUPS.BUYER_PENDING]: process.env.MAILERLITE_BUYER_PENDING_GROUP_ID || DEFAULT_TEST_GROUP_ID,
-  [EVENT_GROUPS.BUYER_PAID]: process.env.MAILERLITE_BUYER_PAID_GROUP_ID || DEFAULT_TEST_GROUP_ID,
-  [EVENT_GROUPS.DETAILS_PENDING]: process.env.MAILERLITE_DETAILS_PENDING_GROUP_ID || DEFAULT_TEST_GROUP_ID,
-  [EVENT_GROUPS.DETAILS_COMPLETE]: process.env.MAILERLITE_DETAILS_COMPLETE_GROUP_ID || DEFAULT_TEST_GROUP_ID,
-  [EVENT_GROUPS.ATTENDED]: process.env.MAILERLITE_ATTENDED_GROUP_ID || DEFAULT_TEST_GROUP_ID,
-  [EVENT_GROUPS.NO_SHOW]: process.env.MAILERLITE_NO_SHOW_GROUP_ID || DEFAULT_TEST_GROUP_ID,
-  [EVENT_GROUPS.ABANDONED_PAYMENT]: process.env.MAILERLITE_ABANDONED_PAYMENT_GROUP_ID || DEFAULT_TEST_GROUP_ID
+  [EVENT_GROUPS.CHECKOUT_STARTED]: process.env.MAILERLITE_CHECKOUT_STARTED_GROUP_ID || '164084418309260989',
+  [EVENT_GROUPS.BUYER_PENDING]: process.env.MAILERLITE_BUYER_PENDING_GROUP_ID || '164084419130295829',
+  [EVENT_GROUPS.BUYER_PAID]: process.env.MAILERLITE_BUYER_PAID_GROUP_ID || '164084419571745998',
+  [EVENT_GROUPS.DETAILS_PENDING]: process.env.MAILERLITE_DETAILS_PENDING_GROUP_ID || '164084420038362902',
+  [EVENT_GROUPS.DETAILS_COMPLETE]: process.env.MAILERLITE_DETAILS_COMPLETE_GROUP_ID || '164084420444161819',
+  [EVENT_GROUPS.ATTENDED]: process.env.MAILERLITE_ATTENDED_GROUP_ID || '164084420929652588',
+  [EVENT_GROUPS.NO_SHOW]: process.env.MAILERLITE_NO_SHOW_GROUP_ID || '164084421314479574',
+  [EVENT_GROUPS.ABANDONED_PAYMENT]: process.env.MAILERLITE_ABANDONED_PAYMENT_GROUP_ID || '164084418758051029'
 };
 
 // Validation schemas for lead data
@@ -434,6 +416,7 @@ async function sendToCRM(payload: EnhancedCRMPayload): Promise<CRMResult> {
     column_id: CRM_CONFIG.columnId,
     name: payload.name,
     phone: payload.phone,
+    email: payload.email,
     title: payload.title || payload.name,
     amount: payload.amount,
     obs: payload.obs || `Lead created via event tracking. Event ID: ${payload.event_id}`,
@@ -601,13 +584,7 @@ async function addLeadToMailerLite(leadData: EnhancedMailerLitePayload): Promise
               crm_contact_id: leadData.fields.crm_contact_id,
               crm_deal_status: leadData.fields.crm_deal_status
             },
-            groups: (leadData.groups || [GROUP_ID_MAPPING[EVENT_GROUPS.CHECKOUT_STARTED]]).map(id => {
-              // Use safe conversion function to handle large integers without precision loss
-              if (typeof id === 'string') {
-                return safeGroupIdToNumber(id);
-              }
-              return typeof id === 'number' ? id : safeGroupIdToNumber(DEFAULT_TEST_GROUP_ID);
-            }),
+            groups: (leadData.groups || [GROUP_ID_MAPPING[EVENT_GROUPS.CHECKOUT_STARTED]]),
             status: leadData.status || 'active',
             subscribed_at: new Date().toISOString().slice(0, 19).replace('T', ' '),
             ip_address: leadData.ip_address,
@@ -621,6 +598,17 @@ async function addLeadToMailerLite(leadData: EnhancedMailerLitePayload): Promise
 
       if (!response.ok) {
         const errorText = await response.text();
+        
+        // Enhanced error logging for debugging
+        console.error('MailerLite API error response:', {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+          body: errorText,
+          email: leadData.email,
+          requestUrl: 'https://connect.mailerlite.com/api/subscribers',
+          requestGroups: leadData.groups || [GROUP_ID_MAPPING[EVENT_GROUPS.CHECKOUT_STARTED]]
+        });
         
         // Handle specific MailerLite error cases
         if (response.status === 422) {
@@ -647,13 +635,7 @@ async function addLeadToMailerLite(leadData: EnhancedMailerLitePayload): Promise
                 errors: errorData.errors,
                 errorDetails,
                 requestPayload: {
-                  groups: (leadData.groups || [GROUP_ID_MAPPING[EVENT_GROUPS.CHECKOUT_STARTED]]).map(id => {
-              // Use safe conversion function to handle large integers without precision loss
-              if (typeof id === 'string') {
-                return safeGroupIdToNumber(id);
-              }
-              return typeof id === 'number' ? id : safeGroupIdToNumber(DEFAULT_TEST_GROUP_ID);
-            }),
+                  groups: (leadData.groups || [GROUP_ID_MAPPING[EVENT_GROUPS.CHECKOUT_STARTED]]),
                   subscribed_at: new Date().toISOString().slice(0, 19).replace('T', ' '),
                   status: leadData.status || 'active'
                 }
@@ -670,6 +652,14 @@ async function addLeadToMailerLite(leadData: EnhancedMailerLitePayload): Promise
               parseError: parseError instanceof Error ? parseError.message : 'Unknown parse error'
             });
           }
+        } else if (response.status === 400) {
+          // Bad Request - often due to malformed data like invalid group IDs
+          console.error(`MailerLite 400 Bad Request for ${leadData.email}:`, errorText);
+          return { 
+            success: false, 
+            reason: `Bad request: ${errorText}. Check group IDs and field values.`, 
+            recoverable: true 
+          };
         } else if (response.status === 401) {
           // Authentication error - not recoverable
           console.error('MailerLite authentication failed - check API key');
