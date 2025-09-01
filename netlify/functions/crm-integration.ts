@@ -480,11 +480,6 @@ export default async (request: Request): Promise<Response> => {
     // Send to CRM
     const crmResult = await sendToCRM(crmPayload);
 
-    // Log the attempt
-    console.log(`CRM integration attempt for ${sanitized.name}`, {
-      success: crmResult.success,
-      amount: sanitized.amount
-    });
 
     // Always return success to not block checkout
     return new Response(JSON.stringify({

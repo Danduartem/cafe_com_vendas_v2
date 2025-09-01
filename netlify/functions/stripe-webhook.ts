@@ -6,23 +6,24 @@
 // Enhanced Stripe webhook handler with event-driven lifecycle management
 import Stripe from 'stripe';
 import type {
+  EventCustomFields,
   FulfillmentRecord,
-  MailerLiteSubscriberData,
-  EventCustomFields
+  MailerLiteSubscriberData
 } from './types';
+
+// Import Phase 1 enhanced types
+import type {
+  EnhancedCRMPayload
+} from '../../src/types/enhanced-tracking.js';
 import {
-  MAILERLITE_EVENT_GROUPS,
-  MAILERLITE_CUSTOM_FIELDS,
-  EVENT_DATE,
   EVENT_ADDRESS,
-  GOOGLE_MAPS_LINK
+  EVENT_DATE,
+  GOOGLE_MAPS_LINK,
+  MAILERLITE_EVENT_GROUPS
 } from './types';
-import {
-  isStripePaymentIntent,
-  hasMultibancoDetails,
-  getMultibancoDetails
-} from '../../src/types/stripe.js';
-import { SHARED_TIMEOUTS, withTimeout, retryWithBackoff } from './shared-utils.js';
+// Stripe types removed for Phase 1 - Multibanco handling deferred to Phase 2
+// import { isStripePaymentIntent, hasMultibancoDetails, getMultibancoDetails } from '../../src/types/stripe.js';
+import { retryWithBackoff, SHARED_TIMEOUTS, withTimeout } from './shared-utils.js';
 
 // MailerLite API response interfaces
 interface MailerLiteSubscriberResponse {
@@ -56,15 +57,15 @@ interface MailerLiteSearchResponse {
 // Enhanced Stripe initialization with Context7 best practices
 const initializeStripe = () => {
   const apiKey = process.env.STRIPE_SECRET_KEY;
-  
+
   if (!apiKey) {
     throw new Error('Stripe secret key not configured - check STRIPE_SECRET_KEY environment variable');
   }
-  
+
   if (!apiKey.startsWith('sk_')) {
     throw new Error('Invalid Stripe secret key format - must start with "sk_"');
   }
-  
+
   return new Stripe(apiKey, {
     apiVersion: '2025-07-30.basil', // Lock API version for consistency
     timeout: 30000, // 30 second timeout for Stripe API calls
@@ -130,12 +131,12 @@ class FulfillmentTracker {
       }
     }
   }
-  
+
   static isAlreadyFulfilled(key: string): boolean {
     this.cleanExpiredEntries();
     return fulfillmentStore.has(key);
   }
-  
+
   static markAsFulfilled(key: string, metadata: Partial<FulfillmentRecord> = {}): void {
     this.cleanExpiredEntries();
     fulfillmentStore.set(key, {
@@ -144,12 +145,12 @@ class FulfillmentTracker {
       ...metadata
     });
   }
-  
+
   static getFulfillmentInfo(key: string): FulfillmentRecord | undefined {
     this.cleanExpiredEntries();
     return fulfillmentStore.get(key);
   }
-  
+
   static getStats() {
     return {
       size: fulfillmentStore.size,
@@ -205,11 +206,11 @@ export default async (request: Request): Promise<Response> => {
       STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
       STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET
     };
-    
+
     const missingVars = Object.entries(requiredEnvVars)
       .filter(([_, value]) => !value)
       .map(([key]) => key);
-    
+
     if (missingVars.length > 0) {
       const errorMsg = `Missing required environment variables: ${missingVars.join(', ')}`;
       logWithCorrelation('error', errorMsg);
@@ -239,7 +240,7 @@ export default async (request: Request): Promise<Response> => {
     // Enhanced webhook signature verification with detailed error logging
     try {
       const body = await request.text();
-      
+
       // Validate request body
       if (!body || body.trim() === '') {
         logWithCorrelation('error', 'Empty request body received', {
@@ -251,19 +252,19 @@ export default async (request: Request): Promise<Response> => {
           headers
         });
       }
-      
+
       // Use synchronous webhook construction for better error handling
       stripeEvent = stripe.webhooks.constructEvent(
         body,
         sig,
         endpointSecret
       );
-      
+
       logWithCorrelation('info', 'Webhook signature verified successfully', {
         eventType: stripeEvent.type,
         eventId: stripeEvent.id
       });
-      
+
     } catch (err) {
       // Enhanced error handling with Context7 patterns
       if (err instanceof Error) {
@@ -274,10 +275,10 @@ export default async (request: Request): Promise<Response> => {
           bodyLength: (await request.clone().text()).length,
           timestamp: new Date().toISOString()
         };
-        
+
         if (err.name === 'StripeSignatureVerificationError') {
           logWithCorrelation('error', 'Stripe signature verification failed', errorContext);
-          return new Response(JSON.stringify({ 
+          return new Response(JSON.stringify({
             error: 'Invalid signature',
             code: 'SIGNATURE_VERIFICATION_FAILED'
           }), {
@@ -285,14 +286,14 @@ export default async (request: Request): Promise<Response> => {
             headers
           });
         }
-        
+
         logWithCorrelation('error', 'Webhook construction failed', {
           ...errorContext,
           stack: err.stack?.split('\n').slice(0, 5).join('\n')
         });
       }
-      
-      return new Response(JSON.stringify({ 
+
+      return new Response(JSON.stringify({
         error: 'Webhook processing failed',
         code: 'WEBHOOK_CONSTRUCTION_ERROR'
       }), {
@@ -356,7 +357,7 @@ export default async (request: Request): Promise<Response> => {
         }, correlationId);
     }
 
-    
+
     // Log fulfillment tracker stats for monitoring
     const fulfillmentStats = FulfillmentTracker.getStats();
     if (fulfillmentStats.size > 0) {
@@ -366,8 +367,8 @@ export default async (request: Request): Promise<Response> => {
     }
 
     // Return success response
-    return new Response(JSON.stringify({ 
-      received: true, 
+    return new Response(JSON.stringify({
+      received: true,
       event: stripeEvent.type,
       correlationId
     }), {
@@ -377,7 +378,7 @@ export default async (request: Request): Promise<Response> => {
 
   } catch (error) {
     console.error('Webhook handler error:', error instanceof Error ? error.message : 'Unknown error');
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       error: 'Webhook handler failed',
       message: error instanceof Error ? error.message : 'Unknown error'
     }), {
@@ -396,11 +397,11 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
     amount: paymentIntent.amount,
     currency: paymentIntent.currency
   }, correlationId);
-  
+
   try {
     // Check if this payment has already been fulfilled
     const fulfillmentKey = `payment_intent_${paymentIntent.id}`;
-    
+
     if (FulfillmentTracker.isAlreadyFulfilled(fulfillmentKey)) {
       const existingFulfillment = FulfillmentTracker.getFulfillmentInfo(fulfillmentKey);
       logWithCorrelation('info', `Payment ${paymentIntent.id} already fulfilled`, {
@@ -410,56 +411,99 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
       }, correlationId);
       return; // Skip duplicate fulfillment
     }
-    
-    // Extract customer information from metadata
+
+    // Extract enhanced metadata from payment intent
     const metadata = paymentIntent.metadata;
-    const customerEmail = metadata.customer_email;
-    const customerName = metadata.customer_name;
-    const customerPhone = metadata.customer_phone;
-    // const leadId = metadata.lead_id; // Available but not needed in enhanced version
+    const customerEmail = metadata.email;
+    const customerName = metadata.full_name;
+    const customerPhone = metadata.phone;
+
+    // Enhanced event tracking fields
+    const event_id = metadata.event_id;
+    const user_session_id = metadata.user_session_id;
+    const lead_created_at = metadata.lead_created_at;
+    const checkout_started_at = metadata.checkout_started_at;
+    const crm_contact_id = metadata.crm_contact_id;
+    const crm_deal_id = metadata.crm_deal_id;
+
+    // Attribution data
+    const utm_source = metadata.utm_source;
+    const utm_medium = metadata.utm_medium;
+    const utm_campaign = metadata.utm_campaign;
+    const utm_content = metadata.utm_content;
+    const utm_term = metadata.utm_term;
+
+    // Consent data
+    const marketing_consent = metadata.marketing_consent === 'true';
+    // Note: consent_timestamp and consent_method stored in metadata for Phase 2
+
+    // Device context
+    const device_type = metadata.device_type;
 
     if (!customerEmail || !customerName) {
       throw new Error('Missing customer information in payment metadata');
     }
 
-    // Add customer to MailerLite with retry logic and circuit breaker
+    logWithCorrelation('info', `Processing payment with enhanced metadata`, {
+      event_id,
+      user_session_id,
+      customerEmail,
+      crm_contact_id,
+      crm_deal_id,
+      utm_source,
+      device_type
+    }, correlationId);
+
+    // Add customer to MailerLite with enhanced payload
     try {
-      // Create comprehensive event-specific subscriber data
-      const eventFields: EventCustomFields = {
-        [MAILERLITE_CUSTOM_FIELDS.first_name]: customerName.split(' ')[0] || customerName,
-        [MAILERLITE_CUSTOM_FIELDS.phone]: customerPhone || '',
-        [MAILERLITE_CUSTOM_FIELDS.checkout_started_at]: metadata.created_at || new Date().toISOString(),
-        [MAILERLITE_CUSTOM_FIELDS.payment_status]: 'paid',
-        [MAILERLITE_CUSTOM_FIELDS.ticket_type]: (metadata.spot_type as 'Standard' | 'VIP') || 'Standard',
-        [MAILERLITE_CUSTOM_FIELDS.order_id]: paymentIntent.id,
-        [MAILERLITE_CUSTOM_FIELDS.amount_paid]: paymentIntent.amount / 100,
-        [MAILERLITE_CUSTOM_FIELDS.details_form_status]: 'pending', // Will be updated when form submitted
-        
-        // Event fields (static for this event)
-        [MAILERLITE_CUSTOM_FIELDS.event_date]: EVENT_DATE,
-        [MAILERLITE_CUSTOM_FIELDS.event_address]: EVENT_ADDRESS,
-        [MAILERLITE_CUSTOM_FIELDS.google_maps_link]: GOOGLE_MAPS_LINK,
-        
-        // Multibanco fields (initially null, updated if applicable)
-        [MAILERLITE_CUSTOM_FIELDS.mb_entity]: null,
-        [MAILERLITE_CUSTOM_FIELDS.mb_reference]: null,
-        [MAILERLITE_CUSTOM_FIELDS.mb_amount]: null,
-        [MAILERLITE_CUSTOM_FIELDS.mb_expires_at]: null,
-        
-        // Attribution fields
-        [MAILERLITE_CUSTOM_FIELDS.utm_source]: metadata.utm_source || null,
-        [MAILERLITE_CUSTOM_FIELDS.utm_medium]: metadata.utm_medium || null,
-        [MAILERLITE_CUSTOM_FIELDS.utm_campaign]: metadata.utm_campaign || null,
-        
-        // Marketing consent
-        [MAILERLITE_CUSTOM_FIELDS.marketing_opt_in]: 'yes' // Default for paid customers
+      const enhancedFields: EventCustomFields = {
+        // Required fields
+        first_name: customerName.split(' ')[0] || customerName,
+        phone: customerPhone || '',
+        checkout_started_at: checkout_started_at || new Date().toISOString(),
+        payment_status: 'paid',
+        ticket_type: 'Standard',
+        order_id: paymentIntent.id,
+        amount_paid: paymentIntent.amount / 100,
+        details_form_status: 'pending',
+
+        // Event information
+        event_date: EVENT_DATE,
+        event_address: EVENT_ADDRESS,
+        google_maps_link: GOOGLE_MAPS_LINK,
+
+        // Multibanco fields (required by type)
+        mb_entity: null,
+        mb_reference: null,
+        mb_amount: paymentIntent.amount / 100,
+        mb_expires_at: null,
+
+        // Enhanced Phase 1 fields with event correlation
+        event_id: event_id,
+        user_session_id: user_session_id,
+        lead_created_at: lead_created_at || new Date().toISOString(),
+        payment_completed_at: new Date().toISOString(),
+
+        // Attribution data
+        utm_source: utm_source || null,
+        utm_medium: utm_medium || null,
+        utm_campaign: utm_campaign || null,
+        utm_content: utm_content || null,
+        utm_term: utm_term || null,
+
+        // Consent and CRM correlation
+        marketing_opt_in: marketing_consent ? 'yes' : 'no',
+        crm_contact_id: crm_contact_id || null,
+
+        // Device context
+        device_type: device_type || null
       };
 
       await retryWithBackoff(() => addToMailerLite({
         email: customerEmail,
         name: customerName,
         phone: customerPhone,
-        fields: eventFields
+        fields: enhancedFields
       }));
     } catch (error) {
       // Log error but don't fail the webhook processing
@@ -470,28 +514,112 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
       }, correlationId);
     }
 
-    // 🔄 ENHANCED LIFECYCLE MANAGEMENT: Implement complete state machine
+    // 🔄 ENHANCED LIFECYCLE MANAGEMENT: Implement complete state machine with event correlation
     try {
       await retryWithBackoff(() => moveSubscriberBetweenGroups(
         customerEmail,
         getLifecycleGroupId('CHECKOUT_STARTED'),    // From: checkout_started
         getLifecycleGroupId('BUYER_PAID')           // To: buyer_paid
       ));
-      
+
       logWithCorrelation('info', 'Successfully executed payment success lifecycle transition', {
+        event_id,
+        user_session_id,
         customerEmail,
         paymentIntentId: paymentIntent.id,
         transition: `${MAILERLITE_EVENT_GROUPS.CHECKOUT_STARTED} → ${MAILERLITE_EVENT_GROUPS.BUYER_PAID}`,
-        lifecycleStage: 'buyer_paid'
+        lifecycleStage: 'buyer_paid',
+        crmCorrelation: crm_contact_id
       }, correlationId);
     } catch (error) {
       // Log but don't fail webhook for lifecycle management errors
       logWithCorrelation('error', 'Failed to execute lifecycle transition', {
         error: error instanceof Error ? error.message : 'Unknown error',
+        event_id,
         customerEmail,
         paymentIntentId: paymentIntent.id,
         lifecycleStage: 'buyer_paid_failed'
       }, correlationId);
+    }
+
+    // Update CRM deal status from Lead to Paid
+    if (crm_contact_id) {
+      try {
+        // Update CRM deal status from lead to paid
+        const enhancedCRMPayload: EnhancedCRMPayload = {
+          // Required CRM fields
+          company_id: process.env.CRM_COMPANY_ID || '',
+          board_id: process.env.CRM_BOARD_ID || '',
+          column_id: process.env.CRM_COLUMN_ID || '',
+          name: customerName,
+          phone: customerPhone || '',
+          amount: (paymentIntent.amount / 100).toString(), // Actual paid amount
+          title: `Paid: ${customerName}`,
+
+          // Event tracking correlation
+          event_id: event_id || `webhook-${paymentIntent.id}`,
+          user_session_id: user_session_id || `session-${paymentIntent.id}`,
+
+          // Contact lifecycle (UPDATED - lead → paid)
+          contact_stage: 'paid',
+          lead_created_at: lead_created_at || checkout_started_at || new Date().toISOString(),
+          payment_completed_at: new Date().toISOString(),
+
+          // Attribution data (preserve from lead creation)
+          utm_source: utm_source,
+          utm_medium: utm_medium,
+          utm_campaign: utm_campaign,
+          utm_content: utm_content,
+          utm_term: utm_term,
+
+          // Business context
+          event_interest: 'cafe_com_vendas_lisbon_2025-09-20',
+          intent_signal: 'completed_payment',
+          landing_page: 'https://jucanamaximiliano.com.br/', // Default landing page for webhooks
+
+          // Enhanced contact data
+          email: customerEmail,
+          contact_tags: ['paid', 'cafe-com-vendas-2025', 'payment-completed'],
+          obs: `Payment completed. Event ID: ${event_id}. PaymentIntent: ${paymentIntent.id}`
+        };
+
+        // Call CRM update API (assuming it exists)
+        const crmUpdateResponse = await retryWithBackoff(() =>
+          fetch(process.env.CRM_API_URL || 'https://mocha-smoky.vercel.app/api/integrations/contact-card', {
+            method: 'PUT', // Update existing contact
+            headers: {
+              'Content-Type': 'application/json',
+              ...(process.env.CRM_API_KEY && { 'Authorization': `Bearer ${process.env.CRM_API_KEY}` })
+            },
+            body: JSON.stringify({
+              ...enhancedCRMPayload,
+              contact_id: crm_contact_id // Include contact ID for update
+            })
+          })
+        );
+
+        if (crmUpdateResponse.ok) {
+          logWithCorrelation('info', 'Successfully updated CRM deal status to paid', {
+            event_id,
+            crm_contact_id,
+            crm_deal_id,
+            customerEmail,
+            paymentAmount: paymentIntent.amount / 100
+          }, correlationId);
+        } else {
+          throw new Error(`CRM update failed: ${crmUpdateResponse.status}`);
+        }
+
+      } catch (error) {
+        // Log but don't fail webhook for CRM update errors
+        logWithCorrelation('error', 'Failed to update CRM deal status', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          event_id,
+          crm_contact_id,
+          customerEmail,
+          paymentIntentId: paymentIntent.id
+        }, correlationId);
+      }
     }
 
     // Send confirmation email (via MailerLite automation)
@@ -511,10 +639,16 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
       fulfilledAt: new Date().toISOString()
     });
 
-    logWithCorrelation('info', `Successfully processed payment for ${customerEmail}`, {
+    logWithCorrelation('info', `Successfully processed enhanced payment for ${customerEmail}`, {
+      event_id,
+      user_session_id,
       paymentIntentId: paymentIntent.id,
       customerEmail,
-      fulfillmentKey
+      fulfillmentKey,
+      crmCorrelation: crm_contact_id,
+      attributionSource: utm_source,
+      deviceType: device_type,
+      enhancedMetadataFields: Object.keys(metadata).length
     }, correlationId);
 
   } catch (error) {
@@ -532,39 +666,25 @@ async function handlePaymentProcessing(paymentIntent: Stripe.PaymentIntent, corr
   logWithCorrelation('info', `Payment processing: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id
   }, correlationId);
-  
+
   try {
     const metadata = paymentIntent.metadata;
     const customerEmail = metadata.customer_email;
-    
+
     if (customerEmail) {
       // Update MailerLite with processing status using retry logic
       await retryWithBackoff(() => updateMailerLiteSubscriber(customerEmail, {
         payment_status: 'processing',
         payment_intent_id: paymentIntent.id
       }));
-      
-      // 🏦 MULTIBANCO: If this is a Multibanco payment, extract and store voucher details
-      if (isStripePaymentIntent(paymentIntent) && hasMultibancoDetails(paymentIntent)) {
-        const multibancoDetails = getMultibancoDetails(paymentIntent);
-        if (multibancoDetails) {
-          await retryWithBackoff(() => updateMultibancoFields(customerEmail, {
-            entity: multibancoDetails.entity,
-            reference: multibancoDetails.reference,
-            amount: paymentIntent.amount / 100, // Convert from cents
-            expiresAt: multibancoDetails.expires_at ? new Date(multibancoDetails.expires_at * 1000).toISOString() : undefined
-          }));
-          
-          logWithCorrelation('info', 'Updated Multibanco voucher details', {
-            customerEmail,
-            entity: multibancoDetails.entity,
-            reference: multibancoDetails.reference,
-            paymentIntentId: paymentIntent.id
-          }, correlationId);
-        }
-      }
+
+      // 🏦 MULTIBANCO: Handled via payment method webhooks in Phase 2
+      // For Phase 1: Focus on core payment completion tracking
+      logWithCorrelation('info', 'Payment processing - advanced payment method details handled in Phase 2', {
+        payment_intent_id: paymentIntent.id
+      }, correlationId);
     }
-    
+
   } catch (error) {
     logWithCorrelation('error', 'Error processing payment processing event', {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -579,11 +699,11 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent, correlat
     paymentIntentId: paymentIntent.id,
     lastPaymentError: paymentIntent.last_payment_error
   }, correlationId);
-  
+
   try {
     const metadata = paymentIntent.metadata;
     const customerEmail = metadata.customer_email;
-    
+
     if (customerEmail) {
       // Update MailerLite with failed status using retry logic
       await retryWithBackoff(() => updateMailerLiteSubscriber(customerEmail, {
@@ -601,7 +721,7 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent, correlat
         failure_reason: paymentIntent.last_payment_error?.message
       }));
     }
-    
+
   } catch (error) {
     logWithCorrelation('error', 'Error processing payment failure', {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -615,11 +735,11 @@ async function handlePaymentCanceled(paymentIntent: Stripe.PaymentIntent, correl
   logWithCorrelation('info', `Payment canceled: ${paymentIntent.id}`, {
     paymentIntentId: paymentIntent.id
   }, correlationId);
-  
+
   try {
     const metadata = paymentIntent.metadata;
     const customerEmail = metadata.customer_email;
-    
+
     if (customerEmail) {
       // Update MailerLite with canceled status using retry logic
       await retryWithBackoff(() => updateMailerLiteSubscriber(customerEmail, {
@@ -628,7 +748,7 @@ async function handlePaymentCanceled(paymentIntent: Stripe.PaymentIntent, correl
         canceled_date: new Date().toISOString()
       }));
     }
-    
+
   } catch (error) {
     logWithCorrelation('error', 'Error processing payment cancellation', {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -643,11 +763,11 @@ async function handlePaymentRequiresAction(paymentIntent: Stripe.PaymentIntent, 
     paymentIntentId: paymentIntent.id,
     nextAction: paymentIntent.next_action
   }, correlationId);
-  
+
   try {
     const metadata = paymentIntent.metadata;
     const customerEmail = metadata.customer_email;
-    
+
     if (customerEmail) {
       await retryWithBackoff(() => updateMailerLiteSubscriber(customerEmail, {
         payment_status: 'requires_action',
@@ -655,7 +775,7 @@ async function handlePaymentRequiresAction(paymentIntent: Stripe.PaymentIntent, 
         action_required_date: new Date().toISOString()
       }));
     }
-    
+
   } catch (error) {
     logWithCorrelation('error', 'Error processing payment requires action', {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -670,11 +790,11 @@ async function handlePaymentPartiallyFunded(paymentIntent: Stripe.PaymentIntent,
     paymentIntentId: paymentIntent.id,
     amountReceived: paymentIntent.amount_received
   }, correlationId);
-  
+
   try {
     const metadata = paymentIntent.metadata;
     const customerEmail = metadata.customer_email;
-    
+
     if (customerEmail) {
       await retryWithBackoff(() => updateMailerLiteSubscriber(customerEmail, {
         payment_status: 'partially_funded',
@@ -683,7 +803,7 @@ async function handlePaymentPartiallyFunded(paymentIntent: Stripe.PaymentIntent,
         partial_funding_date: new Date().toISOString()
       }));
     }
-    
+
   } catch (error) {
     logWithCorrelation('error', 'Error processing partial funding', {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -700,20 +820,20 @@ async function handleChargeDispute(dispute: Stripe.Dispute, correlationId: strin
     amount: dispute.amount,
     reason: dispute.reason
   }, correlationId);
-  
+
   try {
     // Implement dispute handling logic here
     // Could include:
     // - Notifying admin team
     // - Updating customer records
     // - Triggering dispute response workflow
-    
+
     logWithCorrelation('info', `Dispute handling initiated for ${dispute.id}`, {
       disputeId: dispute.id
     }, correlationId);
-    
+
     await Promise.resolve(); // Placeholder for future async dispute handling
-    
+
   } catch (error) {
     logWithCorrelation('error', 'Error processing charge dispute', {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -733,7 +853,7 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session: Stripe.Checko
     currency: session.currency,
     paymentStatus: session.payment_status
   }, correlationId);
-  
+
   try {
     // Retrieve full session with expanded data
     const fullSession = await retryWithBackoff(() =>
@@ -755,12 +875,12 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session: Stripe.Checko
     // Check if this session has already been fulfilled to prevent duplicates
     const fulfillmentKey = `checkout_session_${fullSession.id}`;
     const paymentIntentKey = (typeof fullSession.payment_intent === 'object' && fullSession.payment_intent?.id) ? `payment_intent_${fullSession.payment_intent.id}` : null;
-    
+
     // Check both session and payment intent fulfillment to handle edge cases
-    if (FulfillmentTracker.isAlreadyFulfilled(fulfillmentKey) || 
-        (paymentIntentKey && FulfillmentTracker.isAlreadyFulfilled(paymentIntentKey))) {
-      const existingFulfillment = FulfillmentTracker.getFulfillmentInfo(fulfillmentKey) || 
-                                 (paymentIntentKey ? FulfillmentTracker.getFulfillmentInfo(paymentIntentKey) : undefined);
+    if (FulfillmentTracker.isAlreadyFulfilled(fulfillmentKey) ||
+      (paymentIntentKey && FulfillmentTracker.isAlreadyFulfilled(paymentIntentKey))) {
+      const existingFulfillment = FulfillmentTracker.getFulfillmentInfo(fulfillmentKey) ||
+        (paymentIntentKey ? FulfillmentTracker.getFulfillmentInfo(paymentIntentKey) : undefined);
       logWithCorrelation('info', `Session ${fullSession.id} already fulfilled`, {
         sessionId: fullSession.id,
         existingFulfillment,
@@ -769,7 +889,7 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session: Stripe.Checko
       }, correlationId);
       return; // Skip duplicate fulfillment
     }
-    
+
     logWithCorrelation('info', `Processing delayed payment fulfillment for session ${fullSession.id}`, {
       sessionId: fullSession.id,
       customerEmail,
@@ -829,7 +949,7 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session: Stripe.Checko
       fulfillmentType: 'checkout_session_async_payment_succeeded',
       fulfilledAt: new Date().toISOString()
     });
-    
+
     // Also mark payment intent to prevent duplicate processing from payment_intent.succeeded
     if (paymentIntentKey && typeof fullSession.payment_intent === 'object') {
       FulfillmentTracker.markAsFulfilled(paymentIntentKey, {
@@ -869,7 +989,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session, 
     amount: session.amount_total,
     currency: session.currency
   }, correlationId);
-  
+
   try {
     // Retrieve full session with expanded data
     const fullSession = await retryWithBackoff(() =>
@@ -905,17 +1025,17 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session, 
         // Payment completed immediately (e.g., cards with successful authorization)
         await processImmediatePaymentSuccess(fullSession, correlationId);
         break;
-        
+
       case 'unpaid':
         // Payment pending (e.g., Multibanco voucher generated but not yet paid)
         await processPaymentPending(fullSession, correlationId);
         break;
-        
+
       case 'no_payment_required':
         // Free order or promotional checkout
         processFreeOrder(fullSession, correlationId);
         break;
-        
+
       default:
         logWithCorrelation('info', `Unhandled payment status: ${String(fullSession.payment_status)}`, {
           sessionId: fullSession.id,
@@ -1093,7 +1213,7 @@ async function processPaymentPending(session: Stripe.Checkout.Session, correlati
 function processFreeOrder(session: Stripe.Checkout.Session, correlationId: string): void {
   const customerEmail = session.customer_details?.email || session.metadata?.customer_email;
   const customerName = session.customer_details?.name || session.metadata?.customer_name;
-  
+
   if (!customerEmail || !customerName) {
     return;
   }
@@ -1124,11 +1244,11 @@ async function triggerVoucherInstructionsEmail(email: string, data: Record<strin
       paymentMethod: data.payment_method,
       sessionId: data.session_id
     });
-    
+
     // This would trigger a specific Multibanco instructions automation in MailerLite
     // The automation would include the voucher details and payment instructions
     await Promise.resolve(); // Placeholder for future async automation API calls
-    
+
   } catch (error) {
     logWithCorrelation('error', 'Error triggering voucher instructions email', {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -1147,7 +1267,7 @@ async function handleCheckoutSessionAsyncPaymentFailed(session: Stripe.Checkout.
     amount: session.amount_total,
     currency: session.currency
   }, correlationId);
-  
+
   try {
     // Retrieve full session with expanded data
     const fullSession = await retryWithBackoff(() =>
@@ -1158,7 +1278,7 @@ async function handleCheckoutSessionAsyncPaymentFailed(session: Stripe.Checkout.
 
     const customerEmail = fullSession.customer_details?.email || fullSession.metadata?.customer_email;
     const customerName = fullSession.customer_details?.name || fullSession.metadata?.customer_name;
-    
+
     if (customerEmail) {
       // Update MailerLite with failed status using retry logic
       await retryWithBackoff(() => updateMailerLiteSubscriber(customerEmail, {
@@ -1178,7 +1298,7 @@ async function handleCheckoutSessionAsyncPaymentFailed(session: Stripe.Checkout.
         payment_method: 'Multibanco'
       }));
     }
-    
+
   } catch (error) {
     logWithCorrelation('error', 'Error processing async payment failure', {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -1187,38 +1307,7 @@ async function handleCheckoutSessionAsyncPaymentFailed(session: Stripe.Checkout.
   }
 }
 
-/**
- * Update subscriber with Multibanco voucher details
- */
-async function updateMultibancoFields(email: string, multibancoDetails: {
-  entity: string;
-  reference: string;
-  amount: number;
-  expiresAt?: string;
-}): Promise<void> {
-  if (!MAILERLITE_API_KEY) {
-    console.log('MailerLite API key not configured - skipping Multibanco field updates');
-    return;
-  }
-  
-  try {
-    await updateMailerLiteSubscriber(email, {
-      payment_method: 'multibanco',
-      [MAILERLITE_CUSTOM_FIELDS.mb_entity]: multibancoDetails.entity,
-      [MAILERLITE_CUSTOM_FIELDS.mb_reference]: multibancoDetails.reference,
-      [MAILERLITE_CUSTOM_FIELDS.mb_amount]: multibancoDetails.amount,
-      [MAILERLITE_CUSTOM_FIELDS.mb_expires_at]: multibancoDetails.expiresAt || '',
-      voucher_generated_at: new Date().toISOString()
-    });
-    
-    console.log(`Updated Multibanco fields for ${email}`, {
-      entity: multibancoDetails.entity,
-      reference: multibancoDetails.reference
-    });
-  } catch (error) {
-    console.error('Error updating Multibanco fields:', error instanceof Error ? error.message : 'Unknown error');
-  }
-}
+// Multibanco field updates removed for Phase 1 - handled via payment method webhooks in Phase 2
 
 /**
  * Move subscriber from one group to another (Leads → Buyers transition)
@@ -1228,7 +1317,7 @@ async function moveSubscriberBetweenGroups(email: string, fromGroupId: string, t
     console.log('MailerLite API key not configured - skipping group management');
     return;
   }
-  
+
   try {
     // First find the subscriber
     const searchResponse = await withTimeout(
@@ -1248,7 +1337,7 @@ async function moveSubscriberBetweenGroups(email: string, fromGroupId: string, t
     }
 
     const searchResult = await searchResponse.json() as MailerLiteSearchResponse;
-    
+
     if (!searchResult.data || searchResult.data.length === 0) {
       console.log(`Subscriber not found in MailerLite: ${email}`);
       return;
@@ -1284,7 +1373,7 @@ async function moveSubscriberBetweenGroups(email: string, fromGroupId: string, t
     );
 
     console.log(`Successfully moved ${email} from group ${fromGroupId} to ${toGroupId}`);
-    
+
   } catch (error) {
     console.error('Error moving subscriber between groups:', error instanceof Error ? error.message : 'Unknown error');
     // Fail gracefully for group management errors
@@ -1300,7 +1389,7 @@ async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promis
     console.log('MailerLite API key not configured - skipping email integration');
     return;
   }
-  
+
   try {
     const response = await withTimeout(
       fetch('https://connect.mailerlite.com/api/subscribers', {
@@ -1331,7 +1420,7 @@ async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promis
     const result = await response.json() as MailerLiteSubscriberResponse;
     console.log(`Added subscriber to MailerLite: ${subscriberData.email}`);
     return result;
-    
+
   } catch (error) {
     console.error('MailerLite integration error:', error instanceof Error ? error.message : 'Unknown error');
     // Fail gracefully for email integration errors
@@ -1347,7 +1436,7 @@ async function updateMailerLiteSubscriber(email: string, fields: Record<string, 
     console.log('MailerLite API key not configured - skipping email integration');
     return;
   }
-  
+
   try {
     // First, get the subscriber ID with timeout
     const searchResponse = await withTimeout(
@@ -1367,7 +1456,7 @@ async function updateMailerLiteSubscriber(email: string, fields: Record<string, 
     }
 
     const searchResult = await searchResponse.json() as MailerLiteSearchResponse;
-    
+
     if (!searchResult.data || searchResult.data.length === 0) {
       console.log(`Subscriber not found in MailerLite: ${email}`);
       return;
@@ -1398,7 +1487,7 @@ async function updateMailerLiteSubscriber(email: string, fields: Record<string, 
     }
 
     console.log(`Updated MailerLite subscriber: ${email}`);
-    
+
   } catch (error) {
     console.error('Error updating MailerLite subscriber:', error instanceof Error ? error.message : 'Unknown error');
     // Fail gracefully for email integration errors
@@ -1419,11 +1508,11 @@ async function triggerConfirmationEmail(email: string, data: Record<string, unkn
     // The automation would be set up in MailerLite dashboard
     // For now, we'll just log the action
     console.log(`Triggered confirmation email for: ${email}`, data);
-    
+
     // You can implement specific MailerLite automation triggers here
     // Example: Add to a specific group that triggers the automation
     await Promise.resolve(); // Placeholder for future async automation API calls
-    
+
   } catch (error) {
     console.error('Error triggering confirmation email:', error);
   }
@@ -1439,11 +1528,11 @@ async function triggerAbandonedCartEmail(email: string, data: Record<string, unk
 
   try {
     console.log(`Triggered abandoned cart email for: ${email}`, data);
-    
+
     // Add to abandoned cart group or trigger specific automation
     // This would be configured in MailerLite dashboard
     await Promise.resolve(); // Placeholder for future async automation API calls
-    
+
   } catch (error) {
     console.error('Error triggering abandoned cart email:', error);
   }

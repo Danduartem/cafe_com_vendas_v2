@@ -34,6 +34,12 @@ import {
   type AttributionData 
 } from '../../../utils/browser-data.js';
 import { isValidEmail, isValidPhone } from '../../../utils/validation.js';
+import { 
+  getEventData
+} from '../../../utils/event-tracking.js';
+import type { 
+  EnhancedMailerLitePayload
+} from '../../../types/enhanced-tracking.js';
 
 // 🎯 Get centralized pricing data - SINGLE SOURCE OF TRUTH
 const site = siteData();
@@ -44,9 +50,14 @@ const eventName = site.event.name;
 
 // API Response types
 interface PaymentIntentResponse {
-  clientSecret: string;
-  id?: string;
-  status?: string;
+  // Enhanced Phase 1 response structure
+  success: boolean;
+  client_secret: string;
+  payment_intent_id: string;
+  event_id: string;
+  crm_contact_id?: string;
+  crm_deal_id?: string;
+  metadata_keys: string[];
 }
 
 // Removed unused interface to fix TypeScript warning
@@ -601,9 +612,23 @@ export const Checkout: CheckoutSectionComponent = {
       phone: formData.get('phone') as string
     };
 
-
     // Store lead data for use in payment intent creation
     this.leadData = leadData;
+
+    // === PHASE 1 ENHANCEMENT: Generate event_id and context ===
+    const completeEventData = getEventData({
+      marketing_consent: true, // Assume consent for now, Phase 2 will add consent modal
+      consent_method: 'implied'
+    });
+    
+    // Store event_id as the primary identifier (clean, no legacy compatibility)
+    this.leadId = completeEventData.context.event_id;
+    
+    logger.info('Generated event context for lead submission', {
+      event_id: completeEventData.context.event_id,
+      user_session_id: completeEventData.context.user_session_id,
+      lead_created_at: completeEventData.context.created_at
+    });
 
     // Comprehensive client-side validation using our new validation methods
     let hasValidationErrors = false;
@@ -662,57 +687,82 @@ export const Checkout: CheckoutSectionComponent = {
           sessionDuration: 0
         };
         
-        const mailerlitePayload = {
-          // Basic lead info
-          lead_id: this.leadId,
-          full_name: leadData.fullName,
+        // === PHASE 1 ENHANCEMENT: Enhanced MailerLite payload ===
+        const mailerlitePayload: EnhancedMailerLitePayload = {
           email: leadData.email,
-          phone: `${leadData.countryCode}${leadData.phone}`,
-          page: 'checkout_modal',
           
-          // Core high-leverage fields
-          preferred_language: userEnvironment.language,
-          city: 'unknown', // Will be enhanced with geolocation later
-          country: leadData.countryCode,
-          timezone: userEnvironment.timezone,
-          business_stage: 'unknown', // Future: add form field
-          business_type: 'unknown', // Future: add form field
-          primary_goal: 'unknown', // Future: add form field
-          main_challenge: 'unknown', // Future: add form field
+          fields: {
+            // Basic contact info
+            name: leadData.fullName.split(' ')[0] || leadData.fullName,
+            last_name: leadData.fullName.split(' ').slice(1).join(' ') || '',
+            phone: `${leadData.countryCode}${leadData.phone}`,
+            country: leadData.countryCode,
+            
+            // === PHASE 1 ENHANCED FIELDS ===
+            // Event tracking (NEW - unified across all systems)
+            event_id: completeEventData.context.event_id,
+            user_session_id: completeEventData.context.user_session_id,
+            lead_created_at: completeEventData.context.created_at,
+            checkout_started_at: completeEventData.context.created_at,
+            
+            // Payment lifecycle (NEW - enables targeted campaigns)
+            payment_status: 'lead', // Lead stage
+            
+            // Attribution data (ENHANCED - complete UTM tracking)
+            utm_source: completeEventData.attribution.utm_source,
+            utm_medium: completeEventData.attribution.utm_medium,
+            utm_campaign: completeEventData.attribution.utm_campaign,
+            utm_content: completeEventData.attribution.utm_content,
+            utm_term: completeEventData.attribution.utm_term,
+            first_utm_source: sessionStorage.getItem('first_utm_source') || undefined,
+            first_utm_campaign: sessionStorage.getItem('first_utm_campaign') || undefined,
+            referrer: completeEventData.attribution.referrer,
+            referrer_domain: completeEventData.attribution.referrer_domain,
+            landing_page: completeEventData.attribution.landing_page,
+            
+            // Behavioral data (ENHANCED)
+            time_on_page: behaviorData.timeOnPage,
+            scroll_depth: behaviorData.scrollDepth,
+            sections_viewed: behaviorData.sectionsViewed.join(','),
+            page_views: behaviorData.pageViews,
+            is_returning_visitor: behaviorData.isReturningVisitor,
+            session_duration: behaviorData.sessionDuration,
+            
+            // Device & browser (NEW - for segmentation)
+            device_type: userEnvironment.deviceInfo.type,
+            device_brand: userEnvironment.deviceInfo.brand,
+            browser_name: userEnvironment.browserInfo.name,
+            browser_version: userEnvironment.browserInfo.version,
+            screen_resolution: userEnvironment.screenResolution,
+            viewport_size: userEnvironment.viewportSize,
+            
+            // Business context (NEW - prepared for Phase 2)
+            preferred_language: userEnvironment.language,
+            timezone: userEnvironment.timezone,
+            event_interest: 'cafe_com_vendas_lisbon_2025-09-20',
+            intent_signal: 'started_checkout',
+            lead_score: this.calculateLeadScore(behaviorData, attributionData, userEnvironment),
+            signup_page: window.location.pathname,
+            
+            // === PHASE 2 PREPARATION FIELDS ===
+            // Consent management (prepared for Phase 2)
+            marketing_consent: completeEventData.consent.marketing_consent,
+            consent_method: completeEventData.consent.consent_method,
+            consent_timestamp: completeEventData.consent.consent_timestamp,
+            
+            // Business qualification (prepared for future)
+            business_stage: 'unknown', // Future: add form field
+            business_type: 'unknown', // Future: add form field
+            primary_goal: 'unknown', // Future: add form field
+            main_challenge: 'unknown' // Future: add form field
+          },
           
-          // Intent & lifecycle
-          event_interest: 'cafe_com_vendas_lisbon_2025-09-20',
-          intent_signal: 'started_checkout',
-          lead_score: this.calculateLeadScore(behaviorData, attributionData, userEnvironment),
-          signup_page: window.location.pathname,
-          referrer_domain: attributionData.referrer_domain,
-          
-          // Attribution data
-          utm_source: attributionData.utm_source,
-          utm_medium: attributionData.utm_medium,
-          utm_campaign: attributionData.utm_campaign,
-          utm_content: attributionData.utm_content,
-          utm_term: attributionData.utm_term,
-          first_utm_source: sessionStorage.getItem('first_utm_source'),
-          first_utm_campaign: sessionStorage.getItem('first_utm_campaign'),
-          referrer: attributionData.referrer,
-          landing_page: attributionData.landing_page,
-          
-          // Device & browser data
-          device_type: userEnvironment.deviceInfo.type,
-          device_brand: userEnvironment.deviceInfo.brand,
-          browser_name: userEnvironment.browserInfo.name,
-          browser_version: userEnvironment.browserInfo.version,
-          screen_resolution: userEnvironment.screenResolution,
-          viewport_size: userEnvironment.viewportSize,
-          
-          // Behavioral data
-          time_on_page: behaviorData.timeOnPage,
-          scroll_depth: behaviorData.scrollDepth,
-          sections_viewed: behaviorData.sectionsViewed.join(','),
-          page_views: behaviorData.pageViews,
-          is_returning_visitor: behaviorData.isReturningVisitor,
-          session_duration: behaviorData.sessionDuration
+          // Status and timestamps following 2025 MailerLite API best practices
+          status: 'active',
+          subscribed_at: completeEventData.context.created_at,
+          ip_address: undefined, // Will be determined by server
+          opted_in_at: completeEventData.context.created_at,
+          optin_ip: undefined // Will be determined by server
         };
 
         const mailerliteResponse = await fetch(`${ENV.urls.base}/.netlify/functions/mailerlite-lead`, {
@@ -1718,16 +1768,57 @@ export const Checkout: CheckoutSectionComponent = {
         // Generate fresh idempotency key for each payment attempt to avoid conflicts during testing
         this.idempotencyKey = this.generateIdempotencyKey();
         
-        // Prepare request payload
+        // === PHASE 1 ENHANCEMENT: Enhanced Payment Intent Payload ===
+        // Get the event data that was generated earlier in handleLeadSubmit
+        const completeEventData = getEventData({
+          marketing_consent: true, // Assume consent for now, Phase 2 will add consent modal
+          consent_method: 'implied'
+        });
+
+        // Collect rich user data for enhanced tracking
+        const userEnvironment = getUserEnvironment();
+        // Note: attributionData and behaviorData embedded in completeEventData below
+
+        // Enhanced payload matching EnhancedPaymentIntentPayload interface
         const requestPayload = {
-          // Required fields for Netlify Function
-          lead_id: this.leadId,
+          // Phase 1 required fields
+          event_id: completeEventData.context.event_id,
+          user_session_id: completeEventData.context.user_session_id,
+
+          // Core payment fields
+          // Note: leadId = event_id for clean Phase 1 implementation
           full_name: this.leadData.fullName,
           email: this.leadData.email,
           phone: `${this.leadData.countryCode}${this.leadData.phone}`,
-          amount: priceInCents, // From centralized pricing
+          amount: priceInCents,
           currency: 'eur',
-          idempotency_key: this.idempotencyKey
+          idempotency_key: this.idempotencyKey,
+
+          // Attribution data
+          utm_source: completeEventData.attribution.utm_source,
+          utm_medium: completeEventData.attribution.utm_medium,
+          utm_campaign: completeEventData.attribution.utm_campaign,
+          utm_content: completeEventData.attribution.utm_content,
+          utm_term: completeEventData.attribution.utm_term,
+
+          // CRM integration (will be populated by MailerLite response if available)
+          crm_contact_id: undefined, // Will be set by server if CRM integration succeeded
+          crm_deal_id: undefined,
+
+          // Consent tracking
+          marketing_consent: completeEventData.consent.marketing_consent,
+          consent_timestamp: completeEventData.consent.consent_timestamp,
+          consent_method: completeEventData.consent.consent_method,
+
+          // Customer journey tracking
+          lead_created_at: completeEventData.context.created_at,
+          checkout_started_at: completeEventData.context.created_at,
+          payment_attempt_count: '1', // First attempt
+
+          // Device context for fraud prevention
+          device_type: userEnvironment.deviceInfo.type,
+          user_agent_hash: undefined, // Will be generated server-side
+          ip_address_hash: undefined // Will be generated server-side
         };
 
         // Prepare headers with proper type handling
@@ -1773,11 +1864,15 @@ export const Checkout: CheckoutSectionComponent = {
         }
 
         const data = await response.json() as PaymentIntentResponse;
-        this.clientSecret = data.clientSecret;
         
-        logger.info('Payment intent created successfully', { 
-          leadId: this.leadId,
-          paymentIntentId: data.id 
+        // Handle clean enhanced response format
+        this.clientSecret = data.client_secret;
+        
+        logger.info('Enhanced payment intent created successfully', { 
+          eventId: data.event_id,
+          paymentIntentId: data.payment_intent_id,
+          crmContactId: data.crm_contact_id,
+          metadataFields: data.metadata_keys?.length || 0
         });
       }
     } catch (error) {

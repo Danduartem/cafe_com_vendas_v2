@@ -80,27 +80,58 @@ export const FIELD_VALUES = {
 } as const;
 
 
+// Enhanced for Phase 1
 export interface PaymentIntentRequest {
-  lead_id: string;
+  // Event tracking fields
+  event_id: string;
+  user_session_id: string;
+  
+  // Core payment fields
+  lead_id?: string;
   full_name: string;
   email: string;
   phone: string;
   amount?: number;
   currency?: string;
   idempotency_key?: string;
+  
+  // Attribution data
   utm_source?: string;
   utm_medium?: string;
   utm_campaign?: string;
   utm_term?: string;
   utm_content?: string;
+  
+  // CRM integration
+  crm_contact_id?: string;
+  crm_deal_id?: string;
+  
+  // Consent tracking
+  marketing_consent?: boolean;
+  consent_timestamp?: string;
+  consent_method?: string;
+  
+  // Customer journey tracking
+  lead_created_at?: string;
+  checkout_started_at?: string;
+  payment_attempt_count?: string;
+  
+  // Device context
+  device_type?: string;
+  user_agent_hash?: string;
+  ip_address_hash?: string;
+  
   [key: string]: unknown;
 }
 
+// Enhanced for Phase 1
 export interface ValidationResult {
   isValid: boolean;
   errors: string[];
   sanitized?: {
-    lead_id: string;
+    event_id: string;
+    user_session_id: string;
+    lead_id: string; // Fallback to event_id if not provided
     full_name: string;
     email: string;
     phone: string;

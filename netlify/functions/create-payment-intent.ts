@@ -5,12 +5,17 @@
 
 import Stripe from 'stripe';
 import type {
-  PaymentIntentMetadata,
   PaymentIntentRequest,
   RateLimitResult,
   ValidationResult,
   ValidationRules
 } from './types';
+
+// Import enhanced tracking types for Phase 1
+import type {
+  EnhancedStripeMetadata,
+  EnhancedPaymentIntentResponse
+} from '../../src/types/enhanced-tracking.js';
 
 // Cache and rate limiting interfaces
 interface CustomerCacheEntry {
@@ -146,7 +151,7 @@ class CustomerCacheManager {
 
 // Validation schemas
 const VALIDATION_RULES: ValidationRules = {
-  required_fields: ['lead_id', 'full_name', 'email', 'phone'],
+  required_fields: ['event_id', 'user_session_id', 'full_name', 'email', 'phone'],  // Updated for Phase 1
   email_regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   phone_regex: /^[+]?[0-9][\d\s\-()]{7,20}$/, // International format with spaces/dashes allowed
   name_min_length: 2,
@@ -174,9 +179,16 @@ function validatePaymentRequest(requestBody: PaymentIntentRequest): ValidationRe
 
   const { lead_id, full_name, email, phone, amount, currency = 'eur' } = requestBody;
 
-  // Validate lead_id format (UUID-like)
-  if (!/^[a-zA-Z0-9\-_]{8,}$/.test(lead_id.trim())) {
-    errors.push('Invalid lead_id format');
+  // Validate event_id and user_session_id (UUID v4 format)
+  const event_id = requestBody.event_id;
+  const user_session_id = requestBody.user_session_id;
+  
+  if (!event_id || !/^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$/.test(event_id.trim())) {
+    errors.push('Invalid event_id format (expected UUID v4)');
+  }
+
+  if (!user_session_id || !/^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$/.test(user_session_id.trim())) {
+    errors.push('Invalid user_session_id format (expected UUID v4)');
   }
 
   // Validate full name
@@ -246,7 +258,9 @@ function validatePaymentRequest(requestBody: PaymentIntentRequest): ValidationRe
     isValid: errors.length === 0,
     errors,
     sanitized: {
-      lead_id: lead_id.trim(),
+      event_id: event_id.trim(),
+      user_session_id: user_session_id.trim(),
+      lead_id: lead_id ? lead_id.trim() : event_id.trim(),
       full_name: cleanName,
       email: cleanEmail,
       phone: phone.trim(), // Keep original format for display
@@ -458,7 +472,16 @@ export default async (request: Request): Promise<Response> => {
     }
 
     // Use sanitized data
-    const { lead_id, full_name, email, phone, amount: paymentAmount, currency } = validation.sanitized!;
+    const { 
+      event_id, 
+      user_session_id, 
+      lead_id, 
+      full_name, 
+      email, 
+      phone, 
+      amount: paymentAmount, 
+      currency 
+    } = validation.sanitized!;
 
     // Create or retrieve customer with validated data
     const customerData = {
@@ -474,15 +497,12 @@ export default async (request: Request): Promise<Response> => {
     };
 
     let customer;
-    let cacheHit = false;
 
     try {
       // First, check cache for existing customer
       customer = CustomerCacheManager.get(customerData.email);
 
       if (customer) {
-        cacheHit = true;
-        console.log(`Customer cache hit for ${customerData.email}`);
 
         // Update customer with latest information if data has changed
         const needsUpdate =
@@ -508,7 +528,6 @@ export default async (request: Request): Promise<Response> => {
           CustomerCacheManager.set(customerData.email, customer);
         }
       } else {
-        console.log(`Customer cache miss for ${customerData.email}, querying Stripe`);
 
         // Try to find existing customer by email with timeout
         const existingCustomers = await withTimeout(
@@ -571,27 +590,55 @@ export default async (request: Request): Promise<Response> => {
       });
     }
 
-    // Prepare metadata for PaymentIntent with validated UTM parameters
-    const metadata: PaymentIntentMetadata = {
-      lead_id,
-      customer_name: full_name,
-      customer_email: email,
-      customer_phone: phone.trim(),
-      event_name: 'Café com Vendas - Lisboa',
-      event_date: '2024-09-20',
-      spot_type: 'first_lot_early_bird',
-      source: 'checkout_modal',
-      created_at: new Date().toISOString(),
-      validation_version: '1.0',
-      idempotency_key: idempotencyKey
+    // Build comprehensive enhanced Stripe metadata
+    const metadata: EnhancedStripeMetadata = {
+      // Event tracking - unified tracking across all systems
+      event_id: event_id,
+      user_session_id: user_session_id,
+
+      // Contact information
+      email: email,
+      phone: phone,
+      full_name: full_name,
+
+      // Product information
+      product_id: 'cafe-com-vendas-ticket',
+      product_name: 'Café com Vendas - Lisbon 2025',
+      event_date: '2025-09-20',
+
+      // Attribution data - complete tracking
+      utm_source: requestBody.utm_source as string || undefined,
+      utm_medium: requestBody.utm_medium as string || undefined,
+      utm_campaign: requestBody.utm_campaign as string || undefined,
+      utm_content: requestBody.utm_content as string || undefined,
+      utm_term: requestBody.utm_term as string || undefined,
+
+      // CRM integration - reference to CRM system
+      crm_contact_id: requestBody.crm_contact_id as string || undefined,
+      crm_deal_id: requestBody.crm_deal_id as string || undefined,
+
+      // Consent tracking
+      marketing_consent: (requestBody.marketing_consent as boolean) ? 'true' : 'false',
+      consent_timestamp: requestBody.consent_timestamp as string || new Date().toISOString(),
+      consent_method: requestBody.consent_method as string || 'implied',
+
+      // Customer journey tracking
+      lead_created_at: requestBody.lead_created_at as string || new Date().toISOString(),
+      checkout_started_at: requestBody.checkout_started_at as string || new Date().toISOString(),
+      payment_attempt_count: requestBody.payment_attempt_count as string || '1',
+
+      // Device context for fraud prevention
+      device_type: requestBody.device_type as string || undefined,
+      user_agent_hash: requestBody.user_agent_hash as string || undefined,
+      ip_address_hash: requestBody.ip_address_hash as string || undefined
     };
 
-    // Add validated UTM parameters
-    for (const utmParam of VALIDATION_RULES.utm_params) {
-      if (requestBody[utmParam] && typeof requestBody[utmParam] === 'string') {
-        metadata[utmParam] = requestBody[utmParam].trim().substring(0, 255);
-      }
-    }
+    // Filter out undefined values and convert to strings for Stripe
+    const cleanMetadata = Object.fromEntries(
+      Object.entries(metadata)
+        .filter(([_, value]) => value !== undefined && value !== null)
+        .map(([key, value]) => [key, String(value)])
+    );
 
     // Create PaymentIntent with idempotency key and timeout
     const paymentIntent = await withTimeout(
@@ -603,11 +650,7 @@ export default async (request: Request): Promise<Response> => {
           enabled: true,
           allow_redirects: 'always'
         },
-        // Use account default payment method configuration
-        metadata: {
-          ...metadata,
-          idempotency_key: idempotencyKey
-        },
+        metadata: cleanMetadata,
         description: `Café com Vendas - Lisboa: ${full_name}`,
         receipt_email: email,
         // Payment method options for different payment types
@@ -642,20 +685,22 @@ export default async (request: Request): Promise<Response> => {
 
     console.log(`Created PaymentIntent ${paymentIntent.id} for customer ${customer.email}`);
 
-    // Log cache performance for monitoring
-    const cacheStats = CustomerCacheManager.getStats();
-    console.log(`Customer cache stats: ${JSON.stringify(cacheStats)}, Cache hit: ${cacheHit}`);
+    const enhancedResponse: EnhancedPaymentIntentResponse = {
+      success: true,
+      client_secret: paymentIntent.client_secret!,
+      payment_intent_id: paymentIntent.id,
+      event_id: event_id,
 
-    // Return success response with client secret and idempotency info
-    return new Response(JSON.stringify({
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
-      customerId: customer.id,
-      amount: paymentAmount,
-      currency: currency,
-      idempotencyKey: idempotencyKey,
-      cacheHit: cacheHit // For debugging/monitoring
-    }), {
+      // CRM correlation
+      crm_contact_id: requestBody.crm_contact_id as string || undefined,
+      crm_deal_id: requestBody.crm_deal_id as string || undefined,
+
+      // Enhanced metadata stored
+      metadata_keys: Object.keys(cleanMetadata)
+    };
+
+
+    return new Response(JSON.stringify(enhancedResponse), {
       status: 200,
       headers: responseHeaders
     });
