@@ -345,7 +345,7 @@ describe('MailerLite API Functions', () => {
           payment_status: 'lead',
           checkout_started_at: new Date().toISOString()
         },
-        groups: ['164068163344925725'] // LEADS group
+        groups: ['164068163'] // Test group with safe precision
       };
 
       const response = await fetch('https://connect.mailerlite.com/api/subscribers', {
@@ -359,7 +359,7 @@ describe('MailerLite API Functions', () => {
 
       expect(response.ok).toBe(true);
       const data = await response.json();
-      expect(data.data.groups).toContain('164068163344925725');
+      expect(data.data.groups).toContain('164068163');
     });
 
     it('should assign buyer_paid group for successful payments', async () => {

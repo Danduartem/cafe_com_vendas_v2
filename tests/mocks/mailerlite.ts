@@ -21,7 +21,7 @@ export const mockSubscriber = {
     payment_status: 'lead',
     lead_id: 'test-lead-123'
   },
-  groups: ['164068163344925725'],
+  groups: ['164068163'], // Use smaller test group ID to avoid JavaScript precision issues
   created_at: '2024-01-01T10:00:00Z',
   updated_at: '2024-01-01T10:00:00Z'
 };
