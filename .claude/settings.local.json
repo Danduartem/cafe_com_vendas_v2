@@ -59,7 +59,8 @@
       "Bash(./context7-reminder.sh:*)",
       "Bash(npm test:*)",
       "WebFetch(domain:vite.dev)",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "Bash(node:*)"
     ]
   },
   "enabledMcpjsonServers": [
