@@ -13,18 +13,11 @@
         <span class="block text-4xl md:text-5xl lg:text-6xl bg-gradient-to-r from-burgundy-700 via-burgundy-600 to-burgundy-500 bg-clip-text text-transparent mt-2 font-lora">
           {{ currentSection.copy.headline_part2 }}
         </span>
-        <div class="mx-auto mt-4 h-1 w-24 bg-gradient-to-r from-burgundy-600 to-burgundy-700 rounded-full"></div>
       </h2>
       
       <div class="max-w-4xl mx-auto space-y-4">
         <p class="text-xl md:text-2xl text-navy-700 font-medium font-century">
           {{ currentSection.copy.subhead }}
-        </p>
-        <p class="text-lg text-navy-600 leading-relaxed font-century">
-          {{ currentSection.copy.description }}
-          <span class="inline-flex items-center px-3 py-1 bg-burgundy-100 text-burgundy-700 rounded-full font-semibold text-sm">
-            {{ site.event.capacity.totalCapacity }} empreendedoras
-          </span>
         </p>
       </div>
     </div>
@@ -128,7 +121,18 @@
                 </div>
                 
                 <p class="text-navy-700 font-century leading-relaxed mb-4">
-                  {{ currentSection.copy.guarantee.policy | replace('pelo menos 20%', '<span class="font-bold text-burgundy-700 font-century">' + currentSection.copy.guarantee.claim + '</span>') | safe }}
+                  {{
+                    currentSection.copy.guarantee.policy
+                      | replace(
+                          'GARANTIA EXTRA:',
+                          '<span class="font-bold text-burgundy-700 font-century">GARANTIA EXTRA:</span>'
+                        )
+                      | replace(
+                          'aumentado suas vendas em pelo menos 20%',
+                          '<span class="font-bold text-burgundy-700 font-century">aumentado suas vendas em pelo menos 20%</span>'
+                        )
+                      | safe
+                  }}
                 </p>
                 
                 <div class="border-t border-neutral-300 pt-4">
