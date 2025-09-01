@@ -4,17 +4,17 @@
   "copy": {
     "eyebrow": "Última chamada",
     "headline": {
-      "line1": "Você tem duas escolhas:",
-      "line2": "continuar a fazer tudo sozinha",
-      "line3": "ou aceitar o mapa para a sua liberdade"
+      "line1": "",
+      "line2": "“Insanidade é fazer sempre a mesma coisa e esperar resultados diferentes.”  Albert Einstein",
+      "line3": ""
     },
     "description": {
-      "paragraph1": "As vagas são estritamente limitadas para garantir um ambiente intimista e de profunda transformação.",
-      "paragraph2": "Esta edição é única — garanta o seu lugar e comece a transformação hoje."
+      "paragraph1": "Foi libertador descobrir que empreender com liberdade não é sorte, nem mágica, é método. Eu só consegui quando parei de insistir no mesmo jeito de empreender e criei um plano prático baseado em 5 pilares.",
+      "paragraph2": "um método que aumentou meu lucro, reduziu minha carga de trabalho para 4 horas por semana e, finalmente, me deu a liberdade que eu sempre sonhei."
     },
     "cta": {
       "line1": "Sim, eu escolho",
-      "line2": "A LIBERDADE",
+      "line2": "SER LIVRE",
       "href": "#checkout"
     },
     "trustIndicators": [

@@ -2,14 +2,14 @@
  * Consolidated site data - combines site metadata, event details, presenter info, and global strings
  * Replaces: site.ts, event.ts, presenter.ts, global.ts
  */
-export default function() {
+export default function () {
   return {
     // Site metadata
     name: 'Café com Vendas',
     title: 'Café com Vendas - Evento para Empreendedoras em Portugal',
     description: "Chega de usar o burnout como medalha de honra. O evento presencial e intimista que lhe dará o mapa para trocar o 'trabalhar duro' pelo 'trabalhar com inteligência'. Para empreendedoras em Portugal que querem estratégia, leveza e liberdade nos seus negócios.",
-    url: 'https://cafecomvendas.pt',
-    baseUrl: 'https://cafecomvendas.pt',
+    url: 'https://jucanamaximiliano.com.br',
+    baseUrl: 'https://jucanamaximiliano.com.br',
     lang: 'pt-PT',
     locale: 'pt_PT',
     meta: {
@@ -66,12 +66,13 @@ export default function() {
         }
       },
       guarantee: {
-        claim: 'Garantia de 90 Dias - 100% do Seu Dinheiro de Volta',
-        policy: 'Se participar do evento e não se sentir completamente satisfeita com o conteúdo e metodologia, devolvemos 100% do valor investido em até 90 dias.',
+        claim: 'GARANTIA EXTRA - 100% do Seu Dinheiro de Volta',
+        policy: 'Acreditamos tanto no poder transformador do Café com Vendas que oferecemos uma garantia completa de 90 dias. Se, após participar do evento e aplicar tudo o que foi proposto, você não conseguir estruturar um método para trabalhar menos, faturar mais e aumentar suas vendas em pelo menos 20%, devolvemos 100% do valor investido, sem burocracia.Para ter acesso à garantia, basta:',
         requirements: [
-          'Participação em pelo menos 80% do evento',
-          'Feedback construtivo sobre a experiência',
-          'Solicitação em até 90 dias após o evento'
+          'Participar integralmente das 7 horas do evento',
+          'Executar todas as atividades propostas no material de apoio',
+          'Solicitar o reembolso em até 90 dias após o evento',
+          'Justificativa clara dos motivos da insatisfação'
         ]
       }
     },
@@ -97,7 +98,7 @@ export default function() {
         '@type': 'Person',
         name: 'Juçanã Maximiliano',
         jobTitle: 'Estratega de Negócios para Empreendedoras',
-        url: 'https://cafecomvendas.pt',
+        url: 'https://jucanamaximiliano.com.br',
         sameAs: [
           'https://www.instagram.com/jucanamaximiliano'
         ]
@@ -106,8 +107,8 @@ export default function() {
 
     // Contact information
     contact: {
-      whatsapp: '+351935251983',
-      email: 'contato@cafecomvendas.pt'
+      whatsapp: '+5547991253299',
+      email: 'contato@jucanamaximiliano.com.br'
     },
 
     // Legal pages content
@@ -117,32 +118,19 @@ export default function() {
         lastUpdated: 'Janeiro 2025',
         sections: [
           {
-            title: 'Nossa Garantia de 90 Dias',
-            content: 'Oferecemos uma garantia completa de 90 dias para o evento Café com Vendas. Se não ficar satisfeita com o conteúdo ou metodologia apresentada, devolvemos 100% do valor investido.',
+            title: 'Nossa Garantia Incondicional de 90 Dias',
+            content: '',
             highlight: {
               type: 'success',
               showGuarantee: true
             }
           },
           {
-            title: 'Condições da Garantia',
-            content: 'Para solicitar o reembolso, é necessário participar de pelo menos 80% do evento e enviar feedback construtivo sobre a experiência.',
-            list: [
-              'Participação mínima de 80% do evento (aproximadamente 5.5 horas)',
-              'Feedback detalhado sobre pontos de melhoria',
-              'Solicitação de reembolso em até 90 dias após o evento',
-              'Justificativa clara dos motivos da insatisfação'
-            ]
-          },
-          {
             title: 'Processo de Reembolso',
             content: 'O reembolso será processado no mesmo método de pagamento utilizado na compra, num prazo de até 10 dias úteis após aprovação.',
             showContact: true
           },
-          {
-            title: 'Política de Cancelamento',
-            content: 'Cancelamentos até 7 dias antes do evento: reembolso de 100%. De 3 a 7 dias: 50%. Menos de 3 dias: sem reembolso, mas é possível transferir a vaga.'
-          }
+
         ]
       },
       privacyPolicy: {
