@@ -53,11 +53,31 @@ interface MailerLiteSearchResponse {
 }
 
 
-// Initialize Stripe with secret key and timeout configuration
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  timeout: 30000, // 30 second timeout for Stripe API calls
-  maxNetworkRetries: 2
-});
+// Enhanced Stripe initialization with Context7 best practices
+const initializeStripe = () => {
+  const apiKey = process.env.STRIPE_SECRET_KEY;
+  
+  if (!apiKey) {
+    throw new Error('Stripe secret key not configured - check STRIPE_SECRET_KEY environment variable');
+  }
+  
+  if (!apiKey.startsWith('sk_')) {
+    throw new Error('Invalid Stripe secret key format - must start with "sk_"');
+  }
+  
+  return new Stripe(apiKey, {
+    apiVersion: '2025-07-30.basil', // Lock API version for consistency
+    timeout: 30000, // 30 second timeout for Stripe API calls
+    maxNetworkRetries: 2,
+    telemetry: false, // Disable telemetry for better performance
+    appInfo: {
+      name: 'cafe-com-vendas-webhook',
+      version: '1.0.0'
+    }
+  });
+};
+
+const stripe = initializeStripe();
 
 // Use shared timeout configuration
 const TIMEOUTS = SHARED_TIMEOUTS;
@@ -180,50 +200,105 @@ export default async (request: Request): Promise<Response> => {
   let stripeEvent: Stripe.Event;
 
   try {
-    // Validate environment variables
-    if (!process.env.STRIPE_SECRET_KEY) {
-      throw new Error('Stripe secret key not configured');
+    // Enhanced environment validation with Context7 best practices
+    const requiredEnvVars = {
+      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET
+    };
+    
+    const missingVars = Object.entries(requiredEnvVars)
+      .filter(([_, value]) => !value)
+      .map(([key]) => key);
+    
+    if (missingVars.length > 0) {
+      const errorMsg = `Missing required environment variables: ${missingVars.join(', ')}`;
+      logWithCorrelation('error', errorMsg);
+      return new Response(JSON.stringify({ error: 'Configuration error' }), {
+        status: 500,
+        headers
+      });
     }
 
-    // Get Stripe signature from headers
+    // Enhanced signature validation with better error context
     const sig = request.headers.get('stripe-signature');
-    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
     if (!sig) {
+      logWithCorrelation('error', 'Missing Stripe signature header', {
+        receivedHeaders: Object.fromEntries(
+          [...request.headers.entries()]
+            .filter(([key]) => key.toLowerCase().includes('stripe'))
+        )
+      });
       return new Response(JSON.stringify({ error: 'Missing Stripe signature' }), {
         status: 400,
         headers
       });
     }
 
-    if (!endpointSecret) {
-      console.warn('Stripe webhook secret not configured - skipping signature verification');
-      // Parse event without verification (development mode)
+    // Enhanced webhook signature verification with detailed error logging
+    try {
       const body = await request.text();
-      stripeEvent = JSON.parse(body || '{}') as Stripe.Event;
-    } else {
-      // Verify webhook signature using latest async pattern
-      try {
-        const body = await request.text();
-        stripeEvent = await stripe.webhooks.constructEventAsync(
-          body || '',
-          sig,
-          endpointSecret
-        );
-      } catch (err) {
-        // Handle StripeSignatureVerificationError specifically
-        if (err instanceof Error && err.name === 'StripeSignatureVerificationError') {
-          logWithCorrelation('error', 'Stripe signature verification failed', {
-            error: err.message,
-            signature: sig?.substring(0, 20) + '...' // Log partial signature for debugging
-          });
-          return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+      
+      // Validate request body
+      if (!body || body.trim() === '') {
+        logWithCorrelation('error', 'Empty request body received', {
+          contentLength: request.headers.get('content-length'),
+          contentType: request.headers.get('content-type')
+        });
+        return new Response(JSON.stringify({ error: 'Empty request body' }), {
+          status: 400,
+          headers
+        });
+      }
+      
+      // Use synchronous webhook construction for better error handling
+      stripeEvent = stripe.webhooks.constructEvent(
+        body,
+        sig,
+        endpointSecret
+      );
+      
+      logWithCorrelation('info', 'Webhook signature verified successfully', {
+        eventType: stripeEvent.type,
+        eventId: stripeEvent.id
+      });
+      
+    } catch (err) {
+      // Enhanced error handling with Context7 patterns
+      if (err instanceof Error) {
+        const errorContext = {
+          errorName: err.name,
+          errorMessage: err.message,
+          signaturePrefix: sig.substring(0, 20) + '...',
+          bodyLength: (await request.clone().text()).length,
+          timestamp: new Date().toISOString()
+        };
+        
+        if (err.name === 'StripeSignatureVerificationError') {
+          logWithCorrelation('error', 'Stripe signature verification failed', errorContext);
+          return new Response(JSON.stringify({ 
+            error: 'Invalid signature',
+            code: 'SIGNATURE_VERIFICATION_FAILED'
+          }), {
             status: 400,
             headers
           });
         }
-        throw err; // Re-throw other errors
+        
+        logWithCorrelation('error', 'Webhook construction failed', {
+          ...errorContext,
+          stack: err.stack?.split('\n').slice(0, 5).join('\n')
+        });
       }
+      
+      return new Response(JSON.stringify({ 
+        error: 'Webhook processing failed',
+        code: 'WEBHOOK_CONSTRUCTION_ERROR'
+      }), {
+        status: 400,
+        headers
+      });
     }
 
     const correlationId = logWithCorrelation('info', 'Received Stripe webhook event', {
@@ -232,7 +307,7 @@ export default async (request: Request): Promise<Response> => {
       livemode: stripeEvent.livemode
     });
 
-    // Handle different event types with retry logic
+    // Enhanced event processing with Context7 error handling patterns
     switch (stripeEvent.type) {
       case 'payment_intent.succeeded':
         await handlePaymentSuccess(stripeEvent.data.object, correlationId);

@@ -49,6 +49,8 @@ interface PaymentIntentResponse {
   status?: string;
 }
 
+// Removed unused interface to fix TypeScript warning
+
 interface PaymentErrorResponse {
   error: string;
   details?: string[] | Record<string, unknown>;
@@ -336,20 +338,25 @@ export const Checkout: CheckoutSectionComponent = {
       return Promise.resolve(this.stripe);
     }
 
-    this.stripeLoadPromise = loadStripe(ENV.stripe.publishableKey);
-    
+    // Enhanced error handling following Context7 patterns
     try {
+      this.stripeLoadPromise = loadStripe(ENV.stripe.publishableKey);
       this.stripe = await this.stripeLoadPromise;
       this.stripeLoaded = true;
       
       if (!this.stripe) {
-        throw new Error('Failed to load Stripe.js');
+        throw new Error('Stripe.js failed to load - this may be due to network issues or an invalid publishable key');
       }
       
       return this.stripe;
     } catch (error) {
       this.stripeLoadPromise = null;
-      throw error instanceof Error ? error : new Error(String(error));
+      
+      // Enhanced error context for debugging
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error during Stripe.js loading';
+      logger.error('Stripe.js loading failed:', { error: errorMessage, publishableKey: ENV.stripe.publishableKey?.substring(0, 12) + '...' });
+      
+      throw new Error(`Failed to load Stripe.js: ${errorMessage}`);
     }
   },
 
@@ -887,9 +894,9 @@ export const Checkout: CheckoutSectionComponent = {
       }
       if (payBtnSpinner) payBtnSpinner.classList.remove('hidden');
 
-      // Confirm the payment with Stripe using the Payment Element
+      // Enhanced payment confirmation with Context7 patterns
       // This handles all payment methods configured in Dashboard (cards, SEPA, iDEAL, MB Way, etc.)
-      const { error, paymentIntent } = await this.stripe.confirmPayment({
+      const confirmationResult = await this.stripe.confirmPayment({
         elements: this.elements,
         confirmParams: {
           return_url: `${window.location.origin}/thank-you`,
@@ -904,18 +911,31 @@ export const Checkout: CheckoutSectionComponent = {
         redirect: 'if_required' // Stay on page if possible, redirect if required (e.g., for SEPA/3DS)
       });
 
+      const { error, paymentIntent } = confirmationResult;
+
       if (error) {
-        // Show localized error message
+        // Enhanced error handling with Context7 patterns
         const errorMessage = this.translateStripeError(error.message || 'Erro no pagamento');
         this.showError('payError', errorMessage);
 
-        // Track payment error
+        // Enhanced error logging with more context
+        logger.error('Stripe payment confirmation failed:', {
+          errorType: error.type,
+          errorCode: error.code,
+          errorMessage: error.message,
+          leadId: this.leadId,
+          paymentMethodTypes: paymentIntent ? [] : undefined
+        });
+
+        // Track payment error with enhanced data
         import('../../../analytics/index.js').then(({ default: analytics }) => {
           analytics.track('section_engagement', {
             section: 'checkout',
             action: 'payment_error',
             error_type: error.type,
-            error_code: error.code
+            error_code: error.code,
+            error_message: error.message,
+            lead_id: this.leadId
           });
         }).catch(() => {
           logger.debug('Payment error analytics tracking unavailable');
@@ -924,6 +944,14 @@ export const Checkout: CheckoutSectionComponent = {
         // Payment succeeded without redirect (no 3DS required)
         this.setStep('success');
 
+        // Enhanced success logging
+        logger.info('Payment completed successfully:', {
+          paymentIntentId: paymentIntent.id,
+          leadId: this.leadId,
+          amount: basePrice,
+          currency: 'EUR'
+        });
+
         // Track payment success immediately since we know it succeeded
         import('../../../analytics/index.js').then(({ AnalyticsHelpers }) => {
           AnalyticsHelpers.trackConversion('payment_completed', {
@@ -931,7 +959,8 @@ export const Checkout: CheckoutSectionComponent = {
             value: basePrice, // 🎯 From centralized pricing
             currency: 'EUR',
             items: [{ name: eventName, quantity: 1, price: basePrice }], // 🎯 From centralized data
-            pricing_tier: 'early_bird'
+            pricing_tier: 'early_bird',
+            lead_id: this.leadId
           });
         }).catch(() => {
           logger.debug('Payment completion analytics tracking unavailable');
@@ -1109,8 +1138,8 @@ export const Checkout: CheckoutSectionComponent = {
     // Fallback: create UUID-like string with only valid characters [a-zA-Z0-9\-_]
     // Generate a longer string to ensure it's unique and matches backend validation
     const timestamp = Date.now().toString(36); // Base36 encoding of timestamp
-    const random1 = Math.random().toString(36).substr(2, 8); // 8 random chars
-    const random2 = Math.random().toString(36).substr(2, 8); // 8 more random chars
+    const random1 = Math.random().toString(36).substring(2, 10); // 8 random chars
+    const random2 = Math.random().toString(36).substring(2, 10); // 8 more random chars
     return `lead-${timestamp}-${random1}-${random2}`;
   },
 
@@ -1118,8 +1147,8 @@ export const Checkout: CheckoutSectionComponent = {
     // Enhanced idempotency key with test environment isolation and crypto-level randomness
     const now = Date.now();
     const microTime = performance.now().toString().replace('.', '');
-    const randomSuffix = Math.random().toString(36).substr(2, 15);
-    const sessionId = Math.random().toString(36).substr(2, 8);
+    const randomSuffix = Math.random().toString(36).substring(2, 17);
+    const sessionId = Math.random().toString(36).substring(2, 10);
     
     // Detect test environment and add test-specific prefixes to prevent collisions
     const isTestEnvironment = typeof window !== 'undefined' && 
@@ -1132,12 +1161,12 @@ export const Checkout: CheckoutSectionComponent = {
       ? (window.crypto?.getRandomValues 
           ? Array.from(window.crypto.getRandomValues(new Uint8Array(6)))
               .map(b => b.toString(36)).join('')
-          : Math.random().toString(36).substr(2, 10))
-      : Math.random().toString(36).substr(2, 10);
+          : Math.random().toString(36).substring(2, 12))
+      : Math.random().toString(36).substring(2, 12);
     
     // Generate unique worker/test identifier for test environments
     const testPrefix = isTestEnvironment 
-      ? `test_${Math.random().toString(36).substr(2, 6)}_`
+      ? `test_${Math.random().toString(36).substring(2, 8)}_`
       : '';
     
     // Include page navigation count for additional uniqueness in rapid test scenarios
@@ -1191,17 +1220,34 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   translateStripeError(message: string): string {
+    // Enhanced error translation following Context7 patterns
     const translations: Record<string, string> = {
+      // Card errors
       'Your card was declined.': 'Seu cartão foi recusado. Tente outro método de pagamento.',
       'Your card has insufficient funds.': 'Saldo insuficiente. Verifique seu limite.',
       'Your card has expired.': 'Cartão expirado. Use outro cartão.',
       'Your card number is incorrect.': 'Número do cartão incorreto.',
       'Your card\'s security code is incorrect.': 'Código de segurança incorreto.',
+      
+      // Processing errors
       'Processing error': 'Erro no processamento. Tente novamente.',
-      'Authentication required': 'Autenticação necessária. Complete a verificação.'
+      'Authentication required': 'Autenticação necessária. Complete a verificação.',
+      
+      // Network and API errors
+      'Network error': 'Erro de conexão. Verifique sua internet e tente novamente.',
+      'API error': 'Erro temporário no sistema. Tente novamente em instantes.',
+      
+      // Payment method specific
+      'Your payment method is not available.': 'Este método de pagamento não está disponível no momento.',
+      'Payment declined by issuer.': 'Pagamento recusado pelo banco emissor.',
+      
+      // General fallbacks
+      'Something went wrong.': 'Algo deu errado. Tente novamente.',
+      'Unable to process payment.': 'Não foi possível processar o pagamento. Tente outro método.'
     };
 
-    return translations[message] || message;
+    // Return translated message or fallback to original with user-friendly prefix
+    return translations[message] || `Erro: ${message}. Entre em contato conosco se o problema persistir.`;
   },
 
   handleAsyncPaymentRedirect(paymentIntent: unknown, paymentMethod: string): void {
