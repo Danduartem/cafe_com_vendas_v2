@@ -28,35 +28,11 @@
   ],
   "items": [
     {
-      "id": "business-type",
-      "question": "Para que tipo de negócio é este evento?",
-      "description": "Clique para saber se este evento é ideal para você",
+      "id": "what-it-is",
+      "question": "O que é o Café com vendas?",
+      "description": "",
       "answer": {
-        "main_text": "Para empreendedoras com produto/serviço validado que querem estruturar oferta, melhorar margens e automatizar vendas.",
-        "highlight": "Ideal para: Negócios de serviços, cursos e produtos digitais com foco em escala sustentável"
-      }
-    },
-    {
-      "id": "time-justification",
-      "question": "Não tenho mesmo tempo. Como justificar um dia fora?",
-      "description": "Descubra como um dia pode transformar semanas",
-      "answer": {
-        "main_text": "O investimento de um dia traz frameworks accionáveis que devolvem horas semanais e aumentam receita.",
-        "features_with_labels": [
-          {
-            "label": "Resultado imediato:",
-            "text": "Templates prontos e plano de 90 dias"
-          },
-          {
-            "label": "ROI garantido:",
-            "text": "Recupere 5-8 horas semanais + aumente receita em 30 dias"
-          },
-          {
-            "label": "Investimento:",
-            "text": "1 dia para transformar os próximos 12 meses"
-          }
-        ],
-        "footer_text": "<a href=\"#cta\" class=\"inline-flex items-center gap-2 text-burgundy-600 hover:text-burgundy-700 font-semibold transition-colors duration-300\">Reservar minha transformação <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17 8l4 4m0 0l-4 4m4-4H3\"/></svg></a>"
+        "main_text": "O Café com vendas é um evento imersivo e intimista para empreendedores que desejam destravar suas vendas e estruturar seus negócios para faturar mais, sem se sobrecarregar.<br><br>Durante 7 horas estratégicas em um casarão histórico de 150 anos, você receberá o método Seja Livre, o mesmo que já ajudou dezenas de fundadoras a se libertarem das próprias empresas, aumentarem lucros e empreenderem com propósito, sem se exaurir.<br><br>Aqui não tem motivação vazia nem palestras distantes de um palco. Eu estarei com você olho no olho, e você já vai colocar a mão na massa para construir sua liberdade.<br><br>Você sairá com um plano prático de execução, pronto para aplicar o método Seja Livre na sua empresa e transformar de uma vez por todas a forma como você empreende.<br><br>A proposta é simples: aumentar suas vendas sem se matar de trabalhar."
       }
     },
     {
@@ -85,16 +61,12 @@
       "special_badge": "GARANTIA"
     },
     {
-      "id": "event-logistics",
-      "question": "Onde acontece e como é a logística do evento?",
-      "description": "Tudo sobre localização, horários e o que levar",
+      "id": "where-it-is",
+      "question": "Quando e onde acontece esse evento?",
+      "description": "",
       "answer": {
-        "main_text": "O evento acontece no centro de Lisboa, em espaço exclusivo e intimista. Começamos às 9h e terminamos às 18h, com pausas estratégicas e networking dirigido.",
+        "main_text": "Dia 20/09/25, sábado, às 14h na Mesa Corrida, um casarão histórico lindíssimo na Ajuda em Lisboa.",
         "features_with_labels": [
-          {
-            "label": "Localização:",
-            "text": "Centro de Lisboa, fácil acesso de metro e autocarro"
-          },
           {
             "label": "Grupo pequeno:",
             "text": "Máximo 25 empreendedoras para atenção personalizada"
@@ -108,69 +80,27 @@
       }
     },
     {
-      "id": "networking-value",
-      "question": "Vou conseguir fazer networking de qualidade?",
-      "description": "Descubra o valor das conexões que vai criar",
+      "id": "whos-it-for",
+      "question": "Para quem é o Café com vendas?",
+      "description": "",
       "answer": {
-        "main_text": "Sim! Selecionamos cuidadosamente cada participante para criar um grupo diverso mas alinhado de empreendedoras sérias, focadas em crescimento sustentável.",
-        "highlight": "Networking dirigido com pausas estratégicas e atividades de conexão",
-        "features": [
-          "Perfil das participantes: negócios estabelecidos buscando escala",
-          "Dinâmicas facilitadas para conexões genuínas",
-          "Grupo WhatsApp exclusivo pós-evento para continuar as trocas"
-        ]
+        "main_text": "Para mulheres empreendedoras que desejam parar de carregar suas empresas nas costas e construir um negócio que trabalha por elas."
       }
     },
     {
-      "id": "post-event-support",
-      "question": "Que suporte terei após o evento?",
-      "description": "Como continuar a aplicar o que aprender",
+      "id": "invite",
+      "question": "Como recebo meu convite?",
+      "description": "",
       "answer": {
-        "main_text": "Você não fica sozinha! Oferecemos suporte estruturado para garantir a implementação do que aprender e maximizar os seus resultados.",
-        "features_with_labels": [
-          {
-            "label": "30 dias:",
-            "text": "Acesso ao grupo exclusivo para dúvidas e partilhas"
-          },
-          {
-            "label": "Templates digitais:",
-            "text": "Todos os frameworks prontos para usar"
-          },
-          {
-            "label": "Sessão de follow-up:",
-            "text": "Encontro online 30 dias depois para acompanhar progressos"
-          }
-        ],
-        "footer_text": "<a href=\"#cta\" class=\"inline-flex items-center gap-2 text-burgundy-600 hover:text-burgundy-700 font-semibold transition-colors duration-300\">Garantir meu lugar agora <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17 8l4 4m0 0l-4 4m4-4H3\"/></svg></a>"
+        "main_text": "Após a aprovação do pagamento, você receberá os dados de acesso automaticamente no e-mail cadastrado no ato da compra. Por isso, é importante que você cadastre o seu melhor  e-mail. Procure por um e-mail (inclusive no spam) enviado pelo contato@jucanamaximiliano.com.br"
       }
     },
     {
-      "id": "investment-value",
-      "question": "O investimento vale mesmo a pena?",
-      "description": "Compare o custo com o retorno esperado",
+      "id": "meals",
+      "question": "Terão refeições e bebidas inclusas?",
+      "description": "",
       "answer": {
-        "main_text": "O investimento representa menos de 0,5% da receita que a maioria das participantes gera nos primeiros 90 dias após aplicar o método.",
-        "highlight": "Retorno médio: 300-500% do investimento nos primeiros 6 meses",
-        "features_with_labels": [
-          {
-            "label": "Perspectiva:",
-            "text": "Equivale ao que gasta num almoço de negócios por semana"
-          },
-          {
-            "label": "Retorno documentado:",
-            "text": "Participantes anteriores aumentaram 35-80% das vendas"
-          }
-        ],
-        "footer_text": "<a href=\"#cta\" class=\"inline-flex items-center gap-2 text-burgundy-600 hover:text-burgundy-700 font-semibold transition-colors duration-300\">Reservar minha vaga com desconto <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M17 8l4 4m0 0l-4 4m4-4H3\"/></svg></a>"
-      }
-    },
-    {
-      "id": "about-jucana",
-      "question": "Quem é a Juçanã Maximiliano?",
-      "description": "Conheça quem vai guiar sua transformação",
-      "answer": {
-        "main_text": "Juçanã é estratega de negócios e fundadora do Café com Vendas. Ao longo de 7 anos, guiou empreendedoras de serviços, cursos e produtos digitais a simplificarem ofertas, aumentarem margens e criarem rotinas que libertam tempo.",
-        "highlight": "Especialista em transformar negócios complexos em sistemas simples e lucrativos"
+        "main_text": "Sim! Almoço com sobremesa e bebidas e um coquetel especial de encerramento com lanches, doces e também bebidas exclusivas. Você estará muito bem servida."
       }
     }
   ]
