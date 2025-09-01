@@ -4,6 +4,7 @@
  * Provides GA4-compliant section view events with viewport detection
  */
 
+import { pluginDebugLog } from '../utils/debug.js';
 import type { PluginFactory, SectionTrackingPayload, AnalyticsInstance } from '../types/index.js';
 
 interface SectionTrackingPluginConfig extends Record<string, unknown> {
@@ -32,9 +33,7 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
     initialize(context) {
       // Store analytics instance reference for methods
       analyticsInstance = context?.instance;
-      if (debug) {
-        console.warn('[Section Tracking Plugin] Initialized with threshold:', threshold);
-      }
+      pluginDebugLog(debug, '[Section Tracking Plugin] Initialized with threshold:', threshold);
     },
 
     methods: {
@@ -46,7 +45,7 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
       initSectionTracking(sectionName: string, customThreshold: number = threshold) {
         const section = document.querySelector(`#s-${sectionName}`);
         if (!section) {
-          console.warn(`[Section Tracking Plugin] Section #s-${sectionName} not found`);
+          pluginDebugLog(debug, `[Section Tracking Plugin] Section #s-${sectionName} not found`);
           return;
         }
 
@@ -78,18 +77,14 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
                     });
                   }
 
-                  if (debug) {
-                    console.warn('[Section Tracking Plugin] Section view tracked:', sectionViewPayload);
-                  }
+                  pluginDebugLog(debug, '[Section Tracking Plugin] Section view tracked:', sectionViewPayload);
                 }
                 
                 // Mark as viewed and unobserve (fire once per session)
                 viewedSections.add(sectionName);
                 observer.unobserve(entry.target);
 
-                if (debug) {
-                  console.warn(`[Section Tracking Plugin] Section viewed: ${sectionName}`);
-                }
+                pluginDebugLog(debug, `[Section Tracking Plugin] Section viewed: ${sectionName}`);
               }
             });
           },
@@ -101,9 +96,7 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
 
         observer.observe(section);
 
-        if (debug) {
-          console.warn(`[Section Tracking Plugin] Started tracking section: ${sectionName}`);
-        }
+        pluginDebugLog(debug, `[Section Tracking Plugin] Started tracking section: ${sectionName}`);
       },
 
       /**
@@ -135,9 +128,7 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
           });
         }
 
-        if (debug) {
-          console.warn('[Section Tracking Plugin] Section view tracked:', sectionViewPayload);
-        }
+        pluginDebugLog(debug, '[Section Tracking Plugin] Section view tracked:', sectionViewPayload);
       },
 
       /**
@@ -156,9 +147,7 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
           ...data
         });
 
-        if (debug) {
-          console.warn('[Section Tracking Plugin] Section engagement tracked:', { sectionName, action, data });
-        }
+        pluginDebugLog(debug, '[Section Tracking Plugin] Section engagement tracked:', { sectionName, action, data });
       },
 
       /**
@@ -167,9 +156,7 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
       resetSectionTracking() {
         viewedSections.clear();
         
-        if (debug) {
-          console.warn('[Section Tracking Plugin] Section tracking reset');
-        }
+        pluginDebugLog(debug, '[Section Tracking Plugin] Section tracking reset');
       },
 
       /**

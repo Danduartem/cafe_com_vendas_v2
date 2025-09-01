@@ -4,6 +4,7 @@
  * Tracks LCP, CLS, FID, and page load performance
  */
 
+import { pluginDebugLog } from '../utils/debug.js';
 import type { PluginFactory, PerformanceTrackingPayload, AnalyticsInstance } from '../types/index.js';
 
 interface PerformancePluginConfig extends Record<string, unknown> {
@@ -123,9 +124,7 @@ export const performancePlugin: PluginFactory<PerformancePluginConfig> = (config
     });
     fidObserver.observe({entryTypes: ['first-input']});
 
-    if (debug) {
-      console.warn('[Performance Plugin] Core Web Vitals observers initialized');
-    }
+    pluginDebugLog(debug, '[Performance Plugin] Core Web Vitals observers initialized');
   };
 
   // Setup page load performance tracking
@@ -141,9 +140,7 @@ export const performancePlugin: PluginFactory<PerformancePluginConfig> = (config
             ttfb: Math.round(navigation.responseStart)
           });
 
-          if (debug) {
-            console.warn('[Performance Plugin] Page load performance tracked');
-          }
+          pluginDebugLog(debug, '[Performance Plugin] Page load performance tracked');
         }
       }, 1000);
     });
@@ -164,9 +161,7 @@ export const performancePlugin: PluginFactory<PerformancePluginConfig> = (config
           setupPageLoadTracking(instance);
         }
 
-        if (debug) {
-          console.warn('[Performance Plugin] Performance tracking initialized');
-        }
+        pluginDebugLog(debug, '[Performance Plugin] Performance tracking initialized');
       } catch (error) {
         console.error('[Performance Plugin] Initialization failed:', error);
       }

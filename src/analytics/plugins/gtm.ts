@@ -5,6 +5,7 @@
  */
 
 import { normalizeEventPayload } from '../../assets/js/utils/gtm-normalizer.js';
+import { pluginDebugLog } from '../utils/debug.js';
 import type { PluginFactory, GTMEventPayload } from '../types/index.js';
 
 interface GTMPluginConfig extends Record<string, unknown> {
@@ -23,9 +24,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
       // Ensure dataLayer exists
       window.dataLayer = window.dataLayer || [];
       
-      if (config.debug) {
-        console.warn('[GTM Plugin] Initialized with dataLayer');
-      }
+      pluginDebugLog(config.debug, '[GTM Plugin] Initialized with dataLayer');
     },
 
     /**
@@ -47,9 +46,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
         const normalizedPayload = normalizeEventPayload(payload as Record<string, unknown> & { event: string });
         window.dataLayer.push(normalizedPayload);
         
-        if (config.debug) {
-          console.warn('[GTM Plugin] Event tracked:', payload.event, normalizedPayload);
-        }
+        pluginDebugLog(config.debug, '[GTM Plugin] Event tracked:', payload.event, normalizedPayload);
       } catch (error) {
         console.error('[GTM Plugin] Track failed:', error);
       }
@@ -67,9 +64,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
         
         window.dataLayer.push(pageData);
         
-        if (config.debug) {
-          console.warn('[GTM Plugin] Page view tracked:', pageData);
-        }
+        pluginDebugLog(config.debug, '[GTM Plugin] Page view tracked:', pageData);
       } catch (error) {
         console.error('[GTM Plugin] Page tracking failed:', error);
       }
@@ -87,9 +82,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
         
         window.dataLayer.push(identifyData);
         
-        if (config.debug) {
-          console.warn('[GTM Plugin] User identified:', identifyData);
-        }
+        pluginDebugLog(config.debug, '[GTM Plugin] User identified:', identifyData);
       } catch (error) {
         console.error('[GTM Plugin] Identify failed:', error);
       }
@@ -126,9 +119,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
           ...data
         }));
 
-        if (config.debug) {
-          console.warn('[GTM Plugin] CTA click tracked:', { location, data });
-        }
+        pluginDebugLog(config.debug, '[GTM Plugin] CTA click tracked:', { location, data });
       },
 
       /**
@@ -141,9 +132,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
           ...data
         }));
 
-        if (config.debug) {
-          console.warn('[GTM Plugin] Conversion tracked:', { event, data });
-        }
+        pluginDebugLog(config.debug, '[GTM Plugin] Conversion tracked:', { event, data });
       },
 
       /**
@@ -157,9 +146,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
           item: itemNumber
         }));
 
-        if (config.debug) {
-          console.warn('[GTM Plugin] FAQ tracked:', { itemNumber, isOpen, question });
-        }
+        pluginDebugLog(config.debug, '[GTM Plugin] FAQ tracked:', { itemNumber, isOpen, question });
       },
 
       /**
@@ -168,9 +155,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
       pushToDataLayer(data: GTMEventPayload) {
         window.dataLayer.push(normalizeEventPayload(data));
         
-        if (config.debug) {
-          console.warn('[GTM Plugin] Raw dataLayer push:', data);
-        }
+        pluginDebugLog(config.debug, '[GTM Plugin] Raw dataLayer push:', data);
       }
     },
 

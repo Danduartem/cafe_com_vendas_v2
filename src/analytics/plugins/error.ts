@@ -4,6 +4,7 @@
  * Includes error deduplication and structured error reporting
  */
 
+import { pluginDebugLog } from '../utils/debug.js';
 import type { PluginFactory, ErrorTrackingPayload, AnalyticsInstance } from '../types/index.js';
 
 interface ErrorPluginConfig extends Record<string, unknown> {
@@ -38,9 +39,7 @@ export const errorPlugin: PluginFactory<ErrorPluginConfig> = (config = {}) => {
     name: 'error',
 
     initialize() {
-      if (debug) {
-        console.warn('[Error Plugin] Error tracking initialized with deduplication:', enableDeduplication);
-      }
+      pluginDebugLog(debug, '[Error Plugin] Error tracking initialized with deduplication:', enableDeduplication);
     },
 
     methods: {
@@ -89,9 +88,7 @@ export const errorPlugin: PluginFactory<ErrorPluginConfig> = (config = {}) => {
           ...errorPayload
         });
 
-        if (debug) {
-          console.warn('[Error Plugin] Error tracked:', { errorType, errorKey, context });
-        }
+        pluginDebugLog(debug, '[Error Plugin] Error tracked:', { errorType, errorKey, context });
       },
 
       /**
@@ -159,9 +156,7 @@ export const errorPlugin: PluginFactory<ErrorPluginConfig> = (config = {}) => {
           });
         });
 
-        if (debug) {
-          console.warn('[Error Plugin] Global error handlers configured');
-        }
+        pluginDebugLog(debug, '[Error Plugin] Global error handlers configured');
       },
 
       /**
@@ -170,9 +165,7 @@ export const errorPlugin: PluginFactory<ErrorPluginConfig> = (config = {}) => {
       clearErrors() {
         errors.clear();
         
-        if (debug) {
-          console.warn('[Error Plugin] Error cache cleared');
-        }
+        pluginDebugLog(debug, '[Error Plugin] Error cache cleared');
       },
 
       /**

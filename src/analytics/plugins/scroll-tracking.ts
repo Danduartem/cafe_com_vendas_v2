@@ -5,6 +5,7 @@
  */
 
 import { throttle } from '../../assets/js/utils/throttle.js';
+import { pluginDebugLog } from '../utils/debug.js';
 import type { PluginFactory, AnalyticsInstance } from '../types/index.js';
 
 interface ScrollTrackingPluginConfig extends Record<string, unknown> {
@@ -93,9 +94,7 @@ export const scrollTrackingPlugin: PluginFactory<ScrollTrackingPluginConfig> = (
 
     analyticsInstance.track('scroll_depth', eventData);
 
-    if (debug) {
-      console.warn(`[Scroll Tracking Plugin] Scroll depth reached: ${threshold}%`);
-    }
+    pluginDebugLog(debug, `[Scroll Tracking Plugin] Scroll depth reached: ${threshold}%`);
   };
 
   return {
@@ -105,9 +104,7 @@ export const scrollTrackingPlugin: PluginFactory<ScrollTrackingPluginConfig> = (
       try {
         init(instance);
         
-        if (debug) {
-          console.warn('[Scroll Tracking Plugin] Initialized with thresholds:', thresholds);
-        }
+        pluginDebugLog(debug, '[Scroll Tracking Plugin] Initialized with thresholds:', thresholds);
       } catch (error) {
         console.error('[Scroll Tracking Plugin] Initialization failed:', error);
       }
@@ -120,9 +117,7 @@ export const scrollTrackingPlugin: PluginFactory<ScrollTrackingPluginConfig> = (
       resetScrollTracking() {
         thresholds.forEach(threshold => firedThresholds.set(threshold, false));
         
-        if (debug) {
-          console.warn('[Scroll Tracking Plugin] Scroll tracking reset');
-        }
+        pluginDebugLog(debug, '[Scroll Tracking Plugin] Scroll tracking reset');
       },
 
       /**
@@ -160,9 +155,7 @@ export const scrollTrackingPlugin: PluginFactory<ScrollTrackingPluginConfig> = (
           window.removeEventListener('resize', resizeHandler);
         }
         
-        if (debug) {
-          console.warn('[Scroll Tracking Plugin] Event listeners cleaned up');
-        }
+        pluginDebugLog(debug, '[Scroll Tracking Plugin] Event listeners cleaned up');
       }
     },
 

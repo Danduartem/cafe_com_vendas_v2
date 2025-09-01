@@ -14,6 +14,7 @@ import { sectionTrackingPlugin } from './plugins/section-tracking.js';
 import { errorPlugin } from './plugins/error.js';
 import { scrollTrackingPlugin } from './plugins/scroll-tracking.js';
 import { ENV } from '../assets/js/config/constants.js';
+import { debugLog } from './utils/debug.js';
 import type { 
   AnalyticsInstance, 
   GTMPluginMethods,
@@ -87,10 +88,8 @@ export async function initializeAnalytics(): Promise<void> {
       // Scroll tracking is auto-initialized in the plugin
     }
     
-    if (ENV.isDevelopment) {
-      console.warn('[Analytics] Unified analytics system initialized');
-      console.warn('[Analytics] Available plugins:', Object.keys(analytics.plugins || {}));
-    }
+    debugLog('[Analytics] Unified analytics system initialized');
+    debugLog('[Analytics] Available plugins:', Object.keys(analytics.plugins || {}));
   } catch (error) {
     console.error('[Analytics] Initialization failed:', error);
   }
