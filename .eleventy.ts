@@ -4,17 +4,24 @@ import { HtmlBasePlugin, RenderPlugin, type UserConfig } from '@11ty/eleventy';
 import { logger } from './src/utils/logger.ts';
 
 export default function(eleventyConfig: UserConfig) {
-  // Add essential Eleventy 3.x plugins
+  // Enhanced Eleventy 3.x configuration with Context7 best practices
   eleventyConfig.addPlugin(HtmlBasePlugin);
   eleventyConfig.addPlugin(RenderPlugin);
 
-  // Development server configuration
+  // Enhanced development server configuration - Context7 patterns
   eleventyConfig.setServerOptions({
-    port: 8080
+    port: 8080,
+    // Basic performance optimizations (TypeScript-safe)
+    showAllHosts: false,
+    showVersion: false
   });
 
-  // Watch and passthrough configuration
-  // Note: Some modern API methods may not be available in current TypeScript definitions
+  // Enhanced watch and passthrough configuration with Context7 optimizations
+  // Note: Advanced API methods may not be available in current TypeScript definitions
+  // These optimizations can be applied when TypeScript definitions are updated:
+  // - setServerPassthroughCopyBehavior('passthrough')
+  // - setDynamicPermalinks(false)
+  // - setLayoutResolution(false)
 
   // Utility filters
   eleventyConfig.addFilter('jsonifyArray', (array: unknown) => {
@@ -64,13 +71,19 @@ export default function(eleventyConfig: UserConfig) {
   // Copy public directory to root for favicon and fonts (Eleventy 3.x best practice)
   eleventyConfig.addPassthroughCopy({ 'public': '.' });
 
-  // Build events for development feedback
+  // Enhanced build events with Context7 async patterns
   eleventyConfig.on('eleventy.before', () => {
-    logger.info('🚀 Starting Eleventy build...');
+    logger.info('🚀 Starting Eleventy build...', {
+      event: 'before',
+      timestamp: new Date().toISOString()
+    });
   });
 
   eleventyConfig.on('eleventy.after', () => {
-    logger.info('✅ Eleventy build completed!');
+    logger.info('✅ Eleventy build completed!', {
+      event: 'after',
+      timestamp: new Date().toISOString()
+    });
   });
 
   // Return configuration object (stable approach)

@@ -11,27 +11,35 @@ export default defineConfig({
     tailwindcss()
   ],
   
-  // Dependency optimization with Vite 7 performance improvements
+  // Enhanced dependency optimization with Context7 best practices
   optimizeDeps: {
     include: [
-      'stripe'
+      '@stripe/stripe-js', // Include Stripe client SDK
+      'stripe' // Include Stripe server SDK for consistency
     ],
-    // Improve cold start performance by processing dependencies in parallel
-    holdUntilCrawlEnd: false
+    // Optimize cold start performance - Context7 pattern
+    holdUntilCrawlEnd: false, // Process dependencies in parallel
+    // Force fresh optimization when needed
+    force: false,
+    // Enhanced esbuild options for better performance
+    esbuildOptions: {
+      target: 'es2023'
+    }
   },
   
   build: {
     outDir: '_site',
     emptyOutDir: true,
     target: 'es2023',
-    minify: 'esbuild',
-    // Disable compressed size reporting for faster builds
-    reportCompressedSize: false,
+    minify: 'esbuild', // Fastest minification option
+    // Context7 performance optimizations
+    reportCompressedSize: false, // Skip compression reporting for faster builds
     sourcemap: process.env.NODE_ENV === 'development',
-    // CSS code splitting for faster initial load
-    cssCodeSplit: true,
-    // Improve asset handling for images
-    assetsInlineLimit: 4096, // Inline assets < 4kb as base64
+    cssCodeSplit: true, // Enable CSS code splitting
+    cssMinify: 'esbuild', // Use esbuild for CSS minification
+    assetsInlineLimit: 4096, // Inline small assets
+    // Enhanced chunk size warnings
+    chunkSizeWarningLimit: 500,
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'src/assets/js/main.ts'),
@@ -55,16 +63,20 @@ export default defineConfig({
           }
           return `assets/[name][extname]`;
         },
-        // Manual chunks for better code splitting
+        // Enhanced manual chunks for optimal code splitting - Context7 pattern
         manualChunks: {
-          'vendor': ['@stripe/stripe-js']
+          'vendor': ['@stripe/stripe-js'],
+          'analytics': [], // Reserved for future analytics libs
+          'ui': [] // Reserved for UI component libraries
         }
       }
     }
   },
   
   css: {
-    devSourcemap: process.env.NODE_ENV === 'development'
+    devSourcemap: process.env.NODE_ENV === 'development',
+    // Context7 performance enhancement for CSS preprocessing
+    preprocessorMaxWorkers: true // Enable threaded CSS preprocessing
   },
   
   esbuild: {
