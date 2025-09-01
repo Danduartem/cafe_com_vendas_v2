@@ -445,7 +445,7 @@ export const Checkout: CheckoutSectionComponent = {
       // Create Elements instance with proper Dashboard integration
       this.elements = this.stripe.elements({
         clientSecret: this.clientSecret,
-        locale: 'pt', // Portuguese locale for Portugal market
+        locale: 'pt' as const, // Portuguese locale for Portugal market
         appearance: {
           theme: 'stripe',
           variables: {
@@ -513,8 +513,9 @@ export const Checkout: CheckoutSectionComponent = {
           sepaDebit: 'always',
           sofort: 'always'
         },
-        // Payment method order preference (Multibanco will show prominently for PT customers)
-        paymentMethodOrder: ['card', 'multibanco']
+        // Payment method order preference for Portuguese market
+        // Multibanco first as it's the most trusted local payment method in Portugal
+        paymentMethodOrder: ['multibanco', 'card', 'sepa_debit']
       });
 
       // Mount the Payment Element to the container
@@ -575,14 +576,14 @@ export const Checkout: CheckoutSectionComponent = {
     } catch (error) {
       logger.error('Error initializing payment element:', error);
 
-      // Show specific error messages based on the type of error
-      let errorMessage = 'Erro ao carregar formulário de pagamento.';
+      // Show specific error messages based on the type of error - Portuguese market context
+      let errorMessage = 'Erro ao carregar formulário de pagamento. O Multibanco continua disponível.';
 
       if (error instanceof Error) {
         if (error.message.includes('Network') || error.message.includes('fetch')) {
-          errorMessage = 'Problema de conexão. Verifique sua internet e tente novamente.';
+          errorMessage = 'Problema de ligação à internet. Verifique a sua conexão e tente novamente.';
         } else if (error.message.includes('Payment service')) {
-          errorMessage = 'Serviço de pagamento temporariamente indisponível. Tente novamente em instantes.';
+          errorMessage = 'Serviço de pagamento temporariamente indisponível. Experimente Multibanco - funciona sempre!';
         }
       }
 
@@ -936,7 +937,7 @@ export const Checkout: CheckoutSectionComponent = {
     try {
       if (payBtn) (payBtn as HTMLButtonElement).disabled = true;
       if (payBtnText) {
-        payBtnText.textContent = 'Processando pagamento...';
+        payBtnText.textContent = 'A processar pagamento...'; // Portuguese European form
         // Ensure text is visible by explicitly setting opacity and display
         payBtnText.style.opacity = '1';
         payBtnText.style.display = 'inline';
@@ -1036,7 +1037,7 @@ export const Checkout: CheckoutSectionComponent = {
         if (paymentMethod === 'multibanco' || paymentIntent.next_action?.type === 'multibanco_display_details') {
           // Add a visual indicator that we're transitioning to voucher display
           if (payBtnText) {
-            payBtnText.textContent = 'Gerando referência Multibanco...';
+            payBtnText.textContent = 'A gerar referência Multibanco...'; // Portuguese European progressive form
           }
           
           // Small delay to ensure payment step cleanup before showing voucher
@@ -1053,11 +1054,11 @@ export const Checkout: CheckoutSectionComponent = {
           // For other async methods, show success state in our modal
           this.setStep('success');
           
-          // Generic processing message for other async methods
+          // Generic processing message for other async methods - Portuguese tone
           const successTitle = document.querySelector('#successTitle');
           const successMessage = document.querySelector('#successMessage');
-          if (successTitle) successTitle.textContent = 'Processando pagamento...';
-          if (successMessage) successMessage.textContent = 'Você será redirecionado em breve...';
+          if (successTitle) successTitle.textContent = 'A processar o seu pagamento...';
+          if (successMessage) successMessage.textContent = 'Será redirecionado em breve para confirmar...';
         }
 
         // Track payment initiation (not completion yet)
@@ -1270,14 +1271,22 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   translateStripeError(message: string): string {
-    // Enhanced error translation following Context7 patterns
+    // Enhanced error translation for Portuguese market following Context7 patterns
     const translations: Record<string, string> = {
-      // Card errors
-      'Your card was declined.': 'Seu cartão foi recusado. Tente outro método de pagamento.',
-      'Your card has insufficient funds.': 'Saldo insuficiente. Verifique seu limite.',
-      'Your card has expired.': 'Cartão expirado. Use outro cartão.',
-      'Your card number is incorrect.': 'Número do cartão incorreto.',
-      'Your card\'s security code is incorrect.': 'Código de segurança incorreto.',
+      // Card errors - Portuguese European localization
+      'Your card was declined.': 'O seu cartão foi recusado. Experimente outro método de pagamento ou use Multibanco.',
+      'Your card has insufficient funds.': 'Saldo insuficiente no cartão. Verifique o seu limite ou use Multibanco.',
+      'Your card has expired.': 'Cartão expirado. Use outro cartão ou escolha Multibanco.',
+      'Your card number is incorrect.': 'Número do cartão incorreto. Verifique os dados ou use Multibanco.',
+      'Your card\'s security code is incorrect.': 'Código de segurança incorreto. Confirme o CVV.',
+      
+      // Multibanco specific errors (Portugal's preferred payment method)
+      'Multibanco payment failed.': 'Pagamento via Multibanco falhou. Tente gerar uma nova referência.',
+      'Invalid Multibanco reference.': 'Referência Multibanco inválida. Contacte o nosso suporte.',
+      
+      // SEPA specific errors (European context)
+      'Your bank account details are incorrect.': 'Os dados da conta bancária estão incorretos.',
+      'SEPA payment requires additional verification.': 'Pagamento SEPA requer verificação adicional.',
       
       // Processing errors
       'Processing error': 'Erro no processamento. Tente novamente.',
@@ -1287,17 +1296,18 @@ export const Checkout: CheckoutSectionComponent = {
       'Network error': 'Erro de conexão. Verifique sua internet e tente novamente.',
       'API error': 'Erro temporário no sistema. Tente novamente em instantes.',
       
-      // Payment method specific
-      'Your payment method is not available.': 'Este método de pagamento não está disponível no momento.',
-      'Payment declined by issuer.': 'Pagamento recusado pelo banco emissor.',
+      // Payment method specific - Portuguese market context
+      'Your payment method is not available.': 'Este método de pagamento não está disponível. Recomendamos Multibanco - é seguro e instantâneo.',
+      'Payment declined by issuer.': 'Pagamento recusado pelo banco emissor. O Multibanco pode ser uma alternativa.',
+      'Transaction limit exceeded.': 'Limite de transação excedido. O Multibanco permite valores até €20.000.',
       
-      // General fallbacks
-      'Something went wrong.': 'Algo deu errado. Tente novamente.',
-      'Unable to process payment.': 'Não foi possível processar o pagamento. Tente outro método.'
+      // General fallbacks - European Portuguese tone
+      'Something went wrong.': 'Algo correu mal. Por favor, tente novamente.',
+      'Unable to process payment.': 'Não foi possível processar o pagamento. Experimente outro método ou contacte-nos.'
     };
 
-    // Return translated message or fallback to original with user-friendly prefix
-    return translations[message] || `Erro: ${message}. Entre em contato conosco se o problema persistir.`;
+    // Return translated message or fallback with Portuguese customer service tone
+    return translations[message] || `Erro: ${message}. Se o problema persistir, contacte-nos através do email suporte@cafecomvendas.com.`;
   },
 
   handleAsyncPaymentRedirect(paymentIntent: unknown, paymentMethod: string): void {
@@ -1433,17 +1443,26 @@ export const Checkout: CheckoutSectionComponent = {
       logger.debug('Modal header hidden to prevent covering instructions');
     }
     
-    // Update success message for Multibanco
+    // Update success message for Multibanco - Portuguese market optimization
     const successTitle = document.querySelector('#successTitle');
     const successMessage = document.querySelector('#successMessage');
     const multibancoInstructions = document.querySelector('#multibancoInstructions');
     
     if (successTitle) {
-      successTitle.textContent = 'Referência Multibanco gerada! 🏦';
+      successTitle.textContent = 'Referência Multibanco criada com sucesso! 🏦';
     }
     
     if (successMessage) {
-      successMessage.textContent = 'Complete o pagamento usando a referência abaixo:';
+      successMessage.innerHTML = `
+        <div class="space-y-2">
+          <p class="text-lg font-medium text-navy-800">Pode agora efetuar o pagamento usando a referência abaixo:</p>
+          <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
+            <p class="text-sm text-amber-800">
+              <strong>Instruções:</strong> Aceda ao seu homebanking, MB WAY, ou terminal Multibanco e use os dados abaixo para completar o pagamento.
+            </p>
+          </div>
+        </div>
+      `;
     }
     
     // Show Multibanco instructions section with proper stacking context
@@ -1467,15 +1486,38 @@ export const Checkout: CheckoutSectionComponent = {
           }
           
           if (mbReference && details.reference) {
-            // Format reference in groups of 3 digits for better readability
+            // Format reference in groups of 3 digits for Portuguese readability standards
             const formattedRef = details.reference.replace(/(\d{3})(?=\d)/g, '$1 ');
             mbReference.textContent = formattedRef;
+            
+            // Add copy functionality for better UX in Portugal market
+            (mbReference as HTMLElement).style.cursor = 'pointer';
+            (mbReference as HTMLElement).title = 'Clique para copiar a referência';
+            mbReference.addEventListener('click', () => {
+              navigator.clipboard.writeText(details.reference).then(() => {
+                // Show temporary feedback
+                const originalText = mbReference.textContent;
+                mbReference.textContent = 'Copiado! \u2713';
+                setTimeout(() => {
+                  mbReference.textContent = originalText;
+                }, 2000);
+              }).catch(() => {
+                logger.debug('Clipboard copy not supported');
+              });
+            });
           }
           
           if (mbAmount) {
             const amount = getPaymentIntentAmount(paymentIntent);
             if (amount !== undefined) {
-              mbAmount.textContent = `€${(amount / 100).toFixed(2)}`; // Stripe amounts are in cents
+              // Format amount according to Portuguese standards
+              const formattedAmount = new Intl.NumberFormat('pt-PT', {
+                style: 'currency',
+                currency: 'EUR',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              }).format(amount / 100);
+              mbAmount.textContent = formattedAmount;
             }
           }
           
@@ -1606,36 +1648,36 @@ export const Checkout: CheckoutSectionComponent = {
     switch (fieldName) {
       case 'fullName':
         if (trimmedValue.length < 2) {
-          return { isValid: false, message: 'Nome deve ter pelo menos 2 caracteres.' };
+          return { isValid: false, message: 'O nome deve ter pelo menos 2 caracteres.' };
         }
         if (trimmedValue.length > 100) {
-          return { isValid: false, message: 'Nome muito longo (máximo 100 caracteres).' };
+          return { isValid: false, message: 'Nome demasiado longo (máximo 100 caracteres).' };
         }
         if (!/^[a-zA-ZÀ-ÿ\u0100-\u017F\s\-'.]+$/.test(trimmedValue)) {
-          return { isValid: false, message: 'Nome contém caracteres inválidos. Apenas letras, espaços e hífens são permitidos.' };
+          return { isValid: false, message: 'O nome contém caracteres inválidos. Só são permitidas letras, espaços e hífens.' };
         }
-        // Check for email-like patterns in name field
+        // Check for email-like patterns in name field - Portuguese context
         if (trimmedValue.includes('@') || /\d/.test(trimmedValue)) {
-          return { isValid: false, message: 'Parece que você digitou um email no campo do nome. Por favor, digite apenas seu nome.' };
+          return { isValid: false, message: 'Parece que introduziu um email no campo do nome. Por favor, escreva apenas o seu nome completo.' };
         }
         break;
 
       case 'email':
         if (!isValidEmail(trimmedValue)) {
-          return { isValid: false, message: 'Por favor, insira um email válido.' };
+          return { isValid: false, message: 'Por favor, introduza um email válido.' };
         }
         if (trimmedValue.length > 254) {
-          return { isValid: false, message: 'Email muito longo.' };
+          return { isValid: false, message: 'Email demasiado longo.' };
         }
         break;
 
       case 'phone': {
         if (!isValidPhone(trimmedValue)) {
-          return { isValid: false, message: 'Por favor, insira um número de telefone válido.' };
+          return { isValid: false, message: 'Por favor, introduza um número de telefone válido.' };
         }
         const cleanPhone = trimmedValue.replace(/[\s\-()]/g, '');
         if (cleanPhone.length < 7 || cleanPhone.length > 15) {
-          return { isValid: false, message: 'Telefone deve ter entre 7 e 15 dígitos.' };
+          return { isValid: false, message: 'O telefone deve ter entre 7 e 15 dígitos.' };
         }
         break;
       }

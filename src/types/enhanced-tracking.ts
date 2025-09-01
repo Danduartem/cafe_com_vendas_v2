@@ -150,6 +150,8 @@ export interface EnhancedStripeMetadata {
   product_id: string; // e.g., "cafe-com-vendas-ticket"
   product_name: string; // e.g., "Café com Vendas - Lisbon 2025"
   event_date: string; // e.g., "2025-09-20"
+  product_category?: string; // e.g., "business-event"
+  product_variant?: string; // e.g., "early-bird-ticket"
 
   // Attribution data (NEW - complete tracking)
   utm_source?: string;
@@ -157,25 +159,47 @@ export interface EnhancedStripeMetadata {
   utm_campaign?: string;
   utm_content?: string;
   utm_term?: string;
+  
+  // First-touch attribution (for cross-session tracking)
+  first_utm_source?: string;
+  first_utm_campaign?: string;
+  first_landing_page?: string;
 
   // CRM integration (NEW - reference to CRM system)
   crm_contact_id?: string;
   crm_deal_id?: string;
+  crm_pipeline_stage?: string;
 
   // Consent tracking (prepared for Phase 2)
   marketing_consent?: 'true' | 'false';
   consent_timestamp?: string;
   consent_method?: string;
+  privacy_policy_version?: string;
 
   // Customer journey tracking
   lead_created_at?: string;
   checkout_started_at?: string;
   payment_attempt_count?: string;
+  time_to_purchase_minutes?: string;
 
   // Device context (for fraud prevention)
   device_type?: string;
   user_agent_hash?: string; // Hashed for privacy
   ip_address_hash?: string; // Hashed for privacy
+  browser_language?: string;
+  screen_resolution?: string;
+  timezone?: string;
+  
+  // Phase 2 server-side attribution
+  server_attribution_enabled?: string;
+  integration_version?: string;
+  api_version?: string;
+  client_ip_country?: string;
+  referrer_domain?: string;
+  customer_segment?: string;
+  acquisition_channel?: string;
+  conversion_path_length?: string;
+  checkout_flow_version?: string;
 }
 
 /**

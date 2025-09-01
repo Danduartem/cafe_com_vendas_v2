@@ -24,6 +24,10 @@ import {
 // Stripe types removed for Phase 1 - Multibanco handling deferred to Phase 2
 // import { isStripePaymentIntent, hasMultibancoDetails, getMultibancoDetails } from '../../src/types/stripe.js';
 import { retryWithBackoff, SHARED_TIMEOUTS, withTimeout } from './shared-utils.js';
+import { DeadLetterQueue, type FailedWebhook } from './dlq-handler.js';
+
+// Webhook idempotency tracking - using Stripe event.id for deduplication
+const processedEvents = new Set<string>();
 
 // MailerLite API response interfaces
 interface MailerLiteSubscriberResponse {
@@ -198,7 +202,7 @@ export default async (request: Request): Promise<Response> => {
     });
   }
 
-  let stripeEvent: Stripe.Event;
+  let stripeEvent: Stripe.Event | undefined;
 
   try {
     // Enhanced environment validation with Context7 best practices
@@ -302,6 +306,23 @@ export default async (request: Request): Promise<Response> => {
       });
     }
 
+    // === PHASE 2 RESILIENCE: Webhook Idempotency Check ===
+    if (processedEvents.has(stripeEvent.id)) {
+      logWithCorrelation('info', `Event ${stripeEvent.id} already processed, skipping`, {
+        eventType: stripeEvent.type,
+        eventId: stripeEvent.id
+      });
+      return new Response(JSON.stringify({
+        received: true,
+        event: stripeEvent.type,
+        status: 'already_processed',
+        eventId: stripeEvent.id
+      }), {
+        status: 200,
+        headers
+      });
+    }
+
     const correlationId = logWithCorrelation('info', 'Received Stripe webhook event', {
       eventType: stripeEvent.type,
       eventId: stripeEvent.id,
@@ -309,53 +330,7 @@ export default async (request: Request): Promise<Response> => {
     });
 
     // Enhanced event processing with Context7 error handling patterns
-    switch (stripeEvent.type) {
-      case 'payment_intent.succeeded':
-        await handlePaymentSuccess(stripeEvent.data.object, correlationId);
-        break;
-
-      case 'payment_intent.processing':
-        await handlePaymentProcessing(stripeEvent.data.object, correlationId);
-        break;
-
-      case 'payment_intent.payment_failed':
-        await handlePaymentFailed(stripeEvent.data.object, correlationId);
-        break;
-
-      case 'payment_intent.canceled':
-        await handlePaymentCanceled(stripeEvent.data.object, correlationId);
-        break;
-
-      case 'payment_intent.requires_action':
-        await handlePaymentRequiresAction(stripeEvent.data.object, correlationId);
-        break;
-
-      case 'payment_intent.partially_funded':
-        await handlePaymentPartiallyFunded(stripeEvent.data.object, correlationId);
-        break;
-
-      case 'charge.dispute.created':
-        await handleChargeDispute(stripeEvent.data.object, correlationId);
-        break;
-
-      case 'checkout.session.async_payment_succeeded':
-        await handleCheckoutSessionAsyncPaymentSucceeded(stripeEvent.data.object, correlationId);
-        break;
-
-      case 'checkout.session.async_payment_failed':
-        await handleCheckoutSessionAsyncPaymentFailed(stripeEvent.data.object, correlationId);
-        break;
-
-      case 'checkout.session.completed':
-        await handleCheckoutSessionCompleted(stripeEvent.data.object, correlationId);
-        break;
-
-
-      default:
-        logWithCorrelation('info', `Unhandled event type: ${stripeEvent.type}`, {
-          eventId: stripeEvent.id
-        }, correlationId);
-    }
+    await processWebhookEventLogic(stripeEvent, correlationId);
 
 
     // Log fulfillment tracker stats for monitoring
@@ -377,10 +352,40 @@ export default async (request: Request): Promise<Response> => {
     });
 
   } catch (error) {
-    console.error('Webhook handler error:', error instanceof Error ? error.message : 'Unknown error');
+    // Enhanced error handling with DLQ integration for main webhook handler
+    const errorMessage = error instanceof Error ? error.message : 'Unknown webhook processing error';
+    
+    // If we have a stripeEvent, add to DLQ for retry
+    if (typeof stripeEvent !== 'undefined') {
+      DeadLetterQueue.addFailedEvent({
+        event_id: stripeEvent.id,
+        event_type: stripeEvent.type,
+        payload: stripeEvent,
+        max_retries: parseInt(process.env.DLQ_MAX_RETRIES || '5', 10),
+        error: errorMessage
+      });
+      
+      logWithCorrelation('error', 'Webhook processing failed, added to DLQ', {
+        eventId: stripeEvent.id,
+        eventType: stripeEvent.type,
+        error: errorMessage
+      });
+      
+      return new Response(JSON.stringify({
+        error: 'Webhook processing failed',
+        eventId: stripeEvent.id,
+        status: 'added_to_dlq'
+      }), {
+        status: 500,
+        headers
+      });
+    }
+    
+    // Fallback for errors before event parsing
+    console.error('Webhook handler error:', errorMessage);
     return new Response(JSON.stringify({
       error: 'Webhook handler failed',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: errorMessage
     }), {
       status: 500,
       headers
@@ -630,6 +635,95 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
       event_name: metadata.event_name || 'Café com Vendas',
       event_date: metadata.event_date || '20/09/2024'
     });
+
+    // === PHASE 2 ENHANCEMENT: Server-Side GTM Attribution ===
+    try {
+      const { sendPurchaseToGA4 } = await import('./server-gtm.js');
+      const { hashPIIData } = await import('./pii-hash.js');
+
+      // Build PII data for privacy-compliant hashing
+      const piiData = {
+        email: customerEmail,
+        phone: customerPhone || undefined,
+        first_name: customerName?.split(' ')[0] || undefined,
+        last_name: customerName?.split(' ').slice(1).join(' ') || undefined
+      };
+
+      // Hash PII data for enhanced attribution
+      const hashedUserData = hashPIIData(piiData);
+
+      // Build GA4 purchase event data
+      const purchaseEventData = {
+        event_name: 'purchase' as const,
+        client_id: user_session_id || paymentIntent.id,
+        timestamp_micros: Date.now() * 1000,
+        
+        // Event correlation
+        event_id: event_id || `webhook-${paymentIntent.id}`,
+        session_id: user_session_id,
+        
+        // Transaction details
+        transaction_id: paymentIntent.id,
+        value: paymentIntent.amount / 100,
+        currency: paymentIntent.currency.toUpperCase(),
+        
+        // Enhanced ecommerce items
+        items: [{
+          item_id: metadata.product_id || 'cafe-com-vendas-ticket',
+          item_name: metadata.product_name || 'Café com Vendas - Lisbon 2025',
+          category: metadata.product_category || 'business-event',
+          quantity: 1,
+          price: paymentIntent.amount / 100,
+          currency: paymentIntent.currency.toUpperCase(),
+          item_variant: metadata.product_variant || 'early-bird'
+        }],
+        
+        // Attribution data from metadata
+        source: utm_source || undefined,
+        medium: utm_medium || undefined,
+        campaign: utm_campaign || undefined,
+        content: utm_content || undefined,
+        term: utm_term || undefined,
+        
+        // Hashed user data for privacy compliance
+        user_data: hashedUserData,
+        
+        // Custom parameters for enhanced tracking
+        custom_parameters: {
+          payment_method: paymentIntent.payment_method_types?.[0] || 'unknown',
+          customer_type: (metadata.customer_segment === 'returning' ? 'returning' : 'new'),
+          affiliate_id: metadata.utm_source || undefined,
+          integration_version: metadata.integration_version || 'phase-2'
+        } as const
+      };
+
+      // Send to server-side GTM
+      const gtmResult = await sendPurchaseToGA4(purchaseEventData);
+      
+      if (gtmResult.success) {
+        logWithCorrelation('info', `Server GTM purchase event sent successfully`, {
+          transaction_id: paymentIntent.id,
+          event_id,
+          user_session_id,
+          value: paymentIntent.amount / 100,
+          attribution_source: utm_source
+        });
+      } else {
+        logWithCorrelation('warn', `Server GTM purchase event failed: ${gtmResult.error}`, {
+          transaction_id: paymentIntent.id,
+          event_id,
+          error: gtmResult.error
+        });
+      }
+
+    } catch (serverGTMError) {
+      // Non-blocking error - don't prevent order fulfillment
+      logWithCorrelation('warn', `Server GTM integration error (non-blocking)`, {
+        error: serverGTMError instanceof Error ? serverGTMError.message : 'Unknown error',
+        paymentIntentId: paymentIntent.id,
+        event_id
+      });
+    }
 
     // Mark as fulfilled to prevent duplicates
     FulfillmentTracker.markAsFulfilled(fulfillmentKey, {
@@ -1535,6 +1629,77 @@ async function triggerAbandonedCartEmail(email: string, data: Record<string, unk
 
   } catch (error) {
     console.error('Error triggering abandoned cart email:', error);
+  }
+}
+
+// === PHASE 2 RESILIENCE: DLQ Retry Setup ===
+// Set up DLQ webhook processor for retry capability
+DeadLetterQueue.setWebhookProcessor(async (failedEvent: FailedWebhook) => {
+  const stripeEvent = failedEvent.payload as Stripe.Event;
+  const correlationId = `dlq-retry-${failedEvent.retry_count}-${failedEvent.event_id}`;
+  
+  logWithCorrelation('info', 'DLQ retrying webhook event', {
+    eventId: failedEvent.event_id,
+    eventType: failedEvent.event_type,
+    retryCount: failedEvent.retry_count
+  });
+  
+  // Process the event using the existing switch logic
+  await processWebhookEventLogic(stripeEvent, correlationId);
+  
+  // Mark as processed on successful retry
+  processedEvents.add(stripeEvent.id);
+});
+
+/**
+ * Process webhook event - extracted for DLQ retry capability
+ */
+async function processWebhookEventLogic(stripeEvent: Stripe.Event, correlationId: string): Promise<void> {
+  switch (stripeEvent.type) {
+    case 'payment_intent.succeeded':
+      await handlePaymentSuccess(stripeEvent.data.object, correlationId);
+      break;
+
+    case 'payment_intent.processing':
+      await handlePaymentProcessing(stripeEvent.data.object, correlationId);
+      break;
+
+    case 'payment_intent.payment_failed':
+      await handlePaymentFailed(stripeEvent.data.object, correlationId);
+      break;
+
+    case 'payment_intent.canceled':
+      await handlePaymentCanceled(stripeEvent.data.object, correlationId);
+      break;
+
+    case 'payment_intent.requires_action':
+      await handlePaymentRequiresAction(stripeEvent.data.object, correlationId);
+      break;
+
+    case 'payment_intent.partially_funded':
+      await handlePaymentPartiallyFunded(stripeEvent.data.object, correlationId);
+      break;
+
+    case 'charge.dispute.created':
+      await handleChargeDispute(stripeEvent.data.object, correlationId);
+      break;
+
+    case 'checkout.session.async_payment_succeeded':
+      await handleCheckoutSessionAsyncPaymentSucceeded(stripeEvent.data.object, correlationId);
+      break;
+
+    case 'checkout.session.async_payment_failed':
+      await handleCheckoutSessionAsyncPaymentFailed(stripeEvent.data.object, correlationId);
+      break;
+
+    case 'checkout.session.completed':
+      await handleCheckoutSessionCompleted(stripeEvent.data.object, correlationId);
+      break;
+
+    default:
+      logWithCorrelation('info', `Unhandled event type: ${stripeEvent.type}`, {
+        eventId: stripeEvent.id
+      }, correlationId);
   }
 }
 

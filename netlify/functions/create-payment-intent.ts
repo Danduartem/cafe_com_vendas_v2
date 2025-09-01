@@ -590,7 +590,7 @@ export default async (request: Request): Promise<Response> => {
       });
     }
 
-    // Build comprehensive enhanced Stripe metadata
+    // Build comprehensive Phase 2 enhanced Stripe metadata
     const metadata: EnhancedStripeMetadata = {
       // Event tracking - unified tracking across all systems
       event_id: event_id,
@@ -605,32 +605,58 @@ export default async (request: Request): Promise<Response> => {
       product_id: 'cafe-com-vendas-ticket',
       product_name: 'Café com Vendas - Lisbon 2025',
       event_date: '2025-09-20',
+      product_category: 'business-event',
+      product_variant: 'early-bird-ticket',
 
-      // Attribution data - complete tracking
+      // Attribution data - complete tracking with Phase 2 enhancements
       utm_source: requestBody.utm_source as string || undefined,
       utm_medium: requestBody.utm_medium as string || undefined,
       utm_campaign: requestBody.utm_campaign as string || undefined,
       utm_content: requestBody.utm_content as string || undefined,
       utm_term: requestBody.utm_term as string || undefined,
+      
+      // First-touch attribution (for cross-session tracking)
+      first_utm_source: requestBody.first_utm_source as string || requestBody.utm_source as string || undefined,
+      first_utm_campaign: requestBody.first_utm_campaign as string || requestBody.utm_campaign as string || undefined,
+      first_landing_page: requestBody.first_landing_page as string || undefined,
 
       // CRM integration - reference to CRM system
       crm_contact_id: requestBody.crm_contact_id as string || undefined,
       crm_deal_id: requestBody.crm_deal_id as string || undefined,
+      crm_pipeline_stage: 'payment-initiated',
 
-      // Consent tracking
-      marketing_consent: (requestBody.marketing_consent as boolean) ? 'true' : 'false',
-      consent_timestamp: requestBody.consent_timestamp as string || new Date().toISOString(),
-      consent_method: requestBody.consent_method as string || 'implied',
+      // Consent tracking (Phase 2: assumed consent)
+      marketing_consent: 'true', // Phase 2: assuming consent
+      consent_timestamp: new Date().toISOString(),
+      consent_method: 'implied',
+      privacy_policy_version: '2025-01',
 
-      // Customer journey tracking
+      // Customer journey tracking with Phase 2 enhancements
       lead_created_at: requestBody.lead_created_at as string || new Date().toISOString(),
       checkout_started_at: requestBody.checkout_started_at as string || new Date().toISOString(),
       payment_attempt_count: requestBody.payment_attempt_count as string || '1',
+      time_to_purchase_minutes: requestBody.time_to_purchase_minutes as string || undefined,
 
-      // Device context for fraud prevention
+      // Device & context tracking for enhanced attribution
       device_type: requestBody.device_type as string || undefined,
-      user_agent_hash: requestBody.user_agent_hash as string || undefined,
-      ip_address_hash: requestBody.ip_address_hash as string || undefined
+      browser_language: requestBody.browser_language as string || undefined,
+      screen_resolution: requestBody.screen_resolution as string || undefined,
+      timezone: requestBody.timezone as string || undefined,
+      
+      // Server-side attribution context (Phase 2)
+      server_attribution_enabled: 'true',
+      client_ip_country: requestBody.client_ip_country as string || undefined,
+      referrer_domain: requestBody.referrer_domain as string || undefined,
+      
+      // Business intelligence fields
+      customer_segment: requestBody.customer_segment as string || 'standard',
+      acquisition_channel: requestBody.utm_medium as string || 'direct',
+      conversion_path_length: requestBody.conversion_path_length as string || '1',
+      
+      // Technical context for troubleshooting
+      integration_version: 'phase-2',
+      api_version: '2025-01',
+      checkout_flow_version: 'enhanced-v2'
     };
 
     // Filter out undefined values and convert to strings for Stripe
@@ -671,7 +697,7 @@ export default async (request: Request): Promise<Response> => {
             setup_future_usage: 'off_session'
           },
           multibanco: {
-            // Multibanco doesn't support setup_future_usage, so we explicitly set 'none'
+            // Multibanco doesn't support setup_future_usage, so we explicitly set 'none'  
             // This prevents any future payment method attachment attempts
             setup_future_usage: 'none'
           }
