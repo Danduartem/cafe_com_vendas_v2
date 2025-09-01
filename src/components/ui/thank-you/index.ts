@@ -72,8 +72,8 @@ export const PlatformThankYou = {
       }
 
       // Track animation
-      import('../analytics/index.js').then(({ PlatformAnalytics }) => {
-        PlatformAnalytics.track('ui_interaction', {
+      import('../../../analytics/index.js').then(({ default: analytics }) => {
+        analytics.track('ui_interaction', {
           interaction: 'progress_bar_animated',
           progress_value: targetProgress
         });
@@ -127,8 +127,8 @@ export const PlatformThankYou = {
       sessionStorage.setItem('thankYouCelebrationShown', 'true');
 
       // Track event
-      import('../analytics/index.js').then(({ PlatformAnalytics }) => {
-        PlatformAnalytics.track('ui_interaction', {
+      import('../../../analytics/index.js').then(({ default: analytics }) => {
+        analytics.track('ui_interaction', {
           interaction: 'celebration_shown',
           page: 'thank_you'
         });
@@ -180,8 +180,8 @@ export const PlatformThankYou = {
       heading.innerHTML = updatedHtml;
 
       // Track personalization
-      import('../analytics/index.js').then(({ PlatformAnalytics }) => {
-        PlatformAnalytics.track('personalization', {
+      import('../../../analytics/index.js').then(({ default: analytics }) => {
+        analytics.track('personalization', {
           type: 'greeting_personalized',
           page: 'thank_you'
         });
@@ -195,15 +195,15 @@ export const PlatformThankYou = {
    * Track thank you page conversion
    */
   trackPageView(): void {
-    import('../analytics/index.js').then(({ PlatformAnalytics }) => {
+    import('../../../analytics/index.js').then(({ AnalyticsHelpers, default: analytics }) => {
       // Track page view
-      PlatformAnalytics.track('page_view', {
+      analytics.track('page_view', {
         page: 'thank_you',
         conversion: true
       });
 
       // Track purchase completion
-      PlatformAnalytics.trackConversion('purchase_complete', {
+      AnalyticsHelpers.trackConversion('purchase_complete', {
         value: 1
       });
 
@@ -212,7 +212,7 @@ export const PlatformThankYou = {
       const sessionId = params.get('session_id');
 
       if (sessionId) {
-        PlatformAnalytics.trackConversion('stripe_payment_success', {
+        AnalyticsHelpers.trackConversion('stripe_payment_success', {
           session_id: sessionId
         });
       }

@@ -98,8 +98,8 @@ export const PlatformAccordion = {
           const questionText = item.querySelector('summary')?.textContent?.trim() || `FAQ ${itemNumber}`;
 
           // Import analytics dynamically to avoid circular dependency
-          import('../analytics/index.js').then(({ PlatformAnalytics }) => {
-            PlatformAnalytics.trackFAQ(itemNumber, isOpen, questionText);
+          import('../../../analytics/index.js').then(({ AnalyticsHelpers }) => {
+            AnalyticsHelpers.trackFAQ(itemNumber, isOpen, questionText);
           }).catch(() => {
             logger.debug('FAQ analytics tracking unavailable');
           });
