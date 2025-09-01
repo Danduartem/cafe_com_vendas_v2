@@ -60,7 +60,11 @@
       "Bash(npm test:*)",
       "WebFetch(domain:vite.dev)",
       "mcp__context7__get-library-docs",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(timeout 10s npm run dev)",
+      "Bash(time npm run build)",
+      "Bash(/dev/null)",
+      "mcp__firecrawl__firecrawl_search"
     ]
   },
   "enabledMcpjsonServers": [
