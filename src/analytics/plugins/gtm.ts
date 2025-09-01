@@ -1,13 +1,13 @@
 /**
  * Google Tag Manager Plugin
- * Replaces PlatformAnalytics basic functionality with modern plugin architecture
- * Handles all GTM dataLayer interactions and event normalization
+ * Modern plugin architecture for GTM dataLayer interactions
+ * Handles event normalization and GA4-compliant tracking
  */
 
 import { normalizeEventPayload } from '../../assets/js/utils/gtm-normalizer.js';
 import type { PluginFactory, GTMEventPayload } from '../types/index.js';
 
-interface GTMPluginConfig {
+interface GTMPluginConfig extends Record<string, unknown> {
   containerId?: string;
   debug?: boolean;
 }
@@ -24,7 +24,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
       window.dataLayer = window.dataLayer || [];
       
       if (config.debug) {
-        console.log('[GTM Plugin] Initialized with dataLayer');
+        console.warn('[GTM Plugin] Initialized with dataLayer');
       }
     },
 
@@ -33,12 +33,22 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
      */
     track({ payload }) {
       try {
+        if (!payload) {
+          console.warn('[GTM Plugin] No payload provided for track event');
+          return;
+        }
+        
+        if (!payload.event || typeof payload.event !== 'string') {
+          console.warn('[GTM Plugin] Payload missing required event property');
+          return;
+        }
+        
         // Normalize and push to dataLayer
-        const normalizedPayload = normalizeEventPayload(payload);
+        const normalizedPayload = normalizeEventPayload(payload as Record<string, unknown> & { event: string });
         window.dataLayer.push(normalizedPayload);
         
         if (config.debug) {
-          console.log('[GTM Plugin] Event tracked:', payload.event, normalizedPayload);
+          console.warn('[GTM Plugin] Event tracked:', payload.event, normalizedPayload);
         }
       } catch (error) {
         console.error('[GTM Plugin] Track failed:', error);
@@ -58,7 +68,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
         window.dataLayer.push(pageData);
         
         if (config.debug) {
-          console.log('[GTM Plugin] Page view tracked:', pageData);
+          console.warn('[GTM Plugin] Page view tracked:', pageData);
         }
       } catch (error) {
         console.error('[GTM Plugin] Page tracking failed:', error);
@@ -78,7 +88,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
         window.dataLayer.push(identifyData);
         
         if (config.debug) {
-          console.log('[GTM Plugin] User identified:', identifyData);
+          console.warn('[GTM Plugin] User identified:', identifyData);
         }
       } catch (error) {
         console.error('[GTM Plugin] Identify failed:', error);
@@ -117,7 +127,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
         }));
 
         if (config.debug) {
-          console.log('[GTM Plugin] CTA click tracked:', { location, data });
+          console.warn('[GTM Plugin] CTA click tracked:', { location, data });
         }
       },
 
@@ -132,7 +142,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
         }));
 
         if (config.debug) {
-          console.log('[GTM Plugin] Conversion tracked:', { event, data });
+          console.warn('[GTM Plugin] Conversion tracked:', { event, data });
         }
       },
 
@@ -148,7 +158,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
         }));
 
         if (config.debug) {
-          console.log('[GTM Plugin] FAQ tracked:', { itemNumber, isOpen, question });
+          console.warn('[GTM Plugin] FAQ tracked:', { itemNumber, isOpen, question });
         }
       },
 
@@ -159,7 +169,7 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
         window.dataLayer.push(normalizeEventPayload(data));
         
         if (config.debug) {
-          console.log('[GTM Plugin] Raw dataLayer push:', data);
+          console.warn('[GTM Plugin] Raw dataLayer push:', data);
         }
       }
     },

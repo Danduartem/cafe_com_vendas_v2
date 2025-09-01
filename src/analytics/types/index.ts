@@ -21,7 +21,7 @@ export interface AnalyticsConfig {
  * Plugin context passed to all plugin methods
  */
 export interface PluginContext {
-  payload?: any;
+  payload?: Record<string, unknown>;
   config: AnalyticsConfig;
   instance: AnalyticsInstance;
 }
@@ -48,10 +48,11 @@ export interface AnalyticsPlugin {
   loaded?(): boolean;
   
   // Custom methods exposed to analytics.plugins.{pluginName}
-  methods?: Record<string, Function>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  methods?: Record<string, (...args: any[]) => any>;
   
   // Plugin configuration
-  config?: any;
+  config?: Record<string, unknown>;
 }
 
 /**
@@ -64,7 +65,7 @@ export interface AnalyticsInstance {
   identify(userId: string, traits?: Record<string, unknown>): void;
   ready(callback: () => void): void;
   getPlugin(name: string): AnalyticsPlugin | undefined;
-  plugins: Record<string, Record<string, Function>>;
+  plugins: Record<string, Record<string, PluginMethod>>;
 }
 
 /**
@@ -75,7 +76,7 @@ export type PluginFactory<T = Record<string, unknown>> = (config?: T) => Analyti
 /**
  * Event payload for section tracking
  */
-export interface SectionTrackingPayload {
+export interface SectionTrackingPayload extends Record<string, unknown> {
   section_name: string;
   section_id: string;
   percent_visible?: number;
@@ -85,7 +86,7 @@ export interface SectionTrackingPayload {
 /**
  * Error tracking payload
  */
-export interface ErrorTrackingPayload {
+export interface ErrorTrackingPayload extends Record<string, unknown> {
   error_message: string;
   error_stack?: string;
   error_filename?: string;
@@ -97,10 +98,55 @@ export interface ErrorTrackingPayload {
 /**
  * Performance tracking payload
  */
-export interface PerformanceTrackingPayload {
+export interface PerformanceTrackingPayload extends Record<string, unknown> {
   metric_name: string;
   metric_value: number;
   metric_unit?: 'ms' | 's' | 'bytes' | 'count';
+}
+
+/**
+ * Plugin method signature - flexible to allow various method signatures
+ */
+export type PluginMethod = (...args: unknown[]) => unknown;
+
+/**
+ * Analytics instance interface for plugins
+ */
+export interface AnalyticsInstance {
+  track(event: string, payload?: Record<string, unknown>): void;
+  page(payload?: Record<string, unknown>): void;
+  identify(userId: string, traits?: Record<string, unknown>): void;
+}
+
+/**
+ * Specific plugin method interfaces for common patterns
+ */
+export interface GTMPluginMethods {
+  trackCTAClick(location: string, data?: Record<string, unknown>): void;
+  trackConversion(event: string, data: Record<string, unknown>): void;
+  trackFAQ(itemNumber: string, isOpen: boolean, question: string): void;
+}
+
+export interface SectionTrackingPluginMethods {
+  initSectionTracking(sectionName: string, threshold?: number): void;
+  trackSectionView(sectionName: string, data?: Record<string, unknown>): void;
+  trackSectionEngagement(sectionName: string, action: string, data?: Record<string, unknown>): void;
+  resetSectionTracking(): void;
+  getViewedSections(): string[];
+  hasViewedSection(sectionName: string): boolean;
+}
+
+export interface ErrorPluginMethods {
+  trackError(errorType: string, error: Error, context?: Record<string, unknown>): void;
+  setupGlobalErrorHandling(): void;
+}
+
+export interface PerformancePluginMethods {
+  trackCustomMetric(name: string, value: number, unit?: string): void;
+}
+
+export interface ScrollTrackingPluginMethods {
+  updateScrollThresholds(thresholds: number[]): void;
 }
 
 // GTMEventPayload is now defined in events.ts

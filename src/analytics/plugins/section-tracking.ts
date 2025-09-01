@@ -1,12 +1,12 @@
 /**
  * Section Tracking Plugin
- * Combines section tracking from both PlatformAnalytics and Analytics systems
- * Uses IntersectionObserver for efficient section visibility tracking
+ * Modern IntersectionObserver-based section visibility tracking
+ * Provides GA4-compliant section view events with viewport detection
  */
 
-import type { PluginFactory, SectionTrackingPayload } from '../types/index.js';
+import type { PluginFactory, SectionTrackingPayload, AnalyticsInstance } from '../types/index.js';
 
-interface SectionTrackingPluginConfig {
+interface SectionTrackingPluginConfig extends Record<string, unknown> {
   threshold?: number;
   rootMargin?: string;
   debug?: boolean;
@@ -24,13 +24,16 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
 
   // Track which sections have already been viewed
   const viewedSections = new Set<string>();
+  let analyticsInstance: AnalyticsInstance | null = null;
 
   return {
     name: 'section-tracking',
 
-    initialize() {
+    initialize(context) {
+      // Store analytics instance reference for methods
+      analyticsInstance = context?.instance;
       if (debug) {
-        console.log('[Section Tracking Plugin] Initialized with threshold:', threshold);
+        console.warn('[Section Tracking Plugin] Initialized with threshold:', threshold);
       }
     },
 
@@ -40,7 +43,7 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
        * Best practice implementation following GA4 2025 guidelines
        * Combined from both systems
        */
-      initSectionTracking(sectionName: string, customThreshold = threshold) {
+      initSectionTracking(sectionName: string, customThreshold: number = threshold) {
         const section = document.querySelector(`#s-${sectionName}`);
         if (!section) {
           console.warn(`[Section Tracking Plugin] Section #s-${sectionName} not found`);
@@ -56,16 +59,36 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
           (entries) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting && !viewedSections.has(sectionName)) {
-                this.trackSectionView(sectionName, {
-                  percent_visible: Math.round(entry.intersectionRatio * 100)
-                });
+                const sectionViewPayload: SectionTrackingPayload = {
+                  section_name: sectionName,
+                  section_id: `s-${sectionName}`,
+                  percent_visible: Math.round(entry.intersectionRatio * 100),
+                  timestamp: new Date().toISOString()
+                };
+
+                if (analyticsInstance) {
+                  analyticsInstance.track('section_view', sectionViewPayload);
+                
+                  // Legacy compatibility - fire specific testimonials event if needed
+                  if (sectionName === 'testimonials' || sectionName === 'social-proof') {
+                    analyticsInstance.track('view_testimonials_section', {
+                      section_name: sectionName,
+                      timestamp: new Date().toISOString(),
+                      percent_visible: Math.round(entry.intersectionRatio * 100)
+                    });
+                  }
+
+                  if (debug) {
+                    console.warn('[Section Tracking Plugin] Section view tracked:', sectionViewPayload);
+                  }
+                }
                 
                 // Mark as viewed and unobserve (fire once per session)
                 viewedSections.add(sectionName);
                 observer.unobserve(entry.target);
 
                 if (debug) {
-                  console.log(`[Section Tracking Plugin] Section viewed: ${sectionName}`);
+                  console.warn(`[Section Tracking Plugin] Section viewed: ${sectionName}`);
                 }
               }
             });
@@ -79,19 +102,15 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
         observer.observe(section);
 
         if (debug) {
-          console.log(`[Section Tracking Plugin] Started tracking section: ${sectionName}`);
+          console.warn(`[Section Tracking Plugin] Started tracking section: ${sectionName}`);
         }
       },
 
       /**
        * Track section views with standardized GA4-compliant structure
-       * Combined from both PlatformAnalytics and Analytics approaches
        */
       trackSectionView(sectionName: string, data?: Record<string, unknown>) {
-        // Get analytics instance from plugin context
-        const instance = arguments[arguments.length - 1]; // Instance is injected as last argument
-        
-        if (!instance) {
+        if (!analyticsInstance) {
           console.error('[Section Tracking Plugin] Analytics instance not available');
           return;
         }
@@ -105,11 +124,11 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
           ...data
         };
 
-        instance.track('section_view', sectionViewPayload);
+        analyticsInstance.track('section_view', sectionViewPayload);
 
         // Legacy compatibility - fire specific testimonials event if needed
         if (sectionName === 'testimonials' || sectionName === 'social-proof') {
-          instance.track('view_testimonials_section', {
+          analyticsInstance.track('view_testimonials_section', {
             section_name: sectionName,
             timestamp: new Date().toISOString(),
             ...data
@@ -117,7 +136,7 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
         }
 
         if (debug) {
-          console.log('[Section Tracking Plugin] Section view tracked:', sectionViewPayload);
+          console.warn('[Section Tracking Plugin] Section view tracked:', sectionViewPayload);
         }
       },
 
@@ -125,9 +144,12 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
        * Track section engagement (user interactions within sections)
        */
       trackSectionEngagement(sectionName: string, action: string, data?: Record<string, unknown>) {
-        const instance = arguments[arguments.length - 1]; // Instance is injected as last argument
+        if (!analyticsInstance) {
+          console.error('[Section Tracking Plugin] Analytics instance not available');
+          return;
+        }
         
-        instance.track('section_engagement', {
+        analyticsInstance.track('section_engagement', {
           section: sectionName,
           element_type: action,
           timestamp: new Date().toISOString(),
@@ -135,7 +157,7 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
         });
 
         if (debug) {
-          console.log('[Section Tracking Plugin] Section engagement tracked:', { sectionName, action, data });
+          console.warn('[Section Tracking Plugin] Section engagement tracked:', { sectionName, action, data });
         }
       },
 
@@ -146,7 +168,7 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
         viewedSections.clear();
         
         if (debug) {
-          console.log('[Section Tracking Plugin] Section tracking reset');
+          console.warn('[Section Tracking Plugin] Section tracking reset');
         }
       },
 

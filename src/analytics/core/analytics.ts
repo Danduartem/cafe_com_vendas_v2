@@ -3,10 +3,10 @@
  * Plugin-based architecture following industry best practices (2025)
  * 
  * Inspired by davidwells/analytics with custom plugins for:
- * - GTM integration (replaces basic PlatformAnalytics)  
- * - Performance monitoring (preserves Core Web Vitals)
- * - Section tracking (combines both systems)
- * - Error reporting (preserves deduplication)
+ * - GTM integration with GA4-compliant event structure
+ * - Performance monitoring with Core Web Vitals tracking
+ * - Section tracking using modern IntersectionObserver API
+ * - Error reporting with context and deduplication
  */
 
 import type { AnalyticsEvent, AnalyticsPlugin, AnalyticsConfig, AnalyticsInstance } from '../types/index.js';
@@ -169,7 +169,7 @@ class Analytics {
    * Access to plugin methods (for backward compatibility)
    */
   get plugins() {
-    const pluginMethods: Record<string, Record<string, Function>> = {};
+    const pluginMethods: Record<string, Record<string, (...args: unknown[]) => unknown>> = {};
     
     for (const [name, plugin] of this.pluginMap) {
       if (plugin.methods) {

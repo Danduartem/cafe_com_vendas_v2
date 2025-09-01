@@ -73,10 +73,12 @@ export const CafeComVendas: CafeComVendasInterface = {
   // Expose Analytics module with compatible interface
   Analytics: {
     track: (event: string, data?: Record<string, unknown>) => {
-      // Type-safe wrapper for analytics tracking with proper type assertion
-      analytics.track(event as any, data as any);
+      // Type-safe wrapper for analytics tracking
+      analytics.track(event, data);
     },
-    trackError: AnalyticsHelpers.trackError
+    trackError: (type: string, error: Error, context?: Record<string, unknown>) => {
+      AnalyticsHelpers.trackError(type, error, context);
+    }
   },
 
   components: undefined,

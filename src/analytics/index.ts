@@ -14,6 +14,12 @@ import { sectionTrackingPlugin } from './plugins/section-tracking.js';
 import { errorPlugin } from './plugins/error.js';
 import { scrollTrackingPlugin } from './plugins/scroll-tracking.js';
 import { ENV } from '../assets/js/config/constants.js';
+import type { 
+  AnalyticsInstance, 
+  GTMPluginMethods,
+  SectionTrackingPluginMethods,
+  ErrorPluginMethods
+} from './types/index.js';
 
 /**
  * Main Analytics Instance
@@ -66,13 +72,13 @@ export async function initializeAnalytics(): Promise<void> {
   try {
     await analytics.init();
     
-    // Expose analytics instance globally for plugin access
-    (window as any).analytics = analytics;
+    // Expose analytics instance globally for plugin access (typed)
+    (globalThis as typeof globalThis & { analytics: AnalyticsInstance }).analytics = analytics;
     
-    // Setup global error handling
+    // Setup global error handling with type safety
     const errorPlugin = analytics.getPlugin('error');
-    if (errorPlugin?.methods) {
-      errorPlugin.methods.setupGlobalErrorHandling();
+    if (errorPlugin?.methods && 'setupGlobalErrorHandling' in errorPlugin.methods) {
+      (errorPlugin.methods as unknown as ErrorPluginMethods).setupGlobalErrorHandling();
     }
     
     // Initialize scroll tracking
@@ -82,8 +88,8 @@ export async function initializeAnalytics(): Promise<void> {
     }
     
     if (ENV.isDevelopment) {
-      console.log('[Analytics] Unified analytics system initialized');
-      console.log('[Analytics] Available plugins:', Object.keys(analytics.plugins || {}));
+      console.warn('[Analytics] Unified analytics system initialized');
+      console.warn('[Analytics] Available plugins:', Object.keys(analytics.plugins || {}));
     }
   } catch (error) {
     console.error('[Analytics] Initialization failed:', error);
@@ -96,52 +102,52 @@ export async function initializeAnalytics(): Promise<void> {
  */
 export const AnalyticsHelpers = {
   /**
-   * Track section view (replaces PlatformAnalytics.initSectionTracking)
+   * Track section view - modern IntersectionObserver-based implementation
    */
   initSectionTracking(sectionName: string, threshold?: number): void {
     const plugin = analytics.getPlugin('section-tracking');
-    if (plugin?.methods) {
-      plugin.methods.initSectionTracking(sectionName, threshold);
+    if (plugin?.methods && 'initSectionTracking' in plugin.methods) {
+      (plugin.methods as unknown as SectionTrackingPluginMethods).initSectionTracking(sectionName, threshold);
     }
   },
 
   /**
-   * Track CTA clicks (replaces PlatformAnalytics.trackCTAClick)
+   * Track CTA clicks with GA4-compliant event structure
    */
   trackCTAClick(location: string, data?: Record<string, unknown>): void {
     const plugin = analytics.getPlugin('gtm');
-    if (plugin?.methods) {
-      plugin.methods.trackCTAClick(location, data);
+    if (plugin?.methods && 'trackCTAClick' in plugin.methods) {
+      (plugin.methods as unknown as GTMPluginMethods).trackCTAClick(location, data);
     }
   },
 
   /**
-   * Track conversions (replaces PlatformAnalytics.trackConversion)
+   * Track conversions with enhanced event tracking
    */
   trackConversion(event: string, data: Record<string, unknown>): void {
     const plugin = analytics.getPlugin('gtm');
-    if (plugin?.methods) {
-      plugin.methods.trackConversion(event, data);
+    if (plugin?.methods && 'trackConversion' in plugin.methods) {
+      (plugin.methods as unknown as GTMPluginMethods).trackConversion(event, data);
     }
   },
 
   /**
-   * Track FAQ interactions (replaces PlatformAnalytics.trackFAQ)
+   * Track FAQ interactions and accordion engagement
    */
   trackFAQ(itemNumber: string, isOpen: boolean, question: string): void {
     const plugin = analytics.getPlugin('gtm');
-    if (plugin?.methods) {
-      plugin.methods.trackFAQ(itemNumber, isOpen, question);
+    if (plugin?.methods && 'trackFAQ' in plugin.methods) {
+      (plugin.methods as unknown as GTMPluginMethods).trackFAQ(itemNumber, isOpen, question);
     }
   },
 
   /**
-   * Track errors (replaces Analytics.trackError)
+   * Track errors with context and deduplication
    */
   trackError(errorType: string, error: Error, context?: Record<string, unknown>): void {
     const plugin = analytics.getPlugin('error');
-    if (plugin?.methods) {
-      plugin.methods.trackError(errorType, error, context);
+    if (plugin?.methods && 'trackError' in plugin.methods) {
+      (plugin.methods as unknown as ErrorPluginMethods).trackError(errorType, error, context);
     }
   },
 
@@ -150,8 +156,8 @@ export const AnalyticsHelpers = {
    */
   trackSectionEngagement(sectionName: string, action: string, data?: Record<string, unknown>): void {
     const plugin = analytics.getPlugin('section-tracking');
-    if (plugin?.methods) {
-      plugin.methods.trackSectionEngagement(sectionName, action, data);
+    if (plugin?.methods && 'trackSectionEngagement' in plugin.methods) {
+      (plugin.methods as unknown as SectionTrackingPluginMethods).trackSectionEngagement(sectionName, action, data);
     }
   }
 };

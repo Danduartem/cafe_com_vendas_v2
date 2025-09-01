@@ -4,9 +4,9 @@
  * Tracks LCP, CLS, FID, and page load performance
  */
 
-import type { PluginFactory, PerformanceTrackingPayload } from '../types/index.js';
+import type { PluginFactory, PerformanceTrackingPayload, AnalyticsInstance } from '../types/index.js';
 
-interface PerformancePluginConfig {
+interface PerformancePluginConfig extends Record<string, unknown> {
   trackCoreWebVitals?: boolean;
   trackPageLoad?: boolean;
   clsThreshold?: number; // Only report CLS above this threshold
@@ -43,7 +43,7 @@ export const performancePlugin: PluginFactory<PerformancePluginConfig> = (config
   } = config;
 
   // Setup Core Web Vitals tracking
-  const setupCoreWebVitals = (instance: any) => {
+  const setupCoreWebVitals = (instance: AnalyticsInstance) => {
     // Largest Contentful Paint (LCP)
     const lcpObserver = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
@@ -124,12 +124,12 @@ export const performancePlugin: PluginFactory<PerformancePluginConfig> = (config
     fidObserver.observe({entryTypes: ['first-input']});
 
     if (debug) {
-      console.log('[Performance Plugin] Core Web Vitals observers initialized');
+      console.warn('[Performance Plugin] Core Web Vitals observers initialized');
     }
   };
 
   // Setup page load performance tracking
-  const setupPageLoadTracking = (instance: any) => {
+  const setupPageLoadTracking = (instance: AnalyticsInstance) => {
     window.addEventListener('load', () => {
       setTimeout(() => {
         const navigation = performance.getEntriesByType('navigation')[0] as NavigationTiming;
@@ -142,7 +142,7 @@ export const performancePlugin: PluginFactory<PerformancePluginConfig> = (config
           });
 
           if (debug) {
-            console.log('[Performance Plugin] Page load performance tracked');
+            console.warn('[Performance Plugin] Page load performance tracked');
           }
         }
       }, 1000);
@@ -165,7 +165,7 @@ export const performancePlugin: PluginFactory<PerformancePluginConfig> = (config
         }
 
         if (debug) {
-          console.log('[Performance Plugin] Performance tracking initialized');
+          console.warn('[Performance Plugin] Performance tracking initialized');
         }
       } catch (error) {
         console.error('[Performance Plugin] Initialization failed:', error);

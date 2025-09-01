@@ -4,9 +4,9 @@
  * Includes error deduplication and structured error reporting
  */
 
-import type { PluginFactory, ErrorTrackingPayload } from '../types/index.js';
+import type { PluginFactory, ErrorTrackingPayload, AnalyticsInstance } from '../types/index.js';
 
-interface ErrorPluginConfig {
+interface ErrorPluginConfig extends Record<string, unknown> {
   enableDeduplication?: boolean;
   maxStackLength?: number;
   debug?: boolean;
@@ -39,7 +39,7 @@ export const errorPlugin: PluginFactory<ErrorPluginConfig> = (config = {}) => {
 
     initialize() {
       if (debug) {
-        console.log('[Error Plugin] Error tracking initialized with deduplication:', enableDeduplication);
+        console.warn('[Error Plugin] Error tracking initialized with deduplication:', enableDeduplication);
       }
     },
 
@@ -49,7 +49,7 @@ export const errorPlugin: PluginFactory<ErrorPluginConfig> = (config = {}) => {
        * Preserves deduplication logic from original Analytics system
        */
       trackError(errorType: string, error: Error, context: Record<string, unknown> = {}) {
-        const instance = arguments[arguments.length - 1]; // Instance is injected as last argument
+        const instance = (globalThis as { analytics?: AnalyticsInstance }).analytics;
         
         if (!instance) {
           console.error('[Error Plugin] Analytics instance not available');
@@ -90,7 +90,7 @@ export const errorPlugin: PluginFactory<ErrorPluginConfig> = (config = {}) => {
         });
 
         if (debug) {
-          console.log('[Error Plugin] Error tracked:', { errorType, errorKey, context });
+          console.warn('[Error Plugin] Error tracked:', { errorType, errorKey, context });
         }
       },
 
@@ -114,9 +114,9 @@ export const errorPlugin: PluginFactory<ErrorPluginConfig> = (config = {}) => {
       /**
        * Track unhandled promise rejections
        */
-      trackUnhandledRejection(reason: any, context?: Record<string, unknown>) {
+      trackUnhandledRejection(reason: unknown, context?: Record<string, unknown>) {
         const errorMessage = typeof reason === 'string' ? reason : 
-                           reason?.message || 'Unknown promise rejection';
+                           (reason instanceof Error ? reason.message : 'Unknown promise rejection');
         
         const error = new Error(errorMessage);
         this.trackError('unhandled_promise_rejection', error, context);
@@ -160,7 +160,7 @@ export const errorPlugin: PluginFactory<ErrorPluginConfig> = (config = {}) => {
         });
 
         if (debug) {
-          console.log('[Error Plugin] Global error handlers configured');
+          console.warn('[Error Plugin] Global error handlers configured');
         }
       },
 
@@ -171,7 +171,7 @@ export const errorPlugin: PluginFactory<ErrorPluginConfig> = (config = {}) => {
         errors.clear();
         
         if (debug) {
-          console.log('[Error Plugin] Error cache cleared');
+          console.warn('[Error Plugin] Error cache cleared');
         }
       },
 

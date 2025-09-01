@@ -1,18 +1,17 @@
 /**
  * Analytics Event Type Definitions
- * Consolidated from src/types/components/analytics.ts following DDD principles
- * All analytics-related event interfaces in one domain-specific location
+ * Domain-specific analytics event interfaces following DDD principles
+ * All analytics-related event types consolidated in this location
  */
 
 /**
  * Base analytics event interface
  */
-export interface AnalyticsEvent {
+export interface AnalyticsEvent extends Record<string, unknown> {
   event: string;
   event_category?: string;
   event_label?: string;
   value?: number;
-  [key: string]: string | number | boolean | undefined;
 }
 
 /**
@@ -103,7 +102,6 @@ export interface ComponentsInitializedEvent extends AnalyticsEvent {
 /**
  * GTM normalized event payload
  */
-export interface GTMEventPayload {
+export interface GTMEventPayload extends Record<string, unknown> {
   event: string;
-  [key: string]: string | number | boolean;
 }
