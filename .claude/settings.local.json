@@ -64,7 +64,9 @@
       "Bash(timeout 10s npm run dev)",
       "Bash(time npm run build)",
       "Bash(/dev/null)",
-      "mcp__firecrawl__firecrawl_search"
+      "mcp__firecrawl__firecrawl_search",
+      "Bash(npx eslint:*)",
+      "Bash(cat:*)"
     ]
   },
   "enabledMcpjsonServers": [
