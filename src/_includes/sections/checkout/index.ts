@@ -816,6 +816,7 @@ export const Checkout: CheckoutSectionComponent = {
           column_id: ENV.crm?.columnId || 'fbfa2479-c495-4a37-8d84-9c1109ddafc5',
           name: leadData.fullName.trim(),
           phone: `${leadData.countryCode}${leadData.phone}`,
+          email: leadData.email,
           title: leadData.fullName.trim(),
           amount: `${basePrice}.00`, // Format as "180.00"
           obs: `Lead interessado no produto ${eventName} - Lisboa 2025`,

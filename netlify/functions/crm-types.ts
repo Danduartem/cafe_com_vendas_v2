@@ -10,6 +10,7 @@ export interface CRMContactPayload {
   column_id: string;
   name: string;
   phone: string;
+  email: string;
   title: string;
   amount: string;
   obs: string;
@@ -88,6 +89,7 @@ export interface UnvalidatedCRMRequest {
   // Required fields (strings that may be empty/invalid)
   name?: unknown;
   phone?: unknown;
+  email?: unknown;
   amount?: unknown;
   
   // Optional fields that may be provided

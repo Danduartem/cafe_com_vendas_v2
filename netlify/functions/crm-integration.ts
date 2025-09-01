@@ -35,7 +35,7 @@ const RATE_LIMIT_MAX_REQUESTS = 10; // Max 10 CRM submissions per 10 minutes per
 
 // Validation rules - only require fields in the CRM payload spec
 const VALIDATION_RULES: CRMValidationRules = {
-  required_fields: ['name', 'phone', 'amount'],
+  required_fields: ['name', 'phone', 'email', 'amount'],
   name_min_length: 2,
   name_max_length: 100,
   phone_min_length: 7,
@@ -175,6 +175,7 @@ function validateCRMRequest(requestBody: UnvalidatedCRMRequest): { isValid: bool
   // At this point, TypeScript knows the required fields are non-empty strings
   const name = requestBody.name as string;
   const phone = requestBody.phone as string;
+  const email = requestBody.email as string;
   const amount = requestBody.amount as string;
 
   // Validate name
@@ -187,6 +188,13 @@ function validateCRMRequest(requestBody: UnvalidatedCRMRequest): { isValid: bool
   const cleanPhone = phone.replace(/[\s\-()]/g, '');
   if (cleanPhone.length < VALIDATION_RULES.phone_min_length || cleanPhone.length > VALIDATION_RULES.phone_max_length) {
     errors.push(`Phone number must be between ${VALIDATION_RULES.phone_min_length} and ${VALIDATION_RULES.phone_max_length} digits`);
+  }
+
+  // Validate email
+  const cleanEmail = email.toLowerCase().trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(cleanEmail)) {
+    errors.push('Invalid email format');
   }
 
   // Validate amount format
@@ -220,6 +228,7 @@ function validateCRMRequest(requestBody: UnvalidatedCRMRequest): { isValid: bool
     sanitized: errors.length === 0 ? {
       name: cleanName,
       phone: phone.trim(),
+      email: cleanEmail,
       amount: amount,
       company_id: typeof requestBody.company_id === 'string' ? requestBody.company_id : CRM_CONFIG.companyId,
       board_id: typeof requestBody.board_id === 'string' ? requestBody.board_id : CRM_CONFIG.boardId,
@@ -304,6 +313,15 @@ async function sendToCRM(payload: CRMContactPayload): Promise<CRMResult> {
         headers['Authorization'] = `Bearer ${CRM_CONFIG.apiKey}`;
       }
 
+      // Enhanced logging for debugging
+      console.log('CRM API request details:', {
+        url: CRM_CONFIG.apiUrl,
+        method: 'POST',
+        headers: headers,
+        payload: payload,
+        hasApiKey: !!CRM_CONFIG.apiKey
+      });
+
       const response = await withTimeout(
         fetch(CRM_CONFIG.apiUrl, {
           method: 'POST',
@@ -316,6 +334,16 @@ async function sendToCRM(payload: CRMContactPayload): Promise<CRMResult> {
 
       if (!response.ok) {
         const errorText = await response.text();
+
+        // Enhanced error logging for debugging
+        console.error('CRM API error response:', {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+          body: errorText,
+          requestPayload: payload,
+          apiUrl: CRM_CONFIG.apiUrl
+        });
 
         // Handle specific error cases
         if (response.status === 409) {
@@ -350,9 +378,14 @@ async function sendToCRM(payload: CRMContactPayload): Promise<CRMResult> {
       }
 
       const result = await response.json() as CRMApiResponse;
+      
+      // Enhanced success logging
       console.log(`Successfully sent to CRM: ${payload.name}`, {
         contactId: result.id,
-        amount: payload.amount
+        amount: payload.amount,
+        email: payload.email,
+        fullResponse: result,
+        apiUrl: CRM_CONFIG.apiUrl
       });
 
       return { success: true, contactId: result.id };
@@ -488,6 +521,7 @@ export default async (request: Request): Promise<Response> => {
       column_id: sanitized.column_id || CRM_CONFIG.columnId,
       name: sanitized.name,
       phone: sanitized.phone,
+      email: sanitized.email,
       title: sanitized.title,
       amount: sanitized.amount,
       obs: sanitized.obs,
