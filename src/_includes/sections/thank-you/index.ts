@@ -398,8 +398,8 @@ export const ThankYou = {
   },
 
   trackCalendarInteraction(provider: string, method: string) {
-    import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
-      PlatformAnalytics.track('ui_interaction', {
+    import('../../../analytics/index.js').then(({ default: analytics }) => {
+      analytics.track('ui_interaction', {
         interaction: 'calendar_add',
         calendar_provider: provider,
         integration_method: method,
@@ -530,11 +530,11 @@ export const ThankYou = {
   }) {
     const { paymentIntent, hasEntity, hasReference, paymentMethod, amount } = data;
     
-    import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
+    import('../../../analytics/index.js').then(({ default: analytics }) => {
       // Track voucher display event
-      PlatformAnalytics.track('payment_flow', {
+      analytics.track('payment_flow', {
         event_type: 'multibanco_voucher_displayed',
-        payment_intent: paymentIntent ? paymentIntent.substring(0, 20) + '...' : null,
+        payment_intent: paymentIntent ? paymentIntent.substring(0, 20) + '...' : undefined,
         payment_method: paymentMethod || 'multibanco',
         has_entity: hasEntity,
         has_reference: hasReference,
@@ -545,7 +545,7 @@ export const ThankYou = {
       });
       
       // Track as intermediate conversion step
-      PlatformAnalytics.track('conversion_funnel', {
+      analytics.track('conversion_funnel', {
         funnel_step: 'payment_initiated',
         payment_method: 'multibanco',
         voucher_status: hasEntity && hasReference ? 'complete' : 'incomplete',
@@ -571,9 +571,9 @@ export const ThankYou = {
   }) {
     const { paymentIntent, paymentMethod, amount, source } = data;
     
-    import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
+    import('../../../analytics/index.js').then(({ AnalyticsHelpers, default: analytics }) => {
       // Track the main conversion event
-      PlatformAnalytics.trackConversion('payment_completed', {
+      AnalyticsHelpers.trackConversion('payment_completed', {
         transaction_id: paymentIntent,
         value: amount,
         currency: 'EUR',
@@ -584,7 +584,7 @@ export const ThankYou = {
       });
       
       // Track payment flow completion
-      PlatformAnalytics.track('payment_flow', {
+      analytics.track('payment_flow', {
         event_type: 'payment_completed',
         payment_intent: paymentIntent.substring(0, 20) + '...',
         payment_method: paymentMethod,
@@ -613,11 +613,11 @@ export const ThankYou = {
   }) {
     const { paymentIntent, paymentMethod, reason, source } = data;
     
-    import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
+    import('../../../analytics/index.js').then(({ default: analytics }) => {
       // Track payment failure
-      PlatformAnalytics.track('payment_flow', {
+      analytics.track('payment_flow', {
         event_type: 'payment_failed',
-        payment_intent: paymentIntent ? paymentIntent.substring(0, 20) + '...' : null,
+        payment_intent: paymentIntent ? paymentIntent.substring(0, 20) + '...' : undefined,
         payment_method: paymentMethod || 'unknown',
         failure_reason: reason,
         failure_source: source,
@@ -626,7 +626,7 @@ export const ThankYou = {
       });
       
       // Track conversion funnel dropout
-      PlatformAnalytics.track('conversion_funnel', {
+      analytics.track('conversion_funnel', {
         funnel_step: 'payment_failed',
         payment_method: paymentMethod || 'unknown',
         failure_reason: reason,

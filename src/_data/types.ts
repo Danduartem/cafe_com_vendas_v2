@@ -7,28 +7,8 @@ export interface AnalyticsConfig {
   gtmId: string;
 }
 
-// Event data structure
-export interface EventData {
-  title: string;
-  subtitle?: string;
-  date: string;
-  location: string;
-  price?: number;
-  description?: string;
-  payments?: {
-    alternative?: {
-      mbway?: {
-        phone: string;
-        instruction: string;
-      };
-    };
-  };
-  capacity?: {
-    firstLot: number;
-    totalCapacity: number;
-  };
-  [key: string]: unknown;
-}
+// Import business event data from domain types
+export type { EventData } from '../types/data/event.js';
 
 // FAQ structure
 export interface FAQItem {

@@ -250,9 +250,9 @@ export const Checkout: CheckoutSectionComponent = {
     });
 
     // Track checkout opened (GTM production event + test alias)
-    import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
+    import('../../../analytics/index.js').then(({ AnalyticsHelpers }) => {
       // Use new method that fires both events
-      PlatformAnalytics.trackCTAClick(this.getSourceSection(), {
+      AnalyticsHelpers.trackCTAClick(this.getSourceSection(), {
         trigger_location: this.getSourceSection(),
         action: 'modal_opened'
       });
@@ -820,19 +820,19 @@ export const Checkout: CheckoutSectionComponent = {
       this.initializePaymentElement();
 
       // Track lead conversion (GTM production event + test alias)
-      import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
+      import('../../../analytics/index.js').then(({ AnalyticsHelpers, default: analytics }) => {
         // Fire the GTM production event
-        PlatformAnalytics.trackConversion('lead_form_submitted', {
+        AnalyticsHelpers.trackConversion('lead_form_submitted', {
           lead_id: this.leadId,
           form_location: 'checkout_modal',
           pricing_tier: 'early_bird'
         });
         
         // Fire test alias for E2E compatibility
-        PlatformAnalytics.track('form_submission', {
+        analytics.track('form_submission', {
           section: 'checkout',
           action: 'lead_submitted',
-          lead_id: this.leadId
+          lead_id: this.leadId || undefined
         });
       }).catch(() => {
         logger.debug('Lead submission analytics tracking unavailable');
@@ -910,8 +910,8 @@ export const Checkout: CheckoutSectionComponent = {
         this.showError('payError', errorMessage);
 
         // Track payment error
-        import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
-          PlatformAnalytics.track('section_engagement', {
+        import('../../../analytics/index.js').then(({ default: analytics }) => {
+          analytics.track('section_engagement', {
             section: 'checkout',
             action: 'payment_error',
             error_type: error.type,
@@ -925,8 +925,8 @@ export const Checkout: CheckoutSectionComponent = {
         this.setStep('success');
 
         // Track payment success immediately since we know it succeeded
-        import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
-          PlatformAnalytics.trackConversion('payment_completed', {
+        import('../../../analytics/index.js').then(({ AnalyticsHelpers }) => {
+          AnalyticsHelpers.trackConversion('payment_completed', {
             transaction_id: paymentIntent.id,
             value: basePrice, // 🎯 From centralized pricing
             currency: 'EUR',
@@ -982,13 +982,13 @@ export const Checkout: CheckoutSectionComponent = {
         }
 
         // Track payment initiation (not completion yet)
-        import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
-          PlatformAnalytics.track('section_engagement', {
+        import('../../../analytics/index.js').then(({ default: analytics }) => {
+          analytics.track('section_engagement', {
             section: 'checkout',
             action: 'payment_processing',
             payment_method: paymentMethod,
             payment_intent_id: paymentIntent.id,
-            lead_id: this.leadId
+            lead_id: this.leadId || undefined
           });
         }).catch(() => {
           logger.debug('Payment processing analytics tracking unavailable');

@@ -5,10 +5,11 @@
 
 import type { Component } from '../../../types/components/base.js';
 import { safeQuery } from '../../../utils/dom.js';
-import { Analytics } from '../../../assets/js/core/analytics.js';
+import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 
 interface SolutionComponent extends Component {
   bindEvents(): void;
+  initSectionTracking(): void;
 }
 
 export const Solution: SolutionComponent = {
@@ -17,6 +18,14 @@ export const Solution: SolutionComponent = {
    */
   init(): void {
     this.bindEvents();
+    this.initSectionTracking();
+  },
+
+  /**
+   * Initialize section view tracking using standardized approach
+   */
+  initSectionTracking(): void {
+    AnalyticsHelpers.initSectionTracking('solution');
   },
 
   /**
@@ -28,32 +37,11 @@ export const Solution: SolutionComponent = {
       return;
     }
 
-    // Track section visibility
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            Analytics.track('section_view', {
-              event: 'section_view',
-              event_category: 'Engagement',
-              section: 'solution',
-              element_type: 'section_entry'
-            });
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(section);
-
     // Track interactions with solution pillars
     const solutionPillars = section.querySelectorAll('[data-solution-pillar]');
     solutionPillars.forEach((pillar, index) => {
       pillar.addEventListener('click', () => {
-        Analytics.track('solution_pillar_click', {
-          event: 'solution_pillar_click',
-          event_category: 'Engagement',
+        analytics.track('solution_pillar_click', {
           section: 'solution',
           element_type: 'solution_pillar',
           pillar_number: index + 1,
@@ -66,9 +54,7 @@ export const Solution: SolutionComponent = {
     const ctaButtons = section.querySelectorAll('[data-cta-button]');
     ctaButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        Analytics.track('solution_cta_click', {
-          event: 'solution_cta_click',
-          event_category: 'Conversion',
+        analytics.track('solution_cta_click', {
           section: 'solution',
           element_type: 'cta_button',
           element_text: button.textContent?.trim() || 'unknown'

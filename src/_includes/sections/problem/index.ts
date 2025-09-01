@@ -5,12 +5,13 @@
 
 import type { Component } from '../../../types/components/base.js';
 import { safeQuery } from '../../../utils/dom.js';
-import { Analytics } from '../../../assets/js/core/analytics.js';
+import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 
 interface VisionComponent extends Component {
   bindEvents(): void;
   animateElements(): void;
   handleReducedMotion(): void;
+  initSectionTracking(): void;
 }
 
 // Enhanced motion preferences handling
@@ -24,11 +25,19 @@ export const Vision: VisionComponent = {
     this.handleReducedMotion();
     this.animateElements();
     this.bindEvents();
+    this.initSectionTracking();
     
     // Listen for motion preference changes
     prefersReducedMotion.addEventListener('change', () => {
       this.handleReducedMotion();
     });
+  },
+
+  /**
+   * Initialize section view tracking using standardized approach
+   */
+  initSectionTracking(): void {
+    AnalyticsHelpers.initSectionTracking('vision');
   },
   
   /**
@@ -164,28 +173,7 @@ export const Vision: VisionComponent = {
       return;
     }
 
-    // Enhanced section visibility tracking with scroll depth
-    const visibilityObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const scrollDepth = Math.round((window.scrollY / document.body.scrollHeight) * 100);
-            Analytics.track('section_view', {
-              event: 'section_view',
-              event_category: 'Engagement',
-              section: 'vision',
-              element_type: 'section_entry',
-              scroll_depth: scrollDepth,
-              intersection_ratio: Math.round(entry.intersectionRatio * 100)
-            });
-            visibilityObserver.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: [0.25, 0.5, 0.75] }
-    );
-
-    visibilityObserver.observe(section);
+    // Section tracking is now handled by initSectionTracking()
 
     // Enhanced interaction tracking for list items with engagement metrics
     const listItems = section.querySelectorAll('[data-reveal-item]');
@@ -203,9 +191,7 @@ export const Vision: VisionComponent = {
         if (hoverStartTime) {
           const hoverDuration = Date.now() - hoverStartTime;
           if (hoverDuration > 1000) { // Only track meaningful engagement
-            Analytics.track('vision_outcome_engagement', {
-              event: 'vision_outcome_hover',
-              event_category: 'Engagement',
+            analytics.track('vision_outcome_engagement', {
               section: 'vision',
               element_type: 'vision_outcome',
               element_index: index,
@@ -219,9 +205,7 @@ export const Vision: VisionComponent = {
       // Enhanced click tracking
       item.addEventListener('click', () => {
         itemInteractionCount++;
-        Analytics.track('vision_outcome_click', {
-          event: 'vision_outcome_click',
-          event_category: 'Engagement',
+        analytics.track('vision_outcome_click', {
           section: 'vision',
           element_type: 'vision_outcome',
           element_index: index,
@@ -232,9 +216,7 @@ export const Vision: VisionComponent = {
       
       // Track focus for accessibility
       item.addEventListener('focus', () => {
-        Analytics.track('vision_outcome_focus', {
-          event: 'vision_outcome_focus',
-          event_category: 'Accessibility',
+        analytics.track('vision_outcome_focus', {
           section: 'vision',
           element_index: index,
           navigation_method: 'keyboard'
@@ -246,9 +228,7 @@ export const Vision: VisionComponent = {
     const ctaElement = section.querySelector('[data-analytics-event="click_vision_cta"]');
     if (ctaElement) {
       ctaElement.addEventListener('click', () => {
-        Analytics.track('vision_cta_click', {
-          event: 'click_vision_cta',
-          event_category: 'Conversion',
+        analytics.track('vision_cta_click', {
           section: 'vision',
           total_vision_outcome_interactions: itemInteractionCount,
           user_engagement_level: itemInteractionCount > 3 ? 'high' : itemInteractionCount > 0 ? 'medium' : 'low'

@@ -5,11 +5,12 @@
 
 import type { Component } from '../../../types/components/base.js';
 import { safeQuery } from '../../../utils/dom.js';
-import { Analytics } from '../../../assets/js/core/analytics.js';
+import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 
 interface FinalCTAComponent extends Component {
   bindEvents(): void;
   setupUrgencyElements(): void;
+  initSectionTracking(): void;
 }
 
 export const FinalCTA: FinalCTAComponent = {
@@ -19,6 +20,14 @@ export const FinalCTA: FinalCTAComponent = {
   init(): void {
     this.bindEvents();
     this.setupUrgencyElements();
+    this.initSectionTracking();
+  },
+
+  /**
+   * Initialize section view tracking using standardized approach
+   */
+  initSectionTracking(): void {
+    AnalyticsHelpers.initSectionTracking('final-cta');
   },
 
   /**
@@ -30,32 +39,13 @@ export const FinalCTA: FinalCTAComponent = {
       return;
     }
 
-    // Track section visibility
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            Analytics.track('section_view', {
-              event: 'section_view',
-              event_category: 'Engagement',
-              section: 'final-cta',
-              element_type: 'section_entry'
-            });
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(section);
+    // Section tracking is now handled by initSectionTracking()
 
     // Track final CTA button clicks
     const ctaButtons = section.querySelectorAll('[data-final-cta-button]');
     ctaButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        Analytics.track('final_cta_click', {
-          event: 'final_cta_click',
-          event_category: 'Conversion',
+        analytics.track('final_cta_click', {
           section: 'final-cta',
           element_type: 'final_cta_button',
           element_text: button.textContent?.trim() || 'unknown'
@@ -67,9 +57,7 @@ export const FinalCTA: FinalCTAComponent = {
     const urgencyElements = section.querySelectorAll('[data-urgency-message]');
     urgencyElements.forEach((element) => {
       element.addEventListener('click', () => {
-        Analytics.track('urgency_message_click', {
-          event: 'urgency_message_click',
-          event_category: 'Engagement',
+        analytics.track('urgency_message_click', {
           section: 'final-cta',
           element_type: 'urgency_message',
           element_text: element.textContent?.trim().substring(0, 50) || 'unknown'

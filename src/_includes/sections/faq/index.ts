@@ -5,13 +5,13 @@
  */
 
 import { PlatformAccordion } from '../../../components/ui/index.js';
+import { AnalyticsHelpers } from '../../../analytics/index.js';
 import type { Component } from '../../../types/components/base.js';
-import { safeQuery } from '../../../utils/dom.js';
-import { logger } from '../../../utils/logger.js';
 
 interface FAQSectionComponent extends Component {
   initializeFAQ(): void;
   setupSectionAnalytics(): void;
+  initSectionTracking(): void;
 }
 
 export const FAQ: FAQSectionComponent = {
@@ -19,9 +19,17 @@ export const FAQ: FAQSectionComponent = {
     try {
       this.initializeFAQ();
       this.setupSectionAnalytics();
+      this.initSectionTracking();
     } catch (error) {
       console.error('Error initializing FAQ section:', error);
     }
+  },
+
+  /**
+   * Initialize section view tracking using standardized approach
+   */
+  initSectionTracking(): void {
+    AnalyticsHelpers.initSectionTracking('faq');
   },
 
   initializeFAQ(): void {
@@ -34,28 +42,7 @@ export const FAQ: FAQSectionComponent = {
   },
 
   setupSectionAnalytics(): void {
-    const section = safeQuery('#s-faq');
-    if (!section) return;
-
-    // Track section visibility using platform analytics
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
-              PlatformAnalytics.track('section_engagement', {
-                section: 'faq',
-                action: 'section_view'
-              });
-            }).catch(() => {
-              logger.debug('FAQ section view analytics tracking unavailable');
-            });
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(section);
+    // Section tracking is now handled by initSectionTracking()
+    // This method can be used for other FAQ-specific analytics if needed
   }
 };

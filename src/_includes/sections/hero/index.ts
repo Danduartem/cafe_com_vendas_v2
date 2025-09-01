@@ -6,13 +6,23 @@
 import { CONFIG } from '../../../assets/js/config/constants.js';
 import { safeQuery } from '../../../utils/dom.js';
 import { Animations } from '../../../components/ui/index.js';
+import { AnalyticsHelpers } from '../../../analytics/index.js';
+import type { Component } from '../../../types/components/base.js';
 
-export const Hero = {
+interface HeroComponent extends Component {
+  initAnimations(): void;
+  initInteractions(): void;
+  initScrollIndicator(): void;
+  initSectionTracking(): void;
+}
+
+export const Hero: HeroComponent = {
   init() {
     try {
       this.initAnimations();
       this.initInteractions();
       this.initScrollIndicator();
+      this.initSectionTracking();
     } catch (error) {
       console.error('Error initializing Hero component:', error);
     }
@@ -179,5 +189,12 @@ export const Hero = {
       }
     });
   },
+
+  /**
+   * Initialize section view tracking for Hero section
+   */
+  initSectionTracking() {
+    AnalyticsHelpers.initSectionTracking('hero');
+  }
 
 };

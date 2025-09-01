@@ -5,7 +5,7 @@
 
 import type { Component } from '../../../types/components/base.js';
 import { safeQuery } from '../../../utils/dom.js';
-import { Analytics } from '../../../assets/js/core/analytics.js';
+import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 
 interface TopBannerComponent extends Component {
   countdownInterval?: number;
@@ -15,6 +15,7 @@ interface TopBannerComponent extends Component {
   updateCountdownElement(selector: string, value: number): void;
   handleCountdownExpired(): void;
   destroy(): void;
+  initSectionTracking(): void;
 }
 
 export const TopBanner: TopBannerComponent = {
@@ -26,6 +27,14 @@ export const TopBanner: TopBannerComponent = {
   init(): void {
     this.bindEvents();
     this.initCountdown();
+    this.initSectionTracking();
+  },
+
+  /**
+   * Initialize section view tracking using standardized approach
+   */
+  initSectionTracking(): void {
+    AnalyticsHelpers.initSectionTracking('top-banner');
   },
 
   /**
@@ -37,32 +46,13 @@ export const TopBanner: TopBannerComponent = {
       return;
     }
 
-    // Track banner visibility
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            Analytics.track('section_view', {
-              event: 'section_view',
-              event_category: 'Engagement',
-              section: 'top-banner',
-              element_type: 'section_entry'
-            });
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(section);
+    // Section tracking is now handled by initSectionTracking()
 
     // Track banner CTA clicks
     const bannerCTA = section.querySelectorAll('[data-banner-cta]');
     bannerCTA.forEach((button) => {
       button.addEventListener('click', () => {
-        Analytics.track('banner_cta_click', {
-          event: 'banner_cta_click',
-          event_category: 'Conversion',
+        analytics.track('banner_cta_click', {
           section: 'top-banner',
           element_type: 'banner_cta',
           element_text: button.textContent?.trim() || 'unknown'
@@ -74,9 +64,7 @@ export const TopBanner: TopBannerComponent = {
     const urgencyMessages = section.querySelectorAll('[data-urgency-message]');
     urgencyMessages.forEach((message) => {
       message.addEventListener('click', () => {
-        Analytics.track('urgency_message_click', {
-          event: 'urgency_message_click',
-          event_category: 'Engagement',
+        analytics.track('urgency_message_click', {
           section: 'top-banner',
           element_type: 'urgency_message',
           element_text: message.textContent?.trim().substring(0, 50) || 'unknown'
@@ -112,9 +100,7 @@ export const TopBanner: TopBannerComponent = {
     }, 1000);
 
     // Track countdown view
-    Analytics.track('countdown_view', {
-      event: 'countdown_view',
-      event_category: 'Engagement',
+    analytics.track('countdown_view', {
       section: 'top-banner',
       element_type: 'countdown_timer',
       event_date: eventDate.toISOString()
@@ -176,9 +162,7 @@ export const TopBanner: TopBannerComponent = {
       countdownContainer.innerHTML = '<span class="text-red-600 font-bold">EVENTO EM ANDAMENTO!</span>';
     }
 
-    Analytics.track('countdown_expired', {
-      event: 'countdown_expired',
-      event_category: 'Event',
+    analytics.track('countdown_expired', {
       section: 'top-banner',
       element_type: 'countdown_timer'
     });

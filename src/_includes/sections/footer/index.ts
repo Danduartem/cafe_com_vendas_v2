@@ -5,11 +5,12 @@
 
 import type { Component } from '../../../types/components/base.js';
 import { safeQuery } from '../../../utils/dom.js';
-import { Analytics } from '../../../assets/js/core/analytics.js';
+import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 
 interface FooterComponent extends Component {
   bindEvents(): void;
   setupLegalLinks(): void;
+  initSectionTracking(): void;
 }
 
 export const Footer: FooterComponent = {
@@ -19,6 +20,14 @@ export const Footer: FooterComponent = {
   init(): void {
     this.bindEvents();
     this.setupLegalLinks();
+    this.initSectionTracking();
+  },
+
+  /**
+   * Initialize section view tracking using standardized approach
+   */
+  initSectionTracking(): void {
+    AnalyticsHelpers.initSectionTracking('footer', 0.3);
   },
 
   /**
@@ -30,33 +39,14 @@ export const Footer: FooterComponent = {
       return;
     }
 
-    // Track footer visibility (when user scrolls to bottom)
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            Analytics.track('section_view', {
-              event: 'section_view',
-              event_category: 'Engagement',
-              section: 'footer',
-              element_type: 'section_entry'
-            });
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
-
-    observer.observe(section);
+    // Section tracking is now handled by initSectionTracking()
 
     // Track legal link clicks
     const legalLinks = section.querySelectorAll('[data-legal-link]');
     legalLinks.forEach((link) => {
       link.addEventListener('click', () => {
         const linkType = link.getAttribute('data-legal-link') || 'unknown';
-        Analytics.track('legal_link_click', {
-          event: 'legal_link_click',
-          event_category: 'Navigation',
+        analytics.track('legal_link_click', {
           section: 'footer',
           element_type: 'legal_link',
           link_type: linkType,
@@ -70,9 +60,7 @@ export const Footer: FooterComponent = {
     contactElements.forEach((element) => {
       element.addEventListener('click', () => {
         const contactType = element.getAttribute('data-contact-info') || 'unknown';
-        Analytics.track('contact_info_click', {
-          event: 'contact_info_click',
-          event_category: 'Engagement',
+        analytics.track('contact_info_click', {
           section: 'footer',
           element_type: 'contact_info',
           contact_type: contactType
@@ -85,9 +73,7 @@ export const Footer: FooterComponent = {
     socialLinks.forEach((link) => {
       link.addEventListener('click', () => {
         const platform = link.getAttribute('data-social-link') || 'unknown';
-        Analytics.track('social_link_click', {
-          event: 'social_link_click',
-          event_category: 'Social',
+        analytics.track('social_link_click', {
           section: 'footer',
           element_type: 'social_link',
           platform
@@ -117,9 +103,7 @@ export const Footer: FooterComponent = {
         link.addEventListener('click', () => {
           // Allow normal navigation, but track it
           const page = href.split('/').pop() || 'unknown';
-          Analytics.track('legal_page_navigation', {
-            event: 'legal_page_navigation',
-            event_category: 'Navigation',
+          analytics.track('legal_page_navigation', {
             section: 'footer',
             element_type: 'internal_legal_link',
             page

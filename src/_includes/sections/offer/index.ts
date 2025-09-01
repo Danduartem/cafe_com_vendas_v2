@@ -4,15 +4,24 @@
  */
 
 import { CONFIG } from '../../../assets/js/config/constants.js';
-import { Analytics } from '../../../assets/js/core/analytics.js';
 import { safeQuery, safeQueryAll } from '../../../utils/dom.js';
 import { Animations } from '../../../components/ui/index.js';
+import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
+import type { Component } from '../../../types/components/base.js';
 
-export const Offer = {
+interface OfferComponent extends Component {
+  initMBWayToggle(): void;
+  toggleMBWayInfo(): void;
+  initDeliverableAnimations(): void;
+  initSectionTracking(): void;
+}
+
+export const Offer: OfferComponent = {
   init() {
     try {
       this.initMBWayToggle();
       this.initDeliverableAnimations();
+      this.initSectionTracking();
     } catch (error) {
       console.error('Error initializing Offer component:', error);
     }
@@ -56,10 +65,10 @@ export const Offer = {
       }, CONFIG.animations.duration.normal);
     }
 
-    Analytics.track('view_mbway_option', {
-      event_category: 'Payment',
-      event_label: 'MBWay Option Viewed',
-      value: isHidden ? 1 : 0
+    analytics.track('view_mbway_option', {
+      section: 'offer',
+      element_type: 'mbway_toggle',
+      action: isHidden ? 'open' : 'close'
     });
   },
 
@@ -84,5 +93,12 @@ export const Offer = {
     });
 
     deliverableItems.forEach(item => observer.observe(item));
+  },
+
+  /**
+   * Initialize section view tracking for Offer section
+   */
+  initSectionTracking() {
+    AnalyticsHelpers.initSectionTracking('offer');
   }
 };

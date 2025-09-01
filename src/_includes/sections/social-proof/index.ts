@@ -32,7 +32,7 @@ interface SocialProofComponent extends Component {
   setupCarouselState(elements: CarouselElements): void;
   setupCarouselBehavior(elements: CarouselElements): void;
   bindCarouselEvents(elements: CarouselElements): void;
-  trackSectionView(): void;
+  initSectionTracking(): void;
   createCarouselPagination(elements: CarouselElements): void;
   createPaginationDot(index: number): HTMLButtonElement;
   updateNavigationButtons(elements: CarouselElements): void;
@@ -64,7 +64,7 @@ export const SocialProof: SocialProofComponent = {
     this.setupCarouselState(elements);
     this.setupCarouselBehavior(elements);
     this.bindCarouselEvents(elements);
-    this.trackSectionView();
+    this.initSectionTracking();
   },
 
   getCarouselElements(): CarouselElements {
@@ -201,12 +201,12 @@ export const SocialProof: SocialProofComponent = {
     this.updatePagination(this.carouselElements);
     this.updateNavigationButtons(this.carouselElements);
 
-    // Track testimonial slide view using platform analytics
+    // Track testimonial slide view using unified analytics
     const testimonialId = this.carouselElements.slides[this.currentIndex]?.getAttribute('data-testimonial-id') ??
                          `tst_${String(this.currentIndex + 1).padStart(2, '0')}`;
 
-    import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
-      PlatformAnalytics.track('section_engagement', {
+    import('../../../analytics/index.js').then(({ default: analytics }) => {
+      analytics.track('section_engagement', {
         section: 'testimonials',
         action: 'slide_view',
         testimonial_id: testimonialId,
@@ -306,8 +306,8 @@ export const SocialProof: SocialProofComponent = {
     });
 
     // Track analytics for video interaction
-    import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
-      PlatformAnalytics.track('section_engagement', {
+    import('../../../analytics/index.js').then(({ default: analytics }) => {
+      analytics.track('section_engagement', {
         section: 'testimonials',
         action: 'video_embed_started',
         video_id: videoId
@@ -317,25 +317,11 @@ export const SocialProof: SocialProofComponent = {
     });
   },
 
-  trackSectionView(): void {
-    const observer = Animations.createObserver({
-      callback: () => {
-        import('../../../components/ui/analytics/index.js').then(({ PlatformAnalytics }) => {
-          PlatformAnalytics.track('section_engagement', {
-            section: 'testimonials',
-            action: 'section_view'
-          });
-        }).catch(() => {
-          logger.debug('Section view analytics tracking unavailable');
-        });
-      },
-      once: true,
-      threshold: 0.3
+  initSectionTracking(): void {
+    import('../../../analytics/index.js').then(({ AnalyticsHelpers }) => {
+      AnalyticsHelpers.initSectionTracking('social-proof');
+    }).catch(() => {
+      logger.debug('Section view analytics tracking unavailable');
     });
-
-    const socialProofSection = safeQuery('#s-social-proof');
-    if (socialProofSection) {
-      observer.observe(socialProofSection);
-    }
   }
 };
