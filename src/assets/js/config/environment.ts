@@ -10,6 +10,7 @@
 interface ImportMetaEnv {
   readonly VITE_STRIPE_PUBLIC_KEY?: string;
   readonly VITE_CLOUDINARY_CLOUD_NAME?: string;
+  readonly VITE_ANALYTICS_DEBUG?: string;
 }
 
 // Extend the global ImportMeta interface

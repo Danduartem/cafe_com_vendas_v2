@@ -12,9 +12,9 @@
     
     
     <!-- Critical Resource Preloading (Lighthouse Performance Optimization) -->
-    <!-- Preload only fonts used above the fold to prevent warnings -->
-    <link rel="preload" href="/fonts/Lora/Lora-600.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="/fonts/Lora/Lora-700.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Prefetch fonts used below the fold (avoids "not used within seconds" warning) -->
+    <link rel="prefetch" href="/fonts/Lora/Lora-600.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="prefetch" href="/fonts/Lora/Lora-700.woff2" as="font" type="font/woff2" crossorigin>
     
     <!-- Prefetch fonts used below the fold (avoids "not used within seconds" warning) -->
     <link rel="prefetch" href="/fonts/CenturyGothic/CenturyGothic-Regular.woff2" as="font" type="font/woff2" crossorigin>
