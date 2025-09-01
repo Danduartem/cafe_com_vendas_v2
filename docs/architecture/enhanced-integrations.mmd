@@ -1,0 +1,260 @@
+%%{init: {'theme':'dark', 'themeVariables': { 'primaryColor':'#1e40af', 'primaryTextColor':'#fff', 'primaryBorderColor':'#7c3aed', 'lineColor':'#6366f1', 'secondaryColor':'#0891b2', 'tertiaryColor':'#059669', 'background':'#1f2937', 'mainBkg':'#111827', 'secondBkg':'#1f2937', 'tertiaryBkg':'#374151'}}}%%
+
+graph TB
+    %% ============================================
+    %% CAFÉ COM VENDAS - ENHANCED INTEGRATION MAP
+    %% Enterprise-grade architecture with event_id tracking,
+    %% consent-first data collection, and CRM as source of truth
+    %% ============================================
+    
+    %% User Entry Points
+    User[("👤 User<br/>Female Entrepreneur")]
+    ConsentModal["🔒 Consent Modal<br/>Marketing Consent"]
+    
+    %% Frontend Components
+    subgraph Frontend["🌐 FRONTEND (Eleventy + TypeScript)"]
+        Landing["Landing Page<br/>UTM Capture & Persist"]
+        CheckoutModal["Checkout Modal<br/>Step 1: Lead + Step 2: Payment"]
+        ThankYou["Thank You Page<br/>Event Details"]
+        Videos["Video Testimonials<br/>YouTube Embeds"]
+    end
+    
+    %% Event ID Generation
+    subgraph EventSystem["🎯 EVENT TRACKING SYSTEM"]
+        EventIDGen["Generate event_id<br/>UUID v4 at Step-1"]
+        EventIDStorage["Store in Memory<br/>+ Pass to All Systems"]
+    end
+    
+    %% Consent Management
+    subgraph ConsentSystem["🔒 CONSENT MANAGEMENT"]
+        ConsentStore["Consent Storage<br/>LocalStorage + Server"]
+        ConsentGating["Analytics Gating<br/>Based on Consent"]
+    end
+    
+    %% Analytics Layer - SPLIT CLIENT/SERVER
+    subgraph Analytics["📊 ANALYTICS & TRACKING"]
+        direction TB
+        subgraph ClientAnalytics["Client-Side (UI Events)"]
+            GTM["Google Tag Manager<br/>UI Events Only"]
+            GTMEvents["Events: scroll, video,<br/>section_view, form_start"]
+        end
+        subgraph ServerAnalytics["Server-Side (Conversions)"]
+            SGTM["Server GTM<br/>Purchase Events"]
+            GA4["Google Analytics 4<br/>Enhanced Conversions"]
+            FBPixel["Facebook CAPI<br/>Server-to-Server"]
+        end
+        CoreWebVitals["Core Web Vitals<br/>Performance"]
+        ErrorTracking["Error Tracking<br/>w/ Deduplication"]
+    end
+    
+    %% Payment Processing - Enhanced
+    subgraph Payment["💳 PAYMENT PROCESSING"]
+        StripeJS["Stripe.js<br/>Payment Elements"]
+        StripeAPI["Stripe API<br/>Enhanced PaymentIntents"]
+        PIMetadata["PI.metadata:<br/>event_id, crm_id, email,<br/>product_id, utm_*"]
+        StripeWebhook["Stripe Webhook<br/>Idempotent Handler"]
+        IdempotencyKey["Use: event.id<br/>For Deduplication"]
+        Multibanco["Multibanco<br/>PT Banking"]
+    end
+    
+    %% CRM System - SOURCE OF TRUTH
+    subgraph CRM["📋 CUSTOM CRM (Source of Truth)"]
+        CRMFunction["crm-integration<br/>Netlify Function"]
+        CRMCircuitBreaker["Circuit Breaker<br/>Failure Protection"]
+        CRMRateLimit["Rate Limiter<br/>10 req/10min"]
+        CRMAPI["Custom CRM API<br/>mocha-smoky.vercel.app"]
+        CRMContacts["All Contacts<br/>Lead + Paid"]
+        CRMDeals["Deals Pipeline<br/>Lead → Paid"]
+    end
+    
+    %% Email Marketing - Enhanced Fields
+    subgraph Email["📧 EMAIL AUTOMATION (MailerLite)"]
+        MailerLiteAPI["MailerLite API<br/>JWT Auth"]
+        LeadGroups["Lifecycle Groups<br/>LEADS | PAID | WAITLIST"]
+        EnhancedFields["Enhanced Custom Fields"]
+        MLFields["• event_id (UUID)<br/>• payment_status<br/>• lead_created_at<br/>• checkout_started_at<br/>• marketing_consent<br/>• consent_timestamp<br/>• utm_* (all 5)<br/>• crm_contact_id"]
+        Automations["Email Automations<br/>Nurture Sequences"]
+    end
+    
+    %% Serverless Functions - Enhanced
+    subgraph Functions["⚡ NETLIFY FUNCTIONS"]
+        LeadCapture["mailerlite-lead<br/>+ CRM upsert"]
+        CreatePayment["create-payment-intent<br/>Enhanced metadata"]
+        WebhookHandler["stripe-webhook<br/>Idempotent processing"]
+        CRMIntegration["crm-integration<br/>Contact + Deal mgmt"]
+        DLQ["Dead Letter Queue<br/>Retry Failed Webhooks"]
+    end
+    
+    %% Media & Content
+    subgraph Media["🎥 MEDIA & CONTENT"]
+        YouTubeAPI["YouTube IFrame API<br/>Video Player"]
+        Cloudinary["Cloudinary CDN<br/>Image Optimization"]
+        GoogleFonts["Google Fonts<br/>Typography"]
+    end
+    
+    %% UTM & Attribution
+    subgraph Attribution["📍 ATTRIBUTION SYSTEM"]
+        UTMCapture["UTM Capture<br/>First-touch + Current"]
+        UTMStorage["Persist in Cookie<br/>+ SessionStorage"]
+        UTMPropagate["Propagate to All<br/>Systems (ML, CRM, Stripe)"]
+    end
+    
+    %% Infrastructure
+    subgraph Infra["🏗️ INFRASTRUCTURE"]
+        Netlify["Netlify Platform<br/>Hosting + Functions"]
+        EnvVars["Environment Variables<br/>Secrets Management"]
+        Security["Security Headers<br/>CSP | CORS | HSTS"]
+    end
+    
+    %% ============================================
+    %% ENHANCED USER JOURNEY FLOWS
+    %% ============================================
+    
+    %% Initial Visit & Consent
+    User -->|"First Visit"| ConsentModal
+    ConsentModal -->|"Accept/Decline"| ConsentStore
+    ConsentStore -->|"Consent Given"| Landing
+    ConsentStore -->|"Gate Analytics"| ConsentGating
+    
+    %% UTM & Attribution
+    Landing -->|"Capture UTMs"| UTMCapture
+    UTMCapture -->|"Persist"| UTMStorage
+    UTMStorage -->|"Available for"| UTMPropagate
+    
+    %% Analytics - Consent Gated
+    ConsentGating -->|"If Consented"| GTM
+    ConsentGating -->|"Block if No Consent"| AnalyticsBlock[("❌ Blocked<br/>No Tracking")]
+    
+    %% Video Engagement
+    Landing -->|"Plays Testimonial"| Videos
+    Videos -->|"Lazy Load"| YouTubeAPI
+    YouTubeAPI -->|"Track Progress"| GTM
+    
+    %% STEP 1: Lead Capture (ENHANCED)
+    Landing -->|"Click CTA"| CheckoutModal
+    CheckoutModal -->|"Step 1: Lead Form"| EventIDGen
+    EventIDGen -->|"Generate UUID"| EventIDStorage
+    EventIDStorage -->|"Include in Payload"| LeadCapture
+    
+    %% Lead Capture to BOTH MailerLite AND CRM
+    LeadCapture -->|"Upsert Contact"| MailerLiteAPI
+    LeadCapture -->|"Upsert Contact"| CRMAPI
+    MailerLiteAPI -->|"Add to LEADS"| LeadGroups
+    MailerLiteAPI -->|"Store Fields"| MLFields
+    CRMAPI -->|"Create Contact"| CRMContacts
+    CRMAPI -->|"Return crm_id"| CRMDeals
+    
+    %% UTM Propagation to All Systems
+    UTMPropagate -->|"Include in Lead"| MailerLiteAPI
+    UTMPropagate -->|"Include in CRM"| CRMAPI
+    
+    %% Event ID Propagation
+    EventIDStorage -->|"Store in ML"| MLFields
+    EventIDStorage -->|"Store in CRM"| CRMContacts
+    EventIDStorage -->|"Pass to GTM"| GTM
+    
+    %% Client Analytics (UI Events)
+    GTM -->|"UI Events Only"| GTMEvents
+    GTMEvents -->|"section_view, scroll"| GA4
+    
+    %% STEP 2: Payment (ENHANCED)
+    CheckoutModal -->|"Step 2: Payment"| StripeJS
+    StripeJS -->|"Request with event_id"| CreatePayment
+    CreatePayment -->|"Enhanced Metadata"| PIMetadata
+    PIMetadata -->|"Create Intent"| StripeAPI
+    UTMPropagate -->|"Include in PI"| PIMetadata
+    EventIDStorage -->|"Include in PI"| PIMetadata
+    
+    %% Payment Success Flow (SERVER-SIDE)
+    StripeAPI -->|"Webhook Event"| WebhookHandler
+    WebhookHandler -->|"Use event.id"| IdempotencyKey
+    IdempotencyKey -->|"Prevent Duplicates"| DLQ
+    
+    %% Server-Side Conversions (NEW!)
+    WebhookHandler -->|"Server Purchase Event"| SGTM
+    SGTM -->|"Enhanced Conversions"| GA4
+    SGTM -->|"Server-to-Server"| FBPixel
+    
+    %% CRM & Email Updates
+    WebhookHandler -->|"Update Deal Status"| CRMIntegration
+    CRMIntegration -->|"Deal → PAID"| CRMDeals
+    WebhookHandler -->|"Update Contact"| MailerLiteAPI
+    MailerLiteAPI -->|"LEADS → PAID"| LeadGroups
+    MailerLiteAPI -->|"payment_status=paid"| MLFields
+    
+    %% Post-Payment
+    StripeAPI -->|"Success Redirect"| ThankYou
+    ThankYou -->|"Confirmation Page"| User
+    
+    %% Email Automation Flow
+    LeadGroups -->|"Trigger Based on Status"| Automations
+    Automations -->|"Nurture Sequence"| EmailSend["Automated Emails"]
+    
+    %% Error & Retry Handling
+    WebhookHandler -->|"If Fails"| DLQ
+    DLQ -->|"Retry Logic"| WebhookHandler
+    
+    %% CRM Circuit Breaker Flow
+    CRMIntegration -->|"Check Limits"| CRMRateLimit
+    CRMRateLimit -->|"Check Health"| CRMCircuitBreaker
+    CRMCircuitBreaker -->|"If Open"| FailSilent[("Fail Silently<br/>Non-blocking")]
+    CRMCircuitBreaker -->|"If Closed"| CRMAPI
+    
+    %% Media Loading
+    Landing -->|"Images"| Cloudinary
+    Landing -->|"Fonts"| GoogleFonts
+    
+    %% Error Handling
+    ErrorTracking -->|"Capture"| GTM
+    
+    %% Infrastructure Support
+    Functions -->|"Hosted by"| Netlify
+    Functions -->|"Secrets from"| EnvVars
+    Frontend -->|"Protected by"| Security
+    
+    %% ============================================
+    %% ENHANCED DATA FLOWS (Key Improvements)
+    %% ============================================
+    
+    %% Event ID Propagation (NEW!)
+    EventIDGen -.->|"Propagates To"| EventIDTargets["• MailerLite custom field<br/>• CRM contact record<br/>• Stripe PI metadata<br/>• GTM dataLayer<br/>• Server GTM events"]
+    
+    %% Consent-First Architecture (NEW!)
+    ConsentStore -.->|"Gates All"| ConsentTargets["• GTM firing<br/>• Meta Pixel<br/>• Server analytics<br/>• PII processing"]
+    
+    %% Enhanced Attribution (NEW!)
+    UTMStorage -.->|"Persisted & Sent To"| UTMTargets["• MailerLite custom fields<br/>• CRM contact data<br/>• Stripe PI metadata<br/>• Analytics events"]
+    
+    %% CRM as Source of Truth (NEW!)
+    CRMContacts -.->|"Single Source for"| CRMTruth["• All contacts (lead+paid)<br/>• Deal pipeline status<br/>• Attribution data<br/>• Contact scoring"]
+    
+    %% Server-Side Conversions (NEW!)
+    SGTM -.->|"Benefits"| SGTMBenefits["• No ad blocker impact<br/>• Better attribution<br/>• Enhanced conversions<br/>• Single source of truth"]
+    
+    %% Idempotency & Resilience (NEW!)
+    IdempotencyKey -.->|"Prevents"| IdempotencyBenefits["• Duplicate webhooks<br/>• Double charges<br/>• Inconsistent data<br/>• Lost conversions"]
+    
+    %% Styling
+    classDef userClass fill:#fbbf24,stroke:#f59e0b,stroke-width:3px,color:#000
+    classDef frontendClass fill:#3b82f6,stroke:#2563eb,stroke-width:2px,color:#fff
+    classDef paymentClass fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+    classDef analyticsClass fill:#8b5cf6,stroke:#7c3aed,stroke-width:2px,color:#fff
+    classDef crmClass fill:#f97316,stroke:#ea580c,stroke-width:2px,color:#fff
+    classDef emailClass fill:#06b6d4,stroke:#0891b2,stroke-width:2px,color:#fff
+    classDef functionClass fill:#ec4899,stroke:#db2777,stroke-width:2px,color:#fff
+    classDef infraClass fill:#6b7280,stroke:#4b5563,stroke-width:2px,color:#fff
+    classDef eventClass fill:#eab308,stroke:#ca8a04,stroke-width:3px,color:#000
+    classDef consentClass fill:#dc2626,stroke:#b91c1c,stroke-width:2px,color:#fff
+    classDef attributionClass fill:#9333ea,stroke:#7c3aed,stroke-width:2px,color:#fff
+    
+    class User userClass
+    class Landing,CheckoutModal,ThankYou,Videos frontendClass
+    class StripeJS,StripeAPI,StripeWebhook,Multibanco,PIMetadata,IdempotencyKey paymentClass
+    class GTM,GA4,FBPixel,CoreWebVitals,ErrorTracking,SGTM,ClientAnalytics,ServerAnalytics,GTMEvents analyticsClass
+    class CRMFunction,CRMCircuitBreaker,CRMRateLimit,CRMAPI,CRMContacts,CRMDeals crmClass
+    class MailerLiteAPI,LeadGroups,EnhancedFields,MLFields,Automations emailClass
+    class LeadCapture,WebhookHandler,CreatePayment,CRMIntegration,DLQ functionClass
+    class Netlify,EnvVars,Security infraClass
+    class EventIDGen,EventIDStorage,EventSystem eventClass
+    class ConsentModal,ConsentStore,ConsentGating,ConsentSystem consentClass
+    class UTMCapture,UTMStorage,UTMPropagate,Attribution attributionClass

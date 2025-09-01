@@ -1,0 +1,194 @@
+%%{init: {'theme':'dark', 'themeVariables': { 'primaryColor':'#1e40af', 'primaryTextColor':'#fff', 'primaryBorderColor':'#7c3aed', 'lineColor':'#6366f1', 'secondaryColor':'#0891b2', 'tertiaryColor':'#059669', 'background':'#1f2937', 'mainBkg':'#111827', 'secondBkg':'#1f2937', 'tertiaryBkg':'#374151'}}}%%
+
+graph TB
+    %% ============================================
+    %% CAFÉ COM VENDAS - COMPLETE INTEGRATION MAP
+    %% ============================================
+    
+    %% User Entry Points
+    User[("👤 User<br/>Female Entrepreneur")]
+    
+    %% Frontend Components
+    subgraph Frontend["🌐 FRONTEND (Eleventy + TypeScript)"]
+        Landing["Landing Page<br/>Hero | Social Proof | FAQ"]
+        CheckoutModal["Checkout Modal<br/>2-Step Process"]
+        ThankYou["Thank You Page<br/>Event Details"]
+        Videos["Video Testimonials<br/>YouTube Embeds"]
+    end
+    
+    %% Analytics Layer
+    subgraph Analytics["📊 ANALYTICS & TRACKING"]
+        GTM["Google Tag Manager<br/>GTM-T63QRLFT"]
+        GA4["Google Analytics 4<br/>Conversions"]
+        FBPixel["Facebook Pixel<br/>Retargeting"]
+        CoreWebVitals["Core Web Vitals<br/>Performance"]
+        ErrorTracking["Error Tracking<br/>w/ Deduplication"]
+        ScrollTracking["Scroll Depth<br/>Engagement"]
+    end
+    
+    %% Payment Processing
+    subgraph Payment["💳 PAYMENT PROCESSING"]
+        StripeJS["Stripe.js<br/>Payment Elements"]
+        StripeAPI["Stripe API<br/>Payment Intents"]
+        StripeWebhook["Stripe Webhook<br/>Event Handler"]
+        Multibanco["Multibanco<br/>PT Banking"]
+    end
+    
+    %% CRM System - CUSTOM!
+    subgraph CRM["📋 CUSTOM CRM SYSTEM"]
+        CRMFunction["crm-integration<br/>Netlify Function"]
+        CRMCircuitBreaker["Circuit Breaker<br/>Failure Protection"]
+        CRMRateLimit["Rate Limiter<br/>10 req/10min"]
+        CRMAPI["Custom CRM API<br/>mocha-smoky.vercel.app"]
+        CRMBoard["Kanban Board<br/>Deals Pipeline"]
+    end
+    
+    %% Email Marketing
+    subgraph Email["📧 EMAIL AUTOMATION"]
+        MailerLiteAPI["MailerLite API<br/>JWT Auth"]
+        LeadGroups["Lifecycle Groups<br/>LEADS | PAID | WAITLIST"]
+        CustomFields["Custom Fields<br/>Event Data"]
+        Automations["Email Automations<br/>Nurture Sequences"]
+    end
+    
+    %% Serverless Functions
+    subgraph Functions["⚡ NETLIFY FUNCTIONS"]
+        CreatePayment["create-payment-intent<br/>€180 + metadata"]
+        WebhookHandler["stripe-webhook<br/>Payment Success"]
+        LeadCapture["mailerlite-lead<br/>Lead Creation"]
+        CRMIntegration["crm-integration<br/>Deal Creation"]
+    end
+    
+    %% Media & Content
+    subgraph Media["🎥 MEDIA & CONTENT"]
+        YouTubeAPI["YouTube IFrame API<br/>Video Player"]
+        Cloudinary["Cloudinary CDN<br/>Image Optimization"]
+        GoogleFonts["Google Fonts<br/>Typography"]
+    end
+    
+    %% Form Processing
+    subgraph Forms["📝 FORM PROCESSING"]
+        FormValidation["Client Validation<br/>Email | Phone"]
+        FormspreeBackup["Formspree API<br/>Fallback System"]
+    end
+    
+    %% Infrastructure
+    subgraph Infra["🏗️ INFRASTRUCTURE"]
+        Netlify["Netlify Platform<br/>Hosting + Functions"]
+        EnvVars["Environment Variables<br/>Secrets Management"]
+        Security["Security Headers<br/>CSP | CORS | HSTS"]
+    end
+    
+    %% ============================================
+    %% USER JOURNEY FLOWS
+    %% ============================================
+    
+    %% Initial Visit
+    User -->|"Visits Site"| Landing
+    Landing -->|"Loads"| GTM
+    GTM -->|"Initializes"| GA4
+    GTM -->|"Initializes"| FBPixel
+    GTM -->|"Tracks"| CoreWebVitals
+    
+    %% Video Engagement
+    Landing -->|"Plays Testimonial"| Videos
+    Videos -->|"Lazy Load"| YouTubeAPI
+    YouTubeAPI -->|"Track Progress"| GTM
+    
+    %% Checkout Flow - Lead Capture
+    Landing -->|"Click CTA"| CheckoutModal
+    CheckoutModal -->|"Step 1: Lead"| FormValidation
+    FormValidation -->|"Valid"| LeadCapture
+    LeadCapture -->|"POST"| MailerLiteAPI
+    MailerLiteAPI -->|"Create/Update"| LeadGroups
+    
+    %% Checkout Flow - Payment
+    CheckoutModal -->|"Step 2: Payment"| StripeJS
+    StripeJS -->|"Request"| CreatePayment
+    CreatePayment -->|"Create Intent"| StripeAPI
+    StripeAPI -->|"Client Secret"| StripeJS
+    StripeJS -->|"Confirm Payment"| StripeAPI
+    
+    %% Payment Success Flow
+    StripeAPI -->|"Webhook Event"| WebhookHandler
+    WebhookHandler -->|"Update Lead"| MailerLiteAPI
+    MailerLiteAPI -->|"Move to PAID"| LeadGroups
+    WebhookHandler -->|"Create Deal"| CRMIntegration
+    
+    %% CRM Integration Flow
+    CRMIntegration -->|"Check Limits"| CRMRateLimit
+    CRMRateLimit -->|"Check Health"| CRMCircuitBreaker
+    CRMCircuitBreaker -->|"If Open"| FailSilent[("Fail Silently<br/>Non-blocking")]
+    CRMCircuitBreaker -->|"If Closed"| CRMAPI
+    CRMAPI -->|"Create Contact"| CRMBoard
+    CRMBoard -->|"Deal Pipeline"| DealStages["Stages:<br/>Lead → Qualified → Paid"]
+    
+    %% Post-Payment
+    StripeAPI -->|"Success"| ThankYou
+    ThankYou -->|"Track"| GTM
+    GTM -->|"purchase Event"| GA4
+    
+    %% Email Automation Flow
+    LeadGroups -->|"Trigger"| Automations
+    Automations -->|"Welcome Series"| EmailSend1["Email 1: Welcome"]
+    EmailSend1 -->|"Day 2"| EmailSend2["Email 2: Value"]
+    EmailSend2 -->|"Day 5"| EmailSend3["Email 3: Urgency"]
+    
+    %% Media Loading
+    Landing -->|"Images"| Cloudinary
+    Landing -->|"Fonts"| GoogleFonts
+    
+    %% Error Handling
+    ErrorTracking -->|"Capture"| GTM
+    GTM -->|"error Event"| GA4
+    
+    %% Scroll Tracking
+    Landing -->|"User Scrolls"| ScrollTracking
+    ScrollTracking -->|"Milestones"| GTM
+    
+    %% Form Fallback
+    FormValidation -->|"If API Fails"| FormspreeBackup
+    
+    %% Infrastructure Support
+    Functions -->|"Hosted by"| Netlify
+    Functions -->|"Secrets from"| EnvVars
+    Frontend -->|"Protected by"| Security
+    
+    %% ============================================
+    %% INTEGRATION DETAILS (Annotations)
+    %% ============================================
+    
+    %% Payment Methods
+    StripeAPI -.->|"Supports"| CreditCards["Credit Cards<br/>Visa | MC | Amex"]
+    StripeAPI -.->|"Supports"| Multibanco
+    
+    %% CRM Features
+    CRMAPI -.->|"Features"| CRMFeatures["• Contact Management<br/>• Deal Tracking<br/>• Custom Tags<br/>• Amount Tracking"]
+    
+    %% MailerLite Features
+    MailerLiteAPI -.->|"Features"| MLFeatures["• Segmentation<br/>• Automation<br/>• Custom Fields<br/>• Event Tracking"]
+    
+    %% Analytics Events
+    GTM -.->|"Key Events"| EventList["• payment_completed<br/>• lead_generated<br/>• cta_click<br/>• faq_interaction<br/>• video_progress"]
+    
+    %% Security Measures
+    Security -.->|"Implements"| SecMeasures["• Content Security Policy<br/>• CORS Headers<br/>• Rate Limiting<br/>• Input Validation"]
+    
+    %% Styling
+    classDef userClass fill:#fbbf24,stroke:#f59e0b,stroke-width:3px,color:#000
+    classDef frontendClass fill:#3b82f6,stroke:#2563eb,stroke-width:2px,color:#fff
+    classDef paymentClass fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+    classDef analyticsClass fill:#8b5cf6,stroke:#7c3aed,stroke-width:2px,color:#fff
+    classDef crmClass fill:#f97316,stroke:#ea580c,stroke-width:2px,color:#fff
+    classDef emailClass fill:#06b6d4,stroke:#0891b2,stroke-width:2px,color:#fff
+    classDef functionClass fill:#ec4899,stroke:#db2777,stroke-width:2px,color:#fff
+    classDef infraClass fill:#6b7280,stroke:#4b5563,stroke-width:2px,color:#fff
+    
+    class User userClass
+    class Landing,CheckoutModal,ThankYou,Videos frontendClass
+    class StripeJS,StripeAPI,StripeWebhook,Multibanco paymentClass
+    class GTM,GA4,FBPixel,CoreWebVitals,ErrorTracking,ScrollTracking analyticsClass
+    class CRMFunction,CRMCircuitBreaker,CRMRateLimit,CRMAPI,CRMBoard crmClass
+    class MailerLiteAPI,LeadGroups,CustomFields,Automations emailClass
+    class CreatePayment,WebhookHandler,LeadCapture,CRMIntegration functionClass
+    class Netlify,EnvVars,Security infraClass
