@@ -573,7 +573,7 @@ export const ThankYou = {
     
     import('../../../analytics/index.js').then(({ AnalyticsHelpers, default: analytics }) => {
       // Track the main conversion event
-      AnalyticsHelpers.trackConversion('payment_completed', {
+      AnalyticsHelpers.trackConversion('purchase_completed', {
         transaction_id: paymentIntent,
         value: amount,
         currency: 'EUR',
@@ -585,7 +585,7 @@ export const ThankYou = {
       
       // Track payment flow completion
       analytics.track('payment_flow', {
-        event_type: 'payment_completed',
+        event_type: 'purchase_completed',
         payment_intent: paymentIntent.substring(0, 20) + '...',
         payment_method: paymentMethod,
         amount: amount,

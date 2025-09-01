@@ -15,6 +15,13 @@ interface AccordionConfig {
   onToggle?: (item: HTMLDetailsElement, isOpen: boolean) => void;
 }
 
+// FAQ engagement tracking state
+const faqEngagementState = {
+  toggleCount: 0,
+  hasFiredMeaningfulEngagement: false
+};
+const FAQ_MEANINGFUL_ENGAGEMENT_THRESHOLD = 3;
+
 export const PlatformAccordion = {
   /**
    * Initialize accordion behavior with native <details> elements
@@ -97,9 +104,26 @@ export const PlatformAccordion = {
           const itemNumber = item.getAttribute('data-faq-item') || 'unknown';
           const questionText = item.querySelector('summary')?.textContent?.trim() || `FAQ ${itemNumber}`;
 
+          // Increment toggle count on open
+          if (isOpen) {
+            faqEngagementState.toggleCount++;
+          }
+
           // Import analytics dynamically to avoid circular dependency
           import('../../../analytics/index.js').then(({ AnalyticsHelpers }) => {
+            // Track individual FAQ toggle
             AnalyticsHelpers.trackFAQ(itemNumber, isOpen, questionText);
+
+            // Check for meaningful engagement threshold
+            if (faqEngagementState.toggleCount >= FAQ_MEANINGFUL_ENGAGEMENT_THRESHOLD && 
+                !faqEngagementState.hasFiredMeaningfulEngagement) {
+              faqEngagementState.hasFiredMeaningfulEngagement = true;
+              AnalyticsHelpers.trackFAQMeaningfulEngagement(faqEngagementState.toggleCount, {
+                section_name: 'faq',
+                last_question: questionText,
+                last_item: itemNumber
+              });
+            }
           }).catch(() => {
             logger.debug('FAQ analytics tracking unavailable');
           });
@@ -116,5 +140,20 @@ export const PlatformAccordion = {
       allowMultiple: true, // Allow multiple expanded by default
       ...config
     });
+  },
+
+  /**
+   * Reset FAQ engagement tracking state (useful for SPA navigation)
+   */
+  resetFAQEngagementTracking(): void {
+    faqEngagementState.toggleCount = 0;
+    faqEngagementState.hasFiredMeaningfulEngagement = false;
+  },
+
+  /**
+   * Get current FAQ engagement state (for debugging)
+   */
+  getFAQEngagementState(): { toggleCount: number; hasFiredMeaningfulEngagement: boolean } {
+    return { ...faqEngagementState };
   }
 };

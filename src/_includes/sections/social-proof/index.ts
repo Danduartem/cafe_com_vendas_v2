@@ -205,15 +205,13 @@ export const SocialProof: SocialProofComponent = {
     const testimonialId = this.carouselElements.slides[this.currentIndex]?.getAttribute('data-testimonial-id') ??
                          `tst_${String(this.currentIndex + 1).padStart(2, '0')}`;
 
-    import('../../../analytics/index.js').then(({ default: analytics }) => {
-      analytics.track('section_engagement', {
-        section: 'testimonials',
-        action: 'slide_view',
-        testimonial_id: testimonialId,
-        position: this.currentIndex + 1
+    import('../../../analytics/index.js').then(({ AnalyticsHelpers }) => {
+      // Use the specific testimonial slide tracking method that matches GTM config
+      AnalyticsHelpers.trackTestimonialSlide(testimonialId, this.currentIndex + 1, {
+        section: 'social-proof'
       });
     }).catch(() => {
-      logger.debug('Slide view analytics tracking unavailable');
+      logger.debug('Testimonial slide analytics tracking unavailable');
     });
   },
 

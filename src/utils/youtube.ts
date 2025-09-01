@@ -42,6 +42,7 @@ interface YouTubeUtility {
   handleStateChange(event: any, videoId: string): void;
   handleError(event: any, videoId: string): void;
   trackVideoPlay(videoId: string): void;
+  setupVideoProgressTracking(videoId: string): void;
   showVideoError(videoId: string, errorMsg: string): void;
 }
 
@@ -180,19 +181,90 @@ export const YouTube: YouTubeUtility = {
   },
 
   /**
-   * Track video play event using existing analytics system
+   * Track video play event and setup progress tracking
    */
   trackVideoPlay(videoId: string): void {
     // Import analytics dynamically to avoid circular dependencies
-    import('../analytics/index.js').then(({ default: analytics }) => {
-      analytics.track('section_engagement', {
-        section: 'testimonials',
-        action: 'video_play',
-        video_id: videoId
+    import('../analytics/index.js').then(({ AnalyticsHelpers }) => {
+      // Track initial video play using the GTM method
+      AnalyticsHelpers.trackVideoProgress(videoId, 0, {
+        video_title: `Testimonial Video ${videoId}`,
+        section: 'testimonials'
       });
+
+      // Setup progress tracking for this video
+      this.setupVideoProgressTracking(videoId);
     }).catch(() => {
       logger.debug('Video play analytics tracking unavailable');
     });
+  },
+
+  /**
+   * Setup progress tracking for a video player
+   */
+  setupVideoProgressTracking(videoId: string): void {
+    const player = Array.from(this.playersMap.values()).find(p => 
+      p && typeof p.getVideoData === 'function' && p.getVideoData()?.video_id === videoId
+    );
+
+    if (!player) {
+      logger.debug(`Player not found for video progress tracking: ${videoId}`);
+      return;
+    }
+
+    // Track progress at specific intervals
+    const progressIntervals = [25, 50, 75, 90, 100];
+    const trackedIntervals = new Set<number>();
+
+    const trackProgress = () => {
+      try {
+        if (typeof player.getCurrentTime !== 'function' || typeof player.getDuration !== 'function') {
+          return;
+        }
+
+        const currentTime = player.getCurrentTime();
+        const duration = player.getDuration();
+        
+        if (duration === 0) return;
+
+        const percentPlayed = Math.floor((currentTime / duration) * 100);
+
+        // Track milestone percentages
+        for (const interval of progressIntervals) {
+          if (percentPlayed >= interval && !trackedIntervals.has(interval)) {
+            trackedIntervals.add(interval);
+            
+            // Import analytics and track progress
+            import('../analytics/index.js').then(({ AnalyticsHelpers }) => {
+              AnalyticsHelpers.trackVideoProgress(videoId, interval, {
+                video_title: `Testimonial Video ${videoId}`,
+                current_time: Math.floor(Number(currentTime) || 0),
+                duration: Math.floor(Number(duration) || 0),
+                section: 'testimonials'
+              });
+            }).catch(() => {
+              logger.debug('Video progress analytics tracking unavailable');
+            });
+
+            break; // Only track one interval per check
+          }
+        }
+      } catch (error) {
+        logger.debug('Video progress tracking error:', error);
+      }
+    };
+
+    // Check progress every 2 seconds
+    const intervalId = setInterval(trackProgress, 2000);
+
+    // Clean up interval when video ends or player is destroyed
+    const originalDestroy = this.destroyPlayer.bind(this);
+    this.destroyPlayer = (containerId: string) => {
+      if (this.playersMap.get(containerId) === player) {
+        clearInterval(intervalId);
+      }
+      originalDestroy(containerId);
+    };
   },
 
   /**

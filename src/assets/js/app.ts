@@ -48,6 +48,10 @@ interface CafeComVendasInterface {
   components: ComponentRegistration[] | undefined;
   init(): Promise<void>;
   setupGlobalErrorHandling(): void;
+  setupGlobalClickHandlers(): void;
+  extractWhatsAppLinkText(link: HTMLAnchorElement): string;
+  determineWhatsAppClickLocation(link: HTMLAnchorElement, analyticsEvent?: string | null): string;
+  extractUTMParams(url: string): Record<string, string | undefined>;
   initializeComponents(): void;
   getComponentCount(): number;
   getState(): AppState;
@@ -93,20 +97,16 @@ export const CafeComVendas: CafeComVendasInterface = {
     }
 
     try {
-      // Initializing Café com Vendas landing page...
-
-      // Global error handling is now set up by the error plugin
-
-      // CSS now loaded directly in HTML for reliability
-
       // Initialize unified analytics system
       await initializeAnalytics();
 
       // Initialize all components
       this.initializeComponents();
 
+      // Setup global click handlers
+      this.setupGlobalClickHandlers();
+
       StateManager.setInitialized(true);
-      // Café com Vendas initialized successfully
 
       // Track page view (standard GA4 event for E2E tests)
       analytics.page({
@@ -168,6 +168,129 @@ export const CafeComVendas: CafeComVendasInterface = {
   },
 
   /**
+   * Setup global click handlers for analytics tracking
+   */
+  setupGlobalClickHandlers(): void {
+    // Click deduplication state
+    const clickDebounce = new Map<string, number>();
+    const CLICK_DEBOUNCE_MS = 500; // Prevent rapid double-clicks
+
+    // WhatsApp click tracking - handles all WhatsApp links with optimizations
+    document.addEventListener('click', (event: Event) => {
+      const target = event.target as HTMLElement;
+      const link = target.closest('a[href*="whatsapp.com"], a[href*="wa.me"]') as HTMLAnchorElement;
+      
+      if (link) {
+        const linkUrl = link.href;
+        const linkId = `${linkUrl}-${link.textContent?.slice(0, 20)}`;
+        
+        // Prevent rapid double-clicks
+        const now = Date.now();
+        const lastClick = clickDebounce.get(linkId);
+        if (lastClick && (now - lastClick) < CLICK_DEBOUNCE_MS) {
+          event.preventDefault();
+          return;
+        }
+        clickDebounce.set(linkId, now);
+
+        // Enhanced link text extraction
+        const linkText = this.extractWhatsAppLinkText(link);
+        const analyticsEvent = link.getAttribute('data-analytics-event');
+        
+        // Enhanced location detection with hierarchy
+        const location = this.determineWhatsAppClickLocation(link, analyticsEvent);
+
+        // Extract UTM parameters from WhatsApp URL
+        const utmParams = this.extractUTMParams(linkUrl);
+
+        // Track WhatsApp click with enhanced data
+         
+        AnalyticsHelpers.trackWhatsAppClick(linkUrl, linkText, location, {
+          analytics_event: analyticsEvent || 'whatsapp_click',
+          click_timestamp: new Date().toISOString(),
+          utm_source: utmParams.utm_source,
+          utm_medium: utmParams.utm_medium,
+          utm_campaign: utmParams.utm_campaign,
+          page_url: window.location.href,
+          page_title: document.title
+        });
+      }
+    }, { passive: true });
+  },
+
+  /**
+   * Extract meaningful text from WhatsApp link
+   */
+  extractWhatsAppLinkText(link: HTMLAnchorElement): string {
+    // Priority order: explicit text, aria-label, title, generic fallback
+    const textContent = link.textContent?.trim();
+    const ariaLabel = link.getAttribute('aria-label');
+    const title = link.getAttribute('title');
+    const spanText = link.querySelector('span')?.textContent?.trim();
+    
+    return (textContent && textContent.length > 0) ? textContent :
+           (ariaLabel && ariaLabel.length > 0) ? ariaLabel :
+           (title && title.length > 0) ? title :
+           (spanText && spanText.length > 0) ? spanText :
+           'WhatsApp Contact';
+  },
+
+  /**
+   * Determine WhatsApp click location with enhanced hierarchy detection
+   */
+  determineWhatsAppClickLocation(link: HTMLAnchorElement, analyticsEvent?: string | null): string {
+    // First check explicit analytics event mapping
+    if (analyticsEvent === 'whatsapp_button_click') {
+      return 'floating_button';
+    } else if (analyticsEvent === 'click_footer_whatsapp') {
+      return 'footer';
+    }
+
+    // Check for section hierarchy
+    const section = link.closest('[data-section]')?.getAttribute('data-section');
+    if (section?.trim()) {
+      return section.trim();
+    }
+
+    // Check for common parent elements
+    if (link.closest('header')) return 'header';
+    if (link.closest('footer')) return 'footer';
+    if (link.closest('[class*="hero"]')) return 'hero';
+    if (link.closest('[class*="cta"]')) return 'cta';
+    if (link.closest('[class*="contact"]')) return 'contact';
+
+    // Check by ID patterns
+    const elementId = link.id || link.closest('[id]')?.id;
+    if (elementId?.includes('whatsapp-button')) return 'floating_button';
+    if (elementId?.includes('footer')) return 'footer';
+
+    // Check by class patterns
+    const elementClasses = link.className || link.closest('[class]')?.className;
+    if (elementClasses?.includes('floating')) return 'floating_button';
+    if (elementClasses?.includes('fixed')) return 'floating_button';
+
+    return 'unknown';
+  },
+
+  /**
+   * Extract UTM parameters from URL
+   */
+  extractUTMParams(url: string): Record<string, string | undefined> {
+    try {
+      const urlObj = new URL(url);
+      return {
+        utm_source: urlObj.searchParams.get('utm_source') || undefined,
+        utm_medium: urlObj.searchParams.get('utm_medium') || undefined,
+        utm_campaign: urlObj.searchParams.get('utm_campaign') || undefined,
+        utm_term: urlObj.searchParams.get('utm_term') || undefined,
+        utm_content: urlObj.searchParams.get('utm_content') || undefined
+      };
+    } catch {
+      return {};
+    }
+  },
+
+  /**
    * Initialize all page components with enhanced error handling
    */
   initializeComponents(): void {
@@ -197,7 +320,6 @@ export const CafeComVendas: CafeComVendasInterface = {
       try {
         if (component && typeof component.init === 'function') {
           component.init();
-          // Component initialized: ${name}
           successCount++;
           StateManager.setComponentStatus(name, true, undefined);
         } else {

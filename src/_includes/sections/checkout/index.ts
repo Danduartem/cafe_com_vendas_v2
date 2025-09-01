@@ -954,7 +954,7 @@ export const Checkout: CheckoutSectionComponent = {
 
         // Track payment success immediately since we know it succeeded
         import('../../../analytics/index.js').then(({ AnalyticsHelpers }) => {
-          AnalyticsHelpers.trackConversion('payment_completed', {
+          AnalyticsHelpers.trackConversion('purchase_completed', {
             transaction_id: paymentIntent.id,
             value: basePrice, // 🎯 From centralized pricing
             currency: 'EUR',
