@@ -504,7 +504,8 @@ export default async (request: Request): Promise<Response> => {
   const allowedOrigins = [
     'https://jucanamaximiliano.com',
     'https://www.jucanamaximiliano.com',
-    'http://localhost:8080',
+    'http://localhost:8080',   // Vite dev server
+    'http://localhost:8888',   // Netlify dev server (for E2E testing)
     'https://netlify.app'
   ];
   
