@@ -67,7 +67,8 @@
       "mcp__firecrawl__firecrawl_search",
       "Bash(npx eslint:*)",
       "Bash(cat:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "WebFetch(domain:developers.google.com)"
     ]
   },
   "enabledMcpjsonServers": [
