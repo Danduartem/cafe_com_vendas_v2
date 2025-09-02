@@ -43,6 +43,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'src/assets/js/main.ts'),
+        admin: resolve(__dirname, 'src/admin/dashboard/index.ts'),
         styles: resolve(__dirname, 'src/assets/css/main.css')
       },
       output: {
