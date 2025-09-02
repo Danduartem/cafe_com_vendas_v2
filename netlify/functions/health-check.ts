@@ -225,9 +225,7 @@ function checkServerGTMHealth(): ServiceHealth {
       last_check: new Date().toISOString(),
       message: 'Server GTM configured and ready',
       details: {
-        endpoint_configured: !!process.env.SGTM_ENDPOINT,
-        measurement_id_configured: !!process.env.GA4_MEASUREMENT_ID,
-        api_secret_configured: !!process.env.GA4_API_SECRET
+        endpoint_configured: !!process.env.SGTM_ENDPOINT
       }
     };
 

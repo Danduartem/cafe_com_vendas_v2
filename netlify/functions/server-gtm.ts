@@ -82,13 +82,12 @@ interface GA4PurchaseEvent {
  */
 interface ServerGTMConfig {
   endpoint: string;
-  measurement_id: string;
-  api_secret: string;
   debug_mode?: boolean;
 }
 
 /**
- * Server-Side GTM Client for GA4 Enhanced Ecommerce
+ * Server-Side GTM Client for Enhanced Ecommerce
+ * Routes events through Server GTM container, not directly to GA4
  * Follows 2025 best practices for server-side attribution
  */
 export class ServerGTMClient {
@@ -103,12 +102,14 @@ export class ServerGTMClient {
   }
 
   /**
-   * Send purchase event to GA4 via server-side GTM
-   * Uses latest 2025 Measurement Protocol v2 format
+   * Send purchase event to Server-Side GTM container
+   * Server GTM then routes to GA4 and other configured tags
+   * Uses GA4 Enhanced Ecommerce event format
    */
   async sendPurchaseEvent(eventData: GA4PurchaseEvent): Promise<{ success: boolean; error?: string }> {
     try {
-      // Construct GA4 Measurement Protocol payload (2025 format)
+      // Construct Server GTM event payload
+      // This matches the format expected by Server GTM containers
       const payload = {
         client_id: eventData.client_id,
         timestamp_micros: eventData.timestamp_micros || Date.now() * 1000,
@@ -141,7 +142,7 @@ export class ServerGTMClient {
         ...(eventData.user_data && { user_data: eventData.user_data })
       };
 
-      // Send to GA4 Measurement Protocol
+      // Send to Server GTM container
       const response = await withTimeout(
         fetch(this.buildEndpointUrl(), {
           method: 'POST',
@@ -160,7 +161,7 @@ export class ServerGTMClient {
         console.error(`Server GTM API error: ${response.status} - ${errorText}`);
         return { 
           success: false, 
-          error: `GA4 API returned ${response.status}: ${errorText}` 
+          error: `Server GTM returned ${response.status}: ${errorText}` 
         };
       }
 
@@ -188,20 +189,13 @@ export class ServerGTMClient {
   }
 
   /**
-   * Build GA4 Measurement Protocol endpoint URL (2025 format)
+   * Build Server GTM container endpoint URL
+   * Routes events through Server GTM, not directly to GA4
    */
   private buildEndpointUrl(): string {
-    const params = new URLSearchParams({
-      measurement_id: this.config.measurement_id,
-      api_secret: this.config.api_secret
-    });
-
-    // Use debug endpoint in development
-    const baseUrl = this.config.debug_mode 
-      ? 'https://www.google-analytics.com/debug/mp/collect'
-      : 'https://www.google-analytics.com/mp/collect';
-
-    return `${baseUrl}?${params.toString()}`;
+    // Use Server GTM container endpoint with Measurement Protocol path
+    // Server GTM acts as proxy and forwards to GA4 + other configured tags
+    return `${this.config.endpoint}/mp/collect`;
   }
 
   /**
@@ -234,22 +228,14 @@ export class ServerGTMClient {
  */
 export function createServerGTMClient(): ServerGTMClient | null {
   const endpoint = process.env.SGTM_ENDPOINT;
-  const measurement_id = process.env.GA4_MEASUREMENT_ID;
-  const api_secret = process.env.GA4_API_SECRET;
 
-  if (!endpoint || !measurement_id || !api_secret) {
-    console.warn('Server GTM configuration incomplete:', {
-      endpoint: !!endpoint,
-      measurement_id: !!measurement_id,  
-      api_secret: !!api_secret
-    });
+  if (!endpoint) {
+    console.warn('Server GTM configuration missing: SGTM_ENDPOINT required');
     return null;
   }
 
   return new ServerGTMClient({
     endpoint,
-    measurement_id,
-    api_secret,
     debug_mode: process.env.NODE_ENV !== 'production'
   });
 }
@@ -273,7 +259,7 @@ export async function sendPurchaseToGA4(eventData: GA4PurchaseEvent): Promise<{ 
   if (!client) {
     return { 
       success: false, 
-      error: 'Server GTM not configured' 
+      error: 'Server GTM not configured: SGTM_ENDPOINT required' 
     };
   }
 
