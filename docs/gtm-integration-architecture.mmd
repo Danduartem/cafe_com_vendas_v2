@@ -1,0 +1,263 @@
+# 🏗️ GTM Integration Architecture - Dual-Path Tracking
+
+This diagram shows the complete GTM integration with **dual-path architecture**:
+
+## 🛤️ **Two Event Paths**
+
+### **Path 1: Client-Side (Browser Events)**
+```
+User Action → dataLayer → Web GTM → Server GTM → GA4
+```
+- **Web GTM** already configured with `server_container_url`
+- Handles all user interaction events (clicks, scrolls, views)
+- ~60-70% tracking coverage (blocked by ad blockers)
+
+### **Path 2: Server-Side (Webhook Events)**  
+```
+Stripe Payment → Backend Function → Server GTM → GA4
+```
+- **Backend** needs `SGTM_ENDPOINT` (can't use browser-based Web GTM)
+- Handles critical conversion events from Stripe webhooks
+- 100% tracking coverage (ad-blocker proof)
+
+## 🎯 **Key Architecture Points**
+- **Single Server GTM Container** processes both paths
+- **Deduplication** handled automatically by GA4
+- **Enhanced Attribution** preserved through both flows
+- **Maximum Coverage** through redundant tracking
+
+---
+
+```mermaid
+graph TB
+    subgraph "🌐 Frontend Application"
+        subgraph "📄 Layout (layout.njk)"
+            GTM_CONTAINER[GTM Container<br/>ID: site.analytics.gtmId]
+            DATALAYER_INIT[dataLayer Initialization<br/>window.dataLayer = []]
+        end
+
+        subgraph "⚙️ Analytics System Core"
+            ANALYTICS_CORE[Analytics Core<br/>src/analytics/index.ts]
+            ANALYTICS_CORE --> GTM_PLUGIN[GTM Plugin<br/>src/analytics/plugins/gtm.ts]
+            ANALYTICS_CORE --> PERF_PLUGIN[Performance Plugin<br/>Core Web Vitals]
+            ANALYTICS_CORE --> SECTION_PLUGIN[Section Tracking Plugin<br/>IntersectionObserver]
+            ANALYTICS_CORE --> SCROLL_PLUGIN[Scroll Tracking Plugin<br/>Depth Detection]
+            ANALYTICS_CORE --> ERROR_PLUGIN[Error Plugin<br/>JavaScript Errors]
+        end
+
+        subgraph "🎯 User Interaction Events"
+            CTA_CLICK[CTA Click Triggers<br/>checkout buttons]
+            WHATSAPP_CLICK[WhatsApp Clicks<br/>contact buttons]
+            FAQ_TOGGLE[FAQ Toggles<br/>accordion items]
+            VIDEO_PROGRESS[Video Progress<br/>YouTube API]
+            TESTIMONIAL_SLIDE[Testimonial Slides<br/>carousel navigation]
+        end
+
+        subgraph "📊 Content Engagement Events"
+            SECTION_VIEWS[Section Views<br/>IntersectionObserver 50%]
+            SCROLL_DEPTH[Scroll Depth<br/>10%, 25%, 50%, 75%, 90%]
+            PAGE_VIEWS[Page Views<br/>route changes]
+        end
+
+        subgraph "🏎️ Performance Events"
+            LCP[Largest Contentful Paint]
+            CLS[Cumulative Layout Shift<br/>threshold: 0.1]
+            FID[First Input Delay]
+            PAGE_LOAD[Page Load Metrics]
+        end
+    end
+
+    subgraph "💳 E-commerce Flow"
+        subgraph "🛒 Checkout Process"
+            CHECKOUT_MODAL[Checkout Modal<br/>src/_includes/sections/checkout/]
+            LEAD_FORM[Lead Capture Form<br/>Step 1: MailerLite]
+            STRIPE_ELEMENTS[Stripe Elements<br/>Step 2: Payment]
+            PAYMENT_INTENT[Payment Intent Creation<br/>netlify/functions/create-payment-intent.ts]
+        end
+
+        subgraph "🎣 Stripe Webhook Processing"
+            STRIPE_WEBHOOK[Stripe Webhook<br/>netlify/functions/stripe-webhook.ts]
+            FULFILLMENT_TRACKING[Fulfillment Tracking<br/>Duplicate Prevention]
+            MAILERLITE_UPDATE[MailerLite Contact Update<br/>Payment Status]
+        end
+    end
+
+    subgraph "🏷️ GTM dataLayer Events"
+        subgraph "🎪 User Interaction Events"
+            DL_CHECKOUT_OPENED["🔥 checkout_opened<br/>{<br/>  event: 'checkout_opened',<br/>  source_section: string,<br/>  timestamp: ISO8601,<br/>  event_id: generated<br/>}"]
+            
+            DL_CTA_CLICK["🔥 cta_click<br/>{<br/>  event: 'cta_click',<br/>  location: string,<br/>  timestamp: ISO8601,<br/>  event_id: generated<br/>}"]
+
+            DL_WHATSAPP_CLICK["🔥 whatsapp_click<br/>{<br/>  event: 'whatsapp_click',<br/>  link_url: string,<br/>  link_text: string,<br/>  location: string,<br/>  event_id: generated<br/>}"]
+
+            DL_FAQ_TOGGLE["🔥 faq_toggle<br/>{<br/>  event: 'faq_toggle',<br/>  action: 'open'|'close',<br/>  question: string,<br/>  item: string,<br/>  event_id: generated<br/>}"]
+
+            DL_FAQ_MEANINGFUL["🔥 faq_meaningful_engagement<br/>{<br/>  event: 'faq_meaningful_engagement',<br/>  toggle_count: number,<br/>  section_name: 'faq',<br/>  event_id: generated<br/>}"]
+        end
+
+        subgraph "📺 Media & Content Events"
+            DL_VIDEO_PLAY["🔥 video_play<br/>{<br/>  event: 'video_play',<br/>  video_title: string,<br/>  video_percent_played: number,<br/>  section: string,<br/>  event_id: generated<br/>}"]
+
+            DL_TESTIMONIAL_SLIDE["🔥 view_testimonial_slide<br/>{<br/>  event: 'view_testimonial_slide',<br/>  testimonial_id: string,<br/>  testimonial_position: number,<br/>  section: 'social-proof',<br/>  event_id: generated<br/>}"]
+
+            DL_SECTION_VIEW["🔥 section_view<br/>{<br/>  event: 'section_view',<br/>  section_name: string,<br/>  section_id: 's-{name}',<br/>  percent_visible: number,<br/>  timestamp: ISO8601,<br/>  event_id: generated<br/>}"]
+
+            DL_SCROLL_DEPTH["🔥 scroll_depth<br/>{<br/>  event: 'scroll_depth',<br/>  depth_percentage: number,<br/>  depth_pixels: number,<br/>  timestamp: ISO8601,<br/>  event_id: generated<br/>}"]
+        end
+
+        subgraph "💰 E-commerce Events"
+            DL_PURCHASE_COMPLETED["💎 purchase_completed<br/>{<br/>  event: 'purchase_completed',<br/>  transaction_id: string,<br/>  value: number,<br/>  currency: 'EUR',<br/>  items: [item_data],<br/>  user_session_id: string,<br/>  event_id: string,<br/>  utm_source?: string,<br/>  utm_medium?: string,<br/>  utm_campaign?: string,<br/>  device_type: string,<br/>  event_id: generated<br/>}"]
+
+            DL_PURCHASE_BLOCKED["🚫 purchase_blocked_duplicate<br/>{<br/>  event: 'purchase_blocked_duplicate',<br/>  blocked_transaction_id: string,<br/>  blocked_at: ISO8601,<br/>  original_timestamp: timestamp,<br/>  event_id: generated<br/>}"]
+        end
+
+        subgraph "⚡ Performance Events"
+            DL_PERFORMANCE["📊 performance_metric<br/>{<br/>  event: 'performance_metric',<br/>  event_category: 'Core Web Vitals',<br/>  event_label: 'LCP'|'CLS'|'FID',<br/>  metric_name: string,<br/>  metric_value: number,<br/>  metric_unit: 'ms'|'count',<br/>  event_id: generated<br/>}"]
+        end
+
+        subgraph "🚨 Error Events"
+            DL_ERROR["⚠️ javascript_error<br/>{<br/>  event: 'javascript_error',<br/>  error_message: string,<br/>  error_stack: string,<br/>  error_location: string,<br/>  error_type: string,<br/>  event_id: generated<br/>}"]
+        end
+    end
+
+    subgraph "🌍 Server-Side Tracking"
+        subgraph "🏗️ Dual-Path Architecture"
+            WEB_GTM[Web GTM Container<br/>Client-side events]
+            SERVER_GTM_CONTAINER[Server GTM Container<br/>https://server-side-tagging-m5scdmswwq-uc.a.run.app]
+            GA4_DESTINATION[GA4 + Other Destinations<br/>Final analytics destinations]
+        end
+
+        subgraph "📡 Server GTM Integration"
+            SERVER_GTM_CLIENT[Server GTM Client<br/>netlify/functions/server-gtm.ts]
+            SGTM_ENDPOINT[SGTM_ENDPOINT<br/>Backend → Server GTM Direct]
+        end
+
+        subgraph "🎯 Server GTM Event"
+            SERVER_GTM_PURCHASE["🔥 Server GTM Purchase Event<br/>{<br/>  event_name: 'purchase',<br/>  client_id: string,<br/>  transaction_id: string,<br/>  value: number,<br/>  currency: 'EUR',<br/>  items: [GA4_items],<br/>  user_data: {hashed_email},<br/>  custom_parameters: {<br/>    payment_method: string,<br/>    customer_type: 'new'|'returning',<br/>    integration_version: '1.0'<br/>  }<br/>}<br/><br/>Sent to: Server GTM Container<br/>Path: /mp/collect"]
+        end
+    end
+
+    subgraph "🎯 GTM Container Configuration"
+        subgraph "🏷️ Suggested GTM Tags"
+            TAG_GA4_CONFIG[GA4 Configuration Tag<br/>Measurement ID]
+            TAG_GA4_EVENT[GA4 Event Tag<br/>All Custom Events]
+            TAG_GA4_PURCHASE[GA4 Enhanced Ecommerce<br/>Purchase Events]
+            TAG_GA4_PERFORMANCE[GA4 Performance Tag<br/>Core Web Vitals]
+        end
+
+        subgraph "⚡ Suggested GTM Triggers"
+            TRIGGER_CHECKOUT["Trigger: checkout_opened<br/>Event equals 'checkout_opened'"]
+            TRIGGER_CTA["Trigger: cta_click<br/>Event equals 'cta_click'"]
+            TRIGGER_WHATSAPP["Trigger: whatsapp_click<br/>Event equals 'whatsapp_click'"]
+            TRIGGER_FAQ["Trigger: faq_toggle<br/>Event equals 'faq_toggle'"]
+            TRIGGER_VIDEO["Trigger: video_play<br/>Event equals 'video_play'"]
+            TRIGGER_SECTION["Trigger: section_view<br/>Event equals 'section_view'"]
+            TRIGGER_SCROLL["Trigger: scroll_depth<br/>Event equals 'scroll_depth'"]
+            TRIGGER_PURCHASE["Trigger: purchase_completed<br/>Event equals 'purchase_completed'"]
+            TRIGGER_PERFORMANCE["Trigger: performance_metric<br/>Event equals 'performance_metric'"]
+            TRIGGER_ERROR["Trigger: javascript_error<br/>Event equals 'javascript_error'"]
+        end
+
+        subgraph "📊 Suggested GTM Variables"
+            VAR_EVENT_ID[Built-in: Event ID<br/>{{Event ID}}]
+            VAR_TIMESTAMP[Built-in: Timestamp<br/>{{timestamp}}]
+            VAR_SOURCE_SECTION[DataLayer: source_section<br/>{{DLV - source_section}}]
+            VAR_TRANSACTION_ID[DataLayer: transaction_id<br/>{{DLV - transaction_id}}]
+            VAR_VALUE[DataLayer: value<br/>{{DLV - value}}]
+            VAR_SECTION_NAME[DataLayer: section_name<br/>{{DLV - section_name}}]
+            VAR_DEPTH_PERCENTAGE[DataLayer: depth_percentage<br/>{{DLV - depth_percentage}}]
+        end
+    end
+
+    %% Event Flow Connections
+    CTA_CLICK --> GTM_PLUGIN
+    WHATSAPP_CLICK --> GTM_PLUGIN
+    FAQ_TOGGLE --> GTM_PLUGIN
+    VIDEO_PROGRESS --> GTM_PLUGIN
+    TESTIMONIAL_SLIDE --> GTM_PLUGIN
+
+    SECTION_VIEWS --> SECTION_PLUGIN
+    SCROLL_DEPTH --> SCROLL_PLUGIN
+    PAGE_VIEWS --> GTM_PLUGIN
+
+    LCP --> PERF_PLUGIN
+    CLS --> PERF_PLUGIN
+    FID --> PERF_PLUGIN
+    PAGE_LOAD --> PERF_PLUGIN
+
+    %% Plugin to dataLayer
+    GTM_PLUGIN --> DL_CHECKOUT_OPENED
+    GTM_PLUGIN --> DL_CTA_CLICK
+    GTM_PLUGIN --> DL_WHATSAPP_CLICK
+    GTM_PLUGIN --> DL_FAQ_TOGGLE
+    GTM_PLUGIN --> DL_FAQ_MEANINGFUL
+    GTM_PLUGIN --> DL_VIDEO_PLAY
+    GTM_PLUGIN --> DL_TESTIMONIAL_SLIDE
+
+    SECTION_PLUGIN --> DL_SECTION_VIEW
+    SCROLL_PLUGIN --> DL_SCROLL_DEPTH
+    PERF_PLUGIN --> DL_PERFORMANCE
+    ERROR_PLUGIN --> DL_ERROR
+
+    %% E-commerce Flow
+    CHECKOUT_MODAL --> LEAD_FORM
+    LEAD_FORM --> STRIPE_ELEMENTS
+    STRIPE_ELEMENTS --> PAYMENT_INTENT
+    PAYMENT_INTENT --> STRIPE_WEBHOOK
+    STRIPE_WEBHOOK --> FULFILLMENT_TRACKING
+    STRIPE_WEBHOOK --> MAILERLITE_UPDATE
+    STRIPE_WEBHOOK --> SERVER_GTM_CLIENT
+    SERVER_GTM_CLIENT --> SGTM_ENDPOINT
+    SGTM_ENDPOINT --> SERVER_GTM_CONTAINER
+    SERVER_GTM_CONTAINER --> SERVER_GTM_PURCHASE
+    SERVER_GTM_CONTAINER --> GA4_DESTINATION
+
+    %% Client-side purchase tracking
+    STRIPE_WEBHOOK -.-> DL_PURCHASE_COMPLETED
+    GTM_PLUGIN --> DL_PURCHASE_COMPLETED
+    GTM_PLUGIN --> DL_PURCHASE_BLOCKED
+
+    %% Client-Side GTM Path (Browser Events)
+    GTM_CONTAINER --> DATALAYER_INIT
+    GTM_CONTAINER --> WEB_GTM
+    WEB_GTM --> SERVER_GTM_CONTAINER
+    
+    DL_CHECKOUT_OPENED --> TRIGGER_CHECKOUT
+    DL_CTA_CLICK --> TRIGGER_CTA
+    DL_WHATSAPP_CLICK --> TRIGGER_WHATSAPP
+    DL_FAQ_TOGGLE --> TRIGGER_FAQ
+    DL_VIDEO_PLAY --> TRIGGER_VIDEO
+    DL_SECTION_VIEW --> TRIGGER_SECTION
+    DL_SCROLL_DEPTH --> TRIGGER_SCROLL
+    DL_PURCHASE_COMPLETED --> TRIGGER_PURCHASE
+    DL_PERFORMANCE --> TRIGGER_PERFORMANCE
+    DL_ERROR --> TRIGGER_ERROR
+
+    TRIGGER_CHECKOUT --> TAG_GA4_EVENT
+    TRIGGER_CTA --> TAG_GA4_EVENT
+    TRIGGER_WHATSAPP --> TAG_GA4_EVENT
+    TRIGGER_FAQ --> TAG_GA4_EVENT
+    TRIGGER_VIDEO --> TAG_GA4_EVENT
+    TRIGGER_SECTION --> TAG_GA4_EVENT
+    TRIGGER_SCROLL --> TAG_GA4_EVENT
+    TRIGGER_PURCHASE --> TAG_GA4_PURCHASE
+    TRIGGER_PERFORMANCE --> TAG_GA4_PERFORMANCE
+    TRIGGER_ERROR --> TAG_GA4_EVENT
+
+    %% Styling
+    classDef eventNode fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
+    classDef purchaseNode fill:#f3e5f5,stroke:#4a148c,stroke-width:3px,color:#000
+    classDef performanceNode fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px,color:#000
+    classDef errorNode fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
+    classDef serverNode fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    classDef gtmNode fill:#f1f8e9,stroke:#33691e,stroke-width:2px,color:#000
+    classDef architectureNode fill:#fce4ec,stroke:#880e4f,stroke-width:3px,color:#000
+
+    class DL_CHECKOUT_OPENED,DL_CTA_CLICK,DL_WHATSAPP_CLICK,DL_FAQ_TOGGLE,DL_FAQ_MEANINGFUL,DL_VIDEO_PLAY,DL_TESTIMONIAL_SLIDE,DL_SECTION_VIEW,DL_SCROLL_DEPTH eventNode
+    class DL_PURCHASE_COMPLETED,DL_PURCHASE_BLOCKED,SERVER_GTM_PURCHASE purchaseNode
+    class DL_PERFORMANCE,LCP,CLS,FID,PAGE_LOAD performanceNode
+    class DL_ERROR errorNode
+    class SERVER_GTM_CLIENT,SGTM_ENDPOINT,STRIPE_WEBHOOK serverNode
+    class TRIGGER_CHECKOUT,TRIGGER_CTA,TRIGGER_WHATSAPP,TRIGGER_FAQ,TRIGGER_VIDEO,TRIGGER_SECTION,TRIGGER_SCROLL,TRIGGER_PURCHASE,TRIGGER_PERFORMANCE,TRIGGER_ERROR,TAG_GA4_CONFIG,TAG_GA4_EVENT,TAG_GA4_PURCHASE,TAG_GA4_PERFORMANCE gtmNode
+    class WEB_GTM,SERVER_GTM_CONTAINER,GA4_DESTINATION architectureNode
+```
