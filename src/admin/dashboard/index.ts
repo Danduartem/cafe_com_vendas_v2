@@ -4,8 +4,31 @@
  * Following Tailwind v4 CSS-first patterns and TypeScript strict mode
  */
 
-import type { SystemMetrics, MonitoringEvent } from '../../utils/monitoring.js';
-import { MonitoringUtils } from '../../utils/monitoring.js';
+// Simplified imports to avoid build issues
+// import type { SystemMetrics, MonitoringEvent } from '../../utils/monitoring.js';
+// import { MonitoringUtils } from '../../utils/monitoring.js';
+
+// Temporary type definitions
+interface SystemMetrics {
+  timestamp: string;
+  response_times: { avg_ms: number; p95_ms: number; p99_ms: number };
+  conversion_rate: number;
+  error_rate: number;
+  uptime_percentage: number;
+  page_views: number;
+  unique_visitors: number;
+  bounce_rate: number;
+}
+
+interface MonitoringEvent {
+  id: string;
+  timestamp: string;
+  event_type: string;
+  service: string;
+  message: string;
+  severity: string;
+  metadata?: Record<string, unknown>;
+}
 
 /**
  * Dashboard configuration
@@ -246,7 +269,7 @@ export class AdminDashboard {
     if (!healthOverview || !this.state.healthData) return;
 
     const { status, summary } = this.state.healthData;
-    const healthColor = MonitoringUtils.getHealthColor(status);
+    const healthColor = this.getHealthColor(status);
 
     healthOverview.innerHTML = `
       <div class="health-card">
@@ -265,7 +288,7 @@ export class AdminDashboard {
           </div>
           <div class="stat-item">
             <span class="stat-label">Uptime</span>
-            <span class="stat-value">${MonitoringUtils.formatDuration(this.state.healthData.uptime_seconds)}</span>
+            <span class="stat-value">${this.formatDuration(this.state.healthData.uptime_seconds)}</span>
           </div>
           <div class="stat-item">
             <span class="stat-label">Version</span>
@@ -338,7 +361,7 @@ export class AdminDashboard {
           <h3 class="metric-title">Uptime</h3>
           <span class="metric-icon">⏱️</span>
         </div>
-        <div class="metric-value">${MonitoringUtils.formatDuration(this.state.healthData.uptime_seconds)}</div>
+        <div class="metric-value">${this.formatDuration(this.state.healthData.uptime_seconds)}</div>
         <div class="metric-trend positive">↗ Stable</div>
       </div>
 
@@ -362,7 +385,7 @@ export class AdminDashboard {
 
     const servicesHtml = Object.entries(this.state.healthData.services)
       .map(([serviceName, serviceData]) => {
-        const healthColor = MonitoringUtils.getHealthColor(serviceData.status);
+        const healthColor = this.getHealthColor(serviceData.status);
         const statusIcon = serviceData.status === 'healthy' ? '✅' : 
                           serviceData.status === 'degraded' ? '⚠️' : '❌';
 
@@ -522,6 +545,33 @@ export class AdminDashboard {
     return div.innerHTML;
   }
 
+  private formatDuration(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${secs}s`;
+    } else {
+      return `${secs}s`;
+    }
+  }
+
+  private getHealthColor(status: string): string {
+    switch (status) {
+      case 'healthy':
+        return '#10b981'; // green-500
+      case 'degraded':
+        return '#f59e0b'; // amber-500
+      case 'unhealthy':
+        return '#ef4444'; // red-500
+      default:
+        return '#6b7280'; // gray-500
+    }
+  }
+
   /**
    * Cleanup resources
    */
@@ -552,4 +602,19 @@ export function initializeAdminDashboard(config: Partial<DashboardConfig> = {}):
   }
   
   return dashboard;
+}
+
+// Ensure functions are preserved in build by making them globally available
+declare global {
+  interface Window {
+    initializeAdminDashboard?: typeof initializeAdminDashboard;
+    AdminDashboard?: typeof AdminDashboard;
+  }
+}
+
+if (typeof globalThis !== 'undefined') {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+  (globalThis as any).initializeAdminDashboard = initializeAdminDashboard;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+  (globalThis as any).AdminDashboard = AdminDashboard;
 }
