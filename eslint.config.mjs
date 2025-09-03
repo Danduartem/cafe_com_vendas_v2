@@ -17,7 +17,7 @@ export default tseslint.config(
       sourceType: 'module',
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['eslint.config.mjs', '*.config.{js,mjs}'],
+          allowDefaultProject: ['eslint.config.mjs', '*.config.{js,mjs}', '.eleventy.mjs'],
           defaultProject: 'tsconfig.json',
         },
         tsconfigRootDir: import.meta.dirname,
@@ -56,6 +56,7 @@ export default tseslint.config(
   // JavaScript files (if any remain)
   {
     files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
+    extends: [tseslint.configs.disableTypeChecked],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
@@ -71,6 +72,15 @@ export default tseslint.config(
       'no-console': 'warn', // Warn about console statements
       'prefer-const': 'error',
       'no-var': 'error'
+    }
+  },
+
+  // Root Eleventy config is JS: disable type-checked rules
+  {
+    files: ['.eleventy.mjs'],
+    extends: [tseslint.configs.disableTypeChecked],
+    rules: {
+      'no-console': 'off'
     }
   },
 

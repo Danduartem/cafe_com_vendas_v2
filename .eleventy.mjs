@@ -32,7 +32,7 @@ export default function(eleventyConfig) {
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      .replace(/\"/g, '&quot;')
+      .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
     return escaped.replace(/\n/g, '<br>');
   });
@@ -113,4 +113,3 @@ export default function(eleventyConfig) {
     templateFormats: ['html', 'njk', 'md']
   };
 }
-
