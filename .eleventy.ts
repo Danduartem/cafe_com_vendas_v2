@@ -2,6 +2,8 @@ import 'dotenv/config';
 import 'tsx/esm';
 import { HtmlBasePlugin, RenderPlugin, type UserConfig } from '@11ty/eleventy';
 import { logger } from './src/utils/logger.ts';
+import { readFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
 
 export default function(eleventyConfig: UserConfig) {
   // Enhanced Eleventy 3.x configuration with Context7 best practices
@@ -24,6 +26,9 @@ export default function(eleventyConfig: UserConfig) {
   // - setLayoutResolution(false)
 
   // Utility filters
+  // Basic JSON stringify
+  eleventyConfig.addFilter('json', (data: unknown) => JSON.stringify(data));
+
   eleventyConfig.addFilter('jsonifyArray', (array: unknown) => {
     return JSON.stringify(array as unknown[]);
   });
@@ -45,6 +50,43 @@ export default function(eleventyConfig: UserConfig) {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
     return escaped.replace(/\n/g, '<br>');
+  });
+
+  // Asset manifest resolver (for Vite hashed filenames)
+  // Usage in templates: {{ 'src/assets/js/main.ts' | asset }}
+  let manifestCache: Record<string, { file: string; css?: string[] }> | null = null;
+  // Vite v7 writes manifest to .vite/manifest.json inside outDir
+  const manifestPath = join(process.cwd(), '_site', '.vite', 'manifest.json');
+  const fallbackMap: Record<string, string> = {
+    'src/assets/js/main.ts': '/js/main.js',
+    'src/admin/dashboard/index.ts': '/js/admin.js',
+    'src/assets/css/main.css': '/assets/css/styles.css'
+  };
+
+  function readManifest(): typeof manifestCache {
+    if (manifestCache) return manifestCache;
+    try {
+      if (existsSync(manifestPath)) {
+        const raw = readFileSync(manifestPath, 'utf-8');
+        manifestCache = JSON.parse(raw) as Record<string, { file: string; css?: string[] }>;
+        return manifestCache;
+      }
+    } catch (err) {
+      console.warn('Failed to read Vite manifest:', err);
+    }
+    manifestCache = null;
+    return manifestCache;
+  }
+
+  eleventyConfig.addFilter('asset', (entry: unknown) => {
+    const key = String(entry);
+    const manifest = readManifest();
+    const rec = manifest ? manifest[key] : undefined;
+    if (rec?.file) {
+      return `/${rec.file}`;
+    }
+    // Fallback to non-hashed paths for dev convenience
+    return fallbackMap[key] || key;
   });
 
   // TypeScript data file support for Eleventy 3.x
