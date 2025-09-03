@@ -1,0 +1,161 @@
+<!-- GTM Preview Mode Fix -->
+<script>
+(function() {
+  'use strict';
+  
+  /**
+   * GTM Preview Mode Fix
+   * 
+   * Detects when GTM preview mode is active and configures gtag to route
+   * Server GTM requests through our proxy to preserve cookie context.
+   * 
+   * This solves the cross-site cookie blocking issue that prevents
+   * Server GTM preview mode from working properly.
+   */
+  
+  // Configuration
+  const PROXY_ENDPOINT = '/.netlify/functions/gtm-proxy';
+  const SERVER_GTM_ENDPOINT = 'https://server-side-tagging-m5scdmswwq-uc.a.run.app';
+  const GA4_MEASUREMENT_ID = 'G-T06WRKJGRW';
+  
+  /**
+   * Detect if GTM preview mode is active
+   */
+  function isPreviewModeActive() {
+    // Check URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('gtm_debug') || urlParams.has('gtm_preview')) {
+      return true;
+    }
+    
+    // Check for preview mode cookies
+    const cookies = document.cookie;
+    if (cookies.includes('gtm_auth') || 
+        cookies.includes('gtm_preview') || 
+        cookies.includes('gtm_debug')) {
+      return true;
+    }
+    
+    // Check if Google Tag Manager debugger is active
+    if (window.google_tag_manager && window.google_tag_manager.dataLayer) {
+      return true;
+    }
+    
+    // Check for tag assistant
+    if (document.referrer && document.referrer.includes('tagassistant.google.com')) {
+      return true;
+    }
+    
+    return false;
+  }
+  
+  /**
+   * Get preview mode token from URL or cookies
+   */
+  function getPreviewToken() {
+    // Extract from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const gtmDebug = urlParams.get('gtm_debug');
+    if (gtmDebug) {
+      return gtmDebug;
+    }
+    
+    // Extract from cookies
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'gtm_auth' || name === 'gtm_preview') {
+        return value;
+      }
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Configure gtag to use proxy for Server GTM requests
+   */
+  function configureProxyMode() {
+    // Wait for gtag to be available
+    if (typeof window.gtag !== 'function') {
+      setTimeout(configureProxyMode, 100);
+      return;
+    }
+    
+    const previewToken = getPreviewToken();
+    
+    console.log('[GTM Preview Fix] Configuring proxy mode for Server GTM', {
+      previewToken: previewToken ? previewToken.substring(0, 10) + '...' : 'none',
+      proxyEndpoint: PROXY_ENDPOINT
+    });
+    
+    // Configure GA4 to use our proxy for server-side requests
+    window.gtag('config', GA4_MEASUREMENT_ID, {
+      // Use our proxy endpoint instead of direct Server GTM
+      transport_url: window.location.origin + PROXY_ENDPOINT,
+      // Use XHR to allow custom headers
+      transport_type: 'xhr',
+      // Add custom parameters for debugging
+      custom_map: {
+        'dimension1': 'preview_mode_active'
+      },
+      // Send preview token as custom parameter
+      preview_token: previewToken
+    });
+    
+    // Override fetch to add preview headers for all GTM requests
+    const originalFetch = window.fetch;
+    window.fetch = function(url, options = {}) {
+      // Check if this is a GTM-related request
+      if (typeof url === 'string' && 
+          (url.includes('/g/collect') || url.includes('/mp/collect') || 
+           url.includes(SERVER_GTM_ENDPOINT) || url.includes(PROXY_ENDPOINT))) {
+        
+        // Add preview headers
+        const headers = new Headers(options.headers || {});
+        
+        if (previewToken) {
+          headers.set('X-Gtm-Server-Preview', previewToken);
+        }
+        
+        // Ensure credentials are included for cookie forwarding
+        options = {
+          ...options,
+          headers: headers,
+          credentials: 'include'
+        };
+        
+        console.log('[GTM Preview Fix] Intercepted GTM request:', {
+          url: url.substring(0, 50) + '...',
+          hasPreviewHeader: !!previewToken,
+          method: options.method || 'GET'
+        });
+      }
+      
+      return originalFetch.call(this, url, options);
+    };
+    
+    console.log('[GTM Preview Fix] Preview mode configuration complete');
+  }
+  
+  /**
+   * Initialize preview mode fix
+   */
+  function init() {
+    // Only activate in preview mode
+    if (isPreviewModeActive()) {
+      console.log('[GTM Preview Fix] Preview mode detected, initializing proxy configuration');
+      configureProxyMode();
+    } else {
+      console.log('[GTM Preview Fix] Preview mode not active, using standard configuration');
+    }
+  }
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
