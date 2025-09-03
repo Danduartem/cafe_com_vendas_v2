@@ -63,11 +63,9 @@ export default defineConfig({
           }
           return `assets/[name][extname]`;
         },
-        // Enhanced manual chunks for optimal code splitting - Context7 pattern
+        // Enhanced manual chunks for optimal code splitting
         manualChunks: {
-          'vendor': ['@stripe/stripe-js'],
-          'analytics': [], // Reserved for future analytics libs
-          'ui': [] // Reserved for UI component libraries
+          vendor: ['@stripe/stripe-js']
         }
       }
     }
