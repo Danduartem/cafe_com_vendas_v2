@@ -136,3 +136,22 @@ export class CircuitBreaker {
     };
   }
 }
+
+/**
+ * Hash email for privacy-safe logging
+ * Provides GDPR-compliant logging while maintaining troubleshoot ability
+ */
+export function hashEmail(email: string): string {
+  // Use a simple deterministic hash for debugging while protecting PII
+  let hash = 0;
+  for (let i = 0; i < email.length; i++) {
+    const char = email.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  // Return shortened format with email domain for context
+  const [, domain] = email.split('@');
+  const hashStr = Math.abs(hash).toString(36).substring(0, 8);
+  return `${hashStr}@${domain || 'unknown'}`;
+}

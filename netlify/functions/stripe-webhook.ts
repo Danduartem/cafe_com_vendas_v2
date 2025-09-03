@@ -23,7 +23,7 @@ import {
 } from './types';
 // Stripe types removed for Phase 1 - Multibanco handling deferred to Phase 2
 // import { isStripePaymentIntent, hasMultibancoDetails, getMultibancoDetails } from '../../src/types/stripe.js';
-import { retryWithBackoff, SHARED_TIMEOUTS, withTimeout } from './shared-utils.js';
+import { retryWithBackoff, SHARED_TIMEOUTS, withTimeout, hashEmail } from './shared-utils.js';
 import { DeadLetterQueue, type FailedWebhook } from './dlq-handler.js';
 
 // Webhook idempotency tracking - using Stripe event.id for deduplication
@@ -71,7 +71,7 @@ const initializeStripe = () => {
   }
 
   return new Stripe(apiKey, {
-    apiVersion: '2025-07-30.basil', // Lock API version for consistency
+    // Use account default API version for maximum compatibility
     timeout: 30000, // 30 second timeout for Stripe API calls
     maxNetworkRetries: 2,
     telemetry: false, // Disable telemetry for better performance
@@ -1473,7 +1473,7 @@ async function moveSubscriberBetweenGroups(email: string, fromGroupId: string, t
     const searchResult = await searchResponse.json() as MailerLiteSearchResponse;
 
     if (!searchResult.data || searchResult.data.length === 0) {
-      console.log(`Subscriber not found in MailerLite: ${email}`);
+      console.log(`Subscriber not found in MailerLite: ${hashEmail(email)}`);
       return;
     }
 
@@ -1491,7 +1491,7 @@ async function moveSubscriberBetweenGroups(email: string, fromGroupId: string, t
         TIMEOUTS.mailerlite_api,
         'MailerLite group removal'
       );
-      console.log(`Removed ${email} from group ${fromGroupId}`);
+      console.log(`Removed ${hashEmail(email)} from group ${fromGroupId}`);
     }
 
     // Add to new group (Buyers)
@@ -1506,7 +1506,7 @@ async function moveSubscriberBetweenGroups(email: string, fromGroupId: string, t
       'MailerLite group assignment'
     );
 
-    console.log(`Successfully moved ${email} from group ${fromGroupId} to ${toGroupId}`);
+    console.log(`Successfully moved ${hashEmail(email)} from group ${fromGroupId} to ${toGroupId}`);
 
   } catch (error) {
     console.error('Error moving subscriber between groups:', error instanceof Error ? error.message : 'Unknown error');
@@ -1552,7 +1552,7 @@ async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promis
     }
 
     const result = await response.json() as MailerLiteSubscriberResponse;
-    console.log(`Added subscriber to MailerLite: ${subscriberData.email}`);
+    console.log(`Added subscriber to MailerLite: ${hashEmail(subscriberData.email)}`);
     return result;
 
   } catch (error) {
@@ -1592,7 +1592,7 @@ async function updateMailerLiteSubscriber(email: string, fields: Record<string, 
     const searchResult = await searchResponse.json() as MailerLiteSearchResponse;
 
     if (!searchResult.data || searchResult.data.length === 0) {
-      console.log(`Subscriber not found in MailerLite: ${email}`);
+      console.log(`Subscriber not found in MailerLite: ${hashEmail(email)}`);
       return;
     }
 
@@ -1620,7 +1620,7 @@ async function updateMailerLiteSubscriber(email: string, fields: Record<string, 
       throw new Error(`Failed to update subscriber: ${updateResponse.status} - ${error}`);
     }
 
-    console.log(`Updated MailerLite subscriber: ${email}`);
+    console.log(`Updated MailerLite subscriber: ${hashEmail(email)}`);
 
   } catch (error) {
     console.error('Error updating MailerLite subscriber:', error instanceof Error ? error.message : 'Unknown error');
@@ -1641,7 +1641,7 @@ async function triggerConfirmationEmail(email: string, data: Record<string, unkn
     // This would trigger a specific automation in MailerLite
     // The automation would be set up in MailerLite dashboard
     // For now, we'll just log the action
-    console.log(`Triggered confirmation email for: ${email}`, data);
+    console.log(`Triggered confirmation email for: ${hashEmail(email)}`, data);
 
     // You can implement specific MailerLite automation triggers here
     // Example: Add to a specific group that triggers the automation
@@ -1661,7 +1661,7 @@ async function triggerAbandonedCartEmail(email: string, data: Record<string, unk
   }
 
   try {
-    console.log(`Triggered abandoned cart email for: ${email}`, data);
+    console.log(`Triggered abandoned cart email for: ${hashEmail(email)}`, data);
 
     // Add to abandoned cart group or trigger specific automation
     // This would be configured in MailerLite dashboard

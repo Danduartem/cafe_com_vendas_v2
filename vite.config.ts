@@ -14,8 +14,7 @@ export default defineConfig({
   // Enhanced dependency optimization with Context7 best practices
   optimizeDeps: {
     include: [
-      '@stripe/stripe-js', // Include Stripe client SDK
-      'stripe' // Include Stripe server SDK for consistency
+      '@stripe/stripe-js' // Include only Stripe client SDK for browser
     ],
     // Optimize cold start performance - Context7 pattern
     holdUntilCrawlEnd: false, // Process dependencies in parallel

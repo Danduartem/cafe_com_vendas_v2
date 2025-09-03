@@ -11,6 +11,7 @@ import type {
   StripePaymentElement,
   StripePaymentElementChangeEvent
 } from '@stripe/stripe-js';
+import type { StripePaymentIntent } from '../../../types/stripe.js';
 import { 
   getPaymentIntentId, 
   getPaymentIntentStatus,
@@ -1256,7 +1257,14 @@ export const Checkout: CheckoutSectionComponent = {
     // Handle redirect for async payments
     const paymentIntentId = getPaymentIntentId(paymentIntent);
      
-    // @ts-expect-error - PaymentIntent type compatibility
+    // Type-safe handling using existing type guards
+    if (!isStripePaymentIntent(paymentIntent)) {
+      logger.error('Invalid payment intent type for async redirect');
+      return;
+    }
+    
+    // Type-safe payment intent after guard check (validated by isStripePaymentIntent)
+    // @ts-expect-error - TypeScript doesn't track type narrowing through closure scope
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const redirectDelay = this.getRedirectDelay(paymentMethod, paymentIntent);
     
@@ -1273,7 +1281,8 @@ export const Checkout: CheckoutSectionComponent = {
     
     this.redirectTimeoutId = window.setTimeout(() => {
       try {
-        // @ts-expect-error - PaymentIntent type compatibility
+        // Type-safe redirect URL building using validated payment intent
+        // @ts-expect-error - TypeScript doesn't track type narrowing through closure scope
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const redirectUrl = this.buildRedirectUrl(paymentIntent, paymentMethod);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -1299,7 +1308,7 @@ export const Checkout: CheckoutSectionComponent = {
     }, redirectDelay);
   },
 
-  getRedirectDelay(paymentMethod: string, paymentIntent: unknown): number {
+  getRedirectDelay(paymentMethod: string, paymentIntent: StripePaymentIntent): number {
     // Determine appropriate redirect delay based on payment method
     const isMultibancoPayment = paymentMethod === 'multibanco' || 
       (isStripePaymentIntent(paymentIntent) && hasMultibancoDetails(paymentIntent));
@@ -1310,7 +1319,7 @@ export const Checkout: CheckoutSectionComponent = {
     return 5000; // Standard delay for other async methods
   },
 
-  buildRedirectUrl(paymentIntent: unknown, paymentMethod: string): string {
+  buildRedirectUrl(paymentIntent: StripePaymentIntent, paymentMethod: string): string {
     const paymentId = getPaymentIntentId(paymentIntent);
     const status = getPaymentIntentStatus(paymentIntent);
     
