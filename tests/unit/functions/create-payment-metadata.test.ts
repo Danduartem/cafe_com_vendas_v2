@@ -1,22 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Capture arguments passed to paymentIntents.create
-const captured: { args?: any } = {};
+const captured: { args?: Record<string, unknown> } = {};
 
 vi.mock('stripe', () => {
   class MockStripe {
     customers = {
-      list: vi.fn(async () => ({ data: [] })),
-      update: vi.fn(async (_id: string, data: any) => ({ id: 'cus_123', ...data })),
-      create: vi.fn(async (data: any) => ({ id: 'cus_123', ...data }))
+      list: vi.fn(() => Promise.resolve({ data: [] as unknown[] })),
+      update: vi.fn((_id: string, data: Record<string, unknown>) => Promise.resolve({ id: 'cus_123', ...data })),
+      create: vi.fn((data: Record<string, unknown>) => Promise.resolve({ id: 'cus_123', ...data }))
     };
     paymentIntents = {
-      create: vi.fn(async (data: any, _opts?: any) => {
+      create: vi.fn((data: Record<string, unknown>, _opts?: unknown) => {
         captured.args = data;
-        return { id: 'pi_123', client_secret: 'cs_123' };
+        return Promise.resolve({ id: 'pi_123', client_secret: 'cs_123' });
       })
     };
-    constructor(_key: string) {}
   }
   return { default: MockStripe };
 });
@@ -52,9 +51,11 @@ describe('create-payment-intent metadata', () => {
     expect(res.status).toBe(200);
 
     // Ensure metadata contains IDs
-    expect(captured.args).toBeTruthy();
-    expect(captured.args.metadata).toBeTruthy();
-    expect(captured.args.metadata.event_id).toBe(payload.event_id);
-    expect(captured.args.metadata.user_session_id).toBe(payload.user_session_id);
+    const args = captured.args as Record<string, unknown>;
+    expect(args).toBeTruthy();
+    const metadata = (args.metadata ?? {}) as Record<string, unknown>;
+    expect(metadata).toBeTruthy();
+    expect(metadata.event_id).toBe(payload.event_id);
+    expect(metadata.user_session_id).toBe(payload.user_session_id);
   });
 });
