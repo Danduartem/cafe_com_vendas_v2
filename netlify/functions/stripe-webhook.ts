@@ -24,6 +24,7 @@ import {
 // Stripe types removed for Phase 1 - Multibanco handling deferred to Phase 2
 // import { isStripePaymentIntent, hasMultibancoDetails, getMultibancoDetails } from '../../src/types/stripe.js';
 import { retryWithBackoff, SHARED_TIMEOUTS, withTimeout, hashEmail } from './shared-utils.js';
+import { buildCorsHeaders } from './lib/cors.js';
 import { DeadLetterQueue, type FailedWebhook } from './dlq-handler.js';
 
 // Webhook idempotency tracking - using Stripe event.id for deduplication
@@ -178,14 +179,11 @@ function logWithCorrelation(level: string, message: string, data: Record<string,
 }
 
 export default async (request: Request): Promise<Response> => {
-  // Set CORS headers
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Stripe-Signature',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Credentials': 'false'
-  } as Record<string, string>;
+  // Build dynamic CORS headers based on origin
+  const origin = request.headers.get('origin');
+  const headers = buildCorsHeaders(origin);
+  headers['Access-Control-Allow-Headers'] = 'Content-Type, Stripe-Signature';
+  headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS';
 
   // Handle preflight requests
   if (request.method === 'OPTIONS') {
@@ -371,6 +369,9 @@ export default async (request: Request): Promise<Response> => {
 
     // Enhanced event processing with Context7 error handling patterns
     await processWebhookEventLogic(stripeEvent, correlationId);
+
+    // Mark event as processed for idempotency within runtime lifecycle
+    processedEvents.add(stripeEvent.id);
 
 
     // Log fulfillment tracker stats for monitoring
@@ -803,7 +804,7 @@ async function handlePaymentProcessing(paymentIntent: Stripe.PaymentIntent, corr
 
   try {
     const metadata = paymentIntent.metadata;
-    const customerEmail = metadata.customer_email;
+    const customerEmail = metadata.email;
 
     if (customerEmail) {
       // Update MailerLite with processing status using retry logic
@@ -836,7 +837,7 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent, correlat
 
   try {
     const metadata = paymentIntent.metadata;
-    const customerEmail = metadata.customer_email;
+    const customerEmail = metadata.email;
 
     if (customerEmail) {
       // Update MailerLite with failed status using retry logic
@@ -849,7 +850,7 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent, correlat
 
       // Trigger abandoned cart email sequence
       await retryWithBackoff(() => triggerAbandonedCartEmail(customerEmail, {
-        name: metadata.customer_name,
+        name: metadata.full_name,
         amount: paymentIntent.amount / 100,
         currency: paymentIntent.currency.toUpperCase(),
         failure_reason: paymentIntent.last_payment_error?.message
@@ -872,7 +873,7 @@ async function handlePaymentCanceled(paymentIntent: Stripe.PaymentIntent, correl
 
   try {
     const metadata = paymentIntent.metadata;
-    const customerEmail = metadata.customer_email;
+    const customerEmail = metadata.email;
 
     if (customerEmail) {
       // Update MailerLite with canceled status using retry logic
@@ -900,7 +901,7 @@ async function handlePaymentRequiresAction(paymentIntent: Stripe.PaymentIntent, 
 
   try {
     const metadata = paymentIntent.metadata;
-    const customerEmail = metadata.customer_email;
+    const customerEmail = metadata.email;
 
     if (customerEmail) {
       await retryWithBackoff(() => updateMailerLiteSubscriber(customerEmail, {
@@ -927,7 +928,7 @@ async function handlePaymentPartiallyFunded(paymentIntent: Stripe.PaymentIntent,
 
   try {
     const metadata = paymentIntent.metadata;
-    const customerEmail = metadata.customer_email;
+    const customerEmail = metadata.email;
 
     if (customerEmail) {
       await retryWithBackoff(() => updateMailerLiteSubscriber(customerEmail, {

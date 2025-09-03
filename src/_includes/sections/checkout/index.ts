@@ -515,6 +515,12 @@ export const Checkout: CheckoutSectionComponent = {
       if (paymentElementContainer && this.paymentElement) {
         this.paymentElement.mount('#payment-element');
 
+        // Initially disable the pay button until form is complete
+        const payBtn = document.querySelector('#payBtn') as HTMLButtonElement;
+        if (payBtn) {
+          payBtn.disabled = true;
+        }
+
         // Hide skeleton loader and show payment element
         const skeleton = document.querySelector('#payment-skeleton');
         if (skeleton) {
@@ -1250,7 +1256,7 @@ export const Checkout: CheckoutSectionComponent = {
     };
 
     // Return translated message or fallback
-    return translations[message] || `Erro: ${message}. Se o problema persistir, contacte-nos através do email suporte@cafecomvendas.com.`;
+    return translations[message] || `Erro: ${message}. Se o problema persistir, contacte-nos através do email contato@jucanamaximiliano.com.br.`;
   },
 
   handleAsyncPaymentRedirect(paymentIntent: unknown, paymentMethod: string): void {
