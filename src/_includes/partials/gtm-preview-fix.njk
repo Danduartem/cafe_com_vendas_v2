@@ -1,21 +1,30 @@
-<!-- GTM Preview Mode Fix v2.0 -->
+<!-- GTM Preview Mode Fix v2.1 - Development & Production Support -->
 <script>
 (function() {
   'use strict';
   
   /**
-   * Enhanced GTM Preview Mode Fix
+   * Enhanced GTM Preview Mode Fix (Development & Production)
    * 
    * Intercepts dataLayer pushes to force all GA4 configurations to use our proxy,
    * solving the cross-site cookie blocking issue for Server GTM preview mode.
    * 
-   * This implementation prevents GTM from overriding transport_url configurations.
+   * Works in both environments:
+   * - Development: localhost:8888 → proxy → Server GTM
+   * - Production: www.jucanamaximiliano.com.br → proxy → Server GTM
+   * 
+   * This implementation prevents GTM from overriding transport_url configurations
+   * and only activates during preview mode (gtm_debug parameter).
    */
   
-  // Configuration
+  // Configuration - supports both development and production
   const PROXY_ENDPOINT = '/.netlify/functions/gtm-proxy';
   const SERVER_GTM_ENDPOINT = 'https://server-side-tagging-m5scdmswwq-uc.a.run.app';
   const GA4_MEASUREMENT_ID = 'G-T06WRKJGRW';
+  
+  // Environment detection
+  const IS_LOCALHOST = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const IS_PRODUCTION = window.location.hostname === 'www.jucanamaximiliano.com.br' || window.location.hostname === 'jucanamaximiliano.com.br';
   
   let isPreviewMode = false;
   let previewToken = null;
@@ -304,14 +313,17 @@
    * Initialize enhanced preview mode fix
    */
   function init() {
+    const environment = IS_LOCALHOST ? 'development' : (IS_PRODUCTION ? 'production' : 'unknown');
     isPreviewMode = detectPreviewMode();
     
     if (isPreviewMode) {
       previewToken = getPreviewToken();
       
       console.log('[GTM Preview Fix v2.0] Preview mode detected, installing enhanced interceptors:', {
+        environment: environment,
+        hostname: window.location.hostname,
         previewToken: previewToken ? previewToken.substring(0, 10) + '...' : 'none',
-        proxyEndpoint: PROXY_ENDPOINT
+        proxyEndpoint: window.location.origin + PROXY_ENDPOINT
       });
       
       // Install all interceptors
@@ -320,9 +332,9 @@
       createXHRInterceptor();
       overrideGtagFunction();
       
-      console.log('[GTM Preview Fix] All interceptors installed successfully');
+      console.log('[GTM Preview Fix] All interceptors installed successfully for ' + environment + ' environment');
     } else {
-      console.log('[GTM Preview Fix] Preview mode not detected, running in standard mode');
+      console.log('[GTM Preview Fix] Preview mode not detected, running in standard mode on ' + environment + ' environment');
     }
   }
   
