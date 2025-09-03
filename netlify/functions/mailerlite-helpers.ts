@@ -7,6 +7,7 @@ import {
   MAILERLITE_CUSTOM_FIELDS,
   MAILERLITE_EVENT_GROUPS
 } from './types';
+import { hashEmail } from './shared-utils.js';
 
 // API configuration
 const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
@@ -100,7 +101,7 @@ export async function triggerConfirmationEmail(
     }
 
     const result = await response.json() as { data?: { id?: string; groups?: string[] } };
-    console.log(`Confirmation email triggered for: ${email}`, {
+    console.log(`Confirmation email triggered for: ${hashEmail(email)}`, {
       subscriberId: result.data?.id,
       groups: result.data?.groups
     });
@@ -163,7 +164,7 @@ async function updateSubscriberForConfirmation(
       throw new Error(`Failed to update subscriber: ${updateResponse.status}`);
     }
 
-    console.log(`Updated subscriber for confirmation: ${email}`);
+    console.log(`Updated subscriber for confirmation: ${hashEmail(email)}`);
     return { success: true };
 
   } catch (error) {
@@ -221,7 +222,7 @@ export async function triggerAbandonedCartEmail(
       throw new Error(`MailerLite API error: ${response.status} - ${errorText}`);
     }
 
-    console.log(`Abandoned cart email triggered for: ${email}`, {
+    console.log(`Abandoned cart email triggered for: ${hashEmail(email)}`, {
       amount: data.amount,
       reason: data.failure_reason
     });
@@ -289,7 +290,7 @@ export async function triggerMultibancoVoucherEmail(
       throw new Error(`MailerLite API error: ${response.status} - ${errorText}`);
     }
 
-    console.log(`Multibanco voucher email triggered for: ${email}`, {
+    console.log(`Multibanco voucher email triggered for: ${hashEmail(email)}`, {
       entity: data.entity,
       reference: data.reference,
       amount: data.amount
@@ -403,7 +404,7 @@ export async function addToAutomationWorkflow(
       throw new Error(`MailerLite API error: ${response.status} - ${errorText}`);
     }
 
-    console.log(`Added ${email} to workflow group: ${workflowGroupId}`);
+    console.log(`Added ${hashEmail(email)} to workflow group: ${workflowGroupId}`);
     return { success: true };
 
   } catch (error) {
@@ -423,7 +424,7 @@ function logAutomationTrigger(
 ): void {
   const logEntry = {
     timestamp: new Date().toISOString(),
-    email,
+    email: hashEmail(email),
     automation_type: automationType,
     metadata,
     environment: process.env.NODE_ENV || 'production'

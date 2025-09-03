@@ -13,12 +13,6 @@ import type {
 } from '../../src/types/enhanced-tracking.js';
 
 // Cache and rate limiting interfaces
-interface CustomerCacheEntry {
-  customer: Stripe.Customer;
-  timestamp: number;
-  lastAccessed: number;
-}
-
 interface RateLimitEntry {
   count: number;
   firstRequest: number;
@@ -76,73 +70,8 @@ function getRateLimitConfig(origin: string | undefined) {
   return isDevelopmentRequest(origin) ? DEVELOPMENT_RATE_LIMIT : PRODUCTION_RATE_LIMIT;
 }
 
-// Customer caching to reduce Stripe API calls with proper typing
-const customerCache = new Map<string, CustomerCacheEntry>();
-const CUSTOMER_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
-const MAX_CACHE_SIZE = 1000; // Maximum number of cached customers
-
-// Customer cache management
-class CustomerCacheManager {
-  static cleanExpiredEntries() {
-    const now = Date.now();
-    for (const [email, entry] of customerCache.entries()) {
-      if (now - entry.timestamp > CUSTOMER_CACHE_TTL) {
-        customerCache.delete(email);
-      }
-    }
-  }
-
-  static evictOldestIfNeeded() {
-    if (customerCache.size >= MAX_CACHE_SIZE) {
-      // Remove oldest 10% of entries
-      const entries = Array.from(customerCache.entries())
-        .sort((a, b) => a[1].timestamp - b[1].timestamp);
-
-      const toRemove = Math.floor(MAX_CACHE_SIZE * 0.1);
-      for (let i = 0; i < toRemove && i < entries.length; i++) {
-        customerCache.delete(entries[i][0]);
-      }
-    }
-  }
-
-  static get(email: string): Stripe.Customer | null {
-    const entry = customerCache.get(email);
-    if (!entry) return null;
-
-    const now = Date.now();
-    if (now - entry.timestamp > CUSTOMER_CACHE_TTL) {
-      customerCache.delete(email);
-      return null;
-    }
-
-    // Update access time for LRU behavior
-    entry.lastAccessed = now;
-    return entry.customer;
-  }
-
-  static set(email: string, customer: Stripe.Customer): void {
-    this.cleanExpiredEntries();
-    this.evictOldestIfNeeded();
-
-    customerCache.set(email, {
-      customer,
-      timestamp: Date.now(),
-      lastAccessed: Date.now()
-    });
-  }
-
-  static invalidate(email: string): void {
-    customerCache.delete(email);
-  }
-
-  static getStats() {
-    return {
-      size: customerCache.size,
-      maxSize: MAX_CACHE_SIZE,
-      ttl: CUSTOMER_CACHE_TTL
-    };
-  }
-}
+// Customer caching extracted to lib for reuse and testability
+import { CustomerCacheManager } from './lib/customer-cache.js';
 
 // Validation moved to lib for reuse and testability
 import { validatePaymentRequest, VALIDATION_RULES } from './lib/validation.js';
