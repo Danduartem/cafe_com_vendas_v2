@@ -20,11 +20,21 @@ Stripe Payment → Backend Function → Server GTM → GA4
 - Handles critical conversion events from Stripe webhooks
 - 100% tracking coverage (ad-blocker proof)
 
+### **Development: Preview Mode Support** 
+```
+Web GTM → First-Party Proxy → Server GTM → GA4 (Debug Mode)
+```
+- **Preview Fix Script** intercepts and transforms URLs to use local proxy
+- **GTM Proxy Function** forwards requests while preserving preview cookies
+- **Netlify Redirects** provide transparent proxy routing
+- Solves cross-site cookie blocking in Server GTM preview mode
+
 ## 🎯 **Key Architecture Points**
 - **Single Server GTM Container** processes both paths
 - **Deduplication** handled automatically by GA4
 - **Enhanced Attribution** preserved through both flows
 - **Maximum Coverage** through redundant tracking
+- **Preview Mode Support** through first-party proxy (development only)
 
 ---
 
@@ -132,6 +142,12 @@ graph TB
             SGTM_ENDPOINT[SGTM_ENDPOINT<br/>Backend → Server GTM Direct]
         end
 
+        subgraph "🛠️ Development Preview Mode Infrastructure"
+            GTM_PROXY_FUNCTION[GTM Proxy Function<br/>netlify/functions/gtm-proxy.ts]
+            GTM_PREVIEW_FIX[Preview Fix Script<br/>src/_includes/partials/gtm-preview-fix.njk]
+            NETLIFY_REDIRECTS[Netlify Proxy Routes<br/>/gtm/* → proxy function]
+        end
+
         subgraph "🎯 Server GTM Event"
             SERVER_GTM_PURCHASE["🔥 Server GTM Purchase Event<br/>{<br/>  event_name: 'purchase',<br/>  client_id: string,<br/>  transaction_id: string,<br/>  value: number,<br/>  currency: 'EUR',<br/>  items: [GA4_items],<br/>  user_data: {hashed_email},<br/>  custom_parameters: {<br/>    payment_method: string,<br/>    customer_type: 'new'|'returning',<br/>    integration_version: '1.0'<br/>  }<br/>}<br/><br/>Sent to: Server GTM Container<br/>Path: /mp/collect"]
         end
@@ -217,10 +233,16 @@ graph TB
     GTM_PLUGIN --> DL_PURCHASE_COMPLETED
     GTM_PLUGIN --> DL_PURCHASE_BLOCKED
 
+    %% Preview Mode Infrastructure (Development Only)
+    GTM_PREVIEW_FIX -.-> GTM_PROXY_FUNCTION
+    GTM_PROXY_FUNCTION -.-> SERVER_GTM_CONTAINER
+    NETLIFY_REDIRECTS -.-> GTM_PROXY_FUNCTION
+
     %% Client-Side GTM Path (Browser Events)
     GTM_CONTAINER --> DATALAYER_INIT
     GTM_CONTAINER --> WEB_GTM
     WEB_GTM --> SERVER_GTM_CONTAINER
+    WEB_GTM -.-> GTM_PREVIEW_FIX
     
     DL_CHECKOUT_OPENED --> TRIGGER_CHECKOUT
     DL_CTA_CLICK --> TRIGGER_CTA
@@ -252,6 +274,7 @@ graph TB
     classDef serverNode fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
     classDef gtmNode fill:#f1f8e9,stroke:#33691e,stroke-width:2px,color:#000
     classDef architectureNode fill:#fce4ec,stroke:#880e4f,stroke-width:3px,color:#000
+    classDef previewNode fill:#e8eaf6,stroke:#1a237e,stroke-width:2px,color:#000,stroke-dasharray:5
 
     class DL_CHECKOUT_OPENED,DL_CTA_CLICK,DL_WHATSAPP_CLICK,DL_FAQ_TOGGLE,DL_FAQ_MEANINGFUL,DL_VIDEO_PLAY,DL_TESTIMONIAL_SLIDE,DL_SECTION_VIEW,DL_SCROLL_DEPTH eventNode
     class DL_PURCHASE_COMPLETED,DL_PURCHASE_BLOCKED,SERVER_GTM_PURCHASE purchaseNode
@@ -260,4 +283,5 @@ graph TB
     class SERVER_GTM_CLIENT,SGTM_ENDPOINT,STRIPE_WEBHOOK serverNode
     class TRIGGER_CHECKOUT,TRIGGER_CTA,TRIGGER_WHATSAPP,TRIGGER_FAQ,TRIGGER_VIDEO,TRIGGER_SECTION,TRIGGER_SCROLL,TRIGGER_PURCHASE,TRIGGER_PERFORMANCE,TRIGGER_ERROR,TAG_GA4_CONFIG,TAG_GA4_EVENT,TAG_GA4_PURCHASE,TAG_GA4_PERFORMANCE gtmNode
     class WEB_GTM,SERVER_GTM_CONTAINER,GA4_DESTINATION architectureNode
+    class GTM_PROXY_FUNCTION,GTM_PREVIEW_FIX,NETLIFY_REDIRECTS previewNode
 ```

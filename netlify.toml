@@ -51,6 +51,21 @@
   to = "/obrigado"
   status = 301
 
+# GTM Server-side Preview Mode Support Redirects
+[[redirects]]
+  # Transparent proxy for Server GTM collect endpoint (alternative route)
+  from = "/gtm/g/collect"
+  to = "/.netlify/functions/gtm-proxy"
+  status = 200
+  force = true
+
+[[redirects]]
+  # Transparent proxy for Server GTM measurement protocol (alternative route)
+  from = "/gtm/mp/collect"
+  to = "/.netlify/functions/gtm-proxy"
+  status = 200
+  force = true
+
 # Headers for security and performance
 [[headers]]
   for = "/*"

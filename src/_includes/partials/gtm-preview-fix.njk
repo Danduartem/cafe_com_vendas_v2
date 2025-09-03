@@ -1,16 +1,15 @@
-<!-- GTM Preview Mode Fix -->
+<!-- GTM Preview Mode Fix v2.0 -->
 <script>
 (function() {
   'use strict';
   
   /**
-   * GTM Preview Mode Fix
+   * Enhanced GTM Preview Mode Fix
    * 
-   * Detects when GTM preview mode is active and configures gtag to route
-   * Server GTM requests through our proxy to preserve cookie context.
+   * Intercepts dataLayer pushes to force all GA4 configurations to use our proxy,
+   * solving the cross-site cookie blocking issue for Server GTM preview mode.
    * 
-   * This solves the cross-site cookie blocking issue that prevents
-   * Server GTM preview mode from working properly.
+   * This implementation prevents GTM from overriding transport_url configurations.
    */
   
   // Configuration
@@ -18,10 +17,16 @@
   const SERVER_GTM_ENDPOINT = 'https://server-side-tagging-m5scdmswwq-uc.a.run.app';
   const GA4_MEASUREMENT_ID = 'G-T06WRKJGRW';
   
+  let isPreviewMode = false;
+  let previewToken = null;
+  let originalDataLayerPush = null;
+  let originalFetch = null;
+  let originalXMLHttpRequest = null;
+  
   /**
    * Detect if GTM preview mode is active
    */
-  function isPreviewModeActive() {
+  function detectPreviewMode() {
     // Check URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('gtm_debug') || urlParams.has('gtm_preview')) {
@@ -73,89 +78,260 @@
   }
   
   /**
-   * Configure gtag to use proxy for Server GTM requests
+   * Check if a URL should be proxied
    */
-  function configureProxyMode() {
-    // Wait for gtag to be available
-    if (typeof window.gtag !== 'function') {
-      setTimeout(configureProxyMode, 100);
-      return;
+  function shouldProxyRequest(url) {
+    if (typeof url !== 'string') return false;
+    return url.includes('/g/collect') || 
+           url.includes('/mp/collect') || 
+           url.includes(SERVER_GTM_ENDPOINT) ||
+           url.includes('google-analytics.com') ||
+           url.includes('analytics.google.com') ||
+           url.includes('/.netlify/functions/gtm-proxy'); // Catch existing proxy URLs
+  }
+  
+  /**
+   * Transform Server GTM URLs to use our proxy
+   */
+  function transformUrlToProxy(url) {
+    if (!shouldProxyRequest(url)) return url;
+    
+    // Parse the URL to extract query parameters
+    try {
+      const urlObj = new URL(url);
+      
+      // If it's already pointing to localhost proxy, leave it alone
+      if (urlObj.hostname === window.location.hostname && urlObj.pathname === PROXY_ENDPOINT) {
+        return url;
+      }
+      
+      // Transform any proxy URLs or Server GTM/GA URLs to use localhost proxy
+      if (urlObj.hostname.includes('server-side-tagging') || 
+          urlObj.hostname.includes('google-analytics.com') ||
+          urlObj.hostname.includes('analytics.google.com') ||
+          urlObj.pathname.includes('/g/collect') ||
+          urlObj.pathname.includes('/mp/collect') ||
+          urlObj.pathname.includes('/.netlify/functions/gtm-proxy')) {
+        
+        const proxyUrl = `${window.location.origin}${PROXY_ENDPOINT}${urlObj.search}`;
+        
+        console.log('[GTM Preview Fix] Transformed URL:', {
+          original: `${urlObj.hostname}${urlObj.pathname}${urlObj.search.substring(0, 50)}...`,
+          proxy: proxyUrl.substring(0, 80) + '...'
+        });
+        
+        return proxyUrl;
+      }
+      
+      // Don't transform other URLs
+      return url;
+    } catch (error) {
+      console.warn('[GTM Preview Fix] Failed to transform URL:', url.substring(0, 100), error);
+      return url;
+    }
+  }
+  
+  /**
+   * Enhanced dataLayer push interceptor
+   */
+  function createDataLayerInterceptor() {
+    // Ensure dataLayer exists
+    window.dataLayer = window.dataLayer || [];
+    
+    // Store original push method
+    if (!originalDataLayerPush) {
+      originalDataLayerPush = window.dataLayer.push.bind(window.dataLayer);
     }
     
-    const previewToken = getPreviewToken();
+    // Override dataLayer.push to intercept GA4 config calls
+    window.dataLayer.push = function(...args) {
+      const modifiedArgs = args.map(item => {
+        if (item && typeof item === 'object') {
+          // Intercept 'config' events for GA4
+          if (item.event === 'gtag' && item['gtag.parameter_keys']) {
+            const params = item['gtag.parameter_keys'];
+            if (params && params.includes('transport_url')) {
+              // Force our proxy URL for transport_url
+              item[GA4_MEASUREMENT_ID + '.transport_url'] = window.location.origin + PROXY_ENDPOINT;
+              
+              console.log('[GTM Preview Fix] Intercepted GA4 config, forced proxy transport_url:', {
+                measurementId: GA4_MEASUREMENT_ID,
+                transportUrl: item[GA4_MEASUREMENT_ID + '.transport_url']
+              });
+            }
+          }
+          
+          // Intercept direct gtag calls
+          if (item.event === 'gtag' && item.method === 'config' && item.target === GA4_MEASUREMENT_ID) {
+            if (!item.parameters) item.parameters = {};
+            item.parameters.transport_url = window.location.origin + PROXY_ENDPOINT;
+            item.parameters.transport_type = 'xhr';
+            
+            console.log('[GTM Preview Fix] Intercepted direct gtag config, added transport_url');
+          }
+        }
+        
+        return item;
+      });
+      
+      return originalDataLayerPush(...modifiedArgs);
+    };
     
-    console.log('[GTM Preview Fix] Configuring proxy mode for Server GTM', {
-      previewToken: previewToken ? previewToken.substring(0, 10) + '...' : 'none',
-      proxyEndpoint: PROXY_ENDPOINT
-    });
+    console.log('[GTM Preview Fix] DataLayer interceptor installed');
+  }
+  
+  /**
+   * Enhanced fetch interceptor
+   */
+  function createFetchInterceptor() {
+    if (originalFetch) return; // Already installed
     
-    // Configure GA4 to use our proxy for server-side requests
-    window.gtag('config', GA4_MEASUREMENT_ID, {
-      // Use our proxy endpoint instead of direct Server GTM
-      transport_url: window.location.origin + PROXY_ENDPOINT,
-      // Use XHR to allow custom headers
-      transport_type: 'xhr',
-      // Add custom parameters for debugging
-      custom_map: {
-        'dimension1': 'preview_mode_active'
-      },
-      // Send preview token as custom parameter
-      preview_token: previewToken
-    });
-    
-    // Override fetch to add preview headers for all GTM requests
-    const originalFetch = window.fetch;
+    originalFetch = window.fetch;
     window.fetch = function(url, options = {}) {
-      // Check if this is a GTM-related request
-      if (typeof url === 'string' && 
-          (url.includes('/g/collect') || url.includes('/mp/collect') || 
-           url.includes(SERVER_GTM_ENDPOINT) || url.includes(PROXY_ENDPOINT))) {
+      if (shouldProxyRequest(url)) {
+        const transformedUrl = transformUrlToProxy(url);
         
         // Add preview headers
         const headers = new Headers(options.headers || {});
-        
         if (previewToken) {
           headers.set('X-Gtm-Server-Preview', previewToken);
         }
         
-        // Ensure credentials are included for cookie forwarding
         options = {
           ...options,
           headers: headers,
           credentials: 'include'
         };
         
-        console.log('[GTM Preview Fix] Intercepted GTM request:', {
-          url: url.substring(0, 50) + '...',
-          hasPreviewHeader: !!previewToken,
-          method: options.method || 'GET'
+        console.log('[GTM Preview Fix] Intercepted fetch request:', {
+          transformed: transformedUrl !== url,
+          hasPreviewHeader: !!previewToken
         });
+        
+        return originalFetch.call(this, transformedUrl, options);
       }
       
       return originalFetch.call(this, url, options);
     };
-    
-    console.log('[GTM Preview Fix] Preview mode configuration complete');
   }
   
   /**
-   * Initialize preview mode fix
+   * Enhanced XMLHttpRequest interceptor
+   */
+  function createXHRInterceptor() {
+    if (originalXMLHttpRequest) return; // Already installed
+    
+    originalXMLHttpRequest = window.XMLHttpRequest;
+    
+    function InterceptedXMLHttpRequest() {
+      const xhr = new originalXMLHttpRequest();
+      const originalOpen = xhr.open.bind(xhr);
+      const originalSetRequestHeader = xhr.setRequestHeader.bind(xhr);
+      
+      xhr.open = function(method, url, ...args) {
+        if (shouldProxyRequest(url)) {
+          const transformedUrl = transformUrlToProxy(url);
+          
+          console.log('[GTM Preview Fix] Intercepted XHR request:', {
+            method: method,
+            transformed: transformedUrl !== url
+          });
+          
+          return originalOpen.call(this, method, transformedUrl, ...args);
+        }
+        
+        return originalOpen.call(this, method, url, ...args);
+      };
+      
+      xhr.setRequestHeader = function(name, value) {
+        // Add preview header for GTM requests
+        originalSetRequestHeader.call(this, name, value);
+        
+        if (previewToken && this._url && shouldProxyRequest(this._url)) {
+          originalSetRequestHeader.call(this, 'X-Gtm-Server-Preview', previewToken);
+        }
+      };
+      
+      return xhr;
+    }
+    
+    // Copy static properties
+    Object.setPrototypeOf(InterceptedXMLHttpRequest.prototype, originalXMLHttpRequest.prototype);
+    Object.setPrototypeOf(InterceptedXMLHttpRequest, originalXMLHttpRequest);
+    
+    window.XMLHttpRequest = InterceptedXMLHttpRequest;
+  }
+  
+  /**
+   * Override gtag function to force transport_url
+   */
+  function overrideGtagFunction() {
+    // Wait for gtag to be available
+    const waitForGtag = () => {
+      if (typeof window.gtag === 'function') {
+        const originalGtag = window.gtag;
+        
+        window.gtag = function(command, targetId, config, ...args) {
+          // Intercept 'config' commands for our GA4 measurement ID
+          if (command === 'config' && targetId === GA4_MEASUREMENT_ID) {
+            config = config || {};
+            config.transport_url = window.location.origin + PROXY_ENDPOINT;
+            config.transport_type = 'xhr';
+            
+            if (previewToken) {
+              config.preview_token = previewToken;
+            }
+            
+            console.log('[GTM Preview Fix] Intercepted gtag config, forced transport_url:', {
+              measurementId: targetId,
+              transportUrl: config.transport_url
+            });
+          }
+          
+          return originalGtag.call(this, command, targetId, config, ...args);
+        };
+        
+        console.log('[GTM Preview Fix] Gtag function override installed');
+      } else {
+        setTimeout(waitForGtag, 100);
+      }
+    };
+    
+    waitForGtag();
+  }
+  
+  /**
+   * Initialize enhanced preview mode fix
    */
   function init() {
-    // Only activate in preview mode
-    if (isPreviewModeActive()) {
-      console.log('[GTM Preview Fix] Preview mode detected, initializing proxy configuration');
-      configureProxyMode();
+    isPreviewMode = detectPreviewMode();
+    
+    if (isPreviewMode) {
+      previewToken = getPreviewToken();
+      
+      console.log('[GTM Preview Fix v2.0] Preview mode detected, installing enhanced interceptors:', {
+        previewToken: previewToken ? previewToken.substring(0, 10) + '...' : 'none',
+        proxyEndpoint: PROXY_ENDPOINT
+      });
+      
+      // Install all interceptors
+      createDataLayerInterceptor();
+      createFetchInterceptor();
+      createXHRInterceptor();
+      overrideGtagFunction();
+      
+      console.log('[GTM Preview Fix] All interceptors installed successfully');
     } else {
-      console.log('[GTM Preview Fix] Preview mode not active, using standard configuration');
+      console.log('[GTM Preview Fix] Preview mode not detected, running in standard mode');
     }
   }
   
-  // Initialize when DOM is ready
+  // Initialize immediately to catch early dataLayer pushes
+  init();
+  
+  // Also initialize when DOM is ready for safety
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
   }
 })();
 </script>
