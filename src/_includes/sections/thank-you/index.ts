@@ -22,6 +22,7 @@ import {
   type CalendarUrls,
   type CalendarEvent
 } from '../../../utils/calendar.js';
+import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 
 export const ThankYou = {
   init() {
@@ -398,7 +399,7 @@ export const ThankYou = {
   },
 
   trackCalendarInteraction(provider: string, method: string) {
-    import('../../../analytics/index.js').then(({ default: analytics }) => {
+    try {
       analytics.track('ui_interaction', {
         interaction: 'calendar_add',
         calendar_provider: provider,
@@ -408,9 +409,9 @@ export const ThankYou = {
         event_name: 'cafe_com_vendas_portugal',
         user_platform: detectUserPlatform()
       });
-    }).catch(() => {
+    } catch {
       logger.debug('Calendar analytics tracking unavailable');
-    });
+    }
   },
 
   showMultibancoInstructions(multibancoData: {
@@ -530,7 +531,7 @@ export const ThankYou = {
   }) {
     const { paymentIntent, hasEntity, hasReference, paymentMethod, amount } = data;
     
-    import('../../../analytics/index.js').then(({ default: analytics }) => {
+    try {
       // Track voucher display event
       analytics.track('payment_flow', {
         event_type: 'multibanco_voucher_displayed',
@@ -558,9 +559,9 @@ export const ThankYou = {
         hasReference,
         amount
       });
-    }).catch(() => {
+    } catch {
       logger.debug('Multibanco voucher analytics tracking unavailable');
-    });
+    }
   },
 
   trackPaymentCompletion(data: {
@@ -571,7 +572,7 @@ export const ThankYou = {
   }) {
     const { paymentIntent, paymentMethod, amount, source } = data;
     
-    import('../../../analytics/index.js').then(({ AnalyticsHelpers, default: analytics }) => {
+    try {
       // Track the main conversion event
       AnalyticsHelpers.trackConversion('purchase_completed', {
         transaction_id: paymentIntent,
@@ -580,7 +581,7 @@ export const ThankYou = {
         items: [{ name: eventName, quantity: 1, price: amount }],
         pricing_tier: 'early_bird',
         payment_method: paymentMethod,
-        completion_source: source // 'redirect_success', 'webhook_async', etc.
+        completion_source: source
       });
       
       // Track payment flow completion
@@ -600,9 +601,9 @@ export const ThankYou = {
         paymentMethod,
         source
       });
-    }).catch(() => {
+    } catch {
       logger.debug('Payment completion analytics tracking unavailable');
-    });
+    }
   },
 
   trackPaymentFailure(data: {
@@ -613,7 +614,7 @@ export const ThankYou = {
   }) {
     const { paymentIntent, paymentMethod, reason, source } = data;
     
-    import('../../../analytics/index.js').then(({ default: analytics }) => {
+    try {
       // Track payment failure
       analytics.track('payment_flow', {
         event_type: 'payment_failed',
@@ -639,9 +640,9 @@ export const ThankYou = {
         reason,
         source
       });
-    }).catch(() => {
+    } catch {
       logger.debug('Payment failure analytics tracking unavailable');
-    });
+    }
   },
 
   showGenericPendingPayment(paymentData: {

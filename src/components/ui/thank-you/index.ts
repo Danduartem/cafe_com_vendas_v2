@@ -6,6 +6,7 @@
 import { safeQuery } from '../../../utils/dom.js';
 import { logger } from '../../../utils/logger.js';
 import { Animations } from '../animations/index.js';
+import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 
 interface ThankYouConfig {
   progressTarget?: number;
@@ -72,14 +73,14 @@ export const PlatformThankYou = {
       }
 
       // Track animation
-      import('../../../analytics/index.js').then(({ default: analytics }) => {
+      try {
         analytics.track('ui_interaction', {
           interaction: 'progress_bar_animated',
           progress_value: targetProgress
         });
-      }).catch(() => {
+      } catch {
         logger.debug('Progress bar analytics tracking unavailable');
-      });
+      }
     }, 500);
   },
 
@@ -127,14 +128,14 @@ export const PlatformThankYou = {
       sessionStorage.setItem('thankYouCelebrationShown', 'true');
 
       // Track event
-      import('../../../analytics/index.js').then(({ default: analytics }) => {
+      try {
         analytics.track('ui_interaction', {
           interaction: 'celebration_shown',
           page: 'thank_you'
         });
-      }).catch(() => {
+      } catch {
         logger.debug('Celebration analytics tracking unavailable');
-      });
+      }
     }, 800);
   },
 
@@ -180,14 +181,14 @@ export const PlatformThankYou = {
       heading.innerHTML = updatedHtml;
 
       // Track personalization
-      import('../../../analytics/index.js').then(({ default: analytics }) => {
+      try {
         analytics.track('personalization', {
           type: 'greeting_personalized',
           page: 'thank_you'
         });
-      }).catch(() => {
+      } catch {
         logger.debug('Personalization analytics tracking unavailable');
-      });
+      }
     }
   },
 
@@ -195,7 +196,7 @@ export const PlatformThankYou = {
    * Track thank you page conversion
    */
   trackPageView(): void {
-    import('../../../analytics/index.js').then(({ AnalyticsHelpers, default: analytics }) => {
+    try {
       // Track page view
       analytics.track('page_view', {
         page: 'thank_you',
@@ -216,8 +217,8 @@ export const PlatformThankYou = {
           session_id: sessionId
         });
       }
-    }).catch(() => {
+    } catch {
       logger.debug('Thank you page analytics tracking unavailable');
-    });
+    }
   }
 };

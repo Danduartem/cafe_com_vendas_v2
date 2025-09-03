@@ -13,6 +13,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
 import { logger } from './logger.js';
+import { AnalyticsHelpers } from '../analytics/index.js';
 
 // Global YouTube API types
 declare global {
@@ -184,19 +185,17 @@ export const YouTube: YouTubeUtility = {
    * Track video play event and setup progress tracking
    */
   trackVideoPlay(videoId: string): void {
-    // Import analytics dynamically to avoid circular dependencies
-    import('../analytics/index.js').then(({ AnalyticsHelpers }) => {
-      // Track initial video play using the GTM method
+    // Track initial video play using the GTM method
+    try {
       AnalyticsHelpers.trackVideoProgress(videoId, 0, {
         video_title: `Testimonial Video ${videoId}`,
         section: 'testimonials'
       });
-
       // Setup progress tracking for this video
       this.setupVideoProgressTracking(videoId);
-    }).catch(() => {
+    } catch {
       logger.debug('Video play analytics tracking unavailable');
-    });
+    }
   },
 
   /**
@@ -234,17 +233,17 @@ export const YouTube: YouTubeUtility = {
           if (percentPlayed >= interval && !trackedIntervals.has(interval)) {
             trackedIntervals.add(interval);
             
-            // Import analytics and track progress
-            import('../analytics/index.js').then(({ AnalyticsHelpers }) => {
+            // Track progress
+            try {
               AnalyticsHelpers.trackVideoProgress(videoId, interval, {
                 video_title: `Testimonial Video ${videoId}`,
                 current_time: Math.floor(Number(currentTime) || 0),
                 duration: Math.floor(Number(duration) || 0),
                 section: 'testimonials'
               });
-            }).catch(() => {
+            } catch {
               logger.debug('Video progress analytics tracking unavailable');
-            });
+            }
 
             break; // Only track one interval per check
           }

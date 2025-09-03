@@ -37,6 +37,7 @@ import { isValidEmail, isValidPhone } from '../../../utils/validation.js';
 import { 
   getEventData
 } from '../../../utils/event-tracking.js';
+import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 
 // 🎯 Get centralized pricing data - SINGLE SOURCE OF TRUTH
 const site = siteData();
@@ -257,15 +258,14 @@ export const Checkout: CheckoutSectionComponent = {
     });
 
     // Track checkout opened (GTM production event + test alias)
-    import('../../../analytics/index.js').then(({ AnalyticsHelpers }) => {
-      // Use new method that fires both events
+    try {
       AnalyticsHelpers.trackCTAClick(this.getSourceSection(), {
         trigger_location: this.getSourceSection(),
         action: 'modal_opened'
       });
-    }).catch(() => {
+    } catch {
       logger.debug('Checkout modal analytics tracking unavailable');
-    });
+    }
   },
 
   getSourceSection(): string {
@@ -842,23 +842,20 @@ export const Checkout: CheckoutSectionComponent = {
       this.initializePaymentElement();
 
       // Track lead conversion (GTM production event + test alias)
-      import('../../../analytics/index.js').then(({ AnalyticsHelpers, default: analytics }) => {
-        // Fire the GTM production event
+      try {
         AnalyticsHelpers.trackConversion('lead_form_submitted', {
           lead_id: this.leadId,
           form_location: 'checkout_modal',
           pricing_tier: 'early_bird'
         });
-        
-        // Fire test alias for E2E compatibility
         analytics.track('form_submission', {
           section: 'checkout',
           action: 'lead_submitted',
           lead_id: this.leadId || undefined
         });
-      }).catch(() => {
+      } catch {
         logger.debug('Lead submission analytics tracking unavailable');
-      });
+      }
 
     } catch (error: unknown) {
       logger.error('Lead submission error:', error);
@@ -938,7 +935,7 @@ export const Checkout: CheckoutSectionComponent = {
         });
 
         // Track payment error with enhanced data
-        import('../../../analytics/index.js').then(({ default: analytics }) => {
+        try {
           analytics.track('section_engagement', {
             section: 'checkout',
             action: 'payment_error',
@@ -947,9 +944,9 @@ export const Checkout: CheckoutSectionComponent = {
             error_message: error.message,
             lead_id: this.leadId
           });
-        }).catch(() => {
+        } catch {
           logger.debug('Payment error analytics tracking unavailable');
-        });
+        }
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
         // Payment succeeded without redirect (no 3DS required)
         this.setStep('success');
@@ -960,18 +957,18 @@ export const Checkout: CheckoutSectionComponent = {
         });
 
         // Track payment success immediately since we know it succeeded
-        import('../../../analytics/index.js').then(({ AnalyticsHelpers }) => {
+        try {
           AnalyticsHelpers.trackConversion('purchase_completed', {
             transaction_id: paymentIntent.id,
-            value: basePrice, // 🎯 From centralized pricing
+            value: basePrice,
             currency: 'EUR',
-            items: [{ name: eventName, quantity: 1, price: basePrice }], // 🎯 From centralized data
+            items: [{ name: eventName, quantity: 1, price: basePrice }],
             pricing_tier: 'early_bird',
             lead_id: this.leadId
           });
-        }).catch(() => {
+        } catch {
           logger.debug('Payment completion analytics tracking unavailable');
-        });
+        }
 
         // Auto-redirect after success
         setTimeout(() => {
@@ -1013,7 +1010,7 @@ export const Checkout: CheckoutSectionComponent = {
         }
 
         // Track payment initiation (not completion yet)
-        import('../../../analytics/index.js').then(({ default: analytics }) => {
+        try {
           analytics.track('section_engagement', {
             section: 'checkout',
             action: 'payment_processing',
@@ -1021,9 +1018,9 @@ export const Checkout: CheckoutSectionComponent = {
             payment_intent_id: paymentIntent.id,
             lead_id: this.leadId || undefined
           });
-        }).catch(() => {
+        } catch {
           logger.debug('Payment processing analytics tracking unavailable');
-        });
+        }
 
         // Handle async payment redirect
         // @ts-expect-error - Stripe PaymentIntent type compatibility

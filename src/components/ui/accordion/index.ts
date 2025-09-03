@@ -6,6 +6,7 @@
 import { safeQuery, safeQueryAll } from '../../../utils/dom.js';
 import { logger } from '../../../utils/logger.js';
 import { Animations } from '../animations/index.js';
+import { AnalyticsHelpers } from '../../../analytics/index.js';
 
 interface AccordionConfig {
   containerSelector: string;
@@ -110,8 +111,7 @@ export const PlatformAccordion = {
             faqEngagementState.toggleCount++;
           }
 
-          // Import analytics dynamically to avoid circular dependency
-          import('../../../analytics/index.js').then(({ AnalyticsHelpers }) => {
+          try {
             // Track individual FAQ toggle
             AnalyticsHelpers.trackFAQ(itemNumber, isOpen, questionText);
 
@@ -125,9 +125,9 @@ export const PlatformAccordion = {
                 last_item: itemNumber
               });
             }
-          }).catch(() => {
+          } catch {
             logger.debug('FAQ analytics tracking unavailable');
-          });
+          }
         }
       }
     });

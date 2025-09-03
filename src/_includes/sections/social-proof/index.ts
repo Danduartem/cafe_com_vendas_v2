@@ -10,6 +10,7 @@ import { debounce } from '../../../assets/js/utils/throttle.js';
 import { embedYouTubeIframeLite } from '../../../utils/youtube.js';
 import { logger } from '../../../utils/logger.js';
 import type { Component } from '../../../types/components/base.js';
+import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 
 // Constants for carousel layout
 const CAROUSEL_GAP_DEFAULT = 24;
@@ -206,14 +207,13 @@ export const SocialProof: SocialProofComponent = {
     const testimonialId = this.carouselElements.slides[this.currentIndex]?.getAttribute('data-testimonial-id') ??
                          `tst_${String(this.currentIndex + 1).padStart(2, '0')}`;
 
-    import('../../../analytics/index.js').then(({ AnalyticsHelpers }) => {
-      // Use the specific testimonial slide tracking method that matches GTM config
+    try {
       AnalyticsHelpers.trackTestimonialSlide(testimonialId, this.currentIndex + 1, {
         section: 'social-proof'
       });
-    }).catch(() => {
+    } catch {
       logger.debug('Testimonial slide analytics tracking unavailable');
-    });
+    }
   },
 
   scrollToSlide(index: number): void {
@@ -306,22 +306,22 @@ export const SocialProof: SocialProofComponent = {
     }
 
     // Track analytics for video interaction
-    import('../../../analytics/index.js').then(({ default: analytics }) => {
+    try {
       analytics.track('section_engagement', {
         section: 'testimonials',
         action: 'video_embed_started',
         video_id: videoId
       });
-    }).catch(() => {
+    } catch {
       logger.debug('Video embed analytics tracking unavailable');
-    });
+    }
   },
 
   initSectionTracking(): void {
-    import('../../../analytics/index.js').then(({ AnalyticsHelpers }) => {
+    try {
       AnalyticsHelpers.initSectionTracking('social-proof');
-    }).catch(() => {
+    } catch {
       logger.debug('Section view analytics tracking unavailable');
-    });
+    }
   }
 };
