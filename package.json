@@ -25,7 +25,7 @@
     "test:e2e": "npx playwright test",
     "test:e2e:report": "npx playwright show-report reports/playwright/html",
     "lighthouse": "mkdir -p reports && npx lighthouse --output=json,html --output-path=reports/lighthouse",
-    "prepare": "husky install"
+    "prepare": "node -e \"if (process.env.CI || process.env.NETLIFY) { console.log('Skipping husky in CI'); process.exit(0); } require('child_process').execSync('husky install', { stdio: 'inherit' });\""
   },
   "keywords": [
     "landing-page",

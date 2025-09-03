@@ -177,6 +177,8 @@
   [context.production.environment]
     NODE_ENV = "production"
     ELEVENTY_ENV = "production"
+    # Ensure devDependencies are installed for build tools (Vite/Eleventy)
+    NPM_CONFIG_PRODUCTION = "false"
 
 [context.deploy-preview]
   command = "npm run build"
