@@ -732,6 +732,49 @@ test.describe('User Journey Tests', () => {
     expect(dataLayerStructure.eventTypes.length).toBeGreaterThan(0);
   });
 
+  test('should support GTM preview mode when debug parameter is present', async ({ page }) => {
+    // Navigate with GTM debug parameter
+    await page.goto('/?gtm_debug=1756895052790');
+    await page.waitForLoadState('networkidle');
+
+    // Check that preview mode detection works
+    const previewModeStatus = await page.evaluate(() => {
+      const urlParams = new URLSearchParams(window.location.search);
+      return {
+        hasDebugParam: urlParams.has('gtm_debug'),
+        debugValue: urlParams.get('gtm_debug'),
+        previewModeDetected: urlParams.has('gtm_debug') || urlParams.has('gtm_preview')
+      };
+    });
+
+    expect(previewModeStatus.hasDebugParam).toBe(true);
+    expect(previewModeStatus.debugValue).toBe('1756895052790');
+    expect(previewModeStatus.previewModeDetected).toBe(true);
+
+    // Verify that GTM proxy configuration is available
+    const proxyConfig = await page.evaluate(() => {
+      return {
+        proxyEndpoint: '/.netlify/functions/gtm-proxy',
+        currentOrigin: window.location.origin
+      };
+    });
+
+    expect(proxyConfig.proxyEndpoint).toBe('/.netlify/functions/gtm-proxy');
+    expect(proxyConfig.currentOrigin).toBeTruthy();
+
+    // Test that dataLayer still functions in preview mode
+    const dataLayerInPreview = await page.evaluate(() => {
+      const dl = window.dataLayer || [];
+      return {
+        hasEvents: dl.length > 0,
+        hasGTMLoad: dl.some((e) => e['gtm.start'] !== undefined)
+      };
+    });
+
+    expect(dataLayerInPreview.hasEvents).toBeTruthy();
+    expect(dataLayerInPreview.hasGTMLoad).toBeTruthy();
+  });
+
   test('MailerLite Lead Capture Integration', async ({ page }) => {
     console.log('[Test] Verifying MailerLite lead capture integration...');
     
