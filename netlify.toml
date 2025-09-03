@@ -63,13 +63,38 @@
     # Modern security headers (2025 standards)
     X-Frame-Options = "DENY"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    # Allow Stripe iframes to use the Payment Request API (Apple Pay / GPay)
+    # Prevents: "Potential permissions policy violation: payment is not allowed in this document."
+    # Include exact Stripe origins that may evaluate Payment Request in embedded Elements
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(self \"https://js.stripe.com\" \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://m.stripe.network\"), interest-cohort=()"
+    Cross-Origin-Embedder-Policy = "unsafe-none"
+    Cross-Origin-Opener-Policy = "same-origin-allow-popups"
+    Cross-Origin-Resource-Policy = "cross-origin"
     
     # HSTS with preload for enhanced security
     Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
     
     # Performance headers
     X-DNS-Prefetch-Control = "on"
+
+# Homepage optimization - instant CDN serving with background revalidation
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "public, max-age=0, s-maxage=31536000, stale-while-revalidate=86400"
+    Link = "</fonts/Lora/Lora-600.woff2>; rel=prefetch; as=font; type=font/woff2; crossorigin, </fonts/Lora/Lora-700.woff2>; rel=prefetch; as=font; type=font/woff2; crossorigin, </fonts/CenturyGothic/CenturyGothic-Regular.woff2>; rel=prefetch; as=font; type=font/woff2; crossorigin, </fonts/CenturyGothic/CenturyGothic-Bold.woff2>; rel=prefetch; as=font; type=font/woff2; crossorigin, </assets/css/styles.css>; rel=preload; as=style"
+
+# Directory indexes optimization (like /obrigado/)
+[[headers]]
+  for = "/*/"
+  [headers.values]
+    Cache-Control = "public, max-age=0, s-maxage=31536000, stale-while-revalidate=86400"
+
+# Other HTML files - shorter CDN cache but still use stale-while-revalidate
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400"
 
 # Optimized asset caching - 2025 best practices
 [[headers]]
@@ -82,14 +107,68 @@
 [[headers]]
   for = "*.woff2"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, must-revalidate"
+    Cache-Control = "public, max-age=31536000, immutable"
     Content-Type = "font/woff2"
+    Access-Control-Allow-Origin = "*"
+
+# CSS files cache with compression
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+# JavaScript files cache with compression  
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+# Image files cache with optimization headers
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  for = "/*.jpeg"  
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  for = "/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+# SVG files cache  
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+
+# JSON files cache
+[[headers]]
+  for = "/*.json"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
 
 # Headers for API endpoints
 [[headers]]
   for = "/.netlify/functions/*"
   [headers.values]
-    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Origin = "https://cafecomvendas.com, http://localhost:8888, http://localhost:8080"
     Access-Control-Allow-Headers = "Content-Type, Authorization, Stripe-Signature"
     Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
 
