@@ -103,22 +103,36 @@ describe('GTM Proxy Function', () => {
     it('should build correct URL for /g/collect endpoint', () => {
       const request = new Request('https://jucanamaximiliano.com.br/.netlify/functions/gtm-proxy/g/collect?v=2&tid=G-T06WRKJGRW&cid=test-client');
 
-      const url = buildTargetUrl(request);
+      const url = buildTargetUrl(request, false);
       expect(url).toBe('https://server-side-tagging-m5scdmswwq-uc.a.run.app/g/collect?v=2&tid=G-T06WRKJGRW&cid=test-client');
     });
 
     it('should build correct URL for /mp/collect endpoint', () => {
       const request = new Request('https://jucanamaximiliano.com.br/.netlify/functions/gtm-proxy/mp/collect?measurement_id=G-T06WRKJGRW&api_secret=test-secret');
 
-      const url = buildTargetUrl(request);
+      const url = buildTargetUrl(request, false);
       expect(url).toBe('https://server-side-tagging-m5scdmswwq-uc.a.run.app/mp/collect?measurement_id=G-T06WRKJGRW&api_secret=test-secret');
     });
 
     it('should handle missing query parameters', () => {
       const request = new Request('https://jucanamaximiliano.com.br/.netlify/functions/gtm-proxy/g/collect');
 
-      const url = buildTargetUrl(request);
+      const url = buildTargetUrl(request, false);
       expect(url).toBe('https://server-side-tagging-m5scdmswwq-uc.a.run.app/g/collect');
+    });
+
+    it('should route to preview server when in preview mode', () => {
+      const request = new Request('https://jucanamaximiliano.com.br/.netlify/functions/gtm-proxy/g/collect?v=2&tid=G-T06WRKJGRW&gtm_debug=1');
+
+      const url = buildTargetUrl(request, true);
+      expect(url).toBe('https://server-side-tagging-preview-m5scdmswwq-uc.a.run.app/g/collect?v=2&tid=G-T06WRKJGRW&gtm_debug=1');
+    });
+
+    it('should route to production server when not in preview mode', () => {
+      const request = new Request('https://jucanamaximiliano.com.br/.netlify/functions/gtm-proxy/g/collect?v=2&tid=G-T06WRKJGRW');
+
+      const url = buildTargetUrl(request, false);
+      expect(url).toBe('https://server-side-tagging-m5scdmswwq-uc.a.run.app/g/collect?v=2&tid=G-T06WRKJGRW');
     });
   });
 
@@ -199,7 +213,7 @@ describe('GTM Proxy Function', () => {
   });
 
   describe('Request Proxying', () => {
-    it('should proxy GET request successfully', async () => {
+    it('should proxy GET request to preview server when in preview mode', async () => {
       const request = new Request('https://jucanamaximiliano.com.br/.netlify/functions/gtm-proxy/g/collect?v=2&tid=G-T06WRKJGRW&cid=test-client&gtm_debug=1756895052790', {
         method: 'GET',
         headers: {
@@ -214,15 +228,42 @@ describe('GTM Proxy Function', () => {
       expect(await response.text()).toBe('success');
       expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
 
-      // Verify fetch was called correctly
+      // Verify fetch was called with preview URL
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('server-side-tagging-m5scdmswwq-uc.a.run.app/g/collect'),
+        expect.stringContaining('server-side-tagging-preview-m5scdmswwq-uc.a.run.app/g/collect'),
         expect.objectContaining({
           method: 'GET',
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           headers: expect.objectContaining({
             'user-agent': 'Test Browser',
             'x-gtm-server-preview': 'test-token'
+          })
+        })
+      );
+    });
+
+    it('should proxy GET request to production server when not in preview mode', async () => {
+      const request = new Request('https://jucanamaximiliano.com.br/.netlify/functions/gtm-proxy/g/collect?v=2&tid=G-T06WRKJGRW&cid=test-client', {
+        method: 'GET',
+        headers: {
+          'user-agent': 'Test Browser'
+        }
+      });
+
+      const response = await gtmProxy(request);
+
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe('success');
+      expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
+
+      // Verify fetch was called with production URL
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('server-side-tagging-m5scdmswwq-uc.a.run.app/g/collect'),
+        expect.objectContaining({
+          method: 'GET',
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          headers: expect.objectContaining({
+            'user-agent': 'Test Browser'
           })
         })
       );

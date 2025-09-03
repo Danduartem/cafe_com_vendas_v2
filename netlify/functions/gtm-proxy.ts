@@ -19,7 +19,10 @@ import { withTimeout, SHARED_TIMEOUTS } from './shared-utils.js';
  * Server GTM container configuration
  */
 const SERVER_GTM_CONFIG = {
-  endpoint: 'https://server-side-tagging-m5scdmswwq-uc.a.run.app',
+  endpoints: {
+    production: 'https://server-side-tagging-m5scdmswwq-uc.a.run.app',
+    preview: 'https://server-side-tagging-preview-m5scdmswwq-uc.a.run.app'
+  },
   paths: {
     collect: '/g/collect',
     mpCollect: '/mp/collect'
@@ -36,6 +39,7 @@ const FORWARDED_HEADERS = [
   'accept-language',
   'accept-encoding',
   'referer',
+  'content-type', // Critical for POST requests
   'x-forwarded-for',
   'x-real-ip',
   'x-gtm-server-preview', // Custom preview header
@@ -85,18 +89,23 @@ function isPreviewModeRequest(request: Request): boolean {
 /**
  * Build the target URL for Server GTM
  */
-function buildTargetUrl(request: Request): string {
+function buildTargetUrl(request: Request, isPreview: boolean): string {
   const url = new URL(request.url);
   const pathname = url.pathname;
   
-  // Determine the correct Server GTM endpoint
+  // Determine the correct Server GTM endpoint based on mode
+  const baseEndpoint = isPreview 
+    ? SERVER_GTM_CONFIG.endpoints.preview 
+    : SERVER_GTM_CONFIG.endpoints.production;
+  
+  // Determine the correct Server GTM path
   let targetPath: string = SERVER_GTM_CONFIG.paths.collect; // Default to /g/collect
   
   if (pathname.includes('/mp/collect')) {
     targetPath = SERVER_GTM_CONFIG.paths.mpCollect;
   }
   
-  const baseUrl = `${SERVER_GTM_CONFIG.endpoint}${targetPath}`;
+  const baseUrl = `${baseEndpoint}${targetPath}`;
   
   // Forward query parameters
   const searchParams = url.searchParams.toString();
@@ -117,6 +126,23 @@ function buildForwardedHeaders(request: Request): Record<string, string> {
     }
   }
   
+  // Ensure critical headers are present with fallbacks
+  if (!headers['user-agent']) {
+    headers['user-agent'] = 'Mozilla/5.0 (compatible; GTMProxy/1.0)';
+  }
+  
+  if (!headers['accept']) {
+    headers['accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+  }
+  
+  if (!headers['accept-encoding']) {
+    headers['accept-encoding'] = 'gzip, deflate, br';
+  }
+  
+  if (!headers['accept-language']) {
+    headers['accept-language'] = 'en-US,en;q=0.9';
+  }
+  
   // Set proper origin for Server GTM
   const url = new URL(request.url);
   headers['Origin'] = url.origin;
@@ -124,6 +150,16 @@ function buildForwardedHeaders(request: Request): Record<string, string> {
   // Add proxy identification
   headers['X-Forwarded-Proto'] = 'https';
   headers['X-Forwarded-Host'] = url.host;
+  
+  // Add client IP if not already present
+  if (!headers['x-forwarded-for'] && !headers['x-real-ip']) {
+    const clientIP = request.headers.get('cf-connecting-ip') || 
+                     request.headers.get('x-forwarded-for') || 
+                     request.headers.get('x-real-ip') ||
+                     '127.0.0.1';
+    headers['x-forwarded-for'] = clientIP;
+    headers['x-real-ip'] = clientIP;
+  }
   
   return headers;
 }
@@ -180,17 +216,24 @@ export default async function gtmProxy(request: Request): Promise<Response> {
     }
     
     const isPreview = isPreviewModeRequest(request);
-    const targetUrl = buildTargetUrl(request);
+    const targetUrl = buildTargetUrl(request, isPreview);
     const forwardedHeaders = buildForwardedHeaders(request);
     
-    // Log preview mode detection for debugging
+    // Log mode detection and URL selection for debugging
     if (isPreview) {
-      console.log('[GTM Proxy] Preview mode detected, forwarding request:', {
+      console.log('[GTM Proxy] Preview mode detected, routing to preview server:', {
         method: request.method,
+        mode: 'preview',
         targetUrl: targetUrl.substring(0, 100) + '...',
         hasPreviewHeader: !!request.headers.get('x-gtm-server-preview'),
         hasDebugParam: new URL(request.url).searchParams.has('gtm_debug'),
         hasCookies: !!request.headers.get('cookie')
+      });
+    } else {
+      console.log('[GTM Proxy] Production mode detected, routing to production server:', {
+        method: request.method,
+        mode: 'production',
+        targetUrl: targetUrl.substring(0, 100) + '...'
       });
     }
     
@@ -214,13 +257,25 @@ export default async function gtmProxy(request: Request): Promise<Response> {
     const responseBody = await serverResponse.text();
     const responseHeaders = buildResponseHeaders(serverResponse);
     
-    // Log successful proxy for preview mode
+    // Log request result for preview mode
     if (isPreview) {
-      console.log('[GTM Proxy] Request forwarded successfully:', {
+      console.log('[GTM Proxy] Request forwarded:', {
         status: serverResponse.status,
         responseSize: responseBody.length,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        success: serverResponse.status >= 200 && serverResponse.status < 300
       });
+      
+      // Log error details if server returned an error
+      if (serverResponse.status >= 400) {
+        console.error('[GTM Proxy] Server error response:', {
+          status: serverResponse.status,
+          statusText: serverResponse.statusText,
+          responseBody: responseBody.substring(0, 500),
+          forwardedHeaders: Object.keys(forwardedHeaders),
+          requestMethod: request.method
+        });
+      }
     }
     
     return new Response(responseBody, {
