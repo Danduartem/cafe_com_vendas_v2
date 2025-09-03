@@ -84,6 +84,7 @@ interface CheckoutSectionComponent extends Component {
   pendingRedirect: boolean;
   redirectTimeoutId: number | null;
   behaviorTracker: BehaviorTracker | null;
+  scrollLockY?: number | null;
 
   initializeCheckout(): void;
   performInitialization(): void;
@@ -98,6 +99,8 @@ interface CheckoutSectionComponent extends Component {
   handleOpenClick(event: Event): void;
   handleModalClose(): void;
   handleBackdropClick(event: Event): void;
+  lockScroll(): void;
+  unlockScroll(): void;
   getSourceSection(): string;
   showError(elementId: string, message: string): void;
   setStep(step: number | string): void;
@@ -135,6 +138,7 @@ export const Checkout: CheckoutSectionComponent = {
   pendingRedirect: false,
   redirectTimeoutId: null,
   behaviorTracker: null,
+  scrollLockY: null,
 
   init(): void {
     try {
@@ -237,8 +241,8 @@ export const Checkout: CheckoutSectionComponent = {
       return;
     }
 
-    // Block background scrolling
-    document.body.style.overflow = 'hidden';
+    // Robustly lock background scroll
+    this.lockScroll();
     
     // Create custom backdrop to avoid top-layer issues
     this.createBackdrop();
@@ -287,7 +291,7 @@ export const Checkout: CheckoutSectionComponent = {
     }
     
     // Restore background scrolling
-    document.body.style.overflow = '';
+    this.unlockScroll();
     
     // Remove custom backdrop
     this.removeBackdrop();
@@ -295,6 +299,34 @@ export const Checkout: CheckoutSectionComponent = {
     // Clean application state when modal closes (via any method)
     this.resetForm();
     this.resetModalState();
+  },
+
+  lockScroll(): void {
+    const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    this.scrollLockY = scrollY;
+    // Lock both html and body to cover iOS/Safari
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+  },
+
+  unlockScroll(): void {
+    // Unlock scroll and restore previous position
+    document.documentElement.style.overflow = '';
+    const top = document.body.style.top;
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    document.body.style.overflow = '';
+    if (top) {
+      const y = parseInt(top, 10) || 0;
+      window.scrollTo(0, Math.abs(y));
+    } else if (typeof this.scrollLockY === 'number') {
+      window.scrollTo(0, this.scrollLockY);
+    }
+    this.scrollLockY = null;
   },
 
   createBackdrop(): void {
