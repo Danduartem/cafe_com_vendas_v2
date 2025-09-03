@@ -29,7 +29,7 @@
 
 # Development settings - 2025 best practice: use Netlify dev for full-stack development
 [dev]
-  command = "eleventy --serve --watch --config=.eleventy.ts"
+  command = "eleventy --serve --watch --config=.eleventy.mjs"
   targetPort = 8080
   publish = "_site"
   functions = "netlify/functions"
@@ -80,7 +80,7 @@
   for = "/"
   [headers.values]
     Cache-Control = "public, max-age=0, s-maxage=31536000, stale-while-revalidate=86400"
-    Link = "</fonts/Lora/Lora-600.woff2>; rel=prefetch; as=font; type=font/woff2; crossorigin, </fonts/Lora/Lora-700.woff2>; rel=prefetch; as=font; type=font/woff2; crossorigin, </fonts/CenturyGothic/CenturyGothic-Regular.woff2>; rel=prefetch; as=font; type=font/woff2; crossorigin, </fonts/CenturyGothic/CenturyGothic-Bold.woff2>; rel=prefetch; as=font; type=font/woff2; crossorigin, </assets/css/styles.css>; rel=preload; as=style"
+    Link = "</fonts/Lora/Lora-600.woff2>; rel=prefetch; as=font; type=font/woff2; crossorigin, </fonts/Lora/Lora-700.woff2>; rel=prefetch; as=font; type=font/woff2; crossorigin, </fonts/CenturyGothic/CenturyGothic-Regular.woff2>; rel=prefetch; as=font; type=font/woff2; crossorigin, </fonts/CenturyGothic/CenturyGothic-Bold.woff2>; rel=prefetch; as=font; type=font/woff2; crossorigin"
 
 # Directory indexes optimization (like /obrigado/)
 [[headers]]

@@ -29,6 +29,7 @@ export default defineConfig({
   build: {
     outDir: '_site',
     emptyOutDir: true,
+    manifest: true,
     target: 'es2023',
     minify: 'esbuild', // Fastest minification option
     // Context7 performance optimizations
@@ -46,22 +47,22 @@ export default defineConfig({
         styles: resolve(__dirname, 'src/assets/css/main.css')
       },
       output: {
-        entryFileNames: 'js/[name].js',
+        entryFileNames: 'js/[name]-[hash].js',
         chunkFileNames: 'js/[name]-[hash].js',
         assetFileNames: (assetInfo) => {
           // Optimize asset file naming for better caching
           if (!assetInfo.names || assetInfo.names.length === 0) {
-            return `assets/[name][extname]`;
+            return `assets/[name]-[hash][extname]`;
           }
           const name = assetInfo.names[0];
           const ext = name.split('.').pop()?.toLowerCase();
           if (ext && /png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
-            return `assets/images/[name][extname]`;
+            return `assets/images/[name]-[hash][extname]`;
           }
           if (ext === 'css') {
-            return `assets/css/[name][extname]`;
+            return `assets/css/[name]-[hash][extname]`;
           }
-          return `assets/[name][extname]`;
+          return `assets/[name]-[hash][extname]`;
         },
         // Enhanced manual chunks for optimal code splitting
         manualChunks: {

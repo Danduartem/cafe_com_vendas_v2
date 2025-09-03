@@ -45,8 +45,10 @@
     <meta property="twitter:title" content="Café com Vendas - Evento para Empreendedoras">
     <meta property="twitter:description" content="Chega de usar o burnout como medalha de honra. Evento para empreendedoras em Portugal.">
     
-    <!-- External JSON-LD schema includes -->
-    <script type="application/ld+json" src="/sections/faq/schema.json"></script>
+    <!-- JSON-LD Schema (inline for SEO) -->
+    <script type="application/ld+json">
+      {{ site.presenter.schema | json | safe }}
+    </script>
     
     <!-- Critical CSS inlined for fastest render -->
     <style>
@@ -61,8 +63,9 @@
       @media(min-width:1536px){.hero-bg{background-image:url('https://res.cloudinary.com/ds4dhbneq/image/upload/w_1920,h_1080,c_fill,q_auto:best,f_auto,g_auto,dpr_auto,fl_progressive/cafe_pnkngz')}}
     </style>
     
-    <!-- Main CSS processed by Vite with Tailwind v4 -->
-    <link rel="stylesheet" href="/assets/css/styles.css" id="main-css">
+    <!-- Main CSS processed by Vite with Tailwind v4 (hashed via manifest) -->
+    <link rel="preload" as="style" href="{{ 'src/assets/css/main.css' | asset }}">
+    <link rel="stylesheet" href="{{ 'src/assets/css/main.css' | asset }}" id="main-css">
     
     <!-- Fonts are served locally via @font-face in /assets/css/main.css -->
     
@@ -99,7 +102,7 @@
     {% include "partials/checkout-modal.njk" %}
     
     <!-- Optimized Script Loading (Performance Critical) -->
-    <!-- Main application script - ES6 modules are deferred by default -->
-    <script src="/js/main.js" type="module"></script>
+    <!-- Main application script (hashed via manifest) -->
+    <script src="{{ 'src/assets/js/main.ts' | asset }}" type="module"></script>
 </body>
 </html>
