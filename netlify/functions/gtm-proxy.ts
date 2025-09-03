@@ -17,13 +17,11 @@ import { withTimeout, SHARED_TIMEOUTS } from './shared-utils.js';
 
 /**
  * Server GTM container configuration
- * Using the actual Google Cloud Run URLs with project ID
+ * Single endpoint - GTM handles preview mode internally
  */
 const SERVER_GTM_CONFIG = {
-  endpoints: {
-    production: 'https://server-side-tagging-178683125768.us-central1.run.app',
-    preview: 'https://server-side-tagging-preview-178683125768.us-central1.run.app'
-  },
+  // Using the GTM-provided URL format
+  endpoint: 'https://server-side-tagging-m5scdmswwq-uc.a.run.app',
   paths: {
     collect: '/g/collect',
     mpCollect: '/mp/collect'
@@ -89,15 +87,11 @@ function isPreviewModeRequest(request: Request): boolean {
 
 /**
  * Build the target URL for Server GTM
+ * Always uses the same endpoint - GTM handles preview mode internally
  */
-function buildTargetUrl(request: Request, isPreview: boolean): string {
+function buildTargetUrl(request: Request): string {
   const url = new URL(request.url);
   const pathname = url.pathname;
-  
-  // Determine the correct Server GTM endpoint based on mode
-  const baseEndpoint = isPreview 
-    ? SERVER_GTM_CONFIG.endpoints.preview 
-    : SERVER_GTM_CONFIG.endpoints.production;
   
   // Determine the correct Server GTM path
   let targetPath: string = SERVER_GTM_CONFIG.paths.collect; // Default to /g/collect
@@ -106,7 +100,7 @@ function buildTargetUrl(request: Request, isPreview: boolean): string {
     targetPath = SERVER_GTM_CONFIG.paths.mpCollect;
   }
   
-  const baseUrl = `${baseEndpoint}${targetPath}`;
+  const baseUrl = `${SERVER_GTM_CONFIG.endpoint}${targetPath}`;
   
   // Forward query parameters
   const searchParams = url.searchParams.toString();
@@ -217,26 +211,18 @@ export default async function gtmProxy(request: Request): Promise<Response> {
     }
     
     const isPreview = isPreviewModeRequest(request);
-    const targetUrl = buildTargetUrl(request, isPreview);
+    const targetUrl = buildTargetUrl(request);
     const forwardedHeaders = buildForwardedHeaders(request);
     
-    // Log mode detection and URL selection for debugging
-    if (isPreview) {
-      console.log('[GTM Proxy] Preview mode detected, routing to preview server:', {
-        method: request.method,
-        mode: 'preview',
-        targetUrl: targetUrl.substring(0, 100) + '...',
-        hasPreviewHeader: !!request.headers.get('x-gtm-server-preview'),
-        hasDebugParam: new URL(request.url).searchParams.has('gtm_debug'),
-        hasCookies: !!request.headers.get('cookie')
-      });
-    } else {
-      console.log('[GTM Proxy] Production mode detected, routing to production server:', {
-        method: request.method,
-        mode: 'production',
-        targetUrl: targetUrl.substring(0, 100) + '...'
-      });
-    }
+    // Log request details for debugging
+    console.log('[GTM Proxy] Forwarding request:', {
+      method: request.method,
+      mode: isPreview ? 'preview' : 'production',
+      targetUrl: targetUrl.substring(0, 100) + '...',
+      hasPreviewHeader: !!request.headers.get('x-gtm-server-preview'),
+      hasDebugParam: new URL(request.url).searchParams.has('gtm_debug'),
+      hasCookies: !!request.headers.get('cookie')
+    });
     
     // Get request body for POST requests
     const requestBody = request.method === 'POST' 
@@ -244,7 +230,7 @@ export default async function gtmProxy(request: Request): Promise<Response> {
       : undefined;
     
     // Forward the request to Server GTM
-    let serverResponse = await withTimeout(
+    const serverResponse = await withTimeout(
       fetch(targetUrl, {
         method: request.method,
         headers: forwardedHeaders,
@@ -253,21 +239,6 @@ export default async function gtmProxy(request: Request): Promise<Response> {
       SERVER_GTM_CONFIG.timeout,
       'GTM Proxy request'
     );
-    
-    // If preview server returns 404, fallback to production server
-    if (isPreview && serverResponse.status === 404) {
-      console.log('[GTM Proxy] Preview server returned 404, falling back to production server');
-      const productionUrl = buildTargetUrl(request, false);
-      serverResponse = await withTimeout(
-        fetch(productionUrl, {
-          method: request.method,
-          headers: forwardedHeaders,
-          body: requestBody
-        }),
-        SERVER_GTM_CONFIG.timeout,
-        'GTM Proxy fallback request'
-      );
-    }
     
     // Get response body
     const responseBody = await serverResponse.text();
