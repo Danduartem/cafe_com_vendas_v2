@@ -68,7 +68,8 @@
       "Bash(npx eslint:*)",
       "Bash(cat:*)",
       "Bash(kill:*)",
-      "WebFetch(domain:developers.google.com)"
+      "WebFetch(domain:developers.google.com)",
+      "mcp__playwright-mcp__browser_network_requests"
     ]
   },
   "enabledMcpjsonServers": [
