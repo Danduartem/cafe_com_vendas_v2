@@ -5,6 +5,7 @@
 
 import Stripe from 'stripe';
 import type { PaymentIntentRequest, RateLimitResult } from './types';
+import { withTimeout } from './shared-utils.js';
 
 // Import enhanced tracking types for Phase 1
 import type {
@@ -31,18 +32,6 @@ const TIMEOUTS = {
   external_api: 15000,
   default: 10000
 };
-
-// Timeout wrapper for async operations
-function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Operation'): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) => {
-      setTimeout(() => {
-        reject(new Error(`${operation} timed out after ${timeoutMs}ms`));
-      }, timeoutMs);
-    })
-  ]);
-}
 
 // Simple in-memory rate limiting store with proper typing
 // In production, consider using Redis or another persistent store

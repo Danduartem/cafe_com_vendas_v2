@@ -14,6 +14,7 @@ import type {
   UnvalidatedCRMRequest
 } from './crm-types';
 import { hasExistingContactId } from './types.js';
+import { withTimeout } from './shared-utils.js';
 
 // Environment configuration
 const CRM_CONFIG = {
@@ -129,18 +130,8 @@ class CircuitBreaker {
 const crmCircuitBreaker = new CircuitBreaker('crm-api');
 
 /**
- * Timeout wrapper for async operations
+ * Timeout wrapper for async operations (imported from shared utils)
  */
-function withTimeout<T>(promise: Promise<T>, timeoutMs: number, operation = 'Operation'): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) => {
-      setTimeout(() => {
-        reject(new Error(`${operation} timed out after ${timeoutMs}ms`));
-      }, timeoutMs);
-    })
-  ]);
-}
 
 /**
  * Type guard to check if a value is a non-empty string
