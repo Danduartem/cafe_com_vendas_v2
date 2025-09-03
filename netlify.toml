@@ -56,17 +56,15 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    # Content Security Policy - COMPLETE Stripe requirements from official documentation
-    # Based on https://docs.stripe.com/security/guide#content-security-policy
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://gtm.jucanamaximiliano.com.br https://js.stripe.com https://*.js.stripe.com https://checkout.stripe.com https://connect-js.stripe.com https://m.stripe.network https://www.youtube.com https://s.ytimg.com https://maps.googleapis.com; style-src 'self' 'unsafe-inline' data: https://fonts.googleapis.com https://*.stripe.com https://www.googletagmanager.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com https://*.stripe.com https://www.googletagmanager.com https://gtm.jucanamaximiliano.com.br https://fonts.gstatic.com https://i.ytimg.com https://img.youtube.com; connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://formspree.io https://connect.mailerlite.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://gtm.jucanamaximiliano.com.br https://*.g.doubleclick.net https://www.youtube.com https://maps.googleapis.com; frame-src https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://connect-js.stripe.com https://www.youtube.com https://www.youtube-nocookie.com https://gtm.jucanamaximiliano.com.br; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io"
+    # Content Security Policy - aligned with Stripe & GTM
+    # Remove 'unsafe-eval' to tighten security. Keep minimal required origins.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://gtm.jucanamaximiliano.com.br https://js.stripe.com https://checkout.stripe.com https://connect-js.stripe.com https://m.stripe.network https://www.youtube.com https://s.ytimg.com https://maps.googleapis.com; style-src 'self' 'unsafe-inline' data: https://fonts.googleapis.com https://www.googletagmanager.com https://js.stripe.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com https://www.googletagmanager.com https://gtm.jucanamaximiliano.com.br https://fonts.gstatic.com https://i.ytimg.com https://img.youtube.com; connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://formspree.io https://connect.mailerlite.com https://www.googletagmanager.com https://gtm.jucanamaximiliano.com.br https://www.youtube.com https://maps.googleapis.com; frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://connect-js.stripe.com https://www.youtube.com https://www.youtube-nocookie.com https://gtm.jucanamaximiliano.com.br; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io"
     
     # Modern security headers (2025 standards)
     X-Frame-Options = "DENY"
     Referrer-Policy = "strict-origin-when-cross-origin"
     # Allow Stripe iframes to use the Payment Request API (Apple Pay / GPay)
-    # Prevents: "Potential permissions policy violation: payment is not allowed in this document."
-    # Include exact Stripe origins that may evaluate Payment Request in embedded Elements
-    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(self \"https://js.stripe.com\" \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://m.stripe.network\"), interest-cohort=()"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(self \"https://js.stripe.com\" \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://m.stripe.network\"), browsing-topics=()"
     Cross-Origin-Embedder-Policy = "unsafe-none"
     Cross-Origin-Opener-Policy = "same-origin-allow-popups"
     Cross-Origin-Resource-Policy = "cross-origin"
@@ -168,7 +166,8 @@
 [[headers]]
   for = "/.netlify/functions/*"
   [headers.values]
-    Access-Control-Allow-Origin = "https://cafecomvendas.com, http://localhost:8888, http://localhost:8080"
+    # Use wildcard here; functions also set CORS dynamically
+    Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Headers = "Content-Type, Authorization, Stripe-Signature"
     Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
 

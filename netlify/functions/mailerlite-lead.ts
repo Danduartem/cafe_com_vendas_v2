@@ -738,33 +738,17 @@ async function addLeadToMailerLite(leadData: EnhancedMailerLitePayload): Promise
  * Main handler for lead capture requests
  */
 export default async (request: Request): Promise<Response> => {
-  // Set CORS headers with proper domain restrictions
-  const allowedOrigins = [
-    'https://jucanamaximiliano.com',
-    'https://www.jucanamaximiliano.com',
-    'http://localhost:8080',   // Vite dev server
-    'http://localhost:8888',   // Netlify dev server (for E2E testing)
-    'https://netlify.app'
-  ];
-  
+  // CORS headers via shared helper
+  const { buildCorsHeaders } = await import('./lib/cors.js');
   const origin = request.headers.get('origin');
-  const isAllowedOrigin = allowedOrigins.some(allowed => 
-    origin === allowed || (allowed.includes('netlify.app') && origin?.includes('netlify.app'))
-  );
-  
+  const headers = buildCorsHeaders(origin);
+
   // Get client IP for rate limiting
   const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
                    request.headers.get('x-real-ip') ||
+                   request.headers.get('x-nf-client-connection-ip') ||
                    request.headers.get('cf-connecting-ip') ||
                    'unknown';
-  
-  const headers = {
-    'Access-Control-Allow-Origin': isAllowedOrigin ? (origin || 'https://jucanamaximiliano.com.br') : 'https://jucanamaximiliano.com.br',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Credentials': 'false',
-    'Content-Type': 'application/json'
-  } as Record<string, string>;
 
   // Handle preflight requests
   if (request.method === 'OPTIONS') {

@@ -354,3 +354,45 @@ export async function embedYouTubeVideo(container: HTMLElement, videoId: string)
     YouTube.showVideoError(videoId, 'Erro ao carregar o player do YouTube');
   }
 }
+
+/**
+ * Lightweight embed that avoids loading the YouTube IFrame API.
+ * Injects a privacy-friendly nocookie iframe only on click.
+ * This reduces main-thread work and avoids non-passive listeners until interaction.
+ */
+export function embedYouTubeIframeLite(container: HTMLElement, videoId: string): void {
+  if (!container || !videoId) return;
+
+  try {
+    const rect = container.getBoundingClientRect();
+    const width = Math.floor(rect.width || 640);
+    const height = Math.floor(rect.height || 360);
+
+    // Clear container content
+    container.innerHTML = '';
+
+    const params = new URLSearchParams({
+      autoplay: '1',
+      rel: '0',
+      modestbranding: '1',
+      playsinline: '1'
+    });
+
+    const iframe = document.createElement('iframe');
+    iframe.width = String(width);
+    iframe.height = String(height);
+    iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
+    iframe.title = 'YouTube video player';
+    iframe.loading = 'lazy';
+    iframe.allowFullscreen = true;
+    iframe.setAttribute('frameborder', '0');
+    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+
+    container.appendChild(iframe);
+    container.classList.add('youtube-playing');
+  } catch (error) {
+    logger.error('Failed to embed YouTube iframe (lite):', error);
+    YouTube.showVideoError(videoId, 'Erro ao carregar o player do YouTube');
+  }
+}

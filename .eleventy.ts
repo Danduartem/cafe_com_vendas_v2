@@ -64,9 +64,9 @@ export default function(eleventyConfig: UserConfig) {
     read: false
   });
 
-  // Static asset handling - aligned with Vite best practices
-  eleventyConfig.addPassthroughCopy({ 'src/assets/css': 'assets/css' });
-  eleventyConfig.addPassthroughCopy({ 'src/assets/static/images': 'assets/pictures' });
+  // Static asset handling - delegate CSS/JS to Vite build output
+  // Note: Keep only additional static assets here (images if any)
+  // eleventyConfig.addPassthroughCopy({ 'src/assets/static/images': 'assets/pictures' });
   
   // Copy public directory to root for favicon and fonts (Eleventy 3.x best practice)
   eleventyConfig.addPassthroughCopy({ 'public': '.' });

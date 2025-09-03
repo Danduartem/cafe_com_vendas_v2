@@ -7,7 +7,7 @@
 import { safeQuery, safeQueryAll } from '../../../utils/dom.js';
 import { Animations } from '../../../components/ui/index.js';
 import { debounce } from '../../../assets/js/utils/throttle.js';
-import { embedYouTubeVideo } from '../../../utils/youtube.js';
+import { embedYouTubeIframeLite } from '../../../utils/youtube.js';
 import { logger } from '../../../utils/logger.js';
 import type { Component } from '../../../types/components/base.js';
 
@@ -290,10 +290,11 @@ export const SocialProof: SocialProofComponent = {
     `;
     button.setAttribute('aria-label', 'Carregando vídeo...');
 
-    // Embed the YouTube video and handle the promise properly
-    embedYouTubeVideo(videoContainer, videoId).catch((error) => {
+    // Embed lightweight YouTube iframe without loading the IFrame API
+    try {
+      embedYouTubeIframeLite(videoContainer, videoId);
+    } catch (error) {
       logger.error('Failed to embed YouTube video:', error);
-      
       // Reset button state on error
       button.innerHTML = `
         <svg class="w-16 h-16 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -301,7 +302,7 @@ export const SocialProof: SocialProofComponent = {
         </svg>
       `;
       button.setAttribute('aria-label', 'Reproduzir testemunho em vídeo');
-    });
+    }
 
     // Track analytics for video interaction
     import('../../../analytics/index.js').then(({ default: analytics }) => {

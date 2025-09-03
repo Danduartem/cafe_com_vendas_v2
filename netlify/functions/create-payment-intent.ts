@@ -4,12 +4,7 @@
  */
 
 import Stripe from 'stripe';
-import type {
-  PaymentIntentRequest,
-  RateLimitResult,
-  ValidationResult,
-  ValidationRules
-} from './types';
+import type { PaymentIntentRequest, RateLimitResult } from './types';
 
 // Import enhanced tracking types for Phase 1
 import type {
@@ -149,126 +144,9 @@ class CustomerCacheManager {
   }
 }
 
-// Validation schemas
-const VALIDATION_RULES: ValidationRules = {
-  required_fields: ['event_id', 'user_session_id', 'full_name', 'email', 'phone'],  // Updated for Phase 1
-  email_regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone_regex: /^[+]?[0-9][\d\s\-()]{7,20}$/, // International format with spaces/dashes allowed
-  name_min_length: 2,
-  name_max_length: 100,
-  amount_min: 50, // 50 cents minimum (Multibanco supports €0.50 minimum)
-  amount_max: 1000000, // €10,000 maximum (well within Multibanco's €99,999 limit)
-  currency_allowed: ['eur', 'usd', 'gbp'], // EUR required for Multibanco
-  utm_params: ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
-};
-
-// Comprehensive input validation middleware
-function validatePaymentRequest(requestBody: PaymentIntentRequest): ValidationResult {
-  const errors = [];
-
-  // Check required fields
-  for (const field of VALIDATION_RULES.required_fields) {
-    if (!requestBody[field] || typeof requestBody[field] !== 'string' || !requestBody[field].trim()) {
-      errors.push(`Missing or invalid required field: ${field}`);
-    }
-  }
-
-  if (errors.length > 0) {
-    return { isValid: false, errors };
-  }
-
-  const { lead_id, full_name, email, phone, amount, currency = 'eur' } = requestBody;
-
-  // Validate event_id and user_session_id (UUID v4 format)
-  const event_id = requestBody.event_id;
-  const user_session_id = requestBody.user_session_id;
-  
-  if (!event_id || !/^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$/.test(event_id.trim())) {
-    errors.push('Invalid event_id format (expected UUID v4)');
-  }
-
-  if (!user_session_id || !/^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$/.test(user_session_id.trim())) {
-    errors.push('Invalid user_session_id format (expected UUID v4)');
-  }
-
-  // Validate full name
-  const cleanName = full_name.trim();
-  if (cleanName.length < VALIDATION_RULES.name_min_length || cleanName.length > VALIDATION_RULES.name_max_length) {
-    errors.push(`Name must be between ${VALIDATION_RULES.name_min_length} and ${VALIDATION_RULES.name_max_length} characters`);
-  }
-
-  if (!/^[a-zA-ZÀ-ÿ\u0100-\u017F\s\-'.]+$/.test(cleanName)) {
-    errors.push('Name contains invalid characters');
-  }
-
-  // Validate email
-  const cleanEmail = email.toLowerCase().trim();
-  if (!VALIDATION_RULES.email_regex.test(cleanEmail)) {
-    errors.push('Invalid email format');
-  }
-
-  if (cleanEmail.length > 254) {
-    errors.push('Email address too long');
-  }
-
-  // Validate phone - clean and check
-  const cleanPhone = phone.replace(/[\s\-()]/g, '');
-
-  // Check if it has at least 7 digits and starts with + or digit
-  if (cleanPhone.length < 7 || cleanPhone.length > 15) {
-    errors.push('Phone number must be between 7 and 15 digits');
-  } else if (!/^[+]?[0-9]+$/.test(cleanPhone)) {
-    errors.push('Phone number contains invalid characters');
-  }
-
-  // Validate amount if provided
-  if (amount !== undefined) {
-    const numAmount = parseInt(amount.toString());
-    if (isNaN(numAmount) || numAmount < VALIDATION_RULES.amount_min || numAmount > VALIDATION_RULES.amount_max) {
-      errors.push(`Amount must be between ${VALIDATION_RULES.amount_min} and ${VALIDATION_RULES.amount_max} cents`);
-    }
-  }
-
-  // Validate currency
-  if (!VALIDATION_RULES.currency_allowed.includes(currency.toLowerCase())) {
-    errors.push(`Currency must be one of: ${VALIDATION_RULES.currency_allowed.join(', ')}`);
-  }
-
-  // Validate UTM parameters if present
-  for (const utmParam of VALIDATION_RULES.utm_params) {
-    if (requestBody[utmParam] && (typeof requestBody[utmParam] !== 'string' || requestBody[utmParam].length > 255)) {
-      errors.push(`Invalid ${utmParam}: must be string under 255 characters`);
-    }
-  }
-
-  // Check for suspicious patterns (basic XSS/injection prevention)
-  const suspiciousPatterns = [/<script/i, /javascript:/i, /on\w+=/i, /\bselect\b.*\bfrom\b/i];
-  const allStringValues = [full_name, email, phone, ...(requestBody.utm_source ? [requestBody.utm_source] : [])];
-
-  for (const value of allStringValues) {
-    for (const pattern of suspiciousPatterns) {
-      if (pattern.test(value)) {
-        errors.push('Request contains potentially malicious content');
-        break;
-      }
-    }
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-    sanitized: {
-      event_id: event_id.trim(),
-      user_session_id: user_session_id.trim(),
-      lead_id: lead_id ? lead_id.trim() : event_id.trim(),
-      full_name: cleanName,
-      email: cleanEmail,
-      phone: phone.trim(), // Keep original format for display
-      amount: amount ? parseInt(amount.toString()) : 18000,
-      currency: currency.toLowerCase()
-    }
-  };
-}
+// Validation moved to lib for reuse and testability
+import { validatePaymentRequest, VALIDATION_RULES } from './lib/validation.js';
+import { buildCorsHeaders, attachRateLimitHeaders } from './lib/cors.js';
 
 // Rate limiting middleware with environment-aware configuration
 function checkRateLimit(clientIP: string, origin: string | undefined): RateLimitResult {
@@ -339,33 +217,16 @@ function checkRateLimit(clientIP: string, origin: string | undefined): RateLimit
 }
 
 export default async (request: Request): Promise<Response> => {
-  // Set CORS headers with proper domain restrictions
-  const allowedOrigins = [
-    'https://jucanamaximiliano.com',
-    'https://www.jucanamaximiliano.com',
-    'http://localhost:8080',
-    'http://localhost:8888',   // Netlify dev server (test environment)
-    'https://netlify.app'
-  ];
-
+  // CORS handling
   const origin = request.headers.get('origin');
-  const isAllowedOrigin = allowedOrigins.some(allowed =>
-    origin === allowed || (allowed.includes('netlify.app') && origin?.includes('netlify.app'))
-  );
+  const headers = buildCorsHeaders(origin);
 
-  // Get client IP for rate limiting
+  // Get client IP for rate limiting (Netlify/CF aware)
   const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
     request.headers.get('x-real-ip') ||
+    request.headers.get('x-nf-client-connection-ip') ||
     request.headers.get('cf-connecting-ip') ||
     'unknown';
-
-  const headers = {
-    'Access-Control-Allow-Origin': isAllowedOrigin ? (origin || 'https://jucanamaximiliano.com.br') : 'https://jucanamaximiliano.com.br',
-    'Access-Control-Allow-Headers': 'Content-Type, X-Idempotency-Key',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Credentials': 'false',
-    'Content-Type': 'application/json'
-  } as Record<string, string>;
 
   // Handle preflight requests
   if (request.method === 'OPTIONS') {
@@ -387,12 +248,15 @@ export default async (request: Request): Promise<Response> => {
   const rateLimitResult = checkRateLimit(clientIP, origin || undefined);
   const rateLimitConfig = getRateLimitConfig(origin || undefined);
 
-  // Add rate limit headers - create mutable headers object
-  const responseHeaders = { ...headers };
-  responseHeaders['X-RateLimit-Limit'] = rateLimitConfig.maxRequests.toString();
-  responseHeaders['X-RateLimit-Remaining'] = rateLimitResult.remaining.toString();
-  responseHeaders['X-RateLimit-Window'] = (rateLimitConfig.window / 1000).toString();
-  responseHeaders['X-RateLimit-Environment'] = isDevelopmentRequest(origin || undefined) ? 'development' : 'production';
+  // Add rate limit headers
+  const responseHeaders = attachRateLimitHeaders(
+    { ...headers },
+    rateLimitResult,
+    {
+      windowMs: rateLimitConfig.window,
+      env: isDevelopmentRequest(origin || undefined) ? 'development' : 'production'
+    }
+  );
 
   if (!rateLimitResult.allowed) {
     responseHeaders['Retry-After'] = rateLimitResult.retryAfter?.toString() || '60';
@@ -709,7 +573,8 @@ export default async (request: Request): Promise<Response> => {
       'PaymentIntent creation'
     );
 
-    console.log(`Created PaymentIntent ${paymentIntent.id} for customer ${customer.email}`);
+    // Avoid logging raw PII
+    console.log(`Created PaymentIntent ${paymentIntent.id} for customer ${customer.email ? customer.email.replace(/^[^@]+/, '***') : 'unknown'}`);
 
     const enhancedResponse: EnhancedPaymentIntentResponse = {
       success: true,

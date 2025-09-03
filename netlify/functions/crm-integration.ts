@@ -437,31 +437,16 @@ async function sendToCRM(payload: CRMContactPayload): Promise<CRMResult> {
  */
 export default async (request: Request): Promise<Response> => {
   // CORS headers
-  const allowedOrigins = [
-    'https://jucanamaximiliano.com.br',
-    'https://www.jucanamaximiliano.com.br',
-    'http://localhost:8080',
-    'http://localhost:8888',
-    'https://netlify.app'
-  ];
-
+  const { buildCorsHeaders } = await import('./lib/cors.js');
   const origin = request.headers.get('origin');
-  const isAllowedOrigin = allowedOrigins.some(allowed =>
-    origin === allowed || (allowed.includes('netlify.app') && origin?.includes('netlify.app'))
-  );
+  const headers: Record<string, string> = buildCorsHeaders(origin);
 
   // Get client IP for rate limiting
   const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
                    request.headers.get('x-real-ip') ||
+                   request.headers.get('x-nf-client-connection-ip') ||
                    request.headers.get('cf-connecting-ip') ||
                    'unknown';
-
-  const headers: Record<string, string> = {
-    'Access-Control-Allow-Origin': isAllowedOrigin ? (origin || 'https://jucanamaximiliano.com.br') : 'https://jucanamaximiliano.com.br',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json'
-  };
 
   // Handle preflight
   if (request.method === 'OPTIONS') {
