@@ -67,11 +67,14 @@ cp .env.example .env
 
 ### 2. Development Servers
 ```bash
-# Standard development (Eleventy only)
-npm run dev          # http://localhost:8080
+# Recommended: Vite watch + Eleventy (hashed assets resolved via manifest)
+npm run dev:watch           # http://localhost:8080
+
+# Content-only (Eleventy)
+npm run dev                 # http://localhost:8080
 
 # With Netlify Functions (payments, emails)
-npm run netlify:dev  # http://localhost:8888
+npm run netlify:dev         # http://localhost:8888
 ```
 
 ### 3. Code Quality Checks
@@ -361,3 +364,21 @@ npm run lighthouse -- https://your-url.com
 ---
 
 *Updated: 2025-08-25 | Based on current codebase implementation*
+## Vite Manifest & Asset Resolution
+
+This project uses Vite’s manifest to serve hashed assets in production, with a safe dev fallback.
+
+- Build step outputs `_site/manifest.json` with the final filenames.
+- An Eleventy filter `asset` resolves entry keys to built paths:
+
+```njk
+{# CSS #}
+<link rel="stylesheet" href="{{ 'src/assets/css/main.css' | asset }}">
+
+{# JS #}
+<script type="module" src="{{ 'src/assets/js/main.ts' | asset }}"></script>
+```
+
+In development (no manifest yet), the filter falls back to non‑hashed paths to keep DX smooth.
+
+Tip: use `npm run dev:watch` to run `vite build --watch` alongside Eleventy for a seamless loop.

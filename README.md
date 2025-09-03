@@ -33,9 +33,14 @@ Premium landing page for an intimate business transformation event in Lisbon, de
 # Install dependencies (requires Node 22.17.1+)
 npm install
 
-# Development
+# Development (recommended: Vite watch + Eleventy)
+npm run dev:watch         # Vite build --watch + Eleventy dev server
+
+# Alternative (content-only)
 npm run dev               # Eleventy dev server (port 8080)
-npm run netlify:dev       # With serverless functions
+
+# With Netlify Functions
+npm run netlify:dev       # Full stack (site + functions) on 8888
 
 # Quality checks (must pass all)
 npm run type-check        # TypeScript validation
@@ -81,6 +86,17 @@ npm run lighthouse -- https://your-url.com
 - **UI components**: `src/components/ui/`
 - **Styling**: `src/assets/css/main.css` (Tailwind v4 theme)
 - **Analytics**: `src/analytics/` (unified plugin-based system)
+- **Assets** (hashed): Use the Eleventy filter to resolve built assets
+
+```njk
+{# CSS #}
+<link rel="stylesheet" href="{{ 'src/assets/css/main.css' | asset }}">
+
+{# JS #}
+<script type="module" src="{{ 'src/assets/js/main.ts' | asset }}"></script>
+```
+
+This uses Vite’s manifest (generated on build) and falls back to non‑hashed paths in dev.
 
 ---
 
@@ -143,6 +159,8 @@ npm run netlify:dev  # Port 8888 (not 8080)
 - **Payment testing**: Use `docs/STRIPE_TEST_CARDS.md`
 - **Performance audit**: `npm run lighthouse`
 - **Type checking**: `npm run type-check`
+- **Dev flow**: `npm run dev:watch` (Vite watch + Eleventy)
+- **Asset filter**: `{{ 'src/assets/js/main.ts' | asset }}` resolves hashed file from manifest
 
 ### Project Structure
 ```
