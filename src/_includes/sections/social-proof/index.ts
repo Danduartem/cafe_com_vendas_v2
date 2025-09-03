@@ -79,7 +79,8 @@ export const SocialProof: SocialProofComponent = {
 
   validateCarouselElements(elements: CarouselElements): boolean {
     if (!elements.carousel || !elements.slides.length) {
-      logger.warn('Testimonials carousel elements not found');
+      // Not an error: section may be omitted on this page
+      logger.info('Testimonials carousel elements not found');
       return false;
     }
     return true;

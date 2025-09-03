@@ -292,41 +292,45 @@ export const CafeComVendas: CafeComVendasInterface = {
 
   /**
    * Initialize all page components with enhanced error handling
+   * Only initialize components whose root selector exists on the page
    */
   initializeComponents(): void {
-    const components: ComponentRegistration[] = [
-      // Utility components
-      { name: 'ThankYou', component: { init: () => PlatformThankYou.init() } },
+    // Registry with DOM gating per component
+    const registry: { name: string; selector: string; init: () => void }[] = [
+      // Utility components (thank-you platform features)
+      { name: 'PlatformThankYou', selector: '#thankyou', init: () => PlatformThankYou.init() },
 
       // Co-located section components (new approach)
-      { name: 'TopBanner', component: TopBanner },
-      { name: 'Hero', component: Hero },
-      { name: 'Vision', component: Vision },
-      { name: 'Solution', component: Solution },
-      { name: 'About', component: About },
-      { name: 'SocialProof', component: SocialProof },
-      { name: 'Offer', component: Offer },
-      { name: 'FAQ', component: FAQ },
-      { name: 'FinalCTA', component: FinalCTA },
-      { name: 'Footer', component: Footer },
-      { name: 'ThankYouSection', component: ThankYou },
-      { name: 'Checkout', component: Checkout }
+      { name: 'TopBanner', selector: '#s-top-banner', init: () => TopBanner.init() },
+      { name: 'Hero', selector: '#s-hero', init: () => Hero.init() },
+      { name: 'Vision', selector: '#s-vision', init: () => Vision.init() },
+      { name: 'Solution', selector: '#s-solution', init: () => Solution.init() },
+      { name: 'About', selector: '#s-about', init: () => About.init() },
+      { name: 'SocialProof', selector: '#s-social-proof', init: () => SocialProof.init() },
+      { name: 'Offer', selector: '#s-offer', init: () => Offer.init() },
+      { name: 'FAQ', selector: '#s-faq', init: () => FAQ.init() },
+      { name: 'FinalCTA', selector: '#s-final-cta', init: () => FinalCTA.init() },
+      { name: 'Footer', selector: '#s-footer', init: () => Footer.init() },
+      // Thank-you specific co-located section logic
+      { name: 'ThankYouSection', selector: '#thankyou', init: () => ThankYou.init() },
+      // Checkout modal / triggers (only when modal exists on page)
+      { name: 'Checkout', selector: '#checkoutModal', init: () => Checkout.init() }
     ];
 
     let successCount = 0;
     let failureCount = 0;
+    const initialized: ComponentRegistration[] = [];
 
-    components.forEach(({ name, component }) => {
+    registry.forEach(({ name, selector, init }) => {
+      // Only initialize if the component's root exists
+      if (!document.querySelector(selector)) {
+        return; // silently skip components not present on this page
+      }
       try {
-        if (component && typeof component.init === 'function') {
-          component.init();
-          successCount++;
-          StateManager.setComponentStatus(name, true, undefined);
-        } else {
-          console.warn(`⚠ ${name} component missing or invalid init method`);
-          failureCount++;
-          StateManager.setComponentStatus(name, false, new Error('Missing or invalid init method'));
-        }
+        init();
+        successCount++;
+        initialized.push({ name, component: { init } });
+        StateManager.setComponentStatus(name, true, undefined);
       } catch (error) {
         console.error(`✗ Failed to initialize ${name} component:`, error);
         AnalyticsHelpers.trackError('component_initialization_failed', error as Error, {
@@ -342,11 +346,11 @@ export const CafeComVendas: CafeComVendasInterface = {
       event_category: 'Application',
       success_count: successCount,
       failure_count: failureCount,
-      total_components: components.length
+      total_components: initialized.length
     };
     analytics.track('components_initialized', componentsEvent);
 
-    this.components = components;
+    this.components = initialized;
   },
 
   /**

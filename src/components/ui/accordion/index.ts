@@ -31,7 +31,8 @@ export const PlatformAccordion = {
     const items = safeQueryAll<HTMLDetailsElement>(config.itemSelector);
 
     if (!container || !items.length) {
-      logger.warn(`Accordion elements not found for ${config.containerSelector}`);
+      // Not a warning: FAQ may not be present on this page
+      logger.info(`Accordion elements not found for ${config.containerSelector}`);
       return;
     }
 
