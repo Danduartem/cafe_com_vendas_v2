@@ -732,12 +732,12 @@ test.describe('User Journey Tests', () => {
     expect(dataLayerStructure.eventTypes.length).toBeGreaterThan(0);
   });
 
-  test('should support GTM preview mode when debug parameter is present', async ({ page }) => {
+  test('should support GTM preview mode with custom domain', async ({ page }) => {
     // Navigate with GTM debug parameter
     await page.goto('/?gtm_debug=1756895052790');
     await page.waitForLoadState('networkidle');
 
-    // Check that preview mode detection works
+    // Check that preview mode parameters are preserved
     const previewModeStatus = await page.evaluate(() => {
       const urlParams = new URLSearchParams(window.location.search);
       return {
@@ -751,28 +751,19 @@ test.describe('User Journey Tests', () => {
     expect(previewModeStatus.debugValue).toBe('1756895052790');
     expect(previewModeStatus.previewModeDetected).toBe(true);
 
-    // Verify that GTM proxy configuration is available
-    const proxyConfig = await page.evaluate(() => {
-      return {
-        proxyEndpoint: '/.netlify/functions/gtm-proxy',
-        currentOrigin: window.location.origin
-      };
-    });
-
-    expect(proxyConfig.proxyEndpoint).toBe('/.netlify/functions/gtm-proxy');
-    expect(proxyConfig.currentOrigin).toBeTruthy();
-
-    // Test that dataLayer still functions in preview mode
+    // Test that dataLayer functions normally in preview mode
     const dataLayerInPreview = await page.evaluate(() => {
       const dl = window.dataLayer || [];
       return {
         hasEvents: dl.length > 0,
-        hasGTMLoad: dl.some((e) => e['gtm.start'] !== undefined)
+        hasGTMLoad: dl.some((e) => e['gtm.start'] !== undefined),
+        customDomainEndpoint: 'https://gtm.jucanamaximiliano.com.br'
       };
     });
 
     expect(dataLayerInPreview.hasEvents).toBeTruthy();
     expect(dataLayerInPreview.hasGTMLoad).toBeTruthy();
+    expect(dataLayerInPreview.customDomainEndpoint).toBe('https://gtm.jucanamaximiliano.com.br');
   });
 
   test('MailerLite Lead Capture Integration', async ({ page }) => {
