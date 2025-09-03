@@ -17,11 +17,12 @@ import { withTimeout, SHARED_TIMEOUTS } from './shared-utils.js';
 
 /**
  * Server GTM container configuration
+ * Using the actual Google Cloud Run URLs with project ID
  */
 const SERVER_GTM_CONFIG = {
   endpoints: {
-    production: 'https://server-side-tagging-m5scdmswwq-uc.a.run.app',
-    preview: 'https://server-side-tagging-preview-m5scdmswwq-uc.a.run.app'
+    production: 'https://server-side-tagging-178683125768.us-central1.run.app',
+    preview: 'https://server-side-tagging-preview-178683125768.us-central1.run.app'
   },
   paths: {
     collect: '/g/collect',
@@ -243,7 +244,7 @@ export default async function gtmProxy(request: Request): Promise<Response> {
       : undefined;
     
     // Forward the request to Server GTM
-    const serverResponse = await withTimeout(
+    let serverResponse = await withTimeout(
       fetch(targetUrl, {
         method: request.method,
         headers: forwardedHeaders,
@@ -252,6 +253,21 @@ export default async function gtmProxy(request: Request): Promise<Response> {
       SERVER_GTM_CONFIG.timeout,
       'GTM Proxy request'
     );
+    
+    // If preview server returns 404, fallback to production server
+    if (isPreview && serverResponse.status === 404) {
+      console.log('[GTM Proxy] Preview server returned 404, falling back to production server');
+      const productionUrl = buildTargetUrl(request, false);
+      serverResponse = await withTimeout(
+        fetch(productionUrl, {
+          method: request.method,
+          headers: forwardedHeaders,
+          body: requestBody
+        }),
+        SERVER_GTM_CONFIG.timeout,
+        'GTM Proxy fallback request'
+      );
+    }
     
     // Get response body
     const responseBody = await serverResponse.text();

@@ -104,35 +104,35 @@ describe('GTM Proxy Function', () => {
       const request = new Request('https://jucanamaximiliano.com.br/.netlify/functions/gtm-proxy/g/collect?v=2&tid=G-T06WRKJGRW&cid=test-client');
 
       const url = buildTargetUrl(request, false);
-      expect(url).toBe('https://server-side-tagging-m5scdmswwq-uc.a.run.app/g/collect?v=2&tid=G-T06WRKJGRW&cid=test-client');
+      expect(url).toBe('https://server-side-tagging-178683125768.us-central1.run.app/g/collect?v=2&tid=G-T06WRKJGRW&cid=test-client');
     });
 
     it('should build correct URL for /mp/collect endpoint', () => {
       const request = new Request('https://jucanamaximiliano.com.br/.netlify/functions/gtm-proxy/mp/collect?measurement_id=G-T06WRKJGRW&api_secret=test-secret');
 
       const url = buildTargetUrl(request, false);
-      expect(url).toBe('https://server-side-tagging-m5scdmswwq-uc.a.run.app/mp/collect?measurement_id=G-T06WRKJGRW&api_secret=test-secret');
+      expect(url).toBe('https://server-side-tagging-178683125768.us-central1.run.app/mp/collect?measurement_id=G-T06WRKJGRW&api_secret=test-secret');
     });
 
     it('should handle missing query parameters', () => {
       const request = new Request('https://jucanamaximiliano.com.br/.netlify/functions/gtm-proxy/g/collect');
 
       const url = buildTargetUrl(request, false);
-      expect(url).toBe('https://server-side-tagging-m5scdmswwq-uc.a.run.app/g/collect');
+      expect(url).toBe('https://server-side-tagging-178683125768.us-central1.run.app/g/collect');
     });
 
     it('should route to preview server when in preview mode', () => {
       const request = new Request('https://jucanamaximiliano.com.br/.netlify/functions/gtm-proxy/g/collect?v=2&tid=G-T06WRKJGRW&gtm_debug=1');
 
       const url = buildTargetUrl(request, true);
-      expect(url).toBe('https://server-side-tagging-preview-m5scdmswwq-uc.a.run.app/g/collect?v=2&tid=G-T06WRKJGRW&gtm_debug=1');
+      expect(url).toBe('https://server-side-tagging-preview-178683125768.us-central1.run.app/g/collect?v=2&tid=G-T06WRKJGRW&gtm_debug=1');
     });
 
     it('should route to production server when not in preview mode', () => {
       const request = new Request('https://jucanamaximiliano.com.br/.netlify/functions/gtm-proxy/g/collect?v=2&tid=G-T06WRKJGRW');
 
       const url = buildTargetUrl(request, false);
-      expect(url).toBe('https://server-side-tagging-m5scdmswwq-uc.a.run.app/g/collect?v=2&tid=G-T06WRKJGRW');
+      expect(url).toBe('https://server-side-tagging-178683125768.us-central1.run.app/g/collect?v=2&tid=G-T06WRKJGRW');
     });
   });
 
@@ -230,7 +230,7 @@ describe('GTM Proxy Function', () => {
 
       // Verify fetch was called with preview URL
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('server-side-tagging-preview-m5scdmswwq-uc.a.run.app/g/collect'),
+        expect.stringContaining('server-side-tagging-preview-178683125768.us-central1.run.app/g/collect'),
         expect.objectContaining({
           method: 'GET',
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -258,7 +258,7 @@ describe('GTM Proxy Function', () => {
 
       // Verify fetch was called with production URL
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('server-side-tagging-m5scdmswwq-uc.a.run.app/g/collect'),
+        expect.stringContaining('server-side-tagging-178683125768.us-central1.run.app/g/collect'),
         expect.objectContaining({
           method: 'GET',
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
