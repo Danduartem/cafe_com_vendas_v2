@@ -163,7 +163,7 @@ src/assets/js/
 src/utils/
 ├── browser-data.ts     # Advanced browser data collection & attribution
 ├── event-tracking.ts   # Event tracking utilities & helpers
-├── monitoring.ts       # Performance monitoring & observability  
+<!-- monitoring.ts removed during cleanup -->
 ├── youtube.ts          # YouTube API integration & video tracking
 ├── validation.ts       # Form validation & data validation utilities
 ├── calendar.ts         # Calendar integration utilities
@@ -174,7 +174,7 @@ src/utils/
 **Enhanced Utility Features**:
 - **Browser Data Collection** (`browser-data.ts`): Advanced attribution tracking, user environment detection, behavior analysis
 - **Event Tracking** (`event-tracking.ts`): Sophisticated event tracking with context enrichment and validation
-- **Performance Monitoring** (`monitoring.ts`): Real-time performance monitoring, Core Web Vitals tracking, custom metrics
+<!-- Performance Monitoring utilities removed in cleanup -->
 - **YouTube Integration** (`youtube.ts`): YouTube API integration for video tracking and engagement analytics
 - **Validation** (`validation.ts`): Comprehensive form and data validation with type safety
 - **Enhanced Logging** (`logger.ts`): Structured logging with different levels and enhanced context
@@ -189,7 +189,7 @@ netlify/functions/
 ├── crm-integration.ts         # Advanced CRM system integration
 ├── crm-types.ts              # CRM type definitions and interfaces
 ├── server-gtm.ts             # Server-side Google Tag Manager
-├── metrics-collection.ts      # Performance metrics collection
+<!-- metrics-collection.ts removed during cleanup -->
 ├── health-check.ts           # System health monitoring
 ├── dlq-handler.ts            # Dead letter queue processing
 ├── pii-hash.ts              # Privacy-compliant data hashing
@@ -211,7 +211,7 @@ netlify/functions/
 
 **Analytics & Monitoring Functions**:
 - **`server-gtm.ts`**: Server-side Google Tag Manager integration for accurate conversion tracking and event forwarding
-- **`metrics-collection.ts`**: Performance metrics collection, Core Web Vitals tracking, and custom performance reporting
+<!-- metrics-collection.ts removed during cleanup -->
 - **`health-check.ts`**: System health monitoring, uptime tracking, and automated alerting
 
 **Infrastructure & Utility Functions**:

@@ -251,7 +251,6 @@ AnalyticsHelpers.trackWhatsAppClick(linkUrl, linkText, location);
 
 #### Analytics & Monitoring Functions
 - **`server-gtm.ts`**: Server-side Google Tag Manager integration for accurate tracking
-- **`metrics-collection.ts`**: Performance metrics collection and reporting
 - **`health-check.ts`**: System health monitoring and status reporting
 
 #### Infrastructure & Utility Functions
@@ -273,7 +272,7 @@ AnalyticsHelpers.trackWhatsAppClick(linkUrl, linkText, location);
 - **Setup**: Configure `ADMIN_ACCESS_TOKEN` and `ADMIN_DASHBOARD_PASSWORD` in environment variables
 
 ### Enhanced Monitoring & Observability
-- **Performance Monitoring**: Real-time Core Web Vitals tracking via `metrics-collection.ts`
+<!-- Removed in cleanup: metrics-collection API and related monitoring utilities -->
 - **Error Tracking**: Comprehensive error handling with deduplication via analytics error plugin
 - **System Health**: Automated health checks for all critical systems
 - **Attribution Tracking**: Advanced visitor attribution and behavior analysis

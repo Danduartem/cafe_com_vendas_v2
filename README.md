@@ -194,12 +194,11 @@ src/
 ├── utils/              # Utility functions
 │   ├── browser-data.ts # Enhanced tracking & attribution
 │   ├── event-tracking.ts # Event tracking utilities
-│   ├── monitoring.ts   # Performance monitoring
 │   ├── youtube.ts      # YouTube API integration
 │   └── validation.ts   # Form validation utilities
 └── pages/              # Page templates (privacy, terms, etc.)
 
-netlify/functions/      # Advanced serverless functions (13 total)
+netlify/functions/      # Advanced serverless functions
 ├── create-payment-intent.ts   # Payment initialization
 ├── stripe-webhook.ts          # Payment confirmation
 ├── mailerlite-lead.ts         # Lead capture integration
@@ -207,7 +206,6 @@ netlify/functions/      # Advanced serverless functions (13 total)
 ├── crm-integration.ts         # CRM system integration
 ├── crm-types.ts              # CRM type definitions
 ├── server-gtm.ts             # Server-side GTM tracking
-├── metrics-collection.ts      # Performance metrics
 ├── health-check.ts           # System health monitoring
 ├── dlq-handler.ts            # Dead letter queue processing
 ├── pii-hash.ts              # Privacy-compliant data hashing
@@ -236,7 +234,7 @@ netlify/functions/      # Advanced serverless functions (13 total)
 - **API**: Unified AnalyticsHelpers interface for common tracking patterns
 - **Initialization**: Automatic setup with `initializeAnalytics()` in main app
 
-### Advanced Netlify Functions (13 total)
+### Advanced Netlify Functions
 **Payment & Commerce**:
 - `create-payment-intent.ts` - Stripe payment initialization
 - `stripe-webhook.ts` - Payment confirmation and fulfillment
