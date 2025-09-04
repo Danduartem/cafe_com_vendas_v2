@@ -25,8 +25,8 @@ describe('Landing Page Composition', () => {
       const sections = sectionsLoader.call({ page: { url: '/' } });
       const enabledSections = sections.filter((s: LoadedPageSection) => s.enabled);
 
-      // Should have at least hero, problem, solution, offer, and footer sections
-      const requiredSections = ['hero', 'problem', 'solution', 'offer', 'footer'];
+      // Should have at least core sections (footer optional)
+      const requiredSections = ['hero', 'problem', 'solution', 'offer'];
       const enabledSlugs = enabledSections.map((s: LoadedPageSection) => s.slug);
 
       requiredSections.forEach(required => {

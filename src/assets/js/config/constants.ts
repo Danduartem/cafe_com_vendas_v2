@@ -7,45 +7,6 @@ import ENV from './environment.js';
 import type { Constants as ConstantsType } from '../../../types/components/config.js';
 
 /**
- * Analytics event constants with type safety
- */
-export const ANALYTICS_EVENTS = {
-  // Performance events
-  PAGE_LOAD_PERFORMANCE: 'page_load_performance',
-
-  // Engagement events
-  FAQ_TOGGLE: 'faq_toggle',
-  FAQ_MEANINGFUL_ENGAGEMENT: 'faq_meaningful_engagement',
-  TESTIMONIAL_VIEW: 'view_testimonial_slide',
-  VIDEO_PLAY: 'video_play',
-
-  // Navigation events
-  WHATSAPP_CLICK: 'whatsapp_click',
-
-  // Form events
-  FORM_SUBMIT: 'form_submit',
-
-  // Page events
-  PAGE_VIEW_ENHANCED: 'page_view_enhanced',
-
-  // Conversion events
-  LEAD_CAPTURE_STARTED: 'lead_capture_started',
-  LEAD_FORM_SUBMITTED: 'lead_form_submitted',
-  CHECKOUT_OPENED: 'checkout_opened',
-  CHECKOUT_CLOSED: 'checkout_closed',
-  CHECKOUT_INITIATED: 'checkout_initiated',
-  PURCHASE_COMPLETED: 'purchase_completed',
-
-  // Error events
-  PAYMENT_FAILED: 'payment_failed'
-} as const;
-
-/**
- * Type for analytics event values
- */
-export type AnalyticsEventType = typeof ANALYTICS_EVENTS[keyof typeof ANALYTICS_EVENTS];
-
-/**
  * Main application configuration with strict typing
  */
 export const CONFIG: ConstantsType = {
@@ -90,12 +51,6 @@ export const CONFIG: ConstantsType = {
 
 // Freeze configuration to prevent accidental modification
 Object.freeze(CONFIG);
-Object.freeze(ANALYTICS_EVENTS);
 
 // Export environment configuration for easy access
 export { ENV };
-
-// Make analytics events available globally for debugging (development only)
-if (ENV.isDevelopment && typeof window !== 'undefined') {
-  window.ANALYTICS_EVENTS = ANALYTICS_EVENTS;
-}

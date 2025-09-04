@@ -241,8 +241,8 @@ eleventyExcludeFromCollections: true
   }
 </style>
 
-{# Dashboard JavaScript #}
-<script src="/js/admin.js"></script>
+{# Dashboard JavaScript via Vite asset (hashed) #}
+<script src="{{ 'src/admin/dashboard/index.ts' | asset }}" type="module"></script>
 <script>
   
   // Admin authentication state

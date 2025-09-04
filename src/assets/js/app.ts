@@ -32,7 +32,6 @@ import { SocialProof } from '../../_includes/sections/social-proof/index.js';
 import { Offer } from '../../_includes/sections/offer/index.js';
 import { FAQ } from '../../_includes/sections/faq/index.js';
 import { FinalCTA } from '../../_includes/sections/final-cta/index.js';
-import { Footer } from '../../_includes/sections/footer/index.js';
 import { TopBanner } from '../../_includes/sections/top-banner/index.js';
 import { ThankYou } from '../../_includes/sections/thank-you/index.js';
 import { Checkout } from '../../_includes/sections/checkout/index.js';
@@ -310,7 +309,6 @@ export const CafeComVendas: CafeComVendasInterface = {
       { name: 'Offer', selector: '#s-offer', init: () => Offer.init() },
       { name: 'FAQ', selector: '#s-faq', init: () => FAQ.init() },
       { name: 'FinalCTA', selector: '#s-final-cta', init: () => FinalCTA.init() },
-      { name: 'Footer', selector: '#s-footer', init: () => Footer.init() },
       // Thank-you specific co-located section logic
       { name: 'ThankYouSection', selector: '#thankyou', init: () => ThankYou.init() },
       // Checkout modal / triggers (only when modal exists on page)

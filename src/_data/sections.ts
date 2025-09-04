@@ -17,14 +17,12 @@ const sectionsByPage = {
     'social-proof',
     'offer',
     'faq',
-    'final-cta',
-    'footer'
+    'final-cta'
   ],
   'thank-you': [
     'thank-you-content'
   ],
   'legal': [
-    'footer'
   ]
 } as const;
 
