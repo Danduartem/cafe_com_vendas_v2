@@ -318,28 +318,34 @@ export const Checkout: CheckoutSectionComponent = {
   lockScroll(): void {
     const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
     this.scrollLockY = scrollY;
-    // Lock both html and body to cover iOS/Safari
-    document.documentElement.style.overflow = 'hidden';
+    // Lock body (avoid locking html to reduce layout jumps)
     document.body.style.position = 'fixed';
     document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
     document.body.style.width = '100%';
     document.body.style.overflow = 'hidden';
   },
 
   unlockScroll(): void {
-    // Unlock scroll and restore previous position
-    document.documentElement.style.overflow = '';
-    const top = document.body.style.top;
+    // Read before clearing styles
+    const topStr = document.body.style.top;
+    const storedY = typeof this.scrollLockY === 'number' ? this.scrollLockY : undefined;
+    const y = topStr ? Math.abs(parseInt(topStr, 10) || 0) : storedY || 0;
+
+    // Clear styles first
     document.body.style.position = '';
     document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
     document.body.style.width = '';
     document.body.style.overflow = '';
-    if (top) {
-      const y = parseInt(top, 10) || 0;
-      window.scrollTo(0, Math.abs(y));
-    } else if (typeof this.scrollLockY === 'number') {
-      window.scrollTo(0, this.scrollLockY);
-    }
+
+    // Restore scroll on next frame to avoid visible bounce
+    requestAnimationFrame(() => {
+      window.scrollTo(0, y);
+    });
+
     this.scrollLockY = null;
   },
 
