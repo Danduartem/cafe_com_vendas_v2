@@ -263,9 +263,17 @@ export const Checkout: CheckoutSectionComponent = {
 
     // Track checkout opened (GTM production event + test alias)
     try {
-      AnalyticsHelpers.trackCTAClick(this.getSourceSection(), {
-        trigger_location: this.getSourceSection(),
+      const sourceSection = this.getSourceSection();
+      AnalyticsHelpers.trackCTAClick(sourceSection, {
+        trigger_location: sourceSection,
         action: 'modal_opened'
+      });
+      // GA4 recommended: begin_checkout with basic item context
+      analytics.track('begin_checkout', {
+        currency: 'EUR',
+        value: basePrice,
+        items: [{ item_id: 'cafe-com-vendas-ticket', item_name: eventName, price: basePrice, quantity: 1 }],
+        source_section: sourceSection
       });
     } catch {
       logger.debug('Checkout modal analytics tracking unavailable');
@@ -504,10 +512,11 @@ export const Checkout: CheckoutSectionComponent = {
       // This will automatically show payment methods configured in Stripe Dashboard
       // Using type assertion due to TypeScript definitions not fully covering latest Stripe.js features
       this.paymentElement = this.elements.create('payment' as const, {
+        // Use accordion with all methods collapsed so the user must choose
         layout: {
-          type: 'tabs', // Show tabs for each payment method (cards, Multibanco, SEPA, etc.)
-          defaultCollapsed: false
-          // Removed incompatible options (radios, spacedAccordionItems) that only work with 'accordion' layout
+          type: 'accordion',
+          defaultCollapsed: true
+          // Note: 'radios' and 'spacedAccordionItems' are optional and only for accordion
         },
         defaultValues: {
           billingDetails: {
@@ -537,7 +546,7 @@ export const Checkout: CheckoutSectionComponent = {
           sofort: 'always'
         },
         // Payment method order preference for Portuguese market
-        // Multibanco first as it's the most trusted local payment method in Portugal
+        // Order still controls listing, but none will be pre-selected due to accordion layout
         paymentMethodOrder: ['multibanco', 'card', 'sepa_debit']
       });
 
@@ -562,7 +571,7 @@ export const Checkout: CheckoutSectionComponent = {
         // Show the payment element container
         paymentElementContainer.classList.remove('hidden');
 
-        // Listen for changes to enable/disable pay button
+        // Listen for changes to enable/disable pay button and track method selection
         this.paymentElement?.on('change', (event: StripePaymentElementChangeEvent) => {
           const payBtn = document.querySelector('#payBtn') as HTMLButtonElement;
           if (payBtn) {
@@ -575,6 +584,33 @@ export const Checkout: CheckoutSectionComponent = {
             if (payError) {
               payError.classList.add('hidden');
             }
+          }
+
+          // Track GA4 add_payment_info once per payment method selection
+          try {
+            const currentType = (event as unknown as { value?: { type?: string } }).value?.type;
+            // @ts-expect-error attach dynamic cache on instance
+            const lastType = this._lastPaymentTypeTracked;
+            if (currentType && currentType !== lastType) {
+              analytics.track('add_payment_info', {
+                payment_type: currentType,
+                currency: 'EUR',
+                value: basePrice,
+                items: [{ item_id: 'cafe-com-vendas-ticket', item_name: eventName, price: basePrice, quantity: 1 }]
+              });
+              // @ts-expect-error cache
+              this._lastPaymentTypeTracked = currentType;
+
+              // Also push a normalized dataLayer event for GTM audiences/logic
+              analytics.track('payment_method_selected', {
+                payment_type: currentType,
+                currency: 'EUR',
+                value: basePrice,
+                items: [{ item_id: 'cafe-com-vendas-ticket', item_name: eventName, price: basePrice, quantity: 1 }]
+              });
+            }
+          } catch {
+            logger.debug('add_payment_info tracking unavailable');
           }
         });
 
@@ -880,6 +916,11 @@ export const Checkout: CheckoutSectionComponent = {
           form_location: 'checkout_modal',
           pricing_tier: 'early_bird'
         });
+        // GA4 recommended: generate_lead
+        AnalyticsHelpers.trackConversion('generate_lead', {
+          lead_id: this.leadId,
+          form_location: 'checkout_modal'
+        });
         analytics.track('form_submission', {
           section: 'checkout',
           action: 'lead_submitted',
@@ -988,10 +1029,10 @@ export const Checkout: CheckoutSectionComponent = {
           leadId: this.leadId
         });
 
-        // Track payment success immediately since we know it succeeded
+        // Do not emit GA4 purchase client-side; use server webhook. Fire UI diagnostic only.
         try {
-          AnalyticsHelpers.trackConversion('purchase_completed', {
-            transaction_id: paymentIntent.id,
+          analytics.track('purchase_completed_ui', {
+            payment_intent_id: paymentIntent.id,
             value: basePrice,
             currency: 'EUR',
             items: [{ name: eventName, quantity: 1, price: basePrice }],
@@ -999,7 +1040,7 @@ export const Checkout: CheckoutSectionComponent = {
             lead_id: this.leadId
           });
         } catch {
-          logger.debug('Payment completion analytics tracking unavailable');
+          logger.debug('UI purchase completion analytics unavailable');
         }
 
         // Auto-redirect after success
@@ -1799,6 +1840,8 @@ export const Checkout: CheckoutSectionComponent = {
           utm_campaign: completeEventData.attribution.utm_campaign,
           utm_content: completeEventData.attribution.utm_content,
           utm_term: completeEventData.attribution.utm_term,
+          // First-touch approximation: pass landing page as first_landing_page
+          first_landing_page: completeEventData.attribution.landing_page,
 
           // CRM integration (will be populated by MailerLite response if available)
           crm_contact_id: undefined, // Will be set by server if CRM integration succeeded
@@ -1827,6 +1870,17 @@ export const Checkout: CheckoutSectionComponent = {
 
         if (this.idempotencyKey) {
           headers['X-Idempotency-Key'] = this.idempotencyKey;
+        }
+
+        // Try to attach GA IDs for server-side stitching (best-effort)
+        try {
+          const { collectGAIds } = await import('../../../analytics/utils/ga-ids.js');
+          const ids = collectGAIds();
+          if (ids.ga_client_id) (requestPayload as Record<string, unknown>).ga_client_id = ids.ga_client_id;
+          if (ids.ga_session_id) (requestPayload as Record<string, unknown>).ga_session_id = ids.ga_session_id;
+          if (typeof ids.ga_session_number === 'number') (requestPayload as Record<string, unknown>).ga_session_number = ids.ga_session_number;
+        } catch {
+          // ignore
         }
 
         // Create PaymentIntent with server validation

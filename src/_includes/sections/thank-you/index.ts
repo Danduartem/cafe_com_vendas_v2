@@ -22,7 +22,7 @@ import {
   type CalendarUrls,
   type CalendarEvent
 } from '../../../utils/calendar.js';
-import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
+import analytics from '../../../analytics/index.js';
 
 export const ThankYou = {
   init() {
@@ -573,9 +573,9 @@ export const ThankYou = {
     const { paymentIntent, paymentMethod, amount, source } = data;
     
     try {
-      // Track the main conversion event
-      AnalyticsHelpers.trackConversion('purchase_completed', {
-        transaction_id: paymentIntent,
+      // Do not send GA4 purchase on client; emit UI diagnostic instead
+      analytics.track('purchase_completed_ui', {
+        payment_intent_id: paymentIntent,
         value: amount,
         currency: 'EUR',
         items: [{ name: eventName, quantity: 1, price: amount }],
