@@ -417,7 +417,7 @@ export default async (request: Request): Promise<Response> => {
         eventId: stripeEvent.id,
         status: 'added_to_dlq'
       }), {
-        status: 500,
+        status: 200,
         headers
       });
     }
