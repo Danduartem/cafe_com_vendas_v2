@@ -7,7 +7,7 @@
 import { safeQuery, safeQueryAll } from '../../../utils/dom.js';
 import { Animations } from '../../../components/ui/index.js';
 import { debounce } from '../../../assets/js/utils/throttle.js';
-import { embedYouTubeIframeLite } from '../../../utils/youtube.js';
+import { embedYouTubeVideo } from '../../../utils/youtube.js';
 import { logger } from '../../../utils/logger.js';
 import type { Component } from '../../../types/components/base.js';
 import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
@@ -240,7 +240,7 @@ export const SocialProof: SocialProofComponent = {
     playButtons.forEach(button => {
       // Add click handler for video embedding
       button.addEventListener('click', (event) => {
-        this.handleVideoClick(event);
+        void this.handleVideoClick(event);
       });
     });
 
@@ -291,33 +291,28 @@ export const SocialProof: SocialProofComponent = {
     `;
     button.setAttribute('aria-label', 'Carregando vídeo...');
 
-    // Embed lightweight YouTube iframe without loading the IFrame API
-    try {
-      embedYouTubeIframeLite(videoContainer, videoId);
-    } catch (error) {
-      logger.error('Failed to embed YouTube video:', error);
-      // Reset button state on error
-      button.innerHTML = `
-        <svg class="w-16 h-16 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8 5v14l11-7z"/>
-        </svg>
-      `;
-      button.setAttribute('aria-label', 'Reproduzir testemunho em vídeo');
-    }
+    // Embed YouTube player via IFrame API to enable progress tracking
+    void (async () => {
+      try {
+        await embedYouTubeVideo(videoContainer, videoId);
+      } catch (error) {
+        logger.error('Failed to embed YouTube video:', error);
+        // Reset button state on error
+        button.innerHTML = `
+          <svg class="w-16 h-16 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        `;
+        button.setAttribute('aria-label', 'Reproduzir testemunho em vídeo');
+      }
+    })();
 
-    // Track analytics for video interaction
+    // Track engagement for embed start (video_play will be emitted by the YouTube API when playback starts)
     try {
-      // Engagement context
       analytics.track('section_engagement', {
         section: 'testimonials',
         action: 'video_embed_started',
         video_id: videoId
-      });
-
-      // Dedicated video play event for GTM
-      AnalyticsHelpers.trackVideoPlay(`Testimonial Video ${videoId}`, {
-        video_id: videoId,
-        section: 'testimonials'
       });
     } catch {
       logger.debug('Video embed analytics tracking unavailable');
