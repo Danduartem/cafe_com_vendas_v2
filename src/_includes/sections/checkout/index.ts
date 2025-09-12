@@ -328,12 +328,12 @@ export const Checkout: CheckoutSectionComponent = {
   },
 
   unlockScroll(): void {
-    // Read before clearing styles
+    // Capture scroll position from fixed body offset or stored value
     const topStr = document.body.style.top;
     const storedY = typeof this.scrollLockY === 'number' ? this.scrollLockY : undefined;
     const y = topStr ? Math.abs(parseInt(topStr, 10) || 0) : storedY || 0;
 
-    // Clear styles first
+    // Clear body locking styles first
     document.body.style.position = '';
     document.body.style.top = '';
     document.body.style.left = '';
@@ -341,9 +341,18 @@ export const Checkout: CheckoutSectionComponent = {
     document.body.style.width = '';
     document.body.style.overflow = '';
 
-    // Restore scroll on next frame to avoid visible bounce
+    // Temporarily disable smooth scrolling to prevent visible animation from top → y
+    const root = document.documentElement;
+    const prevBehavior = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+
+    // Restore scroll immediately on the next frame, then restore behavior
     requestAnimationFrame(() => {
       window.scrollTo(0, y);
+      // Restore previous scroll-behavior on a subsequent frame
+      requestAnimationFrame(() => {
+        root.style.scrollBehavior = prevBehavior;
+      });
     });
 
     this.scrollLockY = null;
