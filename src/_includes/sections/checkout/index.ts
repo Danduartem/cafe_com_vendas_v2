@@ -85,6 +85,7 @@ interface CheckoutSectionComponent extends Component {
   redirectTimeoutId: number | null;
   behaviorTracker: BehaviorTracker | null;
   scrollLockY?: number | null;
+  userInteractedWithPayment: boolean;
 
   initializeCheckout(): void;
   performInitialization(): void;
@@ -139,6 +140,7 @@ export const Checkout: CheckoutSectionComponent = {
   redirectTimeoutId: null,
   behaviorTracker: null,
   scrollLockY: null,
+  userInteractedWithPayment: false,
 
   init(): void {
     try {
@@ -307,6 +309,10 @@ export const Checkout: CheckoutSectionComponent = {
     // Clean application state when modal closes (via any method)
     this.resetForm();
     this.resetModalState();
+    // Reset interaction flags and caches
+    this.userInteractedWithPayment = false;
+    // @ts-expect-error cleanup dynamic cache
+    this._lastPaymentTypeTracked = undefined;
   },
 
   lockScroll(): void {
@@ -570,6 +576,11 @@ export const Checkout: CheckoutSectionComponent = {
         
         // Show the payment element container
         paymentElementContainer.classList.remove('hidden');
+        
+        // Mark user interaction when clicking inside the payment element
+        paymentElementContainer.addEventListener('click', () => {
+          this.userInteractedWithPayment = true;
+        }, { passive: true });
 
         // Listen for changes to enable/disable pay button and track method selection
         this.paymentElement?.on('change', (event: StripePaymentElementChangeEvent) => {
@@ -586,12 +597,12 @@ export const Checkout: CheckoutSectionComponent = {
             }
           }
 
-          // Track GA4 add_payment_info once per payment method selection
+          // Track GA4 add_payment_info once per payment method selection (only after explicit user interaction)
           try {
             const currentType = (event as unknown as { value?: { type?: string } }).value?.type;
             // @ts-expect-error attach dynamic cache on instance
             const lastType = this._lastPaymentTypeTracked;
-            if (currentType && currentType !== lastType) {
+            if (this.userInteractedWithPayment && currentType && currentType !== lastType) {
               analytics.track('add_payment_info', {
                 payment_type: currentType,
                 currency: 'EUR',
@@ -1287,6 +1298,11 @@ export const Checkout: CheckoutSectionComponent = {
 
     // Reset UI to step 1
     this.setStep(1);
+
+    // Reset interaction flags and caches when modal state resets
+    this.userInteractedWithPayment = false;
+    // @ts-expect-error cleanup dynamic cache
+    this._lastPaymentTypeTracked = undefined;
   },
 
   translateStripeError(message: string): string {
