@@ -150,6 +150,13 @@ export const AnalyticsHelpers = {
     }
   },
 
+  trackVideoPlay(videoTitle: string, data?: Record<string, unknown>): void {
+    const plugin = analytics.getPlugin('gtm');
+    if (plugin?.methods && 'trackVideoPlay' in plugin.methods) {
+      (plugin.methods as unknown as GTMPluginMethods).trackVideoPlay(videoTitle, data);
+    }
+  },
+
   trackVideoProgress(videoTitle: string, percentPlayed: number, data?: Record<string, unknown>): void {
     const plugin = analytics.getPlugin('gtm');
     if (plugin?.methods && 'trackVideoProgress' in plugin.methods) {

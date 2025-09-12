@@ -360,13 +360,26 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
     },
 
     /**
-     * Track video progress
+     * Track video play (start)
      */
-    trackVideoProgress: (videoTitle: string, percentPlayed: number, data?: Record<string, unknown>) => {
+    trackVideoPlay: (videoTitle: string, data?: Record<string, unknown>) => {
       enhancedPush({
         event: 'video_play',
         video_title: videoTitle,
-        video_percent_played: percentPlayed,
+        ...data
+      });
+
+      pluginDebugLog(debug, '[GTM Plugin] Video play tracked:', { videoTitle, data });
+    },
+
+    /**
+     * Track video progress milestones
+     */
+    trackVideoProgress: (videoTitle: string, percentPlayed: number, data?: Record<string, unknown>) => {
+      enhancedPush({
+        event: 'video_progress',
+        video_title: videoTitle,
+        percent_played: percentPlayed,
         ...data
       });
 

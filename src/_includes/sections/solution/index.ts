@@ -25,7 +25,8 @@ export const Solution: SolutionComponent = {
    * Initialize section view tracking using standardized approach
    */
   initSectionTracking(): void {
-    AnalyticsHelpers.initSectionTracking('solution');
+    // Lower threshold to 30% visibility to ensure firing on tall sections
+    AnalyticsHelpers.initSectionTracking('solution', 0.3);
   },
 
   /**

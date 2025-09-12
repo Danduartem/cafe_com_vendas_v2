@@ -307,10 +307,17 @@ export const SocialProof: SocialProofComponent = {
 
     // Track analytics for video interaction
     try {
+      // Engagement context
       analytics.track('section_engagement', {
         section: 'testimonials',
         action: 'video_embed_started',
         video_id: videoId
+      });
+
+      // Dedicated video play event for GTM
+      AnalyticsHelpers.trackVideoPlay(`Testimonial Video ${videoId}`, {
+        video_id: videoId,
+        section: 'testimonials'
       });
     } catch {
       logger.debug('Video embed analytics tracking unavailable');

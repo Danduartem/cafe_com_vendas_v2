@@ -99,6 +99,7 @@ export const Offer: OfferComponent = {
    * Initialize section view tracking for Offer section
    */
   initSectionTracking() {
-    AnalyticsHelpers.initSectionTracking('offer');
+    // Lower threshold to 30% visibility to ensure firing on tall sections
+    AnalyticsHelpers.initSectionTracking('offer', 0.3);
   }
 };

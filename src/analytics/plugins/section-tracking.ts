@@ -67,16 +67,6 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
 
                 if (analyticsInstance) {
                   analyticsInstance.track('section_view', sectionViewPayload);
-                
-                  // Legacy compatibility - fire specific testimonials event if needed
-                  if (sectionName === 'testimonials' || sectionName === 'social-proof') {
-                    analyticsInstance.track('view_testimonials_section', {
-                      section_name: sectionName,
-                      timestamp: new Date().toISOString(),
-                      percent_visible: Math.round(entry.intersectionRatio * 100)
-                    });
-                  }
-
                   pluginDebugLog(debug, '[Section Tracking Plugin] Section view tracked:', sectionViewPayload);
                 }
                 
@@ -118,15 +108,6 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
         };
 
         analyticsInstance.track('section_view', sectionViewPayload);
-
-        // Legacy compatibility - fire specific testimonials event if needed
-        if (sectionName === 'testimonials' || sectionName === 'social-proof') {
-          analyticsInstance.track('view_testimonials_section', {
-            section_name: sectionName,
-            timestamp: new Date().toISOString(),
-            ...data
-          });
-        }
 
         pluginDebugLog(debug, '[Section Tracking Plugin] Section view tracked:', sectionViewPayload);
       },

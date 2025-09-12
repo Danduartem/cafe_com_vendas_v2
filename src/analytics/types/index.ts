@@ -128,6 +128,7 @@ export interface GTMPluginMethods {
   trackFAQMeaningfulEngagement(toggleCount: number, data?: Record<string, unknown>): void;
   trackTestimonialSlide(testimonialId: string, position: number, data?: Record<string, unknown>): void;
   trackWhatsAppClick(linkUrl: string, linkText: string, location: string, data?: Record<string, unknown>): void;
+  trackVideoPlay(videoTitle: string, data?: Record<string, unknown>): void;
   trackVideoProgress(videoTitle: string, percentPlayed: number, data?: Record<string, unknown>): void;
   pushToDataLayer(data: GTMEventPayload): void;
   getPluginState(): Record<string, unknown>;
