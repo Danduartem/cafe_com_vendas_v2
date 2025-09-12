@@ -438,7 +438,12 @@ export default async (request: Request): Promise<Response> => {
       // Technical context for troubleshooting
       integration_version: 'phase-2',
       api_version: '2025-01',
-      checkout_flow_version: 'enhanced-v2'
+      checkout_flow_version: 'enhanced-v2',
+
+      // GA stitching (best-effort from client)
+      ga_client_id: (requestBody as { ga_client_id?: string }).ga_client_id,
+      ga_session_id: (requestBody as { ga_session_id?: string }).ga_session_id,
+      ga_session_number: (requestBody as { ga_session_number?: number | string }).ga_session_number?.toString()
     };
 
     // Filter out undefined values and convert to strings for Stripe

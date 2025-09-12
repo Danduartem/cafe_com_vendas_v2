@@ -696,12 +696,14 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
       // Build GA4 purchase event data
       const purchaseEventData = {
         event_name: 'purchase' as const,
-        client_id: user_session_id || paymentIntent.id,
+        // Prefer GA client id when available; fallback to our session id
+        client_id: (metadata as { ga_client_id?: string }).ga_client_id || user_session_id || paymentIntent.id,
         timestamp_micros: Date.now() * 1000,
         
         // Event correlation
         event_id: event_id || `webhook-${paymentIntent.id}`,
-        session_id: user_session_id,
+        // Prefer GA4 session id if present
+        session_id: (metadata as { ga_session_id?: string }).ga_session_id || user_session_id,
         
         // Transaction details
         transaction_id: paymentIntent.id,
@@ -712,7 +714,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
         items: [{
           item_id: metadata.product_id || 'cafe-com-vendas-ticket',
           item_name: metadata.product_name || 'Café com Vendas - Lisbon 2025',
-          category: metadata.product_category || 'business-event',
+          item_category: metadata.product_category || 'business-event',
           quantity: 1,
           price: paymentIntent.amount / 100,
           currency: paymentIntent.currency.toUpperCase(),
@@ -733,7 +735,15 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
         custom_parameters: {
           payment_method: paymentIntent.payment_method_types?.[0] || 'unknown',
           customer_type: (metadata.customer_segment === 'returning' ? 'returning' : 'new'),
-          affiliate_id: metadata.utm_source || undefined,
+          affiliate_id: (metadata.affiliate_id) || undefined,
+          affiliation: (metadata.affiliation) || undefined,
+          coupon: (metadata.coupon_code) || undefined,
+          shipping: metadata.shipping_amount ? Number(metadata.shipping_amount) : undefined,
+          tax: metadata.tax_amount ? Number(metadata.tax_amount) : undefined,
+          // first-touch attribution (if present)
+          first_utm_source: (metadata.first_utm_source) || undefined,
+          first_utm_campaign: (metadata.first_utm_campaign) || undefined,
+          first_landing_page: (metadata.first_landing_page) || undefined,
           integration_version: metadata.integration_version || 'phase-2'
         } as const
       };
