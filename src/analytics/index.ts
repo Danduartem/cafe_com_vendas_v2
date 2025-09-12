@@ -8,7 +8,6 @@ import { gtmPlugin } from './plugins/gtm.js';
 import { performancePlugin } from './plugins/performance.js';
 import { sectionTrackingPlugin } from './plugins/section-tracking.js';
 import { errorPlugin } from './plugins/error.js';
-import { scrollTrackingPlugin } from './plugins/scroll-tracking.js';
 import { ENV } from '../assets/js/config/constants.js';
 import { debugLog } from './utils/debug.js';
 import type { 
@@ -50,11 +49,7 @@ export const analytics = createAnalytics({
       debug: ENV.isDevelopment
     }),
     
-    // Scroll Tracking Plugin - scroll depth events
-    scrollTrackingPlugin({
-      thresholds: [10, 25, 50, 75, 90],
-      debug: ENV.isDevelopment
-    })
+    // Scroll depth is handled by GTM's built-in trigger; app plugin disabled to avoid duplicates
   ]
 });
 
@@ -72,11 +67,7 @@ export async function initializeAnalytics(): Promise<void> {
       (errorPlugin.methods as unknown as ErrorPluginMethods).setupGlobalErrorHandling();
     }
     
-    // Initialize scroll tracking
-    const scrollPlugin = analytics.getPlugin('scroll-tracking');
-    if (scrollPlugin?.methods) {
-      // Scroll tracking is auto-initialized in the plugin
-    }
+    // Scroll depth handled by GTM; no app plugin initialization
     
     debugLog('[Analytics] Unified analytics system initialized');
     debugLog('[Analytics] Available plugins:', Object.keys(analytics.plugins || {}));
