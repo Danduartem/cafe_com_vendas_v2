@@ -486,7 +486,11 @@ export default async (request: Request): Promise<Response> => {
           multibanco: {
             // Multibanco doesn't support setup_future_usage, so we explicitly set 'none'  
             // This prevents any future payment method attachment attempts
-            setup_future_usage: 'none'
+            setup_future_usage: 'none',
+            // Stripe Multibanco vouchers default to 7 days. Business requirement: expire sooner.
+            // Note: Stripe only supports whole days for Multibanco expiry (min 1 day).
+            // @ts-expect-error The Stripe types may not expose this field for Multibanco yet.
+            expires_after_days: 1
           }
         }
       }, {
