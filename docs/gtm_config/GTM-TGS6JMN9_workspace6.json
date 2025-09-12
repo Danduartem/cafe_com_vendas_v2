@@ -1,0 +1,160 @@
+{
+    "exportFormatVersion": 2,
+    "exportTime": "2025-09-12 17:09:28",
+    "containerVersion": {
+        "path": "accounts/6308553599/containers/228813091/versions/0",
+        "accountId": "6308553599",
+        "containerId": "228813091",
+        "containerVersionId": "0",
+        "container": {
+            "path": "accounts/6308553599/containers/228813091",
+            "accountId": "6308553599",
+            "containerId": "228813091",
+            "name": "Café com Vendas",
+            "publicId": "GTM-TGS6JMN9",
+            "usageContext": [
+                "SERVER"
+            ],
+            "fingerprint": "1756916933008",
+            "tagManagerUrl": "https://tagmanager.google.com/#/container/accounts/6308553599/containers/228813091/workspaces?apiLink=container",
+            "features": {
+                "supportUserPermissions": true,
+                "supportEnvironments": true,
+                "supportWorkspaces": true,
+                "supportGtagConfigs": false,
+                "supportBuiltInVariables": true,
+                "supportClients": true,
+                "supportFolders": true,
+                "supportTags": true,
+                "supportTemplates": true,
+                "supportTriggers": true,
+                "supportVariables": true,
+                "supportVersions": true,
+                "supportZones": true,
+                "supportTransformations": true
+            },
+            "tagIds": [
+                "GTM-TGS6JMN9"
+            ],
+            "taggingServerUrls": [
+                "https://server-side-tagging-m5scdmswwq-uc.a.run.app",
+                "https://gtm.jucanamaximiliano.com.br"
+            ]
+        },
+        "tag": [
+            {
+                "accountId": "6308553599",
+                "containerId": "228813091",
+                "tagId": "5",
+                "name": "sGTM - GA4 Event Processing",
+                "type": "sgtmgaaw",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "redactVisitorIp",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "epToIncludeDropdown",
+                        "value": "all"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "upToIncludeDropdown",
+                        "value": "all"
+                    }
+                ],
+                "fingerprint": "1756822737209",
+                "firingTriggerId": [
+                    "4"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            }
+        ],
+        "trigger": [
+            {
+                "accountId": "6308553599",
+                "containerId": "228813091",
+                "triggerId": "4",
+                "name": "GA4 Client Events",
+                "type": "ALWAYS",
+                "fingerprint": "1756838472357"
+            }
+        ],
+        "builtInVariable": [
+            {
+                "accountId": "6308553599",
+                "containerId": "228813091",
+                "type": "EVENT_NAME",
+                "name": "Event Name"
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "228813091",
+                "type": "CLIENT_NAME",
+                "name": "Client Name"
+            }
+        ],
+        "fingerprint": "1757696968961",
+        "tagManagerUrl": "https://tagmanager.google.com/#/versions/accounts/6308553599/containers/228813091/versions/0?apiLink=version",
+        "client": [
+            {
+                "accountId": "6308553599",
+                "containerId": "228813091",
+                "clientId": "1",
+                "name": "GA4",
+                "type": "gaaw_client",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "cookieDomain",
+                        "value": "auto"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "cookieSamesite",
+                        "value": "lax"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "cookieMaxAgeInSec",
+                        "value": "63072000"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "activateDefaultPaths",
+                        "value": "true"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "cookiePath",
+                        "value": "/"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "migrateFromJsClientId",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "cookieManagement",
+                        "value": "server"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "cookieName",
+                        "value": "FPID"
+                    }
+                ],
+                "fingerprint": "1757586622006"
+            }
+        ]
+    }
+}
