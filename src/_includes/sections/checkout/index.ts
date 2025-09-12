@@ -642,6 +642,9 @@ export const Checkout: CheckoutSectionComponent = {
 
         // Handle focus events
         this.paymentElement?.on('focus', () => {
+          // Mark explicit user interaction when the element receives focus
+          this.userInteractedWithPayment = true;
+
           // Clear errors when user focuses on payment form
           const payError = document.querySelector('#payError');
           if (payError) {
