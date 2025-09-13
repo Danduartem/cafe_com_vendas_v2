@@ -53,12 +53,17 @@ export default async (request: Request): Promise<Response> => {
       'Retrieve PaymentIntent'
     );
 
+    // Prevent re-applying promo if one is already set (avoids stacking discounts)
+    if (paymentIntent.metadata?.coupon_code) {
+      return new Response(JSON.stringify({ error: 'Promotion code already applied to this payment' }), { status: 400, headers });
+    }
+
     if (paymentIntent.status === 'succeeded' || paymentIntent.status === 'canceled') {
       return new Response(JSON.stringify({ error: `PaymentIntent is ${paymentIntent.status}` }), { status: 400, headers });
     }
 
     const currency = paymentIntent.currency.toLowerCase();
-    const originalAmount = paymentIntent.amount; // in cents
+    const originalAmount = paymentIntent.amount; // in cents (first application)
 
     // Look up active Promotion Code
     const promoList = await withTimeout(

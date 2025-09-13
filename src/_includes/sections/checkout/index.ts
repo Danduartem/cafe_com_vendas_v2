@@ -719,6 +719,9 @@ export const Checkout: CheckoutSectionComponent = {
                   discount_value: (data.original_amount - data.discounted_amount) / 100
                 });
               } catch (e) { logger.debug('add_promotion track failed', e); }
+              // Prevent re-application in UI as well
+              promoInput.disabled = true;
+              applyBtn.disabled = true;
             })
             .catch((err: unknown) => {
               if (promoMsg) {
