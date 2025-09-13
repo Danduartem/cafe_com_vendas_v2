@@ -707,6 +707,8 @@ export const Checkout: CheckoutSectionComponent = {
               const euros = (data.discounted_amount / 100).toLocaleString('pt-PT', { style: 'currency', currency: (data.currency || 'EUR') });
               const payText = document.getElementById('payBtnText');
               if (payText) payText.textContent = `Confirmar pagamento • ${euros}`;
+              const priceHeader = document.getElementById('priceHeader');
+              if (priceHeader) priceHeader.textContent = euros;
               if (promoMsg) {
                 promoMsg.className = 'mt-2 text-sm text-green-700';
                 promoMsg.textContent = `Código aplicado: ${data.coupon.code}`;
