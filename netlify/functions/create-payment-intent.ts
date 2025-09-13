@@ -439,19 +439,23 @@ export default async (request: Request): Promise<Response> => {
       integration_version: 'phase-2',
       api_version: '2025-01',
       checkout_flow_version: 'enhanced-v2',
-
-      // GA stitching (best-effort from client)
-      ga_client_id: (requestBody as { ga_client_id?: string }).ga_client_id,
-      ga_session_id: (requestBody as { ga_session_id?: string }).ga_session_id,
-      ga_session_number: (requestBody as { ga_session_number?: number | string }).ga_session_number?.toString()
+      // GA stitching will be added to metadata map later to satisfy type constraints
     };
 
     // Filter out undefined values and convert to strings for Stripe
-    const cleanMetadata = Object.fromEntries(
+    const cleanMetadata: Record<string, string> = Object.fromEntries(
       Object.entries(metadata)
         .filter(([_, value]) => value !== undefined && value !== null)
         .map(([key, value]) => [key, String(value)])
     );
+
+    // Attach optional GA identifiers if present (outside of typed interface)
+    const gaClientId = (requestBody as { ga_client_id?: string }).ga_client_id;
+    const gaSessionId = (requestBody as { ga_session_id?: string }).ga_session_id;
+    const gaSessionNumber = (requestBody as { ga_session_number?: number | string }).ga_session_number;
+    if (gaClientId) cleanMetadata['ga_client_id'] = gaClientId;
+    if (gaSessionId) cleanMetadata['ga_session_id'] = gaSessionId;
+    if (typeof gaSessionNumber !== 'undefined') cleanMetadata['ga_session_number'] = String(gaSessionNumber);
 
     // Create PaymentIntent with idempotency key and timeout
     const paymentIntent = await withTimeout(
@@ -482,16 +486,8 @@ export default async (request: Request): Promise<Response> => {
           },
           bancontact: {
             setup_future_usage: 'off_session'
-          },
-          multibanco: {
-            // Multibanco doesn't support setup_future_usage, so we explicitly set 'none'  
-            // This prevents any future payment method attachment attempts
-            setup_future_usage: 'none',
-            // Stripe Multibanco vouchers default to 7 days. Business requirement: expire sooner.
-            // Note: Stripe only supports whole days for Multibanco expiry (min 1 day).
-            // @ts-expect-error The Stripe types may not expose this field for Multibanco yet.
-            expires_after_days: 1
           }
+          // Note: Multibanco options like expires_after_days are not supported at PI create; leave default handling.
         }
       }, {
         idempotencyKey: idempotencyKey

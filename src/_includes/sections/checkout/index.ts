@@ -77,6 +77,7 @@ interface CheckoutSectionComponent extends Component {
   clientSecret: string | null;
   paymentIntentId: string | null;
   leadId: string | null;
+  _lastPaymentTypeTracked?: string;
   leadData: { fullName: string; email: string; countryCode: string; phone: string } | null;
   currentStep: number | string;
   idempotencyKey: string | null;
@@ -313,7 +314,6 @@ export const Checkout: CheckoutSectionComponent = {
     this.resetModalState();
     // Reset interaction flags and caches
     this.userInteractedWithPayment = false;
-    // @ts-expect-error cleanup dynamic cache
     this._lastPaymentTypeTracked = undefined;
   },
 
@@ -617,7 +617,6 @@ export const Checkout: CheckoutSectionComponent = {
           // Track GA4 add_payment_info once per payment method selection (only after explicit user interaction)
           try {
             const currentType = (event as unknown as { value?: { type?: string } }).value?.type;
-            // @ts-expect-error attach dynamic cache on instance
             const lastType = this._lastPaymentTypeTracked;
             if (this.userInteractedWithPayment && currentType && currentType !== lastType) {
               analytics.track('add_payment_info', {
@@ -626,7 +625,6 @@ export const Checkout: CheckoutSectionComponent = {
                 value: basePrice,
                 items: [{ item_id: 'cafe-com-vendas-ticket', item_name: eventName, price: basePrice, quantity: 1 }]
               });
-              // @ts-expect-error cache
               this._lastPaymentTypeTracked = currentType;
 
               // Also push a normalized dataLayer event for GTM audiences/logic
@@ -1387,7 +1385,6 @@ export const Checkout: CheckoutSectionComponent = {
 
     // Reset interaction flags and caches when modal state resets
     this.userInteractedWithPayment = false;
-    // @ts-expect-error cleanup dynamic cache
     this._lastPaymentTypeTracked = undefined;
   },
 

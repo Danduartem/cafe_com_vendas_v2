@@ -38,9 +38,13 @@
   - `docs(setup): add GTM preview guide`
 - PRs: clear description, linked issues, screenshots for UI, list of changes, test notes. All checks must pass: `npm run type-check && npm run lint && npm test` (run E2E if applicable).
 
+## Git Operations Policy
+- Do not run `git commit`, `git push`, or create branches unless the user explicitly instructs you to do so.
+- Default workflow: propose diffs and await user approval before any git actions.
+- When changes are approved, use Conventional Commits and keep scope focused.
+
 ## Security & Configuration Tips
 - Node 22.17.1+ (`.nvmrc`).
 - Secrets: `cp .env.example .env`; never commit `.env`.
 - Payments: use test cards (see `docs/STRIPE_TEST_CARDS.md`).
 - Do not edit `_site/`; submit changes under `src/` or `netlify/functions/`.
-

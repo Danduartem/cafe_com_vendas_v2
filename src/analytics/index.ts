@@ -164,8 +164,7 @@ export {
   gtmPlugin,
   performancePlugin, 
   sectionTrackingPlugin,
-  errorPlugin,
-  scrollTrackingPlugin
+  errorPlugin
 };
 
 // Export types

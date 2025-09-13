@@ -14,7 +14,7 @@ interface ApplyPromoRequest {
 }
 
 export default async (request: Request): Promise<Response> => {
-  const origin = request.headers.get('origin') || undefined;
+  const origin = request.headers.get('origin');
   const headers = buildCorsHeaders(origin);
   headers['Access-Control-Allow-Headers'] = 'Content-Type';
   headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS';
@@ -32,7 +32,7 @@ export default async (request: Request): Promise<Response> => {
       throw new Error('Stripe secret key not configured');
     }
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? null, {
       timeout: 30000,
       maxNetworkRetries: 2,
       telemetry: false
@@ -143,4 +143,3 @@ export default async (request: Request): Promise<Response> => {
     return new Response(JSON.stringify({ error: message }), { status: 500, headers });
   }
 };
-
