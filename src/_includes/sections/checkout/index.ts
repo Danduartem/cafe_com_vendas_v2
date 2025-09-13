@@ -75,6 +75,7 @@ interface CheckoutSectionComponent extends Component {
   elements: StripeElements | null;
   paymentElement: StripePaymentElement | null;
   clientSecret: string | null;
+  paymentIntentId: string | null;
   leadId: string | null;
   leadData: { fullName: string; email: string; countryCode: string; phone: string } | null;
   currentStep: number | string;
@@ -130,6 +131,7 @@ export const Checkout: CheckoutSectionComponent = {
   elements: null,
   paymentElement: null,
   clientSecret: null,
+  paymentIntentId: null,
   leadId: null,
   leadData: null, // Store lead form data for payment intent
   currentStep: 1,
@@ -666,6 +668,72 @@ export const Checkout: CheckoutSectionComponent = {
             payError.classList.add('hidden');
           }
         });
+
+        // Wire promo code apply
+        const applyBtn = document.getElementById('applyPromoBtn') as HTMLButtonElement | null;
+        const promoInput = document.getElementById('promoCode') as HTMLInputElement | null;
+        const promoMsg = document.getElementById('promoMessage');
+        if (applyBtn && promoInput) {
+          interface PromoApplyResponse {
+            success: boolean;
+            payment_intent_id: string;
+            client_secret: string;
+            currency: string;
+            original_amount: number;
+            discounted_amount: number;
+            discount_applied: boolean;
+            coupon: { code: string; id: string; percent_off?: number | null; amount_off?: number | null };
+            error?: string;
+          }
+          applyBtn.addEventListener('click', () => {
+            const code = promoInput.value.trim();
+            if (!code || !this.paymentIntentId) {
+              if (promoMsg) {
+                promoMsg.className = 'mt-2 text-sm text-burgundy-700';
+                promoMsg.textContent = code ? 'Erro: pagamento não iniciado.' : 'Digite um código promocional.';
+                promoMsg.classList.remove('hidden');
+              }
+              return;
+            }
+            applyBtn.disabled = true;
+            fetch(`${ENV.urls.base}/.netlify/functions/apply-promo-code`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ payment_intent_id: this.paymentIntentId, promo_code: code })
+            })
+            .then(async (res) => {
+              const data = await (res.json() as Promise<PromoApplyResponse>);
+              if (!res.ok || !data.success) {
+                throw new Error(data.error || 'Falha ao aplicar código');
+              }
+              const euros = (data.discounted_amount / 100).toLocaleString('pt-PT', { style: 'currency', currency: (data.currency || 'EUR') });
+              const payText = document.getElementById('payBtnText');
+              if (payText) payText.textContent = `Confirmar pagamento • ${euros}`;
+              if (promoMsg) {
+                promoMsg.className = 'mt-2 text-sm text-green-700';
+                promoMsg.textContent = `Código aplicado: ${data.coupon.code}`;
+                promoMsg.classList.remove('hidden');
+              }
+              try {
+                analytics.track('add_promotion', {
+                  promotion_code: data.coupon.code,
+                  discount_type: data.coupon.percent_off ? 'percent' : 'amount',
+                  discount_value: (data.original_amount - data.discounted_amount) / 100
+                });
+              } catch (e) { logger.debug('add_promotion track failed', e); }
+            })
+            .catch((err: unknown) => {
+              if (promoMsg) {
+                promoMsg.className = 'mt-2 text-sm text-burgundy-700';
+                promoMsg.textContent = err instanceof Error ? err.message : 'Erro ao aplicar código';
+                promoMsg.classList.remove('hidden');
+              }
+            })
+            .finally(() => {
+              applyBtn.disabled = false;
+            });
+          });
+        }
       }
     } catch (error) {
       logger.error('Error initializing payment element:', error);
@@ -1954,6 +2022,7 @@ export const Checkout: CheckoutSectionComponent = {
         
         // Handle clean enhanced response format
         this.clientSecret = data.client_secret;
+        this.paymentIntentId = data.payment_intent_id;
         
         logger.info('Payment intent created successfully', { 
           eventId: data.event_id,

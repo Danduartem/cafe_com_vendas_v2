@@ -405,6 +405,13 @@
             <div id="payment-element" class="hidden">
               <!-- Stripe Elements will mount here -->
             </div>
+
+            <!-- Promo code -->
+            <div class="mt-4 flex gap-2 items-center">
+              <input id="promoCode" type="text" inputmode="text" autocomplete="off" placeholder="Código promocional" class="flex-1 rounded-xl border border-neutral-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-burgundy-700 focus:border-burgundy-700" />
+              <button id="applyPromoBtn" type="button" class="rounded-xl px-4 py-2 text-sm font-semibold bg-neutral-900 text-white hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed">Aplicar</button>
+            </div>
+            <div id="promoMessage" class="hidden mt-2 text-sm"></div>
           </div>
 
           <button id="payBtn" 
