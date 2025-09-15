@@ -49,20 +49,23 @@
 
         {# Enhanced primary CTA with sophisticated gradient button #}
         <div class="opacity-0 translate-y-3 mt-6 transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] delay-300" data-reveal>
-          <a href="#s-solution" data-analytics-event="click_vision_cta"
-             class="group inline-flex items-center gap-3 bg-gradient-to-r from-burgundy-700 to-burgundy-800 text-white font-century font-semibold px-8 py-4 rounded-xl
-                    transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]
-                    hover:from-burgundy-800 hover:to-burgundy-900 hover:gap-4 hover:shadow-lg hover:shadow-burgundy-700/25
-                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy-500 focus-visible:ring-offset-3 focus-visible:ring-offset-white
-                    active:scale-[0.98]
-                    text-base lg:text-[1.0625rem] tracking-wide
-                    relative overflow-hidden
-                    before:absolute before:inset-0 before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent before:transition-transform before:duration-500 hover:before:translate-x-full">
+          <button type="button"
+                  data-checkout-trigger
+                  data-source="vision"
+                  data-analytics-event="click_vision_cta"
+                  class="group inline-flex items-center gap-3 bg-gradient-to-r from-burgundy-700 to-burgundy-800 text-white font-century font-semibold px-8 py-4 rounded-xl
+                         transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]
+                         hover:from-burgundy-800 hover:to-burgundy-900 hover:gap-4 hover:shadow-lg hover:shadow-burgundy-700/25
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy-500 focus-visible:ring-offset-3 focus-visible:ring-offset-white
+                         active:scale-[0.98]
+                         text-base lg:text-[1.0625rem] tracking-wide
+                         relative overflow-hidden
+                         before:absolute before:inset-0 before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent before:transition-transform before:duration-500 hover:before:translate-x-full">
             <span class="relative">{{ currentSection.copy.cta.label }}</span>
             <svg class="w-5 h-5 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-110" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"/>
             </svg>
-          </a>
+          </button>
         </div>
       </div>
 

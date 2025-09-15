@@ -4,6 +4,7 @@
  */
 
 import { normalizeEventPayload } from '../../assets/js/utils/gtm-normalizer.js';
+import { ensureMetaCookies, getMetaUserData } from '../utils/meta-ids.js';
 import { pluginDebugLog } from '../utils/debug.js';
 import type { PluginFactory, GTMEventPayload } from '../types/index.js';
 
@@ -72,7 +73,10 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
       // Ensure dataLayer exists
       (window as unknown as { dataLayer: unknown[] }).dataLayer = 
         (window as unknown as { dataLayer?: unknown[] }).dataLayer || [];
-      
+
+      // Ensure Meta cookies early (CSP-safe, no external scripts)
+      try { ensureMetaCookies(); } catch { /* noop */ }
+
       state.initialized = true;
       state.isPreviewMode = detectGTMPreviewMode();
       
@@ -148,9 +152,22 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
     pushToDataLayerWithEventId(payload: Record<string, unknown> & { event: string }) {
       state.eventCount++;
       
+      // Build Meta user_data (fbp/fbc) without relying on GTM ParamBuilder
+      let userData: Record<string, unknown> | undefined;
+      try {
+        const metaUserData = getMetaUserData();
+        if (metaUserData && Object.keys(metaUserData).length > 0) {
+          userData = metaUserData;
+        }
+      } catch {
+        // ignore
+      }
+
       const enhancedPayload = normalizeEventPayload({
         ...payload,
         event_id: generateEventId(payload.event),
+        // Attach user_data if not explicitly provided by caller
+        ...(userData && !('user_data' in payload) ? { user_data: userData } : {}),
         timestamp: new Date().toISOString(),
         debug_info: debug ? {
           event_count: state.eventCount,

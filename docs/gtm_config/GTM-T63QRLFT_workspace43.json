@@ -1,6 +1,6 @@
 {
     "exportFormatVersion": 2,
-    "exportTime": "2025-09-12 17:09:16",
+    "exportTime": "2025-09-15 14:59:20",
     "containerVersion": {
         "path": "accounts/6308553599/containers/227494781/versions/0",
         "accountId": "6308553599",
@@ -170,7 +170,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{JS – First UTM Source}}"
+                                        "value": "{{Cookie – First UTM Source}}"
                                     }
                                 ]
                             },
@@ -185,7 +185,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{JS – First UTM Campaign}}"
+                                        "value": "{{Cookie – First UTM Campaign}}"
                                     }
                                 ]
                             },
@@ -200,7 +200,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{JS – First Landing Page}}"
+                                        "value": "{{Cookie – First Landing Page}}"
                                     }
                                 ]
                             }
@@ -222,7 +222,7 @@
                         "value": "{{ESV - GA4 Event defaults}}"
                     }
                 ],
-                "fingerprint": "1757606958742",
+                "fingerprint": "1757786558634",
                 "firingTriggerId": [
                     "9"
                 ],
@@ -306,7 +306,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{JS – First UTM Source}}"
+                                        "value": "{{Cookie – First UTM Source}}"
                                     }
                                 ]
                             },
@@ -321,7 +321,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{JS – First UTM Campaign}}"
+                                        "value": "{{Cookie – First UTM Campaign}}"
                                     }
                                 ]
                             },
@@ -336,7 +336,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{JS – First Landing Page}}"
+                                        "value": "{{Cookie – First Landing Page}}"
                                     }
                                 ]
                             }
@@ -358,7 +358,7 @@
                         "value": "{{ESV - GA4 Event defaults}}"
                     }
                 ],
-                "fingerprint": "1757607014158",
+                "fingerprint": "1757786607663",
                 "firingTriggerId": [
                     "38"
                 ],
@@ -427,7 +427,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{JS – Source Section Fallback}}"
+                                        "value": "{{DL - Source Section}}"
                                     }
                                 ]
                             },
@@ -494,7 +494,7 @@
                         "value": "{{ESV - GA4 Event defaults}}"
                     }
                 ],
-                "fingerprint": "1757694305422",
+                "fingerprint": "1757936947298",
                 "firingTriggerId": [
                     "56"
                 ],
@@ -539,97 +539,6 @@
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
-                "tagId": "71",
-                "name": "GA4 Event – Scroll",
-                "type": "gaawe",
-                "parameter": [
-                    {
-                        "type": "BOOLEAN",
-                        "key": "sendEcommerceData",
-                        "value": "false"
-                    },
-                    {
-                        "type": "LIST",
-                        "key": "eventSettingsTable",
-                        "list": [
-                            {
-                                "type": "MAP",
-                                "map": [
-                                    {
-                                        "type": "TEMPLATE",
-                                        "key": "parameter",
-                                        "value": "percent_scrolled"
-                                    },
-                                    {
-                                        "type": "TEMPLATE",
-                                        "key": "parameterValue",
-                                        "value": "{{Scroll Depth Threshold}}"
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "MAP",
-                                "map": [
-                                    {
-                                        "type": "TEMPLATE",
-                                        "key": "parameter",
-                                        "value": "scroll_units"
-                                    },
-                                    {
-                                        "type": "TEMPLATE",
-                                        "key": "parameterValue",
-                                        "value": "{{Scroll Depth Units}}"
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "MAP",
-                                "map": [
-                                    {
-                                        "type": "TEMPLATE",
-                                        "key": "parameter",
-                                        "value": "scroll_direction"
-                                    },
-                                    {
-                                        "type": "TEMPLATE",
-                                        "key": "parameterValue",
-                                        "value": "{{Scroll Direction}}"
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "type": "TEMPLATE",
-                        "key": "eventName",
-                        "value": "scroll"
-                    },
-                    {
-                        "type": "TEMPLATE",
-                        "key": "measurementIdOverride",
-                        "value": "{{GA4 - Café com Vendas Portugal}}"
-                    },
-                    {
-                        "type": "TEMPLATE",
-                        "key": "eventSettingsVariable",
-                        "value": "{{ESV - GA4 Event defaults}}"
-                    }
-                ],
-                "fingerprint": "1755601145280",
-                "firingTriggerId": [
-                    "67"
-                ],
-                "tagFiringOption": "ONCE_PER_EVENT",
-                "monitoringMetadata": {
-                    "type": "MAP"
-                },
-                "consentSettings": {
-                    "consentStatus": "NOT_SET"
-                }
-            },
-            {
-                "accountId": "6308553599",
-                "containerId": "227494781",
                 "tagId": "79",
                 "name": "GA4 Event – FAQ Toggle",
                 "type": "gaawe",
@@ -654,7 +563,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – FAQ Action}}"
+                                        "value": "{{DL - FAQ Action}}"
                                     }
                                 ]
                             },
@@ -669,7 +578,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – FAQ Question}}"
+                                        "value": "{{DL - FAQ Question}}"
                                     }
                                 ]
                             }
@@ -745,22 +654,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Toggle Count}}"
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "MAP",
-                                "map": [
-                                    {
-                                        "type": "TEMPLATE",
-                                        "key": "parameter",
-                                        "value": "event_id"
-                                    },
-                                    {
-                                        "type": "TEMPLATE",
-                                        "key": "parameterValue",
-                                        "value": "{{DL - Event ID}}"
+                                        "value": "{{DL - Toggle Count}}"
                                     }
                                 ]
                             }
@@ -782,7 +676,7 @@
                         "value": "{{ESV - GA4 Event defaults}}"
                     }
                 ],
-                "fingerprint": "1757597484198",
+                "fingerprint": "1757710284159",
                 "firingTriggerId": [
                     "40"
                 ],
@@ -821,7 +715,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Testimonial ID}}"
+                                        "value": "{{DL - Testimonial ID}}"
                                     }
                                 ]
                             },
@@ -836,7 +730,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Testimonial Position}}"
+                                        "value": "{{DL - Testimonial Position}}"
                                     }
                                 ]
                             }
@@ -873,67 +767,6 @@
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
-                "tagId": "83",
-                "name": "GA4 Event – View Testimonials Section",
-                "type": "gaawe",
-                "parameter": [
-                    {
-                        "type": "BOOLEAN",
-                        "key": "sendEcommerceData",
-                        "value": "false"
-                    },
-                    {
-                        "type": "LIST",
-                        "key": "eventSettingsTable",
-                        "list": [
-                            {
-                                "type": "MAP",
-                                "map": [
-                                    {
-                                        "type": "TEMPLATE",
-                                        "key": "parameter",
-                                        "value": "section"
-                                    },
-                                    {
-                                        "type": "TEMPLATE",
-                                        "key": "parameterValue",
-                                        "value": "testimonials"
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "type": "TEMPLATE",
-                        "key": "eventName",
-                        "value": "section_view"
-                    },
-                    {
-                        "type": "TEMPLATE",
-                        "key": "measurementIdOverride",
-                        "value": "{{GA4 - Café com Vendas Portugal}}"
-                    },
-                    {
-                        "type": "TEMPLATE",
-                        "key": "eventSettingsVariable",
-                        "value": "{{ESV - GA4 Event defaults}}"
-                    }
-                ],
-                "fingerprint": "1757597539827",
-                "firingTriggerId": [
-                    "41"
-                ],
-                "tagFiringOption": "ONCE_PER_EVENT",
-                "monitoringMetadata": {
-                    "type": "MAP"
-                },
-                "consentSettings": {
-                    "consentStatus": "NOT_SET"
-                }
-            },
-            {
-                "accountId": "6308553599",
-                "containerId": "227494781",
                 "tagId": "86",
                 "name": "GA4 Event - Add Payment Info",
                 "type": "gaawe",
@@ -958,7 +791,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Payment Method}}"
+                                        "value": "{{DL - Payment Method}}"
                                     }
                                 ]
                             },
@@ -1064,7 +897,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Event Type}}"
+                                        "value": "{{DL - Event Type}}"
                                     }
                                 ]
                             },
@@ -1079,7 +912,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Payment Method}}"
+                                        "value": "{{DL - Payment Method}}"
                                     }
                                 ]
                             },
@@ -1094,7 +927,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Failure Reason}}"
+                                        "value": "{{DL - Failure Reason}}"
                                     }
                                 ]
                             },
@@ -1109,7 +942,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Voucher Status}}"
+                                        "value": "{{DL - Voucher Status}}"
                                     }
                                 ]
                             },
@@ -1154,7 +987,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Failure Source}}"
+                                        "value": "{{DL - Failure Source}}"
                                     }
                                 ]
                             }
@@ -1215,7 +1048,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Funnel Step}}"
+                                        "value": "{{DL - Funnel Step}}"
                                     }
                                 ]
                             },
@@ -1230,7 +1063,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Payment Method}}"
+                                        "value": "{{DL - Payment Method}}"
                                     }
                                 ]
                             },
@@ -1245,7 +1078,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Failure Reason}}"
+                                        "value": "{{DL - Failure Reason}}"
                                     }
                                 ]
                             },
@@ -1260,7 +1093,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Voucher Status}}"
+                                        "value": "{{DL - Voucher Status}}"
                                     }
                                 ]
                             },
@@ -1275,7 +1108,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Failure Source}}"
+                                        "value": "{{DL - Failure Source}}"
                                     }
                                 ]
                             }
@@ -1336,7 +1169,7 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Video Title}}"
+                                        "value": "{{DL - Video Title}}"
                                     }
                                 ]
                             },
@@ -1351,7 +1184,22 @@
                                     {
                                         "type": "TEMPLATE",
                                         "key": "parameterValue",
-                                        "value": "{{DL – Video Percent Played}}"
+                                        "value": "{{DL - Video Percent Played}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "video_id"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{DL - Video ID}}"
                                     }
                                 ]
                             }
@@ -1373,9 +1221,9 @@
                         "value": "{{ESV - GA4 Event defaults}}"
                     }
                 ],
-                "fingerprint": "1757599718544",
+                "fingerprint": "1757703306613",
                 "firingTriggerId": [
-                    "98"
+                    "122"
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -1654,6 +1502,395 @@
                 "monitoringMetadata": {
                     "type": "MAP"
                 },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "tagId": "120",
+                "name": "GA4 Event – Video Play",
+                "type": "gaawe",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "sendEcommerceData",
+                        "value": "false"
+                    },
+                    {
+                        "type": "LIST",
+                        "key": "eventSettingsTable",
+                        "list": [
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "video_title"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{DL - Video Title}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "video_id"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{DL - Video ID}}"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventName",
+                        "value": "video_play"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "measurementIdOverride",
+                        "value": "{{GA4 - Café com Vendas Portugal}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventSettingsVariable",
+                        "value": "{{ESV - GA4 Event defaults}}"
+                    }
+                ],
+                "fingerprint": "1757703108502",
+                "firingTriggerId": [
+                    "98"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "tagId": "133",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Tag-GA4_Config",
+                "type": "googtag",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "tagId",
+                        "value": "G-T06WRKJGRW"
+                    },
+                    {
+                        "type": "LIST",
+                        "key": "configSettingsTable",
+                        "list": [
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "transport_url"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "https://server-side-tagging-m5scdmswwq-uc.a.run.app"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "send_page_view"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1757931996822",
+                "firingTriggerId": [
+                    "123"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "tagId": "134",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Tag-GA4_Event",
+                "type": "gaawe",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "sendEcommerceData",
+                        "value": "false"
+                    },
+                    {
+                        "type": "LIST",
+                        "key": "eventSettingsTable",
+                        "list": [
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "user_data"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{FB_CONVERSIONS_API-1684031192269636-Web-Variable-User_Data}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "currency"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{DL - Currency}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "items"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{DL - Items}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "transaction_id"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Transaction_ID}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "value"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{DL - Value}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "event_id"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{DL - Event ID}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "event_name"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{FB_CONVERSIONS_API-1684031192269636-Web-Variable-FBEventName}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "first_party_collection"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventName",
+                        "value": "{{Event}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "measurementIdOverride",
+                        "value": "G-T06WRKJGRW"
+                    }
+                ],
+                "fingerprint": "1757938512928",
+                "firingTriggerId": [
+                    "123",
+                    "124"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "tagId": "135",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Tag-Pixel_Event",
+                "type": "html",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "html",
+                        "value": "\n<script>\n  fbq('track', {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-FBEventName}},\n    {\n      'currency': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Currency}},\n      'contents': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Items}},\n      'order_id': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Transaction_ID}},\n      'value': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Value}},\n    },\n    {\n      'eventID': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Event_ID_Constant}},\n    }\n  );\n</script>"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "supportDocumentWrite",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1757940200727",
+                "firingTriggerId": [
+                    "124"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "FB_CONVERSIONS_API-1684031192269636-Web-Tag-Pixel_Setup"
+                    }
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "tagId": "136",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Tag-Pixel_Setup",
+                "type": "html",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "html",
+                        "value": "<!-- Facebook Pixel Code -->\n<script nonce=\"EYhQ1F3f\">\n!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?\nn.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;\nn.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;\nt.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,\ndocument,'script','https://connect.facebook.net/en_US/fbevents.js');\n\nfbq('init', '1684031192269636');\nfbq('set', 'agent', 'gtmss', '1684031192269636');\n\n</script>\n<noscript><img height=\"1\" width=\"1\" style=\"display:none\"\nsrc=\"https://www.facebook.com/tr?id=1684031192269636&ev=PageView&noscript=1\"\n/></noscript>\n<!-- End Facebook Pixel Code -->"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "supportDocumentWrite",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1757942379306",
+                "firingTriggerId": [
+                    "123"
+                ],
+                "tagFiringOption": "ONCE_PER_LOAD",
+                "monitoringMetadata": {
+                    "type": "MAP"
+                },
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "tagId": "137",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Tag-ParamBuilder",
+                "type": "html",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "html",
+                        "value": "\n<script\n  src=\"https://capi-automation.s3.us-east-2.amazonaws.com/public/client_js/capiParamBuilder/clientParamBuilder.bundle.js\">\n</script>\n<script>\n  clientParamBuilder.processAndCollectAllParams();\n</script>"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "supportDocumentWrite",
+                        "value": "false"
+                    }
+                ],
+                "fingerprint": "1757937589027",
+                "firingTriggerId": [
+                    "123"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "paused": true,
                 "consentSettings": {
                     "consentStatus": "NOT_SET"
                 }
@@ -2126,7 +2363,7 @@
                             {
                                 "type": "TEMPLATE",
                                 "key": "arg0",
-                                "value": "{{DL – Payment Method}}"
+                                "value": "{{DL - Payment Method}}"
                             },
                             {
                                 "type": "TEMPLATE",
@@ -2287,6 +2524,81 @@
                     }
                 ],
                 "fingerprint": "1757694166044"
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "triggerId": "122",
+                "name": "Video Progress",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [
+                    {
+                        "type": "EQUALS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{_event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "video_progress"
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1757703234404"
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "triggerId": "123",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Trigger-DOM_Ready",
+                "type": "DOM_READY",
+                "fingerprint": "1757931981273"
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "triggerId": "124",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Trigger-Custom_Event",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [
+                    {
+                        "type": "MATCH_REGEX",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{_event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": ".+"
+                            }
+                        ]
+                    }
+                ],
+                "filter": [
+                    {
+                        "type": "MATCH_REGEX",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{Event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "^(checkout_opened|add_payment_info|purchase_completed|lead_form_submitted|whatsapp_click|page_view)$"
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1757938054424"
             }
         ],
         "variable": [
@@ -2699,7 +3011,7 @@
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "variableId": "72",
-                "name": "DL – FAQ Action",
+                "name": "DL - FAQ Action",
                 "type": "v",
                 "parameter": [
                     {
@@ -2718,14 +3030,14 @@
                         "value": "action"
                     }
                 ],
-                "fingerprint": "1755601749020",
+                "fingerprint": "1757702989531",
                 "formatValue": {}
             },
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "variableId": "73",
-                "name": "DL – FAQ Question",
+                "name": "DL - FAQ Question",
                 "type": "v",
                 "parameter": [
                     {
@@ -2744,14 +3056,14 @@
                         "value": "question"
                     }
                 ],
-                "fingerprint": "1755601763596",
+                "fingerprint": "1757702995903",
                 "formatValue": {}
             },
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "variableId": "74",
-                "name": "DL – Video Title",
+                "name": "DL - Video Title",
                 "type": "v",
                 "parameter": [
                     {
@@ -2770,14 +3082,14 @@
                         "value": "video_title"
                     }
                 ],
-                "fingerprint": "1755601784500",
+                "fingerprint": "1757703051449",
                 "formatValue": {}
             },
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "variableId": "75",
-                "name": "DL – Video Percent Played",
+                "name": "DL - Video Percent Played",
                 "type": "v",
                 "parameter": [
                     {
@@ -2796,14 +3108,14 @@
                         "value": "percent_played"
                     }
                 ],
-                "fingerprint": "1755601809697",
+                "fingerprint": "1757703044862",
                 "formatValue": {}
             },
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "variableId": "76",
-                "name": "DL – Testimonial ID",
+                "name": "DL - Testimonial ID",
                 "type": "v",
                 "parameter": [
                     {
@@ -2822,14 +3134,14 @@
                         "value": "testimonial_id"
                     }
                 ],
-                "fingerprint": "1755601837265",
+                "fingerprint": "1757703015913",
                 "formatValue": {}
             },
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "variableId": "77",
-                "name": "DL – Testimonial Position",
+                "name": "DL - Testimonial Position",
                 "type": "v",
                 "parameter": [
                     {
@@ -2848,14 +3160,14 @@
                         "value": "position"
                     }
                 ],
-                "fingerprint": "1755601865029",
+                "fingerprint": "1757703025310",
                 "formatValue": {}
             },
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "variableId": "84",
-                "name": "DL – Toggle Count",
+                "name": "DL - Toggle Count",
                 "type": "v",
                 "parameter": [
                     {
@@ -2874,7 +3186,7 @@
                         "value": "toggle_count"
                     }
                 ],
-                "fingerprint": "1755602836946",
+                "fingerprint": "1757703037819",
                 "formatValue": {}
             },
             {
@@ -2897,7 +3209,7 @@
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "variableId": "87",
-                "name": "DL – Payment Method",
+                "name": "DL - Payment Method",
                 "type": "v",
                 "parameter": [
                     {
@@ -2916,14 +3228,14 @@
                         "value": "payment_type"
                     }
                 ],
-                "fingerprint": "1757441151738",
+                "fingerprint": "1757703007944",
                 "formatValue": {}
             },
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "variableId": "89",
-                "name": "DL – Event Type",
+                "name": "DL - Event Type",
                 "type": "v",
                 "parameter": [
                     {
@@ -2942,14 +3254,14 @@
                         "value": "event_type"
                     }
                 ],
-                "fingerprint": "1757597686911",
+                "fingerprint": "1757702969203",
                 "formatValue": {}
             },
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "variableId": "90",
-                "name": "DL – Funnel Step",
+                "name": "DL - Funnel Step",
                 "type": "v",
                 "parameter": [
                     {
@@ -2968,14 +3280,14 @@
                         "value": "funnel_step"
                     }
                 ],
-                "fingerprint": "1757597708162",
+                "fingerprint": "1757703001512",
                 "formatValue": {}
             },
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "variableId": "91",
-                "name": "DL – Failure Reason",
+                "name": "DL - Failure Reason",
                 "type": "v",
                 "parameter": [
                     {
@@ -2994,14 +3306,14 @@
                         "value": "failure_reason"
                     }
                 ],
-                "fingerprint": "1757597733557",
+                "fingerprint": "1757702976345",
                 "formatValue": {}
             },
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "variableId": "92",
-                "name": "DL – Voucher Status",
+                "name": "DL - Voucher Status",
                 "type": "v",
                 "parameter": [
                     {
@@ -3020,14 +3332,14 @@
                         "value": "voucher_status"
                     }
                 ],
-                "fingerprint": "1757597763953",
+                "fingerprint": "1757703057602",
                 "formatValue": {}
             },
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "variableId": "93",
-                "name": "DL – Failure Source",
+                "name": "DL - Failure Source",
                 "type": "v",
                 "parameter": [
                     {
@@ -3046,7 +3358,7 @@
                         "value": "failure_source"
                     }
                 ],
-                "fingerprint": "1757597786181",
+                "fingerprint": "1757702982982",
                 "formatValue": {}
             },
             {
@@ -3245,56 +3557,8 @@
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
-                "variableId": "113",
-                "name": "JS – First UTM Source",
-                "type": "jsm",
-                "parameter": [
-                    {
-                        "type": "TEMPLATE",
-                        "key": "javascript",
-                        "value": "function() {\n  var v = {{Cookie – First UTM Source}};\n  if (v) return v;\n  try { v = localStorage.getItem('first_utm_source'); } catch (e) {}\n  return v || '(direct)';\n}"
-                    }
-                ],
-                "fingerprint": "1757692829906",
-                "formatValue": {}
-            },
-            {
-                "accountId": "6308553599",
-                "containerId": "227494781",
-                "variableId": "114",
-                "name": "JS – First UTM Campaign",
-                "type": "jsm",
-                "parameter": [
-                    {
-                        "type": "TEMPLATE",
-                        "key": "javascript",
-                        "value": "function() {\n  var v = {{Cookie – First UTM Campaign}};\n  if (v) return v;\n  try { v = localStorage.getItem('first_utm_campaign'); } catch (e) {}\n  return v || '(none)';\n}\n"
-                    }
-                ],
-                "fingerprint": "1757691095388",
-                "formatValue": {}
-            },
-            {
-                "accountId": "6308553599",
-                "containerId": "227494781",
-                "variableId": "115",
-                "name": "JS – First Landing Page",
-                "type": "jsm",
-                "parameter": [
-                    {
-                        "type": "TEMPLATE",
-                        "key": "javascript",
-                        "value": "function() {\n  var v = {{Cookie – First Landing Page}};\n  if (v) return v;\n  try { v = localStorage.getItem('first_landing_page'); } catch (e) {}\n  return v || '/';\n}\n"
-                    }
-                ],
-                "fingerprint": "1757691071956",
-                "formatValue": {}
-            },
-            {
-                "accountId": "6308553599",
-                "containerId": "227494781",
                 "variableId": "116",
-                "name": "DL – Blocked Tx",
+                "name": "DL - Blocked Tx",
                 "type": "v",
                 "parameter": [
                     {
@@ -3313,23 +3577,432 @@
                         "value": "tx"
                     }
                 ],
-                "fingerprint": "1757608751178",
+                "fingerprint": "1757702962831",
                 "formatValue": {}
             },
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
-                "variableId": "119",
-                "name": "JS – Source Section Fallback",
-                "type": "jsm",
+                "variableId": "121",
+                "name": "DL - Video ID",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "video_id"
+                    }
+                ],
+                "fingerprint": "1757702918363",
+                "formatValue": {}
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "variableId": "125",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Currency",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "eventModel.currency"
+                    }
+                ],
+                "fingerprint": "1757931987173"
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "variableId": "126",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Items",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "eventModel.items"
+                    }
+                ],
+                "fingerprint": "1757931987440"
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "variableId": "127",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Transaction_ID",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "eventModel.transaction_id"
+                    }
+                ],
+                "fingerprint": "1757931987641"
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "variableId": "128",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Value",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "eventModel.value"
+                    }
+                ],
+                "fingerprint": "1757931988142"
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "variableId": "130",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Variable-Event_ID_Constant",
+                "type": "c",
                 "parameter": [
                     {
                         "type": "TEMPLATE",
-                        "key": "javascript",
-                        "value": "   function(){\n     var s = {{DL - Source Section}};\n     if (s) return s;\n     try { return location.pathname || '/'; } catch(e) {}\n     return '/';\n   }"
+                        "key": "value",
+                        "value": "18c60bad-c072-4290-a8a3-3fbbefd6ae23_{{DL - Event ID}}"
                     }
                 ],
-                "fingerprint": "1757694261613",
+                "fingerprint": "1757939952271",
+                "formatValue": {}
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "variableId": "131",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Variable-FBEventName",
+                "type": "smm",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "true"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "input",
+                        "value": "{{Event}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "defaultValue",
+                        "value": "{{Event}}"
+                    },
+                    {
+                        "type": "LIST",
+                        "key": "map",
+                        "list": [
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "add_payment_info"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "AddPaymentInfo"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "add_to_cart"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "AddToCart"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "add_to_wishlist"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "AddToWishlist"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "begin_checkout"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "InitiateCheckout"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "generate_lead"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "Lead"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "gtm.dom"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "PageView"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "page_view"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "PageView"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "purchase"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "Purchase"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "search"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "Search"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "sign_up"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "CompleteRegistration"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "view_item"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "ViewContent"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "checkout_opened"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "InitiateCheckout"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "purchase_completed"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "Purchase"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "lead_form_submitted"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "Lead"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "whatsapp_click"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "Contact"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1757937250740",
+                "formatValue": {}
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "variableId": "132",
+                "name": "FB_CONVERSIONS_API-1684031192269636-Web-Variable-User_Data",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "eventModel.user_data"
+                    }
+                ],
+                "fingerprint": "1757931990485"
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "variableId": "138",
+                "name": "DL - Meta Event ID",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "eventModel.event_id"
+                    }
+                ],
+                "fingerprint": "1757939966671",
                 "formatValue": {}
             }
         ],
@@ -3367,6 +4040,12 @@
             {
                 "accountId": "6308553599",
                 "containerId": "227494781",
+                "type": "CONTAINER_ID",
+                "name": "Container ID"
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
                 "type": "SCROLL_DEPTH_THRESHOLD",
                 "name": "Scroll Depth Threshold"
             },
@@ -3383,7 +4062,7 @@
                 "name": "Scroll Direction"
             }
         ],
-        "fingerprint": "1757696956285",
+        "fingerprint": "1757948360547",
         "tagManagerUrl": "https://tagmanager.google.com/#/versions/accounts/6308553599/containers/227494781/versions/0?apiLink=version"
     }
 }
