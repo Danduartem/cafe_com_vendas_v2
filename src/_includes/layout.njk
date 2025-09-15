@@ -49,9 +49,9 @@
     <meta property="twitter:description" content="Chega de usar o burnout como medalha de honra. Evento para empreendedoras em Portugal.">
     
     <!-- JSON-LD Schema (inline for SEO) -->
-    <script type="application/ld+json">
-      {{ site.presenter.schema | json | safe }}
-    </script>
+    {% if site.presenter and site.presenter.schema %}
+      <script type="application/ld+json">{{ site.presenter.schema | json | safe }}</script>
+    {% endif %}
     
     <!-- Critical CSS inlined for fastest render -->
     <style>

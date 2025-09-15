@@ -353,6 +353,8 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
         link_url: linkUrl,
         link_text: linkText,
         location,
+        // Align with GTM variable naming to avoid JS fallback variables
+        source_section: location,
         ...data
       });
 

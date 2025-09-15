@@ -127,7 +127,7 @@
         </div>
       </div>
     </section>
-    {# Schema Markup for Person #}
-    <script type="application/ld+json">
-      {{ currentSection.schema | dump | safe }}
-    </script>
+    {# Schema Markup for Person (render only when valid) #}
+    {% if currentSection and currentSection.schema %}
+      <script type="application/ld+json">{{ currentSection.schema | json | safe }}</script>
+    {% endif %}
