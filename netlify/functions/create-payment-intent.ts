@@ -425,6 +425,10 @@ export default async (request: Request): Promise<Response> => {
       screen_resolution: requestBody.screen_resolution as string || undefined,
       timezone: requestBody.timezone as string || undefined,
       
+      // Meta identifiers for enhanced matching (forwarded from web)
+      fbp: (requestBody as { fbp?: string }).fbp,
+      fbc: (requestBody as { fbc?: string }).fbc,
+      
       // Server-side attribution context (Phase 2)
       server_attribution_enabled: 'true',
       client_ip_country: requestBody.client_ip_country as string || undefined,

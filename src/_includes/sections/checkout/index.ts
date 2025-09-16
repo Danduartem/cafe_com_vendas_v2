@@ -38,6 +38,8 @@ import {
   getEventData
 } from '../../../utils/event-tracking.js';
 import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
+import { getMetaUserData } from '../../../analytics/utils/meta-ids.js';
+import { buildHashedUserData } from '../../../analytics/utils/pii-hash.js';
 
 // 🎯 Get centralized pricing data - SINGLE SOURCE OF TRUTH
 const site = siteData();
@@ -1011,15 +1013,26 @@ export const Checkout: CheckoutSectionComponent = {
 
       // Track lead conversion (GTM production event + test alias)
       try {
+        // Build Meta user_data with fbp/fbc always; add hashed PII only with consent
+        const metaIds = getMetaUserData();
+        const userData: Record<string, string> = { ...metaIds } as Record<string, string>;
+        if (completeEventData.consent.marketing_consent) {
+          const hashed = await buildHashedUserData(leadData.email, `${leadData.countryCode}${leadData.phone}`);
+          if (hashed.em) userData.em = hashed.em;
+          if (hashed.ph) userData.ph = hashed.ph;
+        }
+
         AnalyticsHelpers.trackConversion('lead_form_submitted', {
           lead_id: this.leadId,
           form_location: 'checkout_modal',
-          pricing_tier: 'early_bird'
+          pricing_tier: 'early_bird',
+          user_data: userData
         });
         // GA4 recommended: generate_lead
         AnalyticsHelpers.trackConversion('generate_lead', {
           lead_id: this.leadId,
-          form_location: 'checkout_modal'
+          form_location: 'checkout_modal',
+          user_data: userData
         });
         analytics.track('form_submission', {
           section: 'checkout',
@@ -1966,6 +1979,13 @@ export const Checkout: CheckoutSectionComponent = {
           user_agent_hash: undefined, // Will be generated server-side
           ip_address_hash: undefined // Will be generated server-side
         };
+
+        // Attach Meta browser identifiers to support server-side matching (CAPI)
+        try {
+          const metaIds = getMetaUserData();
+          if (metaIds.fbp) (requestPayload as Record<string, unknown>).fbp = metaIds.fbp;
+          if (metaIds.fbc) (requestPayload as Record<string, unknown>).fbc = metaIds.fbc;
+        } catch { /* noop */ }
 
         // Prepare headers with proper type handling
         const headers: Record<string, string> = {

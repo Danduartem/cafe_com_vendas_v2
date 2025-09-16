@@ -692,6 +692,12 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
 
       // Hash PII data for enhanced attribution
       const hashedUserData = hashPIIData(piiData);
+      // Enrich with fbp/fbc from PI metadata for higher match quality
+      const hashedUserDataWithIds = {
+        ...hashedUserData,
+        ...(metadata.fbp ? { fbp: metadata.fbp } : {}),
+        ...(metadata.fbc ? { fbc: metadata.fbc } : {})
+      } as Record<string, string>;
 
       // Build GA4 purchase event data
       const purchaseEventData = {
@@ -729,7 +735,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
         term: utm_term || undefined,
         
         // Hashed user data for privacy compliance
-        user_data: hashedUserData,
+        user_data: hashedUserDataWithIds,
         
         // Custom parameters for enhanced tracking
         custom_parameters: {

@@ -200,6 +200,10 @@ export interface EnhancedStripeMetadata {
   acquisition_channel?: string;
   conversion_path_length?: string;
   checkout_flow_version?: string;
+
+  // Meta identifiers for CAPI matching (propagated from web)
+  fbp?: string;
+  fbc?: string;
 }
 
 /**
