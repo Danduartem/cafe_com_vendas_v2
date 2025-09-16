@@ -1812,7 +1812,7 @@
                     {
                         "type": "TEMPLATE",
                         "key": "html",
-                        "value": "\n<script>\n  fbq('track', {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-FBEventName}},\n    {\n      'currency': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Currency}},\n      'contents': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Items}},\n      'order_id': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Transaction_ID}},\n      'value': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Value}},\n    },\n    {\n      'eventID': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Event_ID_Constant}},\n    }\n  );\n</script>"
+                        "value": "\n<script>\n  (function(){\n    var ev = {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-FBEventName}};\n    var params = {\n      'currency': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Currency}},\n      'contents': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Items}},\n      'order_id': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Transaction_ID}},\n      'value': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Value}}\n    };\n    try {\n      var pct = {{Scroll Depth Threshold}};\n      var unt = {{Scroll Depth Units}};\n      if (pct !== undefined && pct !== '' && pct !== 0) {\n        params.percent = pct;\n        if (unt) { params.units = unt; }\n      }\n    } catch(e) {}\n    var options = { 'eventID': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Event_ID_Constant}} };\n    var standard = {\n      'AddPaymentInfo':1,'AddToCart':1,'AddToWishlist':1,'InitiateCheckout':1,\n      'Lead':1,'PageView':1,'Purchase':1,'Search':1,'CompleteRegistration':1,\n      'ViewContent':1,'Contact':1\n    };\n    var method = standard[ev] ? 'track' : 'trackCustom';\n    fbq(method, ev, params, options);\n  })();\n</script>"
                     },
                     {
                         "type": "BOOLEAN",
@@ -1822,7 +1822,8 @@
                 ],
                 "fingerprint": "1757940200727",
                 "firingTriggerId": [
-                    "124"
+                    "124",
+                    "67"
                 ],
                 "setupTag": [
                     {
@@ -3950,6 +3951,21 @@
                                         "type": "TEMPLATE",
                                         "key": "value",
                                         "value": "Contact"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "gtm.scrollDepth"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "ScrollDepth"
                                     }
                                 ]
                             }
