@@ -88,6 +88,34 @@ export function ensureMetaCookies(): void {
 }
 
 /**
+ * Ensure first-touch UTM cookies exist so GTM Cookie variables can read them.
+ * Names align with GTM variables: first_utm_source, first_utm_campaign, first_utm_medium, first_landing_page.
+ */
+export function ensureUtmCookies(): void {
+  try {
+    const params = new URLSearchParams(location.search);
+    const hasUtm = params.has('utm_source') || params.has('utm_campaign') || params.has('utm_medium');
+    // Only set on first touch and when UTMs present
+    if (!hasUtm) return;
+
+    const existing = {
+      src: getCookie('first_utm_source'),
+      camp: getCookie('first_utm_campaign'),
+      med: getCookie('first_utm_medium'),
+      lp: getCookie('first_landing_page')
+    };
+
+    const maxAge = 180 * 24 * 60 * 60; // 180 days
+    if (!existing.src && params.get('utm_source')) setCookie('first_utm_source', params.get('utm_source') || '', maxAge);
+    if (!existing.camp && params.get('utm_campaign')) setCookie('first_utm_campaign', params.get('utm_campaign') || '', maxAge);
+    if (!existing.med && params.get('utm_medium')) setCookie('first_utm_medium', params.get('utm_medium') || '', maxAge);
+    if (!existing.lp) setCookie('first_landing_page', location.pathname + location.search, maxAge);
+  } catch {
+    // ignore
+  }
+}
+
+/**
  * Build user_data payload for Meta Conversions API mapping downstream
  * Only includes non-empty values.
  */
@@ -102,5 +130,6 @@ export function getMetaUserData(): Record<string, string> {
 
 export default {
   ensureMetaCookies,
+  ensureUtmCookies,
   getMetaUserData
 };

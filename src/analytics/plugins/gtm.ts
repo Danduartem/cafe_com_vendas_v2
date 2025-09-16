@@ -4,7 +4,7 @@
  */
 
 import { normalizeEventPayload } from '../../assets/js/utils/gtm-normalizer.js';
-import { ensureMetaCookies, getMetaUserData } from '../utils/meta-ids.js';
+import { ensureMetaCookies, ensureUtmCookies, getMetaUserData } from '../utils/meta-ids.js';
 import { pluginDebugLog } from '../utils/debug.js';
 import type { PluginFactory, GTMEventPayload } from '../types/index.js';
 
@@ -75,7 +75,11 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
         (window as unknown as { dataLayer?: unknown[] }).dataLayer || [];
 
       // Ensure Meta cookies early (CSP-safe, no external scripts)
-      try { ensureMetaCookies(); } catch { /* noop */ }
+      try { 
+        ensureMetaCookies();
+        // Ensure first-touch UTM cookies so GTM Cookie variables resolve
+        ensureUtmCookies();
+      } catch { /* noop */ }
 
       state.initialized = true;
       state.isPreviewMode = detectGTMPreviewMode();

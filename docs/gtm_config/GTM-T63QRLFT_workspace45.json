@@ -1,6 +1,6 @@
 {
     "exportFormatVersion": 2,
-    "exportTime": "2025-09-15 14:59:20",
+    "exportTime": "2025-09-16 10:48:57",
     "containerVersion": {
         "path": "accounts/6308553599/containers/227494781/versions/0",
         "accountId": "6308553599",
@@ -1812,7 +1812,7 @@
                     {
                         "type": "TEMPLATE",
                         "key": "html",
-                        "value": "\n<script>\n  (function(){\n    var ev = {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-FBEventName}};\n    var params = {\n      'currency': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Currency}},\n      'contents': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Items}},\n      'order_id': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Transaction_ID}},\n      'value': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Value}}\n    };\n    try {\n      var pct = {{Scroll Depth Threshold}};\n      var unt = {{Scroll Depth Units}};\n      if (pct !== undefined && pct !== '' && pct !== 0) {\n        params.percent = pct;\n        if (unt) { params.units = unt; }\n      }\n    } catch(e) {}\n    var options = { 'eventID': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Event_ID_Constant}} };\n    var standard = {\n      'AddPaymentInfo':1,'AddToCart':1,'AddToWishlist':1,'InitiateCheckout':1,\n      'Lead':1,'PageView':1,'Purchase':1,'Search':1,'CompleteRegistration':1,\n      'ViewContent':1,'Contact':1\n    };\n    var method = standard[ev] ? 'track' : 'trackCustom';\n    fbq(method, ev, params, options);\n  })();\n</script>"
+                        "value": "<script>\n  (function(){\n    var ev = {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-FBEventName}};\n    var params = {\n      'currency': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Currency}},\n      'contents': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Items}},\n      'order_id': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Transaction_ID}},\n      'value': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Custom_Data_Value}}\n    };\n    try {\n      var pct = {{Scroll Depth Threshold}};\n      var unt = {{Scroll Depth Units}};\n      if (pct !== undefined && pct !== '' && pct !== 0) {\n        params.percent = pct;\n        if (unt) { params.units = unt; }\n      }\n    } catch(e) {}\n    var options = { 'eventID': {{FB_CONVERSIONS_API-1684031192269636-Web-Variable-Event_ID_Constant}} };\n    var standard = {\n      'AddPaymentInfo':1,'AddToCart':1,'AddToWishlist':1,'InitiateCheckout':1,\n      'Lead':1,'PageView':1,'Purchase':1,'Search':1,'CompleteRegistration':1,\n      'ViewContent':1,'Contact':1\n    };\n    var method = standard[ev] ? 'track' : 'trackCustom';\n    fbq(method, ev, params, options);\n  })();\n  </script>\n"
                     },
                     {
                         "type": "BOOLEAN",
@@ -1820,7 +1820,7 @@
                         "value": "false"
                     }
                 ],
-                "fingerprint": "1757940200727",
+                "fingerprint": "1758019562542",
                 "firingTriggerId": [
                     "124",
                     "67"
@@ -1856,9 +1856,9 @@
                         "value": "false"
                     }
                 ],
-                "fingerprint": "1757942379306",
+                "fingerprint": "1757964454681",
                 "firingTriggerId": [
-                    "123"
+                    "2147479553"
                 ],
                 "tagFiringOption": "ONCE_PER_LOAD",
                 "monitoringMetadata": {
@@ -2594,7 +2594,7 @@
                             {
                                 "type": "TEMPLATE",
                                 "key": "arg1",
-                                "value": "^(checkout_opened|add_payment_info|purchase_completed|lead_form_submitted|whatsapp_click|page_view)$"
+                                "value": "^(checkout_opened|add_payment_info|purchase_completed|lead_form_submitted|whatsapp_click|page_view|gtm.dom)$"
                             }
                         ]
                     }
@@ -3697,10 +3697,10 @@
                     {
                         "type": "TEMPLATE",
                         "key": "value",
-                        "value": "18c60bad-c072-4290-a8a3-3fbbefd6ae23_{{DL - Event ID}}"
+                        "value": "18c60bad-c072-4290-a8a3-3fbbefd6ae23_{{DL - Event ID}}{{Cookie – First UTM Source}}"
                     }
                 ],
-                "fingerprint": "1757939952271",
+                "fingerprint": "1757964023060",
                 "formatValue": {}
             },
             {
@@ -3953,21 +3953,6 @@
                                         "value": "Contact"
                                     }
                                 ]
-                            },
-                            {
-                                "type": "MAP",
-                                "map": [
-                                    {
-                                        "type": "TEMPLATE",
-                                        "key": "key",
-                                        "value": "gtm.scrollDepth"
-                                    },
-                                    {
-                                        "type": "TEMPLATE",
-                                        "key": "value",
-                                        "value": "ScrollDepth"
-                                    }
-                                ]
                             }
                         ]
                     }
@@ -3994,32 +3979,6 @@
                     }
                 ],
                 "fingerprint": "1757931990485"
-            },
-            {
-                "accountId": "6308553599",
-                "containerId": "227494781",
-                "variableId": "138",
-                "name": "DL - Meta Event ID",
-                "type": "v",
-                "parameter": [
-                    {
-                        "type": "INTEGER",
-                        "key": "dataLayerVersion",
-                        "value": "2"
-                    },
-                    {
-                        "type": "BOOLEAN",
-                        "key": "setDefaultValue",
-                        "value": "false"
-                    },
-                    {
-                        "type": "TEMPLATE",
-                        "key": "name",
-                        "value": "eventModel.event_id"
-                    }
-                ],
-                "fingerprint": "1757939966671",
-                "formatValue": {}
             }
         ],
         "builtInVariable": [
@@ -4078,7 +4037,7 @@
                 "name": "Scroll Direction"
             }
         ],
-        "fingerprint": "1757948360547",
+        "fingerprint": "1758019737269",
         "tagManagerUrl": "https://tagmanager.google.com/#/versions/accounts/6308553599/containers/227494781/versions/0?apiLink=version"
     }
 }
