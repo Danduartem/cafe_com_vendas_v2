@@ -44,10 +44,6 @@ export interface EnvironmentConfig {
   stripe: {
     publishableKey: string;
   };
-  contact: {
-    email: string;
-    whatsapp: string;
-  };
   cloudinary: {
     cloudName: string;
   };
@@ -61,8 +57,6 @@ export interface EnvironmentConfig {
   urls: {
     base: string;
     thankYou: string;
-    instagram: string;
-    linkedin: string;
   };
   [key: string]: unknown;
 }
@@ -100,13 +94,6 @@ const config: EnvironmentConfig = {
       return '';
     }
   },
-
-  // Contact Information (Public)
-  contact: {
-    email: 'contato@jucanamaximiliano.com.br',
-    whatsapp: '+351912345678'
-  },
-
   // Cloudinary Configuration (Public)
   cloudinary: {
     cloudName: import.meta.env?.VITE_CLOUDINARY_CLOUD_NAME ?? 'ds4dhbneq'
@@ -133,9 +120,7 @@ const config: EnvironmentConfig = {
         ['8080', '8888'].includes(window.location.port) ? window.location.origin : window.location.origin
       ) : 'http://localhost:8888'  // Default to Netlify dev port for backend
     ),
-    thankYou: '/obrigado',
-    instagram: '/instagram',
-    linkedin: '/linkedin'
+    thankYou: '/obrigado'
   }
 };
 

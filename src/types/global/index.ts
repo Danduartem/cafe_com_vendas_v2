@@ -14,18 +14,12 @@ export interface GlobalAppConfig {
   stripe: {
     publishableKey: string;
   };
-  contact: {
-    email: string;
-    whatsapp: string;
-  };
   cloudinary: {
     cloudName: string;
   };
   urls: {
     base: string;
     thankYou: string;
-    instagram: string;
-    linkedin: string;
   };
   [key: string]: unknown;
 }

@@ -4,6 +4,9 @@
  * Following Tailwind v4 CSS-first patterns and TypeScript strict mode
  */
 
+import './styles.css';
+import { logger } from '../../utils/logger.js';
+
 // Simplified imports to avoid build issues
 // import type { SystemMetrics, MonitoringEvent } from '../../utils/monitoring.js';
 // import { MonitoringUtils } from '../../utils/monitoring.js';
@@ -612,9 +615,180 @@ declare global {
   }
 }
 
+function bootstrapAdminDashboardAuthFlow(): void {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return;
+  }
+
+  const initializeAuthFlow = () => {
+    const authModalElement = document.getElementById('admin-auth-modal');
+    const authFormElement = document.getElementById('admin-auth-form');
+    const authErrorElement = document.getElementById('auth-error');
+    const dashboardContainerElement = document.getElementById('admin-dashboard-container');
+
+    if (
+      !(authModalElement instanceof HTMLElement) ||
+      !(authFormElement instanceof HTMLFormElement) ||
+      !(authErrorElement instanceof HTMLElement) ||
+      !(dashboardContainerElement instanceof HTMLElement)
+    ) {
+      logger.warn('[Admin Dashboard] Required DOM elements missing; aborting bootstrap');
+      return;
+    }
+
+    const authModal = authModalElement;
+    const authForm = authFormElement;
+    const authError = authErrorElement;
+    const dashboardContainer = dashboardContainerElement;
+    const apiInput = authModal.querySelector<HTMLInputElement>('#admin-api-key');
+
+    let dashboard: AdminDashboard | null = null;
+
+    function hideAuthError(): void {
+      authError.classList.add('hidden');
+    }
+
+    function showAuthError(message: string): void {
+      const errorMessage = authError.querySelector<HTMLElement>('.error-message');
+      if (errorMessage) {
+        errorMessage.textContent = message;
+      }
+      authError.classList.remove('hidden');
+    }
+
+    function showAuthModal(): void {
+      authModal.classList.remove('hidden');
+      apiInput?.focus();
+    }
+
+    function hideAuthModal(): void {
+      authModal.classList.add('hidden');
+      hideAuthError();
+    }
+
+    function markDashboardLoaded(): void {
+      dashboardContainer.classList.add('dashboard-loaded');
+    }
+
+    function handleInitializationError(error: unknown): void {
+      logger.error('Dashboard initialization failed:', error);
+      const loadingSplash = dashboardContainer.querySelector<HTMLElement>('.loading-splash');
+      if (loadingSplash) {
+        loadingSplash.innerHTML = `
+          <div class="loading-content">
+            <div class="error-icon">⚠️</div>
+            <h1>Dashboard Error</h1>
+            <p>Failed to initialize the dashboard. Please refresh the page to try again.</p>
+            <button class="btn btn-primary retry-button" type="button" data-retry="dashboard-reload">
+              Refresh Page
+            </button>
+          </div>
+        `;
+
+        const retryButton = loadingSplash.querySelector<HTMLButtonElement>('[data-retry="dashboard-reload"]');
+        retryButton?.addEventListener('click', () => {
+          window.location.reload();
+        });
+      }
+    }
+
+    function initializeDashboard(apiKey: string): void {
+      try {
+        sessionStorage.setItem('admin_api_key', apiKey);
+        markDashboardLoaded();
+        hideAuthModal();
+
+        dashboard = initializeAdminDashboard({
+          apiEndpoint: '/.netlify/functions/health-check',
+          adminKey: apiKey,
+          refreshInterval: 30000,
+          maxEvents: 100,
+          enableRealTime: true
+        });
+
+        logger.info('Admin dashboard initialized successfully');
+      } catch (error) {
+        handleInitializationError(error);
+      }
+    }
+
+    const handleAuthSubmit = async (): Promise<void> => {
+      const formData = new FormData(authForm);
+      const submittedKey = formData.get('adminKey');
+
+      if (typeof submittedKey !== 'string' || submittedKey.trim().length === 0) {
+        showAuthError('Please enter your API key');
+        return;
+      }
+
+      const sanitizedKey = submittedKey.trim();
+
+      try {
+        const response = await fetch(`/.netlify/functions/health-check?admin_key=${encodeURIComponent(sanitizedKey)}`);
+
+        if (response.ok) {
+          initializeDashboard(sanitizedKey);
+        } else if (response.status === 401) {
+          showAuthError('Invalid API key. Please check and try again.');
+        } else {
+          showAuthError('Unable to verify API key. Please try again later.');
+        }
+      } catch (error) {
+        logger.error('Auth error:', error);
+        showAuthError('Connection error. Please check your internet connection.');
+      }
+    };
+
+    const storedApiKey = sessionStorage.getItem('admin_api_key');
+    if (storedApiKey) {
+      initializeDashboard(storedApiKey);
+    } else {
+      showAuthModal();
+    }
+
+    authForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      void handleAuthSubmit();
+    });
+
+    const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !authModal.classList.contains('hidden') && isLocalhost) {
+        initializeDashboard('dev-key');
+      }
+    });
+
+    window.addEventListener('beforeunload', () => {
+      dashboard?.destroy();
+    });
+
+    if (isLocalhost) {
+      logger.info('🔧 Admin Dashboard - Development Mode');
+      logger.info('💡 Press ESC in the auth modal to bypass authentication');
+      logger.info('🔑 Or use any API key - validation is relaxed in development');
+
+      const devInfo = document.createElement('div');
+      devInfo.className = 'dev-mode-banner';
+      devInfo.textContent = '🔧 DEV MODE - Press ESC to bypass auth';
+      document.body?.appendChild(devInfo);
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAuthFlow, { once: true });
+  } else {
+    initializeAuthFlow();
+  }
+}
+
 if (typeof globalThis !== 'undefined') {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
   (globalThis as any).initializeAdminDashboard = initializeAdminDashboard;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
   (globalThis as any).AdminDashboard = AdminDashboard;
+}
+
+if (typeof window !== 'undefined') {
+  bootstrapAdminDashboardAuthFlow();
 }
