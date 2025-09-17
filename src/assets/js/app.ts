@@ -213,7 +213,8 @@ export const CafeComVendas: CafeComVendasInterface = {
           utm_source: utmParams.utm_source,
           utm_medium: utmParams.utm_medium,
           utm_campaign: utmParams.utm_campaign,
-          page_url: window.location.href,
+          page_location: window.location.href,
+          page_referrer: document.referrer,
           page_title: document.title
         });
       }

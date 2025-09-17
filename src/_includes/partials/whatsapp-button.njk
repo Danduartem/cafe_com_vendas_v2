@@ -7,7 +7,7 @@
   {# Build a robust WhatsApp URL using global site data #}
   {% set wa_phone = site.contact.whatsapp | replace('+','') | replace(' ','') | replace('(','') | replace(')','') | replace('-','') %}
   <a 
-    href="https://wa.me/{{ wa_phone }}?text=Olá!%20Tenho%20interesse%20no%20Café%20com%20Vendas%20e%20gostaria%20de%20tirar%20algumas%20dúvidas."
+    href="https://wa.me/{{ wa_phone }}?text=Olá!%20Tenho%20interesse%20no%20Café%20com%20Vendas%20e%20gostaria%20de%20tirar%20algumas%20dúvidas.&utm_source=site&utm_medium=whatsapp&utm_campaign=cafe_com_vendas"
     target="_blank"
     rel="noopener noreferrer"
     class="group relative inline-flex items-center justify-center overflow-hidden 

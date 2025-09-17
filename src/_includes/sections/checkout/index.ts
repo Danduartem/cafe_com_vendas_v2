@@ -283,11 +283,7 @@ export const Checkout: CheckoutSectionComponent = {
         ...checkoutContext
       });
 
-      // GA4 recommended: begin_checkout with basic item context
-      analytics.track('begin_checkout', {
-        ...checkoutContext,
-        source_section: sourceSection
-      });
+      // GTM maps checkout_opened to GA4 begin_checkout/InitiateCheckout
     } catch {
       logger.debug('Checkout modal analytics tracking unavailable');
     }
@@ -1032,12 +1028,6 @@ export const Checkout: CheckoutSectionComponent = {
           lead_id: this.leadId,
           form_location: 'checkout_modal',
           pricing_tier: 'early_bird',
-          user_data: userData
-        });
-        // GA4 recommended: generate_lead
-        AnalyticsHelpers.trackConversion('generate_lead', {
-          lead_id: this.leadId,
-          form_location: 'checkout_modal',
           user_data: userData
         });
         analytics.track('form_submission', {

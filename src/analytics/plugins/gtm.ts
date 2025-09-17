@@ -4,7 +4,7 @@
  */
 
 import { normalizeEventPayload } from '../../assets/js/utils/gtm-normalizer.js';
-import { ensureMetaCookies, ensureUtmCookies, getMetaUserData } from '../utils/meta-ids.js';
+import { ensureMetaCookies, getMetaUserData } from '../utils/meta-ids.js';
 import { pluginDebugLog } from '../utils/debug.js';
 import type { PluginFactory, GTMEventPayload } from '../types/index.js';
 
@@ -77,8 +77,6 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
       // Ensure Meta cookies early (CSP-safe, no external scripts)
       try { 
         ensureMetaCookies();
-        // Ensure first-touch UTM cookies so GTM Cookie variables resolve
-        ensureUtmCookies();
       } catch { /* noop */ }
 
       state.initialized = true;
@@ -369,14 +367,41 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
      * Track WhatsApp clicks
      */
     trackWhatsAppClick: (linkUrl: string, linkText: string, location: string, data?: Record<string, unknown>) => {
+      const {
+        page_url,
+        page_location,
+        page_referrer,
+        ...rest
+      } = data ?? {};
+
+      const resolvedLocation = typeof page_location === 'string'
+        ? page_location
+        : typeof page_url === 'string'
+          ? page_url
+          : window.location.href;
+
+      const resolvedReferrer = typeof page_referrer === 'string' && page_referrer.length > 0
+        ? page_referrer
+        : (document.referrer || undefined);
+
+      let linkDomain: string | undefined;
+      try {
+        linkDomain = new URL(linkUrl).hostname;
+      } catch {
+        // ignore invalid URLs
+      }
+
       enhancedPush({
         event: 'whatsapp_click',
         link_url: linkUrl,
+        ...(linkDomain ? { link_domain: linkDomain } : {}),
         link_text: linkText,
         location,
         // Align with GTM variable naming to avoid JS fallback variables
         source_section: location,
-        ...data
+        page_location: resolvedLocation,
+        ...(resolvedReferrer ? { page_referrer: resolvedReferrer } : {}),
+        ...rest
       });
 
       pluginDebugLog(debug, '[GTM Plugin] WhatsApp click tracked:', { linkUrl, linkText, location, data });
