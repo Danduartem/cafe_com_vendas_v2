@@ -138,7 +138,6 @@ export interface GTMPluginMethods {
 export interface SectionTrackingPluginMethods {
   initSectionTracking(sectionName: string, threshold?: number): void;
   trackSectionView(sectionName: string, data?: Record<string, unknown>): void;
-  trackSectionEngagement(sectionName: string, action: string, data?: Record<string, unknown>): void;
   resetSectionTracking(): void;
   getViewedSections(): string[];
   hasViewedSection(sectionName: string): boolean;

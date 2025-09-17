@@ -99,6 +99,9 @@ export const CafeComVendas: CafeComVendasInterface = {
       // Initialize unified analytics system
       await initializeAnalytics();
 
+      // Attach global error listeners now that analytics is ready
+      this.setupGlobalErrorHandling();
+
       // Initialize all components
       this.initializeComponents();
 

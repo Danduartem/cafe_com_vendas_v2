@@ -113,13 +113,6 @@ export const AnalyticsHelpers = {
     }
   },
 
-  trackSectionEngagement(sectionName: string, action: string, data?: Record<string, unknown>): void {
-    const plugin = analytics.getPlugin('section-tracking');
-    if (plugin?.methods && 'trackSectionEngagement' in plugin.methods) {
-      (plugin.methods as unknown as SectionTrackingPluginMethods).trackSectionEngagement(sectionName, action, data);
-    }
-  },
-
   trackFAQMeaningfulEngagement(toggleCount: number, data?: Record<string, unknown>): void {
     const plugin = analytics.getPlugin('gtm');
     if (plugin?.methods && 'trackFAQMeaningfulEngagement' in plugin.methods) {

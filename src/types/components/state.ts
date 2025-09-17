@@ -33,7 +33,6 @@ export interface StateManager {
   setScrollDepth(depth: number): void;
   updateViewport(width: number, height: number): void;
   setComponentStatus(name: string, initialized: boolean, error: Error | undefined): void;
-  subscribe(callback: (state: AppState) => void): () => void;
 
   // FAQ-specific methods
   markFAQOpened(faqId: string): void;

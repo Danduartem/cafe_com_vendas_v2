@@ -113,25 +113,6 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
       },
 
       /**
-       * Track section engagement (user interactions within sections)
-       */
-      trackSectionEngagement(sectionName: string, action: string, data?: Record<string, unknown>) {
-        if (!analyticsInstance) {
-          console.error('[Section Tracking Plugin] Analytics instance not available');
-          return;
-        }
-        
-        analyticsInstance.track('section_engagement', {
-          section: sectionName,
-          element_type: action,
-          timestamp: new Date().toISOString(),
-          ...data
-        });
-
-        pluginDebugLog(debug, '[Section Tracking Plugin] Section engagement tracked:', { sectionName, action, data });
-      },
-
-      /**
        * Reset section tracking (useful for SPAs or testing)
        */
       resetSectionTracking() {

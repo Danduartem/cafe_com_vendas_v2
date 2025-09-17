@@ -126,7 +126,6 @@ The analytics system uses a modern plugin architecture with these core plugins:
    - Error deduplication
    - Context-rich error reporting
 
-5. **Scroll Tracking Plugin** (`src/analytics/plugins/scroll-tracking.ts`)
    - Scroll depth milestone tracking
    - Throttled for performance
    - Configurable thresholds

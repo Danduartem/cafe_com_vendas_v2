@@ -170,19 +170,6 @@ export const StateManager: StateManagerInterface = {
     return this.getSnapshot();
   },
 
-  /**
-   * Subscribe to state changes (basic implementation)
-   * For more complex state management, consider using a library like Zustand
-   */
-  subscribe(callback: (state: AppState) => void): () => void {
-    // Simple implementation - in a real app you might want a more sophisticated system
-    const interval = setInterval(() => {
-      callback(this.getSnapshot());
-    }, 1000);
-
-    // Return unsubscribe function
-    return () => clearInterval(interval);
-  }
 };
 
 /**

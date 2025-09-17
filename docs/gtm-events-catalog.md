@@ -118,7 +118,6 @@ Notes
   - payload: `{ section_name, percent_visible?, timestamp }`
 
 - event: `scroll_depth`
-  - source: src/analytics/plugins/scroll-tracking.ts:95
   - payload: `{ depth_percentage: 10|25|50|75|90, depth_pixels, timestamp }`
 
 - event: `section_engagement`

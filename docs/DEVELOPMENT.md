@@ -91,7 +91,6 @@ src/analytics/
 │   ├── gtm.ts         # Google Tag Manager integration & event normalization
 │   ├── performance.ts  # Core Web Vitals & performance monitoring
 │   ├── section-tracking.ts # IntersectionObserver section tracking
-│   ├── scroll-tracking.ts  # Scroll depth milestone tracking
 │   └── error.ts        # Error tracking with deduplication & context
 ├── types/
 │   ├── index.ts        # Plugin interfaces & comprehensive types
@@ -127,7 +126,7 @@ src/analytics/
 3. **Section Tracking Plugin** (`src/analytics/plugins/section-tracking.ts`)
    - **Purpose**: IntersectionObserver-based section visibility tracking
    - **Features**: One-time view events, configurable thresholds, viewport detection
-   - **Methods**: `initSectionTracking()`, `trackSectionEngagement()`
+   - **Methods**: `initSectionTracking()`
    - **Performance**: Optimized IntersectionObserver usage with throttling
 
 4. **Error Plugin** (`src/analytics/plugins/error.ts`)
@@ -136,7 +135,6 @@ src/analytics/
    - **Methods**: `trackError()`, `setupGlobalErrorHandling()`
    - **Context**: Captures user environment, component state, and action context
 
-5. **Scroll Tracking Plugin** (`src/analytics/plugins/scroll-tracking.ts`)
    - **Purpose**: Scroll depth milestone tracking
    - **Features**: Configurable thresholds, throttled events, engagement scoring
    - **Thresholds**: Default milestones at 10%, 25%, 50%, 75%, 90%
@@ -566,7 +564,6 @@ if (performancePlugin?.methods) {
 // Section tracking with custom configuration
 const sectionPlugin = analytics.getPlugin('section-tracking');
 if (sectionPlugin?.methods) {
-  sectionPlugin.methods.trackSectionEngagement('hero', 'video_play');
 }
 ```
 
