@@ -23,9 +23,9 @@ import {
 } from './types';
 // Stripe types removed for Phase 1 - Multibanco handling deferred to Phase 2
 // import { isStripePaymentIntent, hasMultibancoDetails, getMultibancoDetails } from '../../src/types/stripe.js';
-import { retryWithBackoff, SHARED_TIMEOUTS, withTimeout, hashEmail } from './shared-utils.js';
-import { buildCorsHeaders } from './lib/cors.js';
 import { DeadLetterQueue, type FailedWebhook } from './dlq-handler.js';
+import { buildCorsHeaders } from './lib/cors.js';
+import { hashEmail, retryWithBackoff, SHARED_TIMEOUTS, withTimeout } from './shared-utils.js';
 
 // Webhook idempotency tracking - using Stripe event.id for deduplication
 const processedEvents = new Set<string>();
@@ -292,7 +292,7 @@ export default async (request: Request): Promise<Response> => {
               status: 400,
               headers
             });
-          
+
           case 'StripeInvalidRequestError':
             logWithCorrelation('error', 'Invalid webhook request', errorContext);
             return new Response(JSON.stringify({
@@ -302,7 +302,7 @@ export default async (request: Request): Promise<Response> => {
               status: 400,
               headers
             });
-          
+
           case 'StripeAuthenticationError':
             logWithCorrelation('error', 'Stripe authentication failed', errorContext);
             return new Response(JSON.stringify({
@@ -312,7 +312,7 @@ export default async (request: Request): Promise<Response> => {
               status: 401,
               headers
             });
-          
+
           default:
             logWithCorrelation('error', 'Stripe webhook error', {
               ...errorContext,
@@ -395,7 +395,7 @@ export default async (request: Request): Promise<Response> => {
   } catch (error) {
     // Enhanced error handling with DLQ integration for main webhook handler
     const errorMessage = error instanceof Error ? error.message : 'Unknown webhook processing error';
-    
+
     // If we have a stripeEvent, add to DLQ for retry
     if (typeof stripeEvent !== 'undefined') {
       DeadLetterQueue.addFailedEvent({
@@ -405,13 +405,13 @@ export default async (request: Request): Promise<Response> => {
         max_retries: parseInt(process.env.DLQ_MAX_RETRIES || '5', 10),
         error: errorMessage
       });
-      
+
       logWithCorrelation('error', 'Webhook processing failed, added to DLQ', {
         eventId: stripeEvent.id,
         eventType: stripeEvent.type,
         error: errorMessage
       });
-      
+
       return new Response(JSON.stringify({
         error: 'Webhook processing failed',
         eventId: stripeEvent.id,
@@ -421,7 +421,7 @@ export default async (request: Request): Promise<Response> => {
         headers
       });
     }
-    
+
     // Fallback for errors before event parsing
     console.error('Webhook handler error:', errorMessage);
     return new Response(JSON.stringify({
@@ -674,7 +674,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
       amount: paymentIntent.amount / 100,
       currency: paymentIntent.currency.toUpperCase(),
       event_name: metadata.event_name || 'Café com Vendas',
-      event_date: metadata.event_date || '20/09/2024'
+      event_date: metadata.event_date || '04/10/2025'
     });
 
     // === PHASE 2 ENHANCEMENT: Server-Side GTM Attribution ===
@@ -705,17 +705,17 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
         // Prefer GA client id when available; fallback to our session id
         client_id: (metadata as { ga_client_id?: string }).ga_client_id || user_session_id || paymentIntent.id,
         timestamp_micros: Date.now() * 1000,
-        
+
         // Event correlation
         event_id: event_id || `webhook-${paymentIntent.id}`,
         // Prefer GA4 session id if present
         session_id: (metadata as { ga_session_id?: string }).ga_session_id || user_session_id,
-        
+
         // Transaction details
         transaction_id: paymentIntent.id,
         value: paymentIntent.amount / 100,
         currency: paymentIntent.currency.toUpperCase(),
-        
+
         // Enhanced ecommerce items
         items: [{
           item_id: metadata.product_id || 'cafe-com-vendas-ticket',
@@ -726,17 +726,17 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
           currency: paymentIntent.currency.toUpperCase(),
           item_variant: metadata.product_variant || 'early-bird'
         }],
-        
+
         // Attribution data from metadata
         source: utm_source || undefined,
         medium: utm_medium || undefined,
         campaign: utm_campaign || undefined,
         content: utm_content || undefined,
         term: utm_term || undefined,
-        
+
         // Hashed user data for privacy compliance
         user_data: hashedUserDataWithIds,
-        
+
         // Custom parameters for enhanced tracking
         custom_parameters: {
           payment_method: paymentIntent.payment_method_types?.[0] || 'unknown',
@@ -756,7 +756,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
 
       // Send to server-side GTM
       const gtmResult = await sendPurchaseToGA4(purchaseEventData);
-      
+
       if (gtmResult.success) {
         logWithCorrelation('info', `Server GTM purchase event sent successfully`, {
           transaction_id: paymentIntent.id,
@@ -1088,7 +1088,7 @@ async function handleCheckoutSessionAsyncPaymentSucceeded(session: Stripe.Checko
       amount: (fullSession.amount_total || 0) / 100,
       currency: fullSession.currency?.toUpperCase() || 'EUR',
       event_name: fullSession.metadata?.event_name || 'Café com Vendas',
-      event_date: fullSession.metadata?.event_date || '20/09/2024',
+      event_date: fullSession.metadata?.event_date || '04/10/2025',
       payment_method: 'Multibanco'
     });
 
@@ -1251,7 +1251,7 @@ async function processImmediatePaymentSuccess(session: Stripe.Checkout.Session, 
       amount: (session.amount_total || 0) / 100,
       currency: session.currency?.toUpperCase() || 'EUR',
       event_name: session.metadata?.event_name || 'Café com Vendas',
-      event_date: session.metadata?.event_date || '20/09/2024',
+      event_date: session.metadata?.event_date || '04/10/2025',
       payment_method: 'immediate'
     });
 
@@ -1328,7 +1328,7 @@ async function processPaymentPending(session: Stripe.Checkout.Session, correlati
       amount: (session.amount_total || 0) / 100,
       currency: session.currency?.toUpperCase() || 'EUR',
       event_name: session.metadata?.event_name || 'Café com Vendas',
-      event_date: session.metadata?.event_date || '20/09/2024',
+      event_date: session.metadata?.event_date || '04/10/2025',
       payment_method: 'Multibanco',
       session_id: session.id
     });
@@ -1694,16 +1694,16 @@ async function triggerAbandonedCartEmail(email: string, data: Record<string, unk
 DeadLetterQueue.setWebhookProcessor(async (failedEvent: FailedWebhook) => {
   const stripeEvent = failedEvent.payload as Stripe.Event;
   const correlationId = `dlq-retry-${failedEvent.retry_count}-${failedEvent.event_id}`;
-  
+
   logWithCorrelation('info', 'DLQ retrying webhook event', {
     eventId: failedEvent.event_id,
     eventType: failedEvent.event_type,
     retryCount: failedEvent.retry_count
   });
-  
+
   // Process the event using the existing switch logic
   await processWebhookEventLogic(stripeEvent, correlationId);
-  
+
   // Mark as processed on successful retry
   processedEvents.add(stripeEvent.id);
 });

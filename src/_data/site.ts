@@ -28,8 +28,8 @@ export default function () {
       subtitle: 'Evento para Empreendedoras em Portugal',
       name: 'Café com Vendas',
       date: {
-        display: '20 de Setembro',
-        local: '20 de Setembro'
+        display: '4 de Outubro',
+        local: '4 de Outubro'
       },
       location: {
         city: 'Lisboa, Portugal',
