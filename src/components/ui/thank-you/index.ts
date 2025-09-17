@@ -204,7 +204,7 @@ export const PlatformThankYou = {
       });
 
       // Track purchase completion
-      AnalyticsHelpers.trackConversion('purchase_complete', {
+      AnalyticsHelpers.trackConversion('purchase_completed', {
         value: 1
       });
 

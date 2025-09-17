@@ -271,15 +271,21 @@ export const Checkout: CheckoutSectionComponent = {
     // Track checkout opened (GTM production event + test alias)
     try {
       const sourceSection = this.getSourceSection();
-      AnalyticsHelpers.trackCTAClick(sourceSection, {
-        trigger_location: sourceSection,
-        action: 'modal_opened'
-      });
-      // GA4 recommended: begin_checkout with basic item context
-      analytics.track('begin_checkout', {
+      const checkoutContext = {
         currency: 'EUR',
         value: basePrice,
-        items: [{ item_id: 'cafe-com-vendas-ticket', item_name: eventName, price: basePrice, quantity: 1 }],
+        items: [{ item_id: 'cafe-com-vendas-ticket', item_name: eventName, price: basePrice, quantity: 1 }]
+      };
+
+      AnalyticsHelpers.trackCTAClick(sourceSection, {
+        trigger_location: sourceSection,
+        action: 'modal_opened',
+        ...checkoutContext
+      });
+
+      // GA4 recommended: begin_checkout with basic item context
+      analytics.track('begin_checkout', {
+        ...checkoutContext,
         source_section: sourceSection
       });
     } catch {
