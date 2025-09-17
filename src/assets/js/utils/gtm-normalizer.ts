@@ -12,12 +12,25 @@ export function normalizeEventPayload(payload: Record<string, unknown> & { event
   };
 
   const sanitizedKeys = new Set([
-    'event',
     'event_name',
     'event_category',
     'event_type',
     'action',
     'engagement_type'
+  ]);
+
+  const passthroughKeys = new Set([
+    'page_location',
+    'page_referrer',
+    'link_url',
+    'link_domain',
+    'currency',
+    'transaction_id',
+    'value',
+    'items',
+    'debug_mode',
+    'client_id',
+    'session_id'
   ]);
 
   const sanitizeString = (value: string): string => {
@@ -39,6 +52,8 @@ export function normalizeEventPayload(payload: Record<string, unknown> & { event
     } else if (typeof value === 'string') {
       if (sanitizedKeys.has(key)) {
         cleaned[key] = sanitizeString(value);
+      } else if (passthroughKeys.has(key)) {
+        cleaned[key] = value.trim();
       } else {
         const trimmedValue = value.trim();
         if (trimmedValue.length === 0) {
