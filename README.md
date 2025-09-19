@@ -10,7 +10,7 @@ Premium landing page for an intimate business transformation event in Lisbon, de
 ## 🎯 Project Overview
 
 **Event**: Café com Vendas - Business transformation workshop  
-**Date**: September 20, 2025  
+**Date**: October 04, 2025  
 **Location**: Lisbon, Portugal  
 **Audience**: Female entrepreneurs (20 exclusive spots)  
 **Language**: Portuguese (pt-PT)

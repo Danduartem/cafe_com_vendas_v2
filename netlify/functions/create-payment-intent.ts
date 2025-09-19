@@ -4,13 +4,13 @@
  */
 
 import Stripe from 'stripe';
-import type { PaymentIntentRequest, RateLimitResult } from './types';
 import { withTimeout } from './shared-utils.js';
+import type { PaymentIntentRequest, RateLimitResult } from './types';
 
 // Import enhanced tracking types for Phase 1
 import type {
-  EnhancedStripeMetadata,
-  EnhancedPaymentIntentResponse
+  EnhancedPaymentIntentResponse,
+  EnhancedStripeMetadata
 } from '../../src/types/enhanced-tracking.js';
 
 // Cache and rate limiting interfaces
@@ -63,8 +63,8 @@ function getRateLimitConfig(origin: string | undefined) {
 import { CustomerCacheManager } from './lib/customer-cache.js';
 
 // Validation moved to lib for reuse and testability
+import { attachRateLimitHeaders, buildCorsHeaders } from './lib/cors.js';
 import { validatePaymentRequest, VALIDATION_RULES } from './lib/validation.js';
-import { buildCorsHeaders, attachRateLimitHeaders } from './lib/cors.js';
 
 // Rate limiting middleware with environment-aware configuration
 function checkRateLimit(clientIP: string, origin: string | undefined): RateLimitResult {
@@ -254,15 +254,15 @@ export default async (request: Request): Promise<Response> => {
     }
 
     // Use sanitized data
-    const { 
-      event_id, 
-      user_session_id, 
-      lead_id, 
-      full_name, 
-      email, 
-      phone, 
-      amount: paymentAmount, 
-      currency 
+    const {
+      event_id,
+      user_session_id,
+      lead_id,
+      full_name,
+      email,
+      phone,
+      amount: paymentAmount,
+      currency
     } = validation.sanitized!;
 
     // Create or retrieve customer with validated data
@@ -386,7 +386,7 @@ export default async (request: Request): Promise<Response> => {
       // Product information
       product_id: 'cafe-com-vendas-ticket',
       product_name: 'Café com Vendas - Lisbon 2025',
-      event_date: '2025-09-20',
+      event_date: '2025-10-04',
       product_category: 'business-event',
       product_variant: 'early-bird-ticket',
 
@@ -396,7 +396,7 @@ export default async (request: Request): Promise<Response> => {
       utm_campaign: requestBody.utm_campaign as string || undefined,
       utm_content: requestBody.utm_content as string || undefined,
       utm_term: requestBody.utm_term as string || undefined,
-      
+
       // First-touch attribution (for cross-session tracking)
       first_utm_source: requestBody.first_utm_source as string || requestBody.utm_source as string || undefined,
       first_utm_campaign: requestBody.first_utm_campaign as string || requestBody.utm_campaign as string || undefined,
@@ -424,21 +424,21 @@ export default async (request: Request): Promise<Response> => {
       browser_language: requestBody.browser_language as string || undefined,
       screen_resolution: requestBody.screen_resolution as string || undefined,
       timezone: requestBody.timezone as string || undefined,
-      
+
       // Meta identifiers for enhanced matching (forwarded from web)
       fbp: (requestBody as { fbp?: string }).fbp,
       fbc: (requestBody as { fbc?: string }).fbc,
-      
+
       // Server-side attribution context (Phase 2)
       server_attribution_enabled: 'true',
       client_ip_country: requestBody.client_ip_country as string || undefined,
       referrer_domain: requestBody.referrer_domain as string || undefined,
-      
+
       // Business intelligence fields
       customer_segment: requestBody.customer_segment as string || 'standard',
       acquisition_channel: requestBody.utm_medium as string || 'direct',
       conversion_path_length: requestBody.conversion_path_length as string || '1',
-      
+
       // Technical context for troubleshooting
       integration_version: 'phase-2',
       api_version: '2025-01',

@@ -6,7 +6,7 @@
  * Tests the mailerlite-lead Netlify function with various scenarios
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { setupMockServer } from '../mocks/server.js';
 
 // Setup MSW server
@@ -17,7 +17,7 @@ vi.stubEnv('MAILERLITE_API_KEY', 'test-api-key-123');
 
 describe('MailerLite Lead Endpoint Integration', () => {
   // const apiUrl = 'http://localhost:8888/.netlify/functions/mailerlite-lead';
-  
+
   // Test data
   const validLeadData = {
     lead_id: 'test-lead-123',
@@ -132,7 +132,7 @@ describe('MailerLite Lead Endpoint Integration', () => {
 
     it('should reject non-POST methods', () => {
       const methods = ['GET', 'PUT', 'DELETE', 'PATCH'];
-      
+
       for (const _method of methods) {
         const _response = {
           status: 405,
@@ -156,7 +156,7 @@ describe('MailerLite Lead Endpoint Integration', () => {
       }));
 
       let circuitOpen = false;
-      
+
       for (const [index, _data] of failures.entries()) {
         const response = {
           mailerlite: {
@@ -203,14 +203,14 @@ describe('MailerLite Lead Endpoint Integration', () => {
       // };
 
       // Expected group assignment
-      const expectedGroup = 'ccv-2025-09-20_checkout_started';
-      
+      const expectedGroup = 'ccv-2025-10-04_checkout_started';
+
       expect(expectedGroup).toMatch(/checkout_started/);
     });
 
     it('should set correct custom fields for event', () => {
       const expectedFields = {
-        event_date: '2025-09-20',
+        event_date: '2025-10-04',
         event_address: 'Lisboa, Portugal',
         google_maps_link: 'https://maps.google.com/?q=Lisboa,Portugal',
         checkout_started_at: expect.any(String),

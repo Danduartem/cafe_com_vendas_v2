@@ -619,7 +619,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
           utm_term: utm_term,
 
           // Business context
-          event_interest: 'cafe_com_vendas_lisbon_2025-09-20',
+          event_interest: 'cafe_com_vendas_lisbon_2025-10-04',
           intent_signal: 'completed_payment',
           landing_page: 'https://jucanamaximiliano.com.br/', // Default landing page for webhooks
 

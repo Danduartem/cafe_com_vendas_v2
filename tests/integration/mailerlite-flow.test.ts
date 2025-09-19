@@ -5,9 +5,9 @@
  * Tests complete user journey from lead capture through payment confirmation
  */
 
-import { describe, it, expect, vi } from 'vitest';
-import { setupMockServer, mockApiResponse } from '../mocks/server.js';
+import { describe, expect, it, vi } from 'vitest';
 import { createCustomHandler } from '../mocks/mailerlite.js';
+import { mockApiResponse, setupMockServer } from '../mocks/server.js';
 
 // Setup MSW server
 setupMockServer();
@@ -61,7 +61,7 @@ describe('MailerLite Complete Flow E2E Tests', () => {
         lead_id: 'e2e-test-lead-123',
         customer_phone: '+351923456789',
         event_name: 'Café com Vendas',
-        event_date: '2025-09-20',
+        event_date: '2025-10-04',
         spot_type: 'vip_ticket'
       }
     }

@@ -6,9 +6,9 @@
  * Tests the API integration logic without requiring a running server
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { setupMockServer, mockApiResponse } from '../../mocks/server.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createCustomHandler } from '../../mocks/mailerlite.js';
+import { mockApiResponse, setupMockServer } from '../../mocks/server.js';
 
 // Setup MSW server
 setupMockServer();
@@ -250,7 +250,7 @@ describe('MailerLite API Functions', () => {
           },
           body: JSON.stringify({ email: 'test@example.com' })
         });
-        
+
         expect.fail('Should have thrown an error');
       } catch (error) {
         expect(error).toBeDefined();
@@ -279,7 +279,7 @@ describe('MailerLite API Functions', () => {
         email: 'event@example.com',
         name: 'Event Attendee',
         fields: {
-          event_date: '2025-09-20',
+          event_date: '2025-10-04',
           event_address: 'Lisboa, Portugal',
           google_maps_link: 'https://maps.google.com/?q=Lisboa,Portugal',
           ticket_type: 'VIP',
@@ -301,7 +301,7 @@ describe('MailerLite API Functions', () => {
       expect(response.ok).toBe(true);
       const data = await response.json();
       expect(data.data.fields).toMatchObject({
-        event_date: '2025-09-20',
+        event_date: '2025-10-04',
         ticket_type: 'VIP',
         payment_status: 'paid'
       });

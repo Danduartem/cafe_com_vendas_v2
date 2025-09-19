@@ -3,26 +3,26 @@
  * Handles thank-you page animations, milestone progress, and premium interactions
  */
 
-import { safeQuery } from '../../../utils/dom.js';
-import { Animations } from '../../../components/ui/index.js';
-import { logger } from '../../../utils/logger.js';
 import siteData from '../../../_data/site.js';
+import analytics from '../../../analytics/index.js';
+import { Animations } from '../../../components/ui/index.js';
+import {
+  createCafeComVendasEvent,
+  detectUserPlatform,
+  downloadIcsFile,
+  generateCalendarUrls,
+  generateIcsContent,
+  type CalendarEvent,
+  type CalendarUrls
+} from '../../../utils/calendar.js';
+import { safeQuery } from '../../../utils/dom.js';
+import { logger } from '../../../utils/logger.js';
 
 // 🎯 Get centralized pricing data - SINGLE SOURCE OF TRUTH
 const site = siteData();
 const eventPricing = site.event.pricing;
 const basePrice = eventPricing.basePrice;
 const eventName = site.event.name;
-import { 
-  generateIcsContent, 
-  downloadIcsFile, 
-  createCafeComVendasEvent, 
-  generateCalendarUrls, 
-  detectUserPlatform,
-  type CalendarUrls,
-  type CalendarEvent
-} from '../../../utils/calendar.js';
-import analytics from '../../../analytics/index.js';
 
 export const ThankYou = {
   init() {
@@ -78,7 +78,7 @@ export const ThankYou = {
       if (isMultibancoPayment) {
         // Determine the amount to display
         const displayAmount = amount ? (parseInt(amount) / 100) : basePrice;
-        
+
         // If we have complete voucher details, show them
         if (multibancoEntity && multibancoReference) {
           this.showMultibancoInstructions({
@@ -88,7 +88,7 @@ export const ThankYou = {
             sessionId,
             amount: displayAmount
           });
-          
+
           logger.info('Multibanco payment detected with complete voucher details', {
             hasEntity: !!multibancoEntity,
             hasReference: !!multibancoReference,
@@ -104,7 +104,7 @@ export const ThankYou = {
             redirectStatus,
             paymentStatus
           });
-          
+
           this.showMultibancoInstructionsWithFallback({
             paymentIntent,
             sessionId,
@@ -113,7 +113,7 @@ export const ThankYou = {
             leadId
           });
         }
-        
+
         // Track Multibanco voucher display
         this.trackMultibancoVoucherDisplay({
           paymentIntent,
@@ -122,7 +122,7 @@ export const ThankYou = {
           paymentMethod: paymentMethod || 'multibanco',
           amount: displayAmount
         });
-        
+
         return;
       }
 
@@ -146,7 +146,7 @@ export const ThankYou = {
           paymentMethod,
           reason: 'Payment failed during processing'
         });
-        
+
         // Track payment failure
         this.trackPaymentFailure({
           paymentIntent,
@@ -219,7 +219,7 @@ export const ThankYou = {
     // Add a subtle fade-in to the entire section
     thankYouSection.style.opacity = '0';
     thankYouSection.style.transform = 'translateY(20px)';
-    
+
     setTimeout(() => {
       thankYouSection.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
       thankYouSection.style.opacity = '1';
@@ -240,13 +240,13 @@ export const ThankYou = {
     // Enhanced step cards interactions  
     const stepCards = safeQuery('#thankyou')?.querySelectorAll('.step-card');
     stepCards?.forEach((card) => {
-      card.addEventListener('mouseenter', function(this: HTMLElement) {
+      card.addEventListener('mouseenter', function (this: HTMLElement) {
         this.style.transform = 'translateY(-2px)';
         this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
         this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
       });
 
-      card.addEventListener('mouseleave', function(this: HTMLElement) {
+      card.addEventListener('mouseleave', function (this: HTMLElement) {
         this.style.transform = 'translateY(0)';
         this.style.boxShadow = '';
         this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -256,12 +256,12 @@ export const ThankYou = {
     // Add premium interactions to feature cards in sidebar
     const featureCards = safeQuery('aside')?.querySelectorAll('.hover\\:shadow-md');
     featureCards?.forEach((card) => {
-      card.addEventListener('mouseenter', function(this: HTMLElement) {
+      card.addEventListener('mouseenter', function (this: HTMLElement) {
         this.style.transform = 'translateX(4px)';
         this.style.borderColor = 'rgb(129,23,31,0.2)';
       });
 
-      card.addEventListener('mouseleave', function(this: HTMLElement) {
+      card.addEventListener('mouseleave', function (this: HTMLElement) {
         this.style.transform = 'translateX(0)';
         this.style.borderColor = '';
       });
@@ -275,7 +275,7 @@ export const ThankYou = {
     const dropdownButton = dropdownContainer.querySelector('[data-dropdown-button]') as HTMLButtonElement;
     const dropdownMenu = dropdownContainer.querySelector('[data-dropdown-menu]') as HTMLElement;
     const dropdownIcon = dropdownContainer.querySelector('[data-dropdown-icon]') as SVGElement;
-    
+
     if (!dropdownButton || !dropdownMenu || !dropdownIcon) return;
 
     // Generate calendar URLs once
@@ -289,7 +289,7 @@ export const ThankYou = {
     // Toggle dropdown visibility
     const toggleDropdown = (show?: boolean) => {
       const isVisible = show ?? dropdownMenu.classList.contains('opacity-100');
-      
+
       if (!isVisible) {
         dropdownMenu.classList.remove('opacity-0', 'invisible', 'scale-95');
         dropdownMenu.classList.add('opacity-100', 'visible', 'scale-100');
@@ -314,7 +314,7 @@ export const ThankYou = {
     calendarOptions.forEach((option) => {
       option.addEventListener('click', (event) => {
         event.stopPropagation();
-        
+
         const calendarType = (option as HTMLElement).getAttribute('data-calendar-option') as string;
         this.handleCalendarSelection(calendarType, calendarUrls, eventData);
         toggleDropdown(true); // Close dropdown
@@ -348,7 +348,7 @@ export const ThankYou = {
 
     // Add platform-specific recommendation
     let recommendedOption = 'google'; // Default
-    
+
     if (platform === 'ios') {
       recommendedOption = 'apple';
     } else if (platform === 'windows') {
@@ -374,12 +374,12 @@ export const ThankYou = {
           window.open(calendarUrls.google, '_blank');
           this.trackCalendarInteraction('google', 'direct_link');
           break;
-          
+
         case 'outlook':
           window.open(calendarUrls.outlook, '_blank');
           this.trackCalendarInteraction('outlook', 'direct_link');
           break;
-          
+
         case 'apple':
         default: {
           // For iPhone/Apple devices, create an optimized ICS file
@@ -389,9 +389,9 @@ export const ThankYou = {
           break;
         }
       }
-      
+
       logger.info(`Calendar ${calendarType} integration successful`);
-      
+
     } catch (error) {
       logger.error(`Error with calendar ${calendarType} integration:`, error);
       alert('Erro ao criar o evento no calendário. Por favor, tente novamente.');
@@ -405,7 +405,7 @@ export const ThankYou = {
         calendar_provider: provider,
         integration_method: method,
         location: 'thank_you_page',
-        event_date: '2025-09-20',
+        event_date: '2025-10-04',
         event_name: 'cafe_com_vendas_portugal',
         user_platform: detectUserPlatform()
       });
@@ -422,7 +422,7 @@ export const ThankYou = {
     amount?: number;
   }) {
     const { entity, reference, paymentIntent, sessionId, amount = basePrice } = multibancoData;
-    
+
     logger.info('Displaying Multibanco instructions', {
       hasEntity: !!entity,
       hasReference: !!reference,
@@ -492,7 +492,7 @@ export const ThankYou = {
           </div>
         </div>
       `;
-      
+
       // Insert before the main action section
       mainActionSection.parentNode?.insertBefore(multibancoCard, mainActionSection);
     } else {
@@ -501,7 +501,7 @@ export const ThankYou = {
         hasEntity: !!entity,
         hasReference: !!reference
       });
-      
+
       this.showGenericPendingPayment({
         paymentIntent,
         sessionId,
@@ -530,7 +530,7 @@ export const ThankYou = {
     amount: number;
   }) {
     const { paymentIntent, hasEntity, hasReference, paymentMethod, amount } = data;
-    
+
     try {
       // Track voucher display event
       analytics.track('payment_flow', {
@@ -544,7 +544,7 @@ export const ThankYou = {
         page_location: 'thank_you',
         timestamp: new Date().toISOString()
       });
-      
+
       // Track as intermediate conversion step
       analytics.track('conversion_funnel', {
         funnel_step: 'payment_initiated',
@@ -553,7 +553,7 @@ export const ThankYou = {
         amount: amount,
         currency: 'EUR'
       });
-      
+
       logger.info('Multibanco voucher display tracked', {
         hasEntity,
         hasReference,
@@ -571,7 +571,7 @@ export const ThankYou = {
     source: string;
   }) {
     const { paymentIntent, paymentMethod, amount, source } = data;
-    
+
     try {
       // Do not send GA4 purchase on client; emit UI diagnostic instead
       analytics.track('purchase_completed_ui', {
@@ -583,7 +583,7 @@ export const ThankYou = {
         payment_method: paymentMethod,
         completion_source: source
       });
-      
+
       // Track payment flow completion
       analytics.track('payment_flow', {
         event_type: 'purchase_completed',
@@ -595,7 +595,7 @@ export const ThankYou = {
         page_location: 'thank_you',
         timestamp: new Date().toISOString()
       });
-      
+
       logger.info('Payment completion tracked', {
         paymentIntent: paymentIntent.substring(0, 20) + '...',
         paymentMethod,
@@ -613,7 +613,7 @@ export const ThankYou = {
     source: string;
   }) {
     const { paymentIntent, paymentMethod, reason, source } = data;
-    
+
     try {
       // Track payment failure
       analytics.track('payment_flow', {
@@ -625,7 +625,7 @@ export const ThankYou = {
         page_location: 'thank_you',
         timestamp: new Date().toISOString()
       });
-      
+
       // Track conversion funnel dropout
       analytics.track('conversion_funnel', {
         funnel_step: 'payment_failed',
@@ -633,7 +633,7 @@ export const ThankYou = {
         failure_reason: reason,
         dropout_point: source
       });
-      
+
       logger.warn('Payment failure tracked', {
         paymentIntent: paymentIntent ? paymentIntent.substring(0, 20) + '...' : null,
         paymentMethod,
@@ -651,7 +651,7 @@ export const ThankYou = {
     amount: number;
   }) {
     const { paymentIntent, sessionId, amount } = paymentData;
-    
+
     logger.info('Showing generic pending payment message', {
       hasPaymentIntent: !!paymentIntent,
       hasSessionId: !!sessionId,
@@ -692,7 +692,7 @@ export const ThankYou = {
     leadId?: string | null;
   }) {
     const { paymentIntent, sessionId, amount, paymentMethod, leadId } = fallbackData;
-    
+
     logger.info('Showing Multibanco fallback instructions', {
       hasPaymentIntent: !!paymentIntent,
       hasSessionId: !!sessionId,
@@ -780,7 +780,7 @@ export const ThankYou = {
           </div>
         </div>
       `;
-      
+
       // Insert before the main action section
       mainActionSection.parentNode?.insertBefore(multibancoCard, mainActionSection);
     }
@@ -792,7 +792,7 @@ export const ThankYou = {
     reason?: string;
   }) {
     const { paymentIntent, paymentMethod, reason } = failureData;
-    
+
     logger.warn('Showing payment failure message', {
       hasPaymentIntent: !!paymentIntent,
       paymentMethod,

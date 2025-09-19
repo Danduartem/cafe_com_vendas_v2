@@ -8,9 +8,9 @@
 
 // Event-specific constants
 
-// Event naming convention: ccv-2025-09-20 (event slug)
-export const EVENT_SLUG = 'ccv-2025-09-20' as const;
-export const EVENT_DATE = '2025-09-20' as const;
+// Event naming convention: ccv-2025-10-04 (event slug)
+export const EVENT_SLUG = 'ccv-2025-10-04' as const;
+export const EVENT_DATE = '2025-10-04' as const;
 export const EVENT_NAME = 'Café com Vendas - Lisboa' as const;
 export const EVENT_ADDRESS = 'Lisboa, Portugal' as const;
 export const GOOGLE_MAPS_LINK = 'https://maps.google.com/?q=Lisboa,Portugal' as const;
@@ -22,15 +22,15 @@ export const MAILERLITE_EVENT_GROUPS = {
   // Lead nurture funnel
   CHECKOUT_STARTED: `${EVENT_SLUG}_checkout_started`,
   ABANDONED_PAYMENT: `${EVENT_SLUG}_abandoned_payment`,
-  
+
   // Payment processing states
   BUYER_PENDING: `${EVENT_SLUG}_buyer_pending`,
   BUYER_PAID: `${EVENT_SLUG}_buyer_paid`,
-  
+
   // Post-purchase lifecycle
   DETAILS_PENDING: `${EVENT_SLUG}_details_pending`,
   DETAILS_COMPLETE: `${EVENT_SLUG}_details_complete`,
-  
+
   // Event participation
   ATTENDED: `${EVENT_SLUG}_attended`,
   NO_SHOW: `${EVENT_SLUG}_no_show`
@@ -49,23 +49,23 @@ export const MAILERLITE_CUSTOM_FIELDS = {
   order_id: 'order_id',
   amount_paid: 'amount_paid',
   details_form_status: 'details_form_status',
-  
+
   // Event fields (consistent across events)
   event_date: 'event_date',
-  event_address: 'event_address', 
+  event_address: 'event_address',
   google_maps_link: 'google_maps_link',
-  
+
   // Multibanco fields
   mb_entity: 'mb_entity',
   mb_reference: 'mb_reference',
   mb_amount: 'mb_amount',
   mb_expires_at: 'mb_expires_at',
-  
+
   // Attribution fields
   utm_source: 'utm_source',
   utm_medium: 'utm_medium',
   utm_campaign: 'utm_campaign',
-  
+
   // Marketing consent
   marketing_opt_in: 'marketing_opt_in'
 } as const;
@@ -85,7 +85,7 @@ export interface PaymentIntentRequest {
   // Event tracking fields
   event_id: string;
   user_session_id: string;
-  
+
   // Core payment fields
   lead_id?: string;
   full_name: string;
@@ -94,33 +94,33 @@ export interface PaymentIntentRequest {
   amount?: number;
   currency?: string;
   idempotency_key?: string;
-  
+
   // Attribution data
   utm_source?: string;
   utm_medium?: string;
   utm_campaign?: string;
   utm_term?: string;
   utm_content?: string;
-  
+
   // CRM integration
   crm_contact_id?: string;
   crm_deal_id?: string;
-  
+
   // Consent tracking
   marketing_consent?: boolean;
   consent_timestamp?: string;
   consent_method?: string;
-  
+
   // Customer journey tracking
   lead_created_at?: string;
   checkout_started_at?: string;
   payment_attempt_count?: string;
-  
+
   // Device context
   device_type?: string;
   user_agent_hash?: string;
   ip_address_hash?: string;
-  
+
   [key: string]: unknown;
 }
 
@@ -183,23 +183,23 @@ export interface EventCustomFields extends Record<string, string | number | bool
   order_id: string | null;
   amount_paid: number | null;
   details_form_status: 'pending' | 'submitted';
-  
+
   // Event fields (seeded/static)
   event_date: string;
   event_address: string;
   google_maps_link: string;
-  
+
   // Multibanco fields (set by Stripe/webhook)
   mb_entity: string | null;
   mb_reference: string | null;
   mb_amount: number | null;
   mb_expires_at: string | null;
-  
+
   // Attribution fields
   utm_source: string | null;
   utm_medium: string | null;
   utm_campaign: string | null;
-  
+
   // Marketing consent
   marketing_opt_in: 'yes' | 'no';
 }
@@ -229,7 +229,7 @@ export interface MailerLiteLeadRequest {
   email: string;
   phone: string;
   page?: string;
-  
+
   // Core high-leverage fields
   first_name?: string;
   preferred_language?: string;
@@ -240,14 +240,14 @@ export interface MailerLiteLeadRequest {
   business_type?: string;
   primary_goal?: string;
   main_challenge?: string;
-  
+
   // Intent & lifecycle tracking
   event_interest?: string;
   intent_signal?: string;
   lead_score?: number;
   signup_page?: string;
   referrer_domain?: string;
-  
+
   // Attribution data
   utm_source?: string;
   utm_medium?: string;
@@ -258,7 +258,7 @@ export interface MailerLiteLeadRequest {
   first_utm_campaign?: string;
   referrer?: string;
   landing_page?: string;
-  
+
   // Device & browser data
   device_type?: string;
   device_brand?: string;
@@ -266,7 +266,7 @@ export interface MailerLiteLeadRequest {
   browser_version?: string;
   screen_resolution?: string;
   viewport_size?: string;
-  
+
   // Behavioral data
   time_on_page?: number;
   scroll_depth?: number;
@@ -274,12 +274,12 @@ export interface MailerLiteLeadRequest {
   page_views?: number;
   is_returning_visitor?: boolean;
   session_duration?: number;
-  
+
   // Technical data
   online_status?: boolean;
   cookie_enabled?: boolean;
   javascript_enabled?: boolean;
-  
+
   [key: string]: unknown;
 }
 

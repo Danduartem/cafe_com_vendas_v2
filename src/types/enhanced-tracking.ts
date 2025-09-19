@@ -9,7 +9,7 @@
  * - CRM integration with lead-stage tracking
  */
 
-import type { EventContext, EventAttribution } from '../utils/event-tracking.js';
+import type { EventAttribution, EventContext } from '../utils/event-tracking.js';
 
 // ================================
 // ENHANCED MAILERLITE TYPES
@@ -76,7 +76,7 @@ export interface EnhancedMailerLitePayload {
     // Business context (NEW - prepared for Phase 2)
     preferred_language?: string;
     timezone?: string;
-    event_interest: string; // e.g., "cafe_com_vendas_lisbon_2025-09-20"
+    event_interest: string; // e.g., "cafe_com_vendas_lisbon_2025-10-04"
     intent_signal?: string; // e.g., "started_checkout", "completed_payment"
     lead_score?: number;
     signup_page: string;
@@ -149,7 +149,7 @@ export interface EnhancedStripeMetadata {
   // Product information (NEW - better reporting)
   product_id: string; // e.g., "cafe-com-vendas-ticket"
   product_name: string; // e.g., "Café com Vendas - Lisbon 2025"
-  event_date: string; // e.g., "2025-09-20"
+  event_date: string; // e.g., "2025-10-04"
   product_category?: string; // e.g., "business-event"
   product_variant?: string; // e.g., "early-bird-ticket"
 
@@ -159,7 +159,7 @@ export interface EnhancedStripeMetadata {
   utm_campaign?: string;
   utm_content?: string;
   utm_term?: string;
-  
+
   // First-touch attribution (for cross-session tracking)
   first_utm_source?: string;
   first_utm_campaign?: string;
@@ -189,7 +189,7 @@ export interface EnhancedStripeMetadata {
   browser_language?: string;
   screen_resolution?: string;
   timezone?: string;
-  
+
   // Phase 2 server-side attribution
   server_attribution_enabled?: string;
   integration_version?: string;

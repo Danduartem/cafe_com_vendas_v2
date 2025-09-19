@@ -3,9 +3,9 @@
  * Handles countdown timer and interactive behaviors for the top banner
  */
 
+import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 import type { Component } from '../../../types/components/base.js';
 import { safeQuery } from '../../../utils/dom.js';
-import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 
 interface TopBannerComponent extends Component {
   countdownInterval?: number;
@@ -89,8 +89,8 @@ export const TopBanner: TopBannerComponent = {
     if (eventDateStr) {
       eventDate = new Date(eventDateStr);
     } else {
-      // Default: September 20, 2025, 9:00 AM Lisbon time
-      eventDate = new Date('2025-09-20T09:00:00+01:00');
+      // Default: October 04, 2025, 9:00 AM Lisbon time
+      eventDate = new Date('2025-10-04T09:00:00+01:00');
     }
 
     // Start countdown
