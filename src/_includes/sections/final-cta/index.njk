@@ -145,20 +145,26 @@
     </div>
     
     {# Urgency Message #}
-    <div class="mt-20 pt-12 border-t border-white/10 text-center">
-      <div class="flex items-center justify-center space-x-4 max-w-2xl mx-auto">
-        <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-gold-400/20 to-gold-600/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-          <svg class="w-6 h-6 text-gold-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-          </svg>
-        </div>
-        <div class="text-left">
-          <p class="text-lg md:text-xl text-white font-century leading-relaxed">
-            {{ currentSection.copy.urgencyMessage.line1 | replace('04/10', '<span class="font-bold text-white">04/10</span>') | safe }}
-          </p>
-          <p class="text-base md:text-lg text-white/80 mt-1">
-            {{ currentSection.copy.urgencyMessage.line2 | replace('20 vagas', '<span class="font-bold text-white">20 vagas</span>') | safe }}
-          </p>
+    <div class="mt-20 pt-12 border-t border-white/10">
+      <div class="max-w-3xl mx-auto bg-white/5 border border-white/10 rounded-3xl px-6 py-7 md:px-10 md:py-9 shadow-lg shadow-black/20 backdrop-blur">
+        <div class="flex flex-col items-center text-center gap-4">
+          <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-gold-400/20 to-gold-600/30 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+            <svg class="w-6 h-6 md:w-7 md:h-7 text-gold-300" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="space-y-2">
+            <p class="text-lg md:text-xl text-white leading-relaxed font-century">
+              {{ currentSection.copy.urgencyMessage.line1
+                | replace('04 de Outubro de 2025 (Sábado)', '<span class="font-semibold text-gold-200">04 de Outubro de 2025 (Sábado)</span>')
+                | safe }}
+            </p>
+            <p class="text-sm md:text-base text-white/75 font-century">
+              {{ currentSection.copy.urgencyMessage.line2
+                | replace('Lisboa, Ajuda, na Mesa Corrida 14H às 21H', '<span class="text-white font-medium">Lisboa, Ajuda, na Mesa Corrida · 14H às 21H</span>')
+                | safe }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
