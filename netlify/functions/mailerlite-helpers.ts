@@ -76,7 +76,7 @@ export async function triggerConfirmationEmail(
         confirmation_sent_at: new Date().toISOString()
       },
       groups: [
-        // Add to buyer_paid lifecycle group for post-purchase automation
+        // Add to ccv_buyer_paid lifecycle group for post-purchase automation
         MAILERLITE_EVENT_GROUPS.BUYER_PAID
       ],
       status: 'active'
@@ -155,7 +155,7 @@ async function updateSubscriberForConfirmation(
         method: 'PUT',
         body: JSON.stringify({
           fields,
-          groups: [MAILERLITE_EVENT_GROUPS.BUYER_PAID] // Use buyer_paid lifecycle group
+          groups: [MAILERLITE_EVENT_GROUPS.BUYER_PAID] // Use ccv_buyer_paid lifecycle group
         })
       }
     );
@@ -344,7 +344,7 @@ export async function triggerEventReminderEmail(
           reminder_count: 1 // Increment this on each reminder
         },
         groups: [
-          // Use buyer_paid for confirmed purchasers receiving event reminders
+          // Use ccv_buyer_paid for confirmed purchasers receiving event reminders
           MAILERLITE_EVENT_GROUPS.BUYER_PAID,
           // Also add to details_complete if they've filled required info
           // This enables sophisticated reminder automation targeting

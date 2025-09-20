@@ -83,7 +83,7 @@ const RATE_LIMIT_MAX_REQUESTS = 8; // Max 8 lead submissions per 10 minutes per 
 const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
 
 // Event-specific Group Names (will be resolved to IDs)
-// Following naming convention: ccv-2025-10-04_lifecycle_state
+// Following naming convention: ccv_<lifecycle_state>
 const EVENT_GROUPS = MAILERLITE_EVENT_GROUPS;
 
 // Direct Group ID mapping to actual MailerLite groups

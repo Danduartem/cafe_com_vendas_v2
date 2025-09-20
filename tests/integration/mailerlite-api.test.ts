@@ -203,7 +203,7 @@ describe('MailerLite Lead Endpoint Integration', () => {
       // };
 
       // Expected group assignment
-      const expectedGroup = 'ccv-2025-10-04_checkout_started';
+      const expectedGroup = 'ccv_checkout_started';
 
       expect(expectedGroup).toMatch(/checkout_started/);
     });

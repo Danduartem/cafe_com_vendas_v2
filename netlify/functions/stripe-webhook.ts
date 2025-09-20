@@ -564,8 +564,8 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
     try {
       await retryWithBackoff(() => moveSubscriberBetweenGroups(
         customerEmail,
-        getLifecycleGroupId('CHECKOUT_STARTED'),    // From: checkout_started
-        getLifecycleGroupId('BUYER_PAID')           // To: buyer_paid
+        getLifecycleGroupId('CHECKOUT_STARTED'),    // From: ccv_checkout_started
+        getLifecycleGroupId('BUYER_PAID')           // To: ccv_buyer_paid
       ));
 
       logWithCorrelation('info', 'Successfully executed payment success lifecycle transition', {
@@ -574,7 +574,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
         customerEmail,
         paymentIntentId: paymentIntent.id,
         transition: `${MAILERLITE_EVENT_GROUPS.CHECKOUT_STARTED} → ${MAILERLITE_EVENT_GROUPS.BUYER_PAID}`,
-        lifecycleStage: 'buyer_paid',
+        lifecycleStage: MAILERLITE_EVENT_GROUPS.BUYER_PAID,
         crmCorrelation: crm_contact_id
       }, correlationId);
     } catch (error) {
@@ -584,7 +584,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent, correla
         event_id,
         customerEmail,
         paymentIntentId: paymentIntent.id,
-        lifecycleStage: 'buyer_paid_failed'
+        lifecycleStage: `${MAILERLITE_EVENT_GROUPS.BUYER_PAID}_failed`
       }, correlationId);
     }
 
@@ -1554,7 +1554,7 @@ async function addToMailerLite(subscriberData: MailerLiteSubscriberData): Promis
           email: subscriberData.email,
           name: subscriberData.name,
           fields: subscriberData.fields,
-          groups: [getLifecycleGroupId('BUYER_PAID')], // Add to buyer_paid lifecycle state
+          groups: [getLifecycleGroupId('BUYER_PAID')], // Add to ccv_buyer_paid lifecycle state
           status: 'active',
           subscribed_at: new Date().toISOString()
         })

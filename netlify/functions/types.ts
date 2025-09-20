@@ -17,23 +17,23 @@ export const GOOGLE_MAPS_LINK = 'https://maps.google.com/?q=Lisboa,Portugal' as 
 
 // MailerLite group hierarchy
 
-// Lifecycle state groups following MailerLite best practices
+// Lifecycle state groups follow MailerLite naming: ccv_<lifecycle_state>
 export const MAILERLITE_EVENT_GROUPS = {
   // Lead nurture funnel
-  CHECKOUT_STARTED: `${EVENT_SLUG}_checkout_started`,
-  ABANDONED_PAYMENT: `${EVENT_SLUG}_abandoned_payment`,
+  CHECKOUT_STARTED: 'ccv_checkout_started',
+  ABANDONED_PAYMENT: 'ccv_abandoned_payment',
 
   // Payment processing states
-  BUYER_PENDING: `${EVENT_SLUG}_buyer_pending`,
-  BUYER_PAID: `${EVENT_SLUG}_buyer_paid`,
+  BUYER_PENDING: 'ccv_buyer_pending',
+  BUYER_PAID: 'ccv_buyer_paid',
 
   // Post-purchase lifecycle
-  DETAILS_PENDING: `${EVENT_SLUG}_details_pending`,
-  DETAILS_COMPLETE: `${EVENT_SLUG}_details_complete`,
+  DETAILS_PENDING: 'ccv_details_pending',
+  DETAILS_COMPLETE: 'ccv_details_complete',
 
   // Event participation
-  ATTENDED: `${EVENT_SLUG}_attended`,
-  NO_SHOW: `${EVENT_SLUG}_no_show`
+  ATTENDED: 'ccv_attended',
+  NO_SHOW: 'ccv_no_show'
 } as const;
 
 

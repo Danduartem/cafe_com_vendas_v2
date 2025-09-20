@@ -76,7 +76,7 @@ describe('MailerLite Complete Flow E2E Tests', () => {
         expectedResult: {
           leadCreated: true,
           addedToMailerLite: true,
-          group: 'checkout_started',
+          group: 'ccv_checkout_started',
           customFields: {
             payment_status: 'lead',
             checkout_started_at: expect.any(String),
@@ -88,7 +88,7 @@ describe('MailerLite Complete Flow E2E Tests', () => {
 
       // Validate flow expectations
       expect(leadCaptureFlow.expectedResult.leadCreated).toBe(true);
-      expect(leadCaptureFlow.expectedResult.group).toBe('checkout_started');
+      expect(leadCaptureFlow.expectedResult.group).toBe('ccv_checkout_started');
       expect(leadCaptureFlow.expectedResult.customFields.payment_status).toBe('lead');
     });
 
@@ -146,7 +146,7 @@ describe('MailerLite Complete Flow E2E Tests', () => {
           },
           expectedMailerLiteUpdate: {
             payment_status: 'paid',
-            group: 'buyer_paid',
+            group: 'ccv_buyer_paid',
             amount_paid: 180,
             payment_date: expect.any(String),
             payment_method: 'card_or_instant'
@@ -155,7 +155,7 @@ describe('MailerLite Complete Flow E2E Tests', () => {
         };
 
         expect(cardPaymentFlow.expectedMailerLiteUpdate.payment_status).toBe('paid');
-        expect(cardPaymentFlow.expectedMailerLiteUpdate.group).toBe('buyer_paid');
+        expect(cardPaymentFlow.expectedMailerLiteUpdate.group).toBe('ccv_buyer_paid');
         expect(cardPaymentFlow.expectedEmailTrigger).toBe('confirmation_email');
       });
 
@@ -226,7 +226,7 @@ describe('MailerLite Complete Flow E2E Tests', () => {
             mb_amount: 180,
             mb_expires_at: expect.any(String),
             voucher_generated_at: expect.any(String),
-            group: 'buyer_pending'
+            group: 'ccv_buyer_pending'
           },
           expectedEmailTrigger: 'multibanco_voucher_email'
         };
@@ -246,7 +246,7 @@ describe('MailerLite Complete Flow E2E Tests', () => {
           },
           expectedMailerLiteUpdate: {
             payment_status: 'paid',
-            group: 'buyer_paid',
+            group: 'ccv_buyer_paid',
             amount_paid: 180,
             payment_date: expect.any(String),
             fulfillment_trigger: 'async_payment_succeeded'
@@ -266,7 +266,7 @@ describe('MailerLite Complete Flow E2E Tests', () => {
           voucherExpiry: Date.now() - 86400000, // Expired 24 hours ago
           expectedMailerLiteUpdate: {
             payment_status: 'expired',
-            group: 'abandoned_payment'
+            group: 'ccv_abandoned_payment'
           },
           expectedEmailTrigger: 'payment_expired_email'
         };
@@ -322,25 +322,25 @@ describe('MailerLite Complete Flow E2E Tests', () => {
       const emailAutomations = [
         {
           status: 'lead',
-          group: 'checkout_started',
+          group: 'ccv_checkout_started',
           expectedSequence: 'nurture_sequence',
           emails: ['welcome', 'value_prop', 'urgency']
         },
         {
           status: 'processing',
-          group: 'buyer_pending',
+          group: 'ccv_buyer_pending',
           expectedSequence: 'multibanco_reminder',
           emails: ['voucher_details', 'payment_reminder', 'expiry_warning']
         },
         {
           status: 'paid',
-          group: 'buyer_paid',
+          group: 'ccv_buyer_paid',
           expectedSequence: 'buyer_onboarding',
           emails: ['confirmation', 'event_details', 'preparation_tips']
         },
         {
           status: 'failed',
-          group: 'abandoned_payment',
+          group: 'ccv_abandoned_payment',
           expectedSequence: 'cart_recovery',
           emails: ['payment_failed', 'special_offer', 'last_chance']
         }
@@ -437,7 +437,7 @@ describe('MailerLite Complete Flow E2E Tests', () => {
         finalState: {
           leadId: 'e2e-test-lead-123',
           email: 'carlos@example.com',
-          mailerliteGroups: ['buyer_paid', 'vip_buyers'],
+          mailerliteGroups: ['ccv_buyer_paid', 'vip_buyers'],
           paymentStatus: 'paid',
           amountPaid: 180,
           ticketType: 'VIP',
@@ -447,7 +447,7 @@ describe('MailerLite Complete Flow E2E Tests', () => {
       };
 
       expect(completeJourney.finalState.paymentStatus).toBe('paid');
-      expect(completeJourney.finalState.mailerliteGroups).toContain('buyer_paid');
+      expect(completeJourney.finalState.mailerliteGroups).toContain('ccv_buyer_paid');
       expect(completeJourney.finalState.analyticsEvents).toContain('purchase');
     });
 
@@ -466,12 +466,12 @@ describe('MailerLite Complete Flow E2E Tests', () => {
           timeToRecover: '4 hours',
           emailClicked: true,
           conversionComplete: true,
-          finalGroup: 'buyer_paid'
+          finalGroup: 'ccv_buyer_paid'
         }
       };
 
       expect(abandonedCartFlow.recovery.conversionComplete).toBe(true);
-      expect(abandonedCartFlow.recovery.finalGroup).toBe('buyer_paid');
+      expect(abandonedCartFlow.recovery.finalGroup).toBe('ccv_buyer_paid');
     });
   });
 
