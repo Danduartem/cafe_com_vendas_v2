@@ -175,9 +175,9 @@ export function generateCalendarUrls(event: CalendarEvent): CalendarUrls {
  * Creates the Café com Vendas event calendar entry
  */
 export function createCafeComVendasEvent(): CalendarEvent {
-  // September 20, 2025 - Full day event (9:00 AM - 6:00 PM Portugal time)
-  const eventStart = new Date('2025-10-04T09:00:00+01:00'); // Portugal timezone (UTC+1)
-  const eventEnd = new Date('2025-10-04T18:00:00+01:00');
+  // October 4, 2025 - Afternoon/Evening event (14:00 - 21:00 Portugal time)
+  const eventStart = new Date('2025-10-04T14:00:00+01:00'); // Portugal timezone (UTC+1 during DST)
+  const eventEnd = new Date('2025-10-04T21:00:00+01:00');
 
   return {
     title: 'Café com Vendas - Edição Exclusiva Portugal',

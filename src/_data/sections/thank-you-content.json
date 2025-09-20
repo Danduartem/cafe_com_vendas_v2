@@ -6,7 +6,7 @@
       "ariaLabel": "Página de agradecimento e próximos passos"
     },
     "badge": {
-      "text": "✓ Pagamento confirmado com sucesso"
+      "text": "Pagamento confirmado com sucesso"
     },
     "header": {
       "title": "<span class=\"text-gold-500\">Parabéns!</span> Falta só <em class=\"italic text-burgundy-600 font-black\">um</em> passo<br class=\"hidden sm:block\"/><span class=\"text-navy-700\">para garantir a sua experiência premium</span>",
@@ -37,16 +37,23 @@
     "mainAction": {
       "title": "Garanta o seu lugar agora",
       "description": "Complete o seu perfil personalizado em apenas 2 minutos. Estas informações garantem que preparamos tudo especificamente para si e que recebe todos os materiais exclusivos antes do evento.",
-      "note": "Receberá um email com instruções para completar o seu perfil."
+      "note": "Receberá um email com instruções para completar o seu perfil.",
+      "button": {
+        "text": "Completar o meu perfil",
+        "url": "https://forms.gle/WpKyuUYmdLAWbs17A",
+        "analytics": "cta_complete_form"
+      }
     },
     "steps": [
       {
         "number": "2",
+        "color": "navy",
         "title": "Receba a confirmação por email",
         "description": "Após completar o perfil, receberá automaticamente todos os detalhes do evento, incluindo localização, horários e materiais de preparação."
       },
       {
         "number": "3",
+        "color": "navy",
         "title": "Adicione ao seu calendário",
         "description": "Não perca esta oportunidade única. Adicione o evento ao seu calendário.",
         "calendarDropdown": {
@@ -70,7 +77,7 @@
             {
               "id": "apple",
               "text": "iPhone",
-              "icon": "📱", 
+              "icon": "📱",
               "description": "Optimizado para iPhone"
             }
           ]

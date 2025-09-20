@@ -9,7 +9,7 @@
     <!-- Header -->
     <div class="text-center mb-16" data-reveal>
       <!-- Success Badge -->
-      <div class="inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-burgundy-50 to-burgundy-100/80 text-burgundy-700 shadow-md backdrop-blur-sm border border-burgundy-200/40 mb-8">
+      <div class="inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-burgundy-50 to-burgundy-100/80 text-burgundy-700 shadow-md backdrop-blur-sm border border-burgundy-200/40 mb-8 text-center sm:text-left">
         <!-- check icon with subtle animation -->
         <div class="flex-shrink-0 w-6 h-6 rounded-full bg-burgundy-600 flex items-center justify-center">
           <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" aria-hidden="true">
@@ -41,15 +41,16 @@
       <!-- Milestone Steps -->
       <div class="relative">
         <!-- Progress Line -->
-        <div class="absolute top-8 left-0 right-0 h-1 bg-gradient-to-r from-neutral-200 to-neutral-300 rounded-full"></div>
-        <div class="absolute top-8 left-0 w-1/2 h-1 bg-gradient-to-r from-burgundy-500 to-burgundy-600 rounded-full transition-all duration-1000 ease-out"></div>
+        <div class="absolute top-10 bottom-10 left-1/2 w-[3px] -translate-x-1/2 bg-gradient-to-b from-burgundy-500 via-burgundy-400/70 to-neutral-300 rounded-full sm:hidden"></div>
+        <div class="hidden sm:block absolute top-8 left-0 right-0 h-1 bg-gradient-to-r from-neutral-200 to-neutral-300 rounded-full"></div>
+        <div class="hidden sm:block absolute top-8 left-0 w-1/2 h-1 bg-gradient-to-r from-burgundy-500 to-burgundy-600 rounded-full transition-all duration-1000 ease-out"></div>
         
         <!-- Steps Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-4">
           {% for milestone in currentSection.copy.progress.milestones %}
-          <div class="flex flex-col items-center text-center">
+          <div class="relative flex flex-col items-center text-center">
             <!-- Step Icon -->
-            <div class="relative z-10 flex items-center justify-center w-16 h-16 rounded-full mb-3 transition-all duration-300
+            <div class="relative z-10 flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full mb-4 transition-all duration-300
               {% if milestone.status == 'completed' %}bg-gradient-to-br from-burgundy-500 to-burgundy-700 shadow-lg
               {% elif milestone.status == 'current' %}bg-gradient-to-br from-gold-400 to-gold-600 shadow-lg ring-4 ring-gold-100
               {% else %}bg-white border-2 border-neutral-300{% endif %}"
@@ -71,21 +72,23 @@
               
               <!-- Time Badge for Current Step -->
               {% if milestone.status == 'current' and milestone.time %}
-              <div class="absolute -top-2 -right-2 px-2 py-1 bg-navy-700 text-white text-xs font-century font-bold rounded-full shadow-md">
+              <div class="absolute -top-2 -right-1 sm:-right-2 px-2 py-1 bg-navy-700 text-white text-xs font-century font-bold rounded-full shadow-md">
                 {{ milestone.time }}
               </div>
               {% endif %}
             </div>
             
             <!-- Step Info -->
-            <div>
-              <p class="font-century text-sm font-bold mb-1 
+            <div class="mt-4 sm:mt-3 flex flex-col items-center text-center">
+              <p class="relative z-10 font-century text-sm font-bold mb-2 leading-tight 
                 {% if milestone.status == 'completed' %}text-burgundy-700
                 {% elif milestone.status == 'current' %}text-gold-700
                 {% else %}text-neutral-500{% endif %}">
-                {{ milestone.title }}
+                <span class="inline-block px-3 py-1 rounded-full bg-white/95 border border-neutral-200/80 shadow-sm sm:px-0 sm:py-0 sm:bg-transparent sm:border-0 sm:shadow-none">
+                  {{ milestone.title }}
+                </span>
               </p>
-              <span class="inline-block w-2 h-2 rounded-full 
+              <span class="inline-block w-2 h-2 rounded-full mt-2 
                 {% if milestone.status == 'completed' %}bg-burgundy-500
                 {% elif milestone.status == 'current' %}bg-gold-500 animate-pulse
                 {% else %}bg-neutral-300{% endif %}">
