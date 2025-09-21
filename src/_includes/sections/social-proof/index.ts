@@ -17,10 +17,13 @@ const CAROUSEL_GAP_DEFAULT = 24;
 
 interface CarouselElements {
   carousel: HTMLElement | null;
+  track: HTMLElement | null;
   slides: HTMLElement[];
   prevButton: HTMLElement | null;
   nextButton: HTMLElement | null;
   paginationContainer: HTMLElement | null;
+  loadMoreButton: HTMLElement | null;
+  template: HTMLTemplateElement | null;
 }
 
 interface SocialProofComponent extends Component {
@@ -32,6 +35,8 @@ interface SocialProofComponent extends Component {
   validateCarouselElements(elements: CarouselElements): boolean;
   setupCarouselState(elements: CarouselElements): void;
   setupCarouselBehavior(elements: CarouselElements): void;
+  setupLoadMore(elements: CarouselElements): void;
+  refreshCarouselSlides(elements: CarouselElements): void;
   bindCarouselEvents(elements: CarouselElements): void;
   initSectionTracking(): void;
   createCarouselPagination(elements: CarouselElements): void;
@@ -43,6 +48,7 @@ interface SocialProofComponent extends Component {
   toggleButtonState(button: HTMLElement, isDisabled: boolean): void;
   scrollToSlide(index: number): void;
   handleVideoClick(event: Event): void;
+  initializeVideoInteractions(root: Document | Element): void;
 }
 
 export const SocialProof: SocialProofComponent = {
@@ -64,22 +70,33 @@ export const SocialProof: SocialProofComponent = {
 
     this.setupCarouselState(elements);
     this.setupCarouselBehavior(elements);
+    this.setupLoadMore(elements);
     this.bindCarouselEvents(elements);
     this.initSectionTracking();
   },
 
   getCarouselElements(): CarouselElements {
+    const carousel = safeQuery<HTMLElement>('.testimonials-carousel');
+    const track = safeQuery<HTMLElement>('[data-carousel-track]');
+    const slideNodeList = track
+      ? track.querySelectorAll<HTMLElement>('.carousel-slide')
+      : safeQueryAll<HTMLElement>('.carousel-slide');
+    const slides = Array.from(slideNodeList).filter((el): el is HTMLElement => el instanceof HTMLElement);
+
     return {
-      carousel: safeQuery<HTMLElement>('.testimonials-carousel'),
-      slides: Array.from(safeQueryAll('.carousel-slide')).filter((el): el is HTMLElement => el instanceof HTMLElement),
+      carousel,
+      track,
+      slides,
       prevButton: safeQuery<HTMLElement>('[data-carousel-prev]'),
       nextButton: safeQuery<HTMLElement>('[data-carousel-next]'),
-      paginationContainer: safeQuery<HTMLElement>('[data-carousel-pagination]')
+      paginationContainer: safeQuery<HTMLElement>('[data-carousel-pagination]'),
+      loadMoreButton: safeQuery<HTMLElement>('[data-carousel-load-more]'),
+      template: safeQuery<HTMLTemplateElement>('[data-testimonials-template]')
     };
   },
 
   validateCarouselElements(elements: CarouselElements): boolean {
-    if (!elements.carousel || !elements.slides.length) {
+    if (!elements.carousel || !elements.track || !elements.slides.length) {
       // Not an error: section may be omitted on this page
       logger.info('Testimonials carousel elements not found');
       return false;
@@ -93,16 +110,44 @@ export const SocialProof: SocialProofComponent = {
 
     // Add scroll-snap classes to carousel
     elements.carousel?.classList.add('snap-x', 'snap-mandatory', 'scroll-smooth');
-
-    // Add snap classes to slides
-    elements.slides.forEach(slide => {
-      slide.classList.add('snap-start', 'flex-shrink-0');
-    });
+    this.refreshCarouselSlides(elements);
   },
 
   setupCarouselBehavior(elements: CarouselElements): void {
     this.createCarouselPagination(elements);
     this.updateNavigationButtons(elements);
+  },
+
+  setupLoadMore(elements: CarouselElements): void {
+    const { loadMoreButton, template, track } = elements;
+    if (!loadMoreButton || !template || !track) return;
+
+    loadMoreButton.addEventListener('click', () => {
+      const fragment = template.content.cloneNode(true) as DocumentFragment;
+      track.appendChild(fragment);
+
+      template.remove();
+      loadMoreButton.remove();
+
+      elements.template = null;
+      elements.loadMoreButton = null;
+
+      this.refreshCarouselSlides(elements);
+      this.createCarouselPagination(elements);
+      this.updateNavigationButtons(elements);
+      this.initializeVideoInteractions(track);
+    }, { once: true });
+  },
+
+  refreshCarouselSlides(elements: CarouselElements): void {
+    if (!elements.track) return;
+
+    const slideNodeList = elements.track.querySelectorAll<HTMLElement>('.carousel-slide');
+    elements.slides = Array.from(slideNodeList).filter((el): el is HTMLElement => el instanceof HTMLElement);
+
+    elements.slides.forEach(slide => {
+      slide.classList.add('snap-start', 'flex-shrink-0');
+    });
   },
 
   createCarouselPagination(elements: CarouselElements): void {
@@ -145,8 +190,9 @@ export const SocialProof: SocialProofComponent = {
 
     const scrollLeft = elements.carousel.scrollLeft;
     const slideWidth = elements.slides[0].offsetWidth;
-    const firstChild = elements.carousel.firstElementChild;
-    const gap = firstChild ? parseInt(window.getComputedStyle(firstChild).gap) || CAROUSEL_GAP_DEFAULT : CAROUSEL_GAP_DEFAULT;
+    const gapSource = elements.track ? window.getComputedStyle(elements.track).gap : '';
+    const parsedGap = gapSource ? parseInt(gapSource, 10) : Number.NaN;
+    const gap = Number.isFinite(parsedGap) ? parsedGap : CAROUSEL_GAP_DEFAULT;
 
     // Calculate which slide is most visible
     const newIndex = Math.round(scrollLeft / (slideWidth + gap));
@@ -234,19 +280,24 @@ export const SocialProof: SocialProofComponent = {
    * Uses modern YouTube IFrame API with lazy loading
    */
   initYouTubeVideos(): void {
-    // Find all play buttons for YouTube videos
-    const playButtons = safeQueryAll('.youtube-play-btn');
-    
+    this.initializeVideoInteractions(document);
+  },
+
+  initializeVideoInteractions(root: Document | Element): void {
+    const playButtons = Array.from(root.querySelectorAll<HTMLElement>('.youtube-play-btn'));
     playButtons.forEach(button => {
-      // Add click handler for video embedding
+      if (button.dataset.youtubeBound === 'true') return;
+      button.dataset.youtubeBound = 'true';
       button.addEventListener('click', (event) => {
         void this.handleVideoClick(event);
       });
     });
 
-    // Add hover effects to video cards
-    const videoCards = safeQueryAll('[data-video-card]');
+    const videoCards = Array.from(root.querySelectorAll<HTMLElement>('[data-video-card]'));
     videoCards.forEach(card => {
+      if (card.dataset.videoCardBound === 'true') return;
+      card.dataset.videoCardBound = 'true';
+
       // Add platform animations for better UX
       Animations.addClickFeedback(card, 'scale-105');
 

@@ -21,38 +21,49 @@
       </p>
     </header>
 
+    {% macro testimonial_slide(video) %}
+    <article class="carousel-slide flex-shrink-0 w-full sm:w-80 lg:w-96" data-testimonial-id="testimonial-{{ video.id }}">
+      <div class="video-card group overflow-hidden rounded-2xl border border-white/50 bg-white/90 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_16px_48px_rgba(0,0,0,0.12)]" data-video-card>
+        <div class="relative aspect-video youtube-embed bg-gradient-to-br from-navy-800 to-burgundy-700" data-video-id="{{ video.video_id }}">
+          <img 
+            src="{{ video.thumbnail }}" 
+            alt="Testemunho de {{ video.name }}, {{ video.profession }}"
+            class="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+          <button 
+            type="button"
+            class="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors hover:bg-black/30 focus:outline-none focus:ring-4 focus:ring-gold-400/20 youtube-play-btn group"
+            aria-label="Reproduzir testemunho em vídeo de {{ video.name }}"
+            data-analytics-event="play_testimonial_video"
+          >
+            <svg class="w-16 h-16 text-white drop-shadow-lg transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="p-6">
+          <h3 class="font-lora font-semibold text-lg text-navy-800 mb-2">{{ video.name }}</h3>
+          <p class="font-century text-sm text-navy-800/80">{{ video.profession }}</p>
+        </div>
+      </div>
+    </article>
+    {% endmacro %}
+
+    {% set INITIAL_VISIBLE = 6 %}
+    {% set testimonials = currentSection.testimonials %}
+    {% set testimonialsCount = testimonials | length %}
+    {% set hasMoreTestimonials = testimonialsCount > INITIAL_VISIBLE %}
+
     <div class="testimonials-carousel-container relative">
       <div class="testimonials-carousel overflow-x-auto overflow-y-hidden scrollbar-hide">
         <div class="testimonials-track flex gap-6 pb-12" data-carousel-track>
           
-          {% for video in currentSection.testimonials %}
-          <article class="carousel-slide flex-shrink-0 w-full sm:w-80 lg:w-96">
-            <div class="video-card group overflow-hidden rounded-2xl border border-white/50 bg-white/90 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_16px_48px_rgba(0,0,0,0.12)]" data-video-card>
-              <div class="relative aspect-video youtube-embed bg-gradient-to-br from-navy-800 to-burgundy-700" data-video-id="{{ video.video_id }}">
-                <img 
-                  src="{{ video.thumbnail }}" 
-                  alt="Testemunho de {{ video.name }}, {{ video.profession }}}"
-                  class="absolute inset-0 w-full h-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <button 
-                  type="button"
-                  class="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors hover:bg-black/30 focus:outline-none focus:ring-4 focus:ring-gold-400/20 youtube-play-btn group"
-                  aria-label="Reproduzir testemunho em vídeo de {{ video.name }}"
-                  data-analytics-event="play_testimonial_video"
-                >
-                  <svg class="w-16 h-16 text-white drop-shadow-lg transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                </button>
-              </div>
-              <div class="p-6">
-                <h3 class="font-lora font-semibold text-lg text-navy-800 mb-2">{{ video.name }}</h3>
-                <p class="font-century text-sm text-navy-800/80">{{ video.profession }}</p>
-              </div>
-            </div>
-          </article>
+          {% for video in testimonials %}
+            {% if loop.index0 < INITIAL_VISIBLE %}
+              {{ testimonial_slide(video) | safe }}
+            {% endif %}
           {% endfor %}
 
         </div>
@@ -85,7 +96,30 @@
           </svg>
         </button>
       </nav>
+
+      {% if hasMoreTestimonials %}
+        <div class="flex justify-center">
+          <button
+            type="button"
+            class="load-more-testimonials mt-4 px-5 py-3 rounded-full border border-navy-800/10 bg-white/90 text-sm font-century font-semibold text-navy-800 transition-colors duration-300 hover:bg-white hover:text-navy-900 focus:outline-none focus:ring-4 focus:ring-gold-400/20"
+            data-carousel-load-more
+            aria-label="Carregar mais depoimentos"
+          >
+            Ver mais depoimentos
+          </button>
+        </div>
+      {% endif %}
     </div>
+
+      {% if hasMoreTestimonials %}
+      <template id="testimonials-template" data-testimonials-template>
+        {% for video in testimonials %}
+          {% if loop.index0 >= INITIAL_VISIBLE %}
+            {{ testimonial_slide(video) | safe }}
+          {% endif %}
+        {% endfor %}
+      </template>
+    {% endif %}
 
     <footer class="text-center mt-16">
       <p class="font-century text-base italic text-navy-800/70">
