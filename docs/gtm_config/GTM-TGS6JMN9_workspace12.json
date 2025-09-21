@@ -1,6 +1,6 @@
 {
     "exportFormatVersion": 2,
-    "exportTime": "2025-09-19 09:26:33",
+    "exportTime": "2025-09-21 08:56:15",
     "containerVersion": {
         "path": "accounts/6308553599/containers/228813091/versions/0",
         "accountId": "6308553599",
@@ -92,7 +92,7 @@
                     {
                         "type": "TEMPLATE",
                         "key": "apiAccessToken",
-                        "value": "{{Secret | Meta | access_token}}"
+                        "value": "{{Secret | Meta | META_ACCESS_TOKEN}}"
                     },
                     {
                         "type": "BOOLEAN",
@@ -110,7 +110,7 @@
                         "value": "website"
                     }
                 ],
-                "fingerprint": "1758126168823",
+                "fingerprint": "1758299911731",
                 "firingTriggerId": [
                     "8"
                 ],
@@ -159,37 +159,6 @@
             }
         ],
         "variable": [
-            {
-                "accountId": "6308553599",
-                "containerId": "228813091",
-                "variableId": "10",
-                "name": "Secret | Meta | access_token",
-                "type": "fs",
-                "parameter": [
-                    {
-                        "type": "TEMPLATE",
-                        "key": "keyPath",
-                        "value": "value"
-                    },
-                    {
-                        "type": "BOOLEAN",
-                        "key": "setProjectId",
-                        "value": "false"
-                    },
-                    {
-                        "type": "TEMPLATE",
-                        "key": "operation",
-                        "value": "read"
-                    },
-                    {
-                        "type": "TEMPLATE",
-                        "key": "documentPath",
-                        "value": "gtm_secrets/meta_access_token"
-                    }
-                ],
-                "fingerprint": "1758126186993",
-                "formatValue": {}
-            },
             {
                 "accountId": "6308553599",
                 "containerId": "228813091",
@@ -467,6 +436,27 @@
                 ],
                 "fingerprint": "1758126274678",
                 "formatValue": {}
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "228813091",
+                "variableId": "23",
+                "name": "Secret | Meta | META_ACCESS_TOKEN",
+                "type": "ed",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "keyPath",
+                        "value": "META_ACCESS_TOKEN"
+                    }
+                ],
+                "fingerprint": "1758299897166",
+                "formatValue": {}
             }
         ],
         "builtInVariable": [
@@ -483,7 +473,7 @@
                 "name": "Client Name"
             }
         ],
-        "fingerprint": "1758273992996",
+        "fingerprint": "1758444975502",
         "tagManagerUrl": "https://tagmanager.google.com/#/versions/accounts/6308553599/containers/228813091/versions/0?apiLink=version",
         "customTemplate": [
             {

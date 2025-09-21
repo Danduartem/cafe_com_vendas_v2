@@ -1,6 +1,6 @@
 {
     "exportFormatVersion": 2,
-    "exportTime": "2025-09-19 09:26:46",
+    "exportTime": "2025-09-21 08:55:59",
     "containerVersion": {
         "path": "accounts/6308553599/containers/227494781/versions/0",
         "accountId": "6308553599",
@@ -4760,7 +4760,7 @@
                 "name": "Scroll Direction"
             }
         ],
-        "fingerprint": "1758274006842",
+        "fingerprint": "1758444959013",
         "tagManagerUrl": "https://tagmanager.google.com/#/versions/accounts/6308553599/containers/227494781/versions/0?apiLink=version"
     }
 }

@@ -5,6 +5,7 @@
 
 import { CONFIG } from './config/constants.js';
 import { state, StateManager } from './core/state.js';
+import { normalizeEventPayload } from './utils/gtm-normalizer.js';
 import type {
   ComponentRegistration,
   ComponentHealthStatus,
@@ -21,6 +22,20 @@ type AnalyticsModule = typeof import('../../analytics/index.js');
 
 let analyticsModulePromise: Promise<AnalyticsModule> | undefined;
 let analyticsModuleCache: AnalyticsModule | undefined;
+
+type AnalyticsActivationSource = 'first_scroll' | 'cta_click' | 'timeout_fallback';
+
+interface AnalyticsActivationDetail {
+  source: AnalyticsActivationSource;
+  timestamp: string;
+}
+
+let analyticsActivationSetup = false;
+let resolveAnalyticsActivation: ((detail: AnalyticsActivationDetail) => void) | undefined;
+
+const analyticsActivationPromise = new Promise<AnalyticsActivationDetail>(resolve => {
+  resolveAnalyticsActivation = resolve;
+});
 
 async function loadAnalyticsModule(): Promise<AnalyticsModule> {
   if (analyticsModuleCache) {
@@ -67,6 +82,102 @@ import { TopBanner } from '../../_includes/sections/top-banner/index.js';
 import { ThankYou } from '../../_includes/sections/thank-you/index.js';
 import { Checkout } from '../../_includes/sections/checkout/index.js';
 
+function setupAnalyticsActivation(): void {
+  if (analyticsActivationSetup) {
+    return;
+  }
+  analyticsActivationSetup = true;
+
+  const dataLayerWindow = window as unknown as { dataLayer?: Record<string, unknown>[] };
+  dataLayerWindow.dataLayer = dataLayerWindow.dataLayer || [];
+  const dataLayer = dataLayerWindow.dataLayer;
+
+  let activated = false;
+  let fallbackTimerId: number | undefined;
+  const cleanupTasks: (() => void)[] = [];
+
+  const dispatchActivation = (source: AnalyticsActivationSource): void => {
+    if (activated) {
+      return;
+    }
+    activated = true;
+
+    cleanupTasks.forEach(task => {
+      try {
+        task();
+      } catch {
+        // noop
+      }
+    });
+    cleanupTasks.length = 0;
+
+    if (fallbackTimerId !== undefined) {
+      window.clearTimeout(fallbackTimerId);
+      fallbackTimerId = undefined;
+    }
+
+    const timestamp = new Date().toISOString();
+    const basePayload = {
+      activation_source: source,
+      activation_timestamp: timestamp
+    };
+
+    dataLayer.push(normalizeEventPayload({
+      event: 'ga4_activate',
+      engagement_type: source,
+      ...basePayload
+    }));
+
+    dataLayer.push(normalizeEventPayload({
+      event: 'meta_activate',
+      intent: source,
+      ...basePayload
+    }));
+
+    if (resolveAnalyticsActivation) {
+      resolveAnalyticsActivation({ source, timestamp });
+      resolveAnalyticsActivation = undefined;
+    }
+
+    window.dispatchEvent(new CustomEvent<AnalyticsActivationDetail>('analytics:activated', {
+      detail: { source, timestamp }
+    }));
+  };
+
+  const scrollThreshold = 150;
+  const handleScroll = (): void => {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
+    if (scrollTop >= scrollThreshold) {
+      dispatchActivation('first_scroll');
+    }
+  };
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  cleanupTasks.push(() => window.removeEventListener('scroll', handleScroll));
+
+  // If the user loads partway down the page, fire immediately.
+  handleScroll();
+
+  const primaryCTASelector = '[data-cta="primary"]';
+  const ctas = Array.from(document.querySelectorAll<HTMLElement>(primaryCTASelector));
+  const handleCtaClick = (): void => dispatchActivation('cta_click');
+
+  ctas.forEach(cta => {
+    cta.addEventListener('click', handleCtaClick, { once: true });
+    cleanupTasks.push(() => cta.removeEventListener('click', handleCtaClick));
+  });
+
+  fallbackTimerId = window.setTimeout(() => {
+    dispatchActivation('timeout_fallback');
+  }, 7000);
+
+  cleanupTasks.push(() => {
+    if (fallbackTimerId !== undefined) {
+      window.clearTimeout(fallbackTimerId);
+    }
+  });
+}
+
 /**
  * Main application interface - matches global CafeComVendasApp type
  */
@@ -79,6 +190,7 @@ interface CafeComVendasInterface {
   init(): Promise<void>;
   setupGlobalErrorHandling(): void;
   setupGlobalClickHandlers(): void;
+  waitForAnalyticsActivation(): Promise<AnalyticsActivationDetail>;
   extractWhatsAppLinkText(link: HTMLAnchorElement): string;
   determineWhatsAppClickLocation(link: HTMLAnchorElement, analyticsEvent?: string | null): string;
   extractUTMParams(url: string): Record<string, string | undefined>;
@@ -137,6 +249,9 @@ export const CafeComVendas: CafeComVendasInterface = {
 
       // Initialize all components
       this.initializeComponents();
+
+      // Register activation listeners so GA4/Meta load only after engagement
+      setupAnalyticsActivation();
 
       // Setup global click handlers
       this.setupGlobalClickHandlers();
@@ -258,6 +373,10 @@ export const CafeComVendas: CafeComVendasInterface = {
         });
       }
     }, { passive: true });
+  },
+
+  waitForAnalyticsActivation(): Promise<AnalyticsActivationDetail> {
+    return analyticsActivationPromise;
   },
 
   /**
