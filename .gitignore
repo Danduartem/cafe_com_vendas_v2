@@ -112,6 +112,8 @@ temp/
 .netlify-cache/
 netlify-automatic-functions/
 .netlify-auto-functions.json
+.config/configstore/
+Library/Preferences/netlify/
 
 # ==============================================================================
 # Platform-Specific (macOS/Windows)
