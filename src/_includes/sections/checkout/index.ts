@@ -4,7 +4,6 @@
  * Two-step modal checkout: Lead capture (MailerLite) + Stripe Payment Elements
  */
 
-import { loadStripe } from '@stripe/stripe-js';
 import type {
   Stripe,
   StripeElements,
@@ -47,6 +46,19 @@ const eventPricing = site.event.pricing;
 const basePrice = eventPricing.basePrice;
 const priceInCents = eventPricing.tiers[0].priceInCents;
 const eventName = site.event.name;
+
+let stripeModulePromise: Promise<typeof import('@stripe/stripe-js')> | null = null;
+
+async function getStripeModule(): Promise<typeof import('@stripe/stripe-js')> {
+  if (!stripeModulePromise) {
+    stripeModulePromise = import('@stripe/stripe-js').catch(error => {
+      stripeModulePromise = null;
+      throw error;
+    });
+  }
+
+  return stripeModulePromise;
+}
 
 // API Response types
 interface PaymentIntentResponse {
@@ -412,6 +424,7 @@ export const Checkout: CheckoutSectionComponent = {
 
     // Enhanced error handling
     try {
+      const { loadStripe } = await getStripeModule();
       this.stripeLoadPromise = loadStripe(ENV.stripe.publishableKey);
       this.stripe = await this.stripeLoadPromise;
       this.stripeLoaded = true;
@@ -442,6 +455,7 @@ export const Checkout: CheckoutSectionComponent = {
       }
 
       // Start loading Stripe but don't await - let it load in background
+      const { loadStripe } = await getStripeModule();
       this.stripeLoadPromise = loadStripe(ENV.stripe.publishableKey);
       try {
         this.stripe = await this.stripeLoadPromise;
