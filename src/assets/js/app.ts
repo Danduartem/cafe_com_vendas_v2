@@ -28,7 +28,7 @@ let analyticsInitialized = false;
 type AnalyticsCallback = (module: AnalyticsModule) => void;
 const pendingAnalyticsCallbacks: AnalyticsCallback[] = [];
 
-type AnalyticsActivationSource = 'first_scroll' | 'cta_click' | 'timeout_fallback';
+type AnalyticsActivationSource = 'first_scroll' | 'cta_click' | 'pointer_interaction' | 'timeout_fallback';
 
 interface AnalyticsActivationDetail {
   source: AnalyticsActivationSource;
@@ -113,6 +113,11 @@ import { TopBanner } from '../../_includes/sections/top-banner/index.js';
 import { ThankYou } from '../../_includes/sections/thank-you/index.js';
 import { Checkout } from '../../_includes/sections/checkout/index.js';
 
+type HeartbeatTrigger = 'scroll' | 'pointer' | 'cta';
+
+let notifyEngagementInteraction: ((trigger: HeartbeatTrigger) => void) | undefined;
+let requestAnalyticsActivation: ((source: AnalyticsActivationSource) => void) | undefined;
+
 function setupAnalyticsActivation(): void {
   if (analyticsActivationSetup) {
     return;
@@ -122,10 +127,300 @@ function setupAnalyticsActivation(): void {
   const dataLayerWindow = window as unknown as { dataLayer?: Record<string, unknown>[] };
   dataLayerWindow.dataLayer = dataLayerWindow.dataLayer || [];
   const dataLayer = dataLayerWindow.dataLayer;
+  const analyticsWindow = window as typeof window & { __preActivationPageViewSent?: boolean };
 
   let activated = false;
   let fallbackTimerId: number | undefined;
-  const cleanupTasks: (() => void)[] = [];
+  const activationCleanups: (() => void)[] = [];
+  const engagementCleanups: (() => void)[] = [];
+
+  const HEARTBEAT_DELAY_MS = 1000;
+  const SCROLL_ACTIVATION_THRESHOLD_PX = 150;
+  const sessionStart = performance.now();
+
+  const sessionState: {
+    pageViewSent: boolean;
+    pageLoadedSent: boolean;
+    heartbeatSent: boolean;
+    heartbeatTimerId?: number;
+    maxScrollPercent: number;
+    pointerInteraction: boolean;
+    scrollInteraction: boolean;
+    lastTrigger?: HeartbeatTrigger;
+  } = {
+    pageViewSent: false,
+    pageLoadedSent: false,
+    heartbeatSent: false,
+    heartbeatTimerId: undefined,
+    maxScrollPercent: 0,
+    pointerInteraction: false,
+    scrollInteraction: false,
+    lastTrigger: undefined
+  };
+
+  const pushDataLayerEvent = (eventName: string, payload: Record<string, unknown>) => {
+    dataLayer.push(normalizeEventPayload({
+      event: eventName,
+      ...payload
+    }));
+  };
+
+  const getNavigationMetrics = () => {
+    let navigationEntry: PerformanceNavigationTiming | undefined;
+    if (typeof performance.getEntriesByType === 'function') {
+      const navigationEntries = performance.getEntriesByType('navigation');
+      if (navigationEntries.length > 0) {
+        navigationEntry = navigationEntries[0] as PerformanceNavigationTiming;
+      }
+    }
+
+    const legacyTiming = (performance as Performance & { timing?: PerformanceTiming }).timing;
+    let loadTimeMs: number | undefined;
+    let domContentLoadedMs: number | undefined;
+
+    if (navigationEntry) {
+      if (navigationEntry.loadEventEnd && Number.isFinite(navigationEntry.loadEventEnd)) {
+        loadTimeMs = Math.round(navigationEntry.loadEventEnd);
+      }
+      if (navigationEntry.domContentLoadedEventEnd && Number.isFinite(navigationEntry.domContentLoadedEventEnd)) {
+        domContentLoadedMs = Math.round(navigationEntry.domContentLoadedEventEnd);
+      }
+    } else if (legacyTiming) {
+      if (legacyTiming.loadEventEnd) {
+        loadTimeMs = Math.round(legacyTiming.loadEventEnd - legacyTiming.fetchStart);
+      }
+      if (legacyTiming.domContentLoadedEventEnd) {
+        domContentLoadedMs = Math.round(legacyTiming.domContentLoadedEventEnd - legacyTiming.fetchStart);
+      }
+    }
+
+    return { loadTimeMs, domContentLoadedMs };
+  };
+
+  const buildPageContext = (): Record<string, unknown> => ({
+    page_location: window.location.href,
+    page_title: document.title,
+    load_timestamp: new Date().toISOString(),
+    pre_activation: !activated
+  });
+
+  const recordInitialPageView = (): void => {
+    if (sessionState.pageViewSent) {
+      return;
+    }
+    sessionState.pageViewSent = true;
+
+    const context = buildPageContext();
+    const { domContentLoadedMs } = getNavigationMetrics();
+
+    if (domContentLoadedMs !== undefined) {
+      context['dom_content_loaded_ms'] = domContentLoadedMs;
+    }
+
+    pushDataLayerEvent('page_view', {
+      ...context,
+      load_state: 'dom_ready'
+    });
+
+    analyticsWindow.__preActivationPageViewSent = true;
+
+    withAnalytics(module => {
+      module.default.page({
+        ...context,
+        load_state: 'dom_ready',
+        pre_activation_recorded: true
+      });
+    });
+  };
+
+  const recordPageLoaded = (): void => {
+    if (sessionState.pageLoadedSent) {
+      return;
+    }
+    sessionState.pageLoadedSent = true;
+
+    const context = buildPageContext();
+    const { loadTimeMs, domContentLoadedMs } = getNavigationMetrics();
+
+    if (domContentLoadedMs !== undefined) {
+      context['dom_content_loaded_ms'] = domContentLoadedMs;
+    }
+
+    if (loadTimeMs !== undefined) {
+      context['load_time_ms'] = loadTimeMs;
+    }
+
+    pushDataLayerEvent('page_loaded', {
+      ...context,
+      activation_state: activated ? 'activated' : 'pending'
+    });
+
+    withAnalytics(module => {
+      module.default.track('page_loaded', {
+        ...context,
+        event_category: 'Performance',
+        event_label: 'Page Fully Loaded',
+        skip_data_layer: true
+      });
+    });
+  };
+
+  const computeScrollPercent = () => {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
+    const docHeight = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+    if (docHeight === 0) {
+      return 100;
+    }
+    return Math.min(100, Math.max(0, (scrollTop / docHeight) * 100));
+  };
+
+  const stopHeartbeatTimer = () => {
+    if (sessionState.heartbeatTimerId !== undefined) {
+      window.clearTimeout(sessionState.heartbeatTimerId);
+      sessionState.heartbeatTimerId = undefined;
+    }
+  };
+
+  const recordUserEngaged = (trigger: HeartbeatTrigger): void => {
+    if (sessionState.heartbeatSent) {
+      return;
+    }
+    sessionState.heartbeatSent = true;
+    sessionState.lastTrigger = trigger;
+    stopHeartbeatTimer();
+
+    sessionState.maxScrollPercent = Math.round(Math.max(sessionState.maxScrollPercent, computeScrollPercent()));
+
+    const engagementSourceMap: Record<HeartbeatTrigger, AnalyticsActivationSource> = {
+      scroll: 'first_scroll',
+      pointer: 'pointer_interaction',
+      cta: 'cta_click'
+    };
+
+    if (!activated) {
+      dispatchActivation(engagementSourceMap[trigger]);
+    }
+
+    const timeOnPageMs = Math.round(performance.now() - sessionStart);
+
+    const payload = {
+      engagement_trigger: trigger,
+      time_on_page_ms: timeOnPageMs,
+      max_scroll_percent: sessionState.maxScrollPercent,
+      pointer_interaction: sessionState.pointerInteraction,
+      scroll_interaction: sessionState.scrollInteraction,
+      page_location: window.location.href,
+      page_title: document.title
+    };
+
+    pushDataLayerEvent('user_engaged', payload);
+
+    withAnalytics(module => {
+      module.default.track('user_engaged', {
+        ...payload,
+        skip_data_layer: true
+      });
+    });
+
+    engagementCleanups.forEach(task => {
+      try {
+        task();
+      } catch {
+        // noop
+      }
+    });
+    engagementCleanups.length = 0;
+    notifyEngagementInteraction = undefined;
+  };
+
+  const scheduleHeartbeat = (trigger: HeartbeatTrigger): void => {
+    sessionState.lastTrigger = trigger;
+
+    if (trigger === 'scroll') {
+      sessionState.scrollInteraction = true;
+    } else {
+      sessionState.pointerInteraction = true;
+    }
+
+    if (sessionState.heartbeatSent) {
+      return;
+    }
+
+    const elapsed = performance.now() - sessionStart;
+
+    if (elapsed >= HEARTBEAT_DELAY_MS) {
+      recordUserEngaged(trigger);
+      return;
+    }
+
+    stopHeartbeatTimer();
+    sessionState.heartbeatTimerId = window.setTimeout(() => {
+      recordUserEngaged(trigger);
+    }, HEARTBEAT_DELAY_MS - elapsed);
+  };
+
+  notifyEngagementInteraction = scheduleHeartbeat;
+
+  const pointerHandler = (): void => {
+    scheduleHeartbeat('pointer');
+    dispatchActivation('pointer_interaction');
+  };
+
+  window.addEventListener('pointerdown', pointerHandler, { passive: true });
+  engagementCleanups.push(() => window.removeEventListener('pointerdown', pointerHandler));
+
+  const scrollHandler = (): void => {
+    const percent = computeScrollPercent();
+    sessionState.maxScrollPercent = Math.max(sessionState.maxScrollPercent, Math.round(percent));
+
+    if (percent >= 1 && !sessionState.scrollInteraction) {
+      sessionState.scrollInteraction = true;
+      scheduleHeartbeat('scroll');
+    }
+
+    const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
+    if (!activated && scrollTop >= SCROLL_ACTIVATION_THRESHOLD_PX) {
+      dispatchActivation('first_scroll');
+    }
+  };
+
+  window.addEventListener('scroll', scrollHandler, { passive: true });
+  engagementCleanups.push(() => window.removeEventListener('scroll', scrollHandler));
+  scrollHandler();
+
+  const ctaInteractionHandler = (event: Event): void => {
+    const target = event.target as HTMLElement | null;
+    if (!target) {
+      return;
+    }
+
+    const cta = target.closest<HTMLElement>('[data-checkout-trigger], [data-cta], [data-analytics-cta]');
+    if (!cta) {
+      return;
+    }
+
+    scheduleHeartbeat('cta');
+    dispatchActivation('cta_click');
+  };
+
+  document.addEventListener('click', ctaInteractionHandler, { passive: true });
+  engagementCleanups.push(() => document.removeEventListener('click', ctaInteractionHandler));
+
+  const scheduleInitialPageView = (): void => {
+    queueMicrotask(() => recordInitialPageView());
+  };
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    scheduleInitialPageView();
+  } else {
+    document.addEventListener('DOMContentLoaded', scheduleInitialPageView, { once: true });
+  }
+
+  if (document.readyState === 'complete') {
+    queueMicrotask(() => recordPageLoaded());
+  } else {
+    window.addEventListener('load', recordPageLoaded, { once: true });
+  }
 
   const dispatchActivation = (source: AnalyticsActivationSource): void => {
     if (activated) {
@@ -133,14 +428,14 @@ function setupAnalyticsActivation(): void {
     }
     activated = true;
 
-    cleanupTasks.forEach(task => {
+    activationCleanups.forEach(task => {
       try {
         task();
       } catch {
         // noop
       }
     });
-    cleanupTasks.length = 0;
+    activationCleanups.length = 0;
 
     if (fallbackTimerId !== undefined) {
       window.clearTimeout(fallbackTimerId);
@@ -194,38 +489,22 @@ function setupAnalyticsActivation(): void {
     }));
   };
 
-  const scrollThreshold = 150;
-  const handleScroll = (): void => {
-    const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
-    if (scrollTop >= scrollThreshold) {
-      dispatchActivation('first_scroll');
-    }
-  };
-
-  window.addEventListener('scroll', handleScroll, { passive: true });
-  cleanupTasks.push(() => window.removeEventListener('scroll', handleScroll));
-
-  // If the user loads partway down the page, fire immediately.
-  handleScroll();
-
-  const primaryCTASelector = '[data-cta="primary"], [data-checkout-trigger]';
-  const ctas = Array.from(document.querySelectorAll<HTMLElement>(primaryCTASelector));
-  const handleCtaClick = (): void => dispatchActivation('cta_click');
-
-  ctas.forEach(cta => {
-    cta.addEventListener('click', handleCtaClick, { once: true });
-    cleanupTasks.push(() => cta.removeEventListener('click', handleCtaClick));
-  });
-
   fallbackTimerId = window.setTimeout(() => {
     dispatchActivation('timeout_fallback');
   }, ANALYTICS_ACTIVATION_FALLBACK_DELAY_MS);
 
-  cleanupTasks.push(() => {
+  activationCleanups.push(() => {
     if (fallbackTimerId !== undefined) {
       window.clearTimeout(fallbackTimerId);
+      fallbackTimerId = undefined;
     }
   });
+
+  activationCleanups.push(() => {
+    requestAnalyticsActivation = undefined;
+  });
+
+  requestAnalyticsActivation = dispatchActivation;
 }
 
 function onAnalyticsActivated(callback: ActivationCallback): void {
@@ -303,7 +582,7 @@ export const CafeComVendas: CafeComVendasInterface = {
     }
 
     try {
-      const ensureAnalyticsInitialized = async (detail: AnalyticsActivationDetail): Promise<void> => {
+      const ensureAnalyticsInitialized = async (detail?: AnalyticsActivationDetail): Promise<void> => {
         if (analyticsInitializationStarted) {
           return;
         }
@@ -321,12 +600,13 @@ export const CafeComVendas: CafeComVendasInterface = {
         } catch (initError) {
           analyticsInitialized = false;
           analyticsInitializationStarted = false;
-          trackAnalyticsError('analytics_initialization_failed', initError as Error, {
-            activation_source: detail.source
-          });
-          console.error('[Analytics] Initialization failed after activation:', initError);
+          const errorContext = detail ? { activation_source: detail.source } : undefined;
+          trackAnalyticsError('analytics_initialization_failed', initError as Error, errorContext);
+          console.error('[Analytics] Initialization failed:', initError);
         }
       };
+
+      void ensureAnalyticsInitialized();
 
       onAnalyticsActivated(detail => {
         void ensureAnalyticsInitialized(detail);
@@ -339,13 +619,6 @@ export const CafeComVendas: CafeComVendasInterface = {
       this.setupGlobalClickHandlers();
 
       StateManager.setInitialized(true);
-
-      withAnalytics(module => {
-        module.default.page({
-          page_title: document.title,
-          page_location: window.location.href
-        });
-      });
 
       withAnalytics(module => {
         const initEvent: AppInitializedEvent = {
@@ -447,7 +720,9 @@ export const CafeComVendas: CafeComVendasInterface = {
         const utmParams = this.extractUTMParams(linkUrl);
 
         // Track WhatsApp click with enhanced data
-         
+        notifyEngagementInteraction?.('cta');
+        requestAnalyticsActivation?.('cta_click');
+
         withAnalytics(({ AnalyticsHelpers }) => {
           AnalyticsHelpers.trackWhatsAppClick(linkUrl, linkText, location, {
             analytics_event: analyticsEvent || 'whatsapp_click',

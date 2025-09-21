@@ -143,6 +143,8 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
 
   updateDiagnostics();
 
+  const activationBypassEvents = new Set(['page_view', 'page_loaded']);
+
   const pushEnhancedPayload = (
     payload: Record<string, unknown> & { event: string },
     eventIdOverride?: string
@@ -363,7 +365,9 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
      * Enhanced push to dataLayer with event ID
      */
     pushToDataLayerWithEventId(payload: Record<string, unknown> & { event: string }) {
-      if (!state.activated) {
+      const allowImmediateDispatch = state.activated || activationBypassEvents.has(payload.event);
+
+      if (!allowImmediateDispatch) {
         return queueEventUntilActivation(payload);
       }
 
@@ -384,9 +388,21 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
           console.warn('[GTM Plugin] Payload missing required event property');
           return;
         }
+
+        const skipDataLayer = (payload as { skip_data_layer?: unknown })?.skip_data_layer === true;
+
+        if (skipDataLayer) {
+          pluginDebugLog(debug, '[GTM Plugin] Data layer push skipped by payload flag:', {
+            event: payload.event
+          });
+          return;
+        }
+
+        const sanitizedPayload = { ...(payload) } as Record<string, unknown> & { event: string };
+        delete (sanitizedPayload as { skip_data_layer?: unknown }).skip_data_layer;
         
         // Use enhanced push method
-        plugin.pushToDataLayerWithEventId(payload as Record<string, unknown> & { event: string });
+        plugin.pushToDataLayerWithEventId(sanitizedPayload);
       } catch (error) {
         console.error('[GTM Plugin] Track failed:', error);
       }
@@ -397,6 +413,13 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
      */
     page({ payload }: { payload?: Record<string, unknown> }) {
       try {
+        const preActivationFlag = (payload as { pre_activation_recorded?: unknown })?.pre_activation_recorded;
+
+        if (preActivationFlag === true) {
+          pluginDebugLog(debug, '[GTM Plugin] Pre-activation page view already recorded; skipping dataLayer push.');
+          return;
+        }
+
         plugin.pushToDataLayerWithEventId({
           event: 'page_view',
           ...payload
