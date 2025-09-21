@@ -30,9 +30,16 @@ interface CarouselElements {
   template: HTMLTemplateElement | null;
 }
 
+interface CarouselMetrics {
+  slideWidth: number;
+  gap: number;
+}
+
 interface SocialProofComponent extends Component {
   currentIndex: number;
   carouselElements: CarouselElements | null;
+  carouselMetrics: CarouselMetrics | null;
+  pendingMeasurementFrame: number | null;
   initTestimonialsCarousel(): void;
   initYouTubeVideos(): void;
   getCarouselElements(): CarouselElements;
@@ -53,11 +60,15 @@ interface SocialProofComponent extends Component {
   scrollToSlide(index: number): void;
   handleVideoClick(event: Event): void;
   initializeVideoInteractions(root: Document | Element): void;
+  scheduleCarouselMetricsUpdate(elements: CarouselElements): void;
+  measureCarouselMetrics(elements: CarouselElements): CarouselMetrics | null;
 }
 
 export const SocialProof: SocialProofComponent = {
   currentIndex: 0,
   carouselElements: null,
+  carouselMetrics: null,
+  pendingMeasurementFrame: null,
 
   init(): void {
     try {
@@ -152,6 +163,8 @@ export const SocialProof: SocialProofComponent = {
     elements.slides.forEach(slide => {
       slide.classList.add('snap-start', 'flex-shrink-0');
     });
+
+    this.scheduleCarouselMetricsUpdate(elements);
   },
 
   createCarouselPagination(elements: CarouselElements): void {
@@ -187,16 +200,22 @@ export const SocialProof: SocialProofComponent = {
     // Navigation button events
     elements.prevButton?.addEventListener('click', () => this.goToSlide(this.currentIndex - 1));
     elements.nextButton?.addEventListener('click', () => this.goToSlide(this.currentIndex + 1));
+
+    const handleResize = debounce(() => {
+      this.scheduleCarouselMetricsUpdate(elements);
+    }, 150);
+
+    window.addEventListener('resize', handleResize);
   },
 
   handleCarouselScroll(elements: CarouselElements): void {
     if (!elements.carousel || !elements.slides.length) return;
 
     const scrollLeft = elements.carousel.scrollLeft;
-    const slideWidth = elements.slides[0].offsetWidth;
-    const gapSource = elements.track ? window.getComputedStyle(elements.track).gap : '';
-    const parsedGap = gapSource ? parseInt(gapSource, 10) : Number.NaN;
-    const gap = Number.isFinite(parsedGap) ? parsedGap : CAROUSEL_GAP_DEFAULT;
+    const metrics = this.carouselMetrics;
+    if (!metrics || metrics.slideWidth === 0) return;
+
+    const { slideWidth, gap } = metrics;
 
     // Calculate which slide is most visible
     const newIndex = Math.round(scrollLeft / (slideWidth + gap));
@@ -372,6 +391,47 @@ export const SocialProof: SocialProofComponent = {
     } catch {
       logger.debug('Video embed analytics tracking unavailable');
     }
+  },
+
+  scheduleCarouselMetricsUpdate(elements: CarouselElements): void {
+    if (typeof window === 'undefined') return;
+
+    if (this.pendingMeasurementFrame !== null) {
+      window.cancelAnimationFrame(this.pendingMeasurementFrame);
+      this.pendingMeasurementFrame = null;
+    }
+
+    const collectMetrics = (): void => {
+      this.pendingMeasurementFrame = null;
+      this.measureCarouselMetrics(elements);
+    };
+
+    if (typeof window.requestAnimationFrame === 'function') {
+      this.pendingMeasurementFrame = window.requestAnimationFrame(collectMetrics);
+    } else {
+      collectMetrics();
+    }
+  },
+
+  measureCarouselMetrics(elements: CarouselElements): CarouselMetrics | null {
+    if (typeof window === 'undefined') return this.carouselMetrics;
+    if (!elements.track || !elements.slides.length) return this.carouselMetrics;
+
+    const firstSlide = elements.slides[0];
+    if (!firstSlide) return this.carouselMetrics;
+
+    const slideWidth = firstSlide.getBoundingClientRect().width || firstSlide.offsetWidth;
+    const gapValue = window.getComputedStyle(elements.track).gap || '';
+    const parsedGap = gapValue ? Number.parseFloat(gapValue) : Number.NaN;
+    const gap = Number.isFinite(parsedGap) ? parsedGap : CAROUSEL_GAP_DEFAULT;
+
+    const metrics: CarouselMetrics = {
+      slideWidth,
+      gap
+    };
+
+    this.carouselMetrics = metrics;
+    return metrics;
   },
 
   initSectionTracking(): void {
