@@ -185,14 +185,26 @@ if (typeof window !== 'undefined') {
  * Initialize scroll tracking (browser only)
  */
 if (typeof window !== 'undefined') {
-  window.addEventListener('scroll', () => {
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
-    const scrollTop = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+  let scrollTicking = false;
 
-    if (documentHeight > windowHeight) {
-      const scrollPercent = Math.round(((scrollTop + windowHeight) / documentHeight) * 100);
-      StateManager.setScrollDepth(scrollPercent);
+  window.addEventListener('scroll', () => {
+    if (scrollTicking) {
+      return;
     }
+
+    scrollTicking = true;
+
+    window.requestAnimationFrame(() => {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+
+      if (documentHeight > windowHeight) {
+        const scrollPercent = Math.round(((scrollTop + windowHeight) / documentHeight) * 100);
+        StateManager.setScrollDepth(scrollPercent);
+      }
+
+      scrollTicking = false;
+    });
   }, { passive: true });
 }

@@ -5,7 +5,6 @@
 
 import { CONFIG } from './config/constants.js';
 import { state, StateManager } from './core/state.js';
-import analytics, { initializeAnalytics, AnalyticsHelpers } from '../../analytics/index.js';
 import type {
   ComponentRegistration,
   ComponentHealthStatus,
@@ -17,6 +16,38 @@ import type {
 } from '../../analytics/types/events.js';
 import type { AppState } from '../../types/components/state.js';
 import type { Constants } from '../../types/components/config.js';
+
+type AnalyticsModule = typeof import('../../analytics/index.js');
+
+let analyticsModulePromise: Promise<AnalyticsModule> | undefined;
+let analyticsModuleCache: AnalyticsModule | undefined;
+
+async function loadAnalyticsModule(): Promise<AnalyticsModule> {
+  if (analyticsModuleCache) {
+    return analyticsModuleCache;
+  }
+
+  if (!analyticsModulePromise) {
+    analyticsModulePromise = import('../../analytics/index.js');
+  }
+
+  analyticsModuleCache = await analyticsModulePromise;
+  return analyticsModuleCache;
+}
+
+function withAnalytics(callback: (module: AnalyticsModule) => void): void {
+  loadAnalyticsModule()
+    .then(callback)
+    .catch(error => {
+      console.warn('[Analytics] Skipped analytics callback; module failed to load.', error);
+    });
+}
+
+function trackAnalyticsError(type: string, error: Error, context?: Record<string, unknown>): void {
+  withAnalytics(module => {
+    module.AnalyticsHelpers.trackError(type, error, context);
+  });
+}
 
 // Import utility components
 import {
@@ -76,11 +107,12 @@ export const CafeComVendas: CafeComVendasInterface = {
   // Expose Analytics module with compatible interface
   Analytics: {
     track: (event: string, data?: Record<string, unknown>) => {
-      // Type-safe wrapper for analytics tracking
-      analytics.track(event, data);
+      withAnalytics(module => {
+        module.default.track(event, data);
+      });
     },
     trackError: (type: string, error: Error, context?: Record<string, unknown>) => {
-      AnalyticsHelpers.trackError(type, error, context);
+      trackAnalyticsError(type, error, context);
     }
   },
 
@@ -96,8 +128,9 @@ export const CafeComVendas: CafeComVendasInterface = {
     }
 
     try {
-      // Initialize unified analytics system
-      await initializeAnalytics();
+      // Initialize unified analytics system lazily to reduce initial bundle size
+      const analyticsModule = await loadAnalyticsModule();
+      await analyticsModule.initializeAnalytics();
 
       // Attach global error listeners now that analytics is ready
       this.setupGlobalErrorHandling();
@@ -111,7 +144,7 @@ export const CafeComVendas: CafeComVendasInterface = {
       StateManager.setInitialized(true);
 
       // Track page view (standard GA4 event for E2E tests)
-      analytics.page({
+      analyticsModule.default.page({
         page_title: document.title,
         page_location: window.location.href
       });
@@ -122,10 +155,10 @@ export const CafeComVendas: CafeComVendasInterface = {
         event_category: 'Application',
         components_count: this.getComponentCount()
       };
-      analytics.track('app_initialized', initEvent);
+      analyticsModule.default.track('app_initialized', initEvent);
 
     } catch (error) {
-      AnalyticsHelpers.trackError('app_initialization_failed', error as Error);
+      trackAnalyticsError('app_initialization_failed', error as Error);
       console.error('Failed to initialize Café com Vendas:', error);
     }
   },
@@ -134,38 +167,42 @@ export const CafeComVendas: CafeComVendasInterface = {
    * Set up global error handling for better debugging
    */
   setupGlobalErrorHandling(): void {
-    // Handle unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent): void => {
-      const reason: unknown = event.reason;
-      const errorMessage = reason instanceof Error ? reason.message : String(reason);
-      const errorStack = reason instanceof Error ? reason.stack : undefined;
-      
-      const errorContext: ErrorContext = {
-        message: errorMessage,
-        stack: errorStack,
-        filename: undefined,
-        lineno: undefined,
-        colno: undefined,
-        component_name: undefined
-      };
-      AnalyticsHelpers.trackError('unhandled_promise_rejection', new Error(errorContext.message), errorContext);
-    });
+    withAnalytics(({ AnalyticsHelpers }) => {
+      const helpers = AnalyticsHelpers;
 
-    // Handle JavaScript errors
-    window.addEventListener('error', (event: ErrorEvent): void => {
-      const error: unknown = event.error;
-      const errorStack = error instanceof Error ? error.stack : undefined;
-      const errorToPass = error instanceof Error ? error : new Error(event.message);
-      
-      const errorContext: ErrorContext = {
-        message: event.message,
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno,
-        stack: errorStack,
-        component_name: undefined
-      };
-      AnalyticsHelpers.trackError('global_javascript_error', errorToPass, errorContext);
+      // Handle unhandled promise rejections
+      window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent): void => {
+        const reason: unknown = event.reason;
+        const errorMessage = reason instanceof Error ? reason.message : String(reason);
+        const errorStack = reason instanceof Error ? reason.stack : undefined;
+
+        const errorContext: ErrorContext = {
+          message: errorMessage,
+          stack: errorStack,
+          filename: undefined,
+          lineno: undefined,
+          colno: undefined,
+          component_name: undefined
+        };
+        helpers.trackError('unhandled_promise_rejection', new Error(errorContext.message), errorContext);
+      });
+
+      // Handle JavaScript errors
+      window.addEventListener('error', (event: ErrorEvent): void => {
+        const error: unknown = event.error;
+        const errorStack = error instanceof Error ? error.stack : undefined;
+        const errorToPass = error instanceof Error ? error : new Error(event.message);
+
+        const errorContext: ErrorContext = {
+          message: event.message,
+          filename: event.filename,
+          lineno: event.lineno,
+          colno: event.colno,
+          stack: errorStack,
+          component_name: undefined
+        };
+        helpers.trackError('global_javascript_error', errorToPass, errorContext);
+      });
     });
   },
 
@@ -207,15 +244,17 @@ export const CafeComVendas: CafeComVendasInterface = {
 
         // Track WhatsApp click with enhanced data
          
-        AnalyticsHelpers.trackWhatsAppClick(linkUrl, linkText, location, {
-          analytics_event: analyticsEvent || 'whatsapp_click',
-          click_timestamp: new Date().toISOString(),
-          utm_source: utmParams.utm_source,
-          utm_medium: utmParams.utm_medium,
-          utm_campaign: utmParams.utm_campaign,
-          page_location: window.location.href,
-          page_referrer: document.referrer,
-          page_title: document.title
+        withAnalytics(({ AnalyticsHelpers }) => {
+          AnalyticsHelpers.trackWhatsAppClick(linkUrl, linkText, location, {
+            analytics_event: analyticsEvent || 'whatsapp_click',
+            click_timestamp: new Date().toISOString(),
+            utm_source: utmParams.utm_source,
+            utm_medium: utmParams.utm_medium,
+            utm_campaign: utmParams.utm_campaign,
+            page_location: window.location.href,
+            page_referrer: document.referrer,
+            page_title: document.title
+          });
         });
       }
     }, { passive: true });
@@ -335,7 +374,7 @@ export const CafeComVendas: CafeComVendasInterface = {
         StateManager.setComponentStatus(name, true, undefined);
       } catch (error) {
         console.error(`✗ Failed to initialize ${name} component:`, error);
-        AnalyticsHelpers.trackError('component_initialization_failed', error as Error, {
+        trackAnalyticsError('component_initialization_failed', error as Error, {
           component_name: name
         });
         failureCount++;
@@ -350,7 +389,9 @@ export const CafeComVendas: CafeComVendasInterface = {
       failure_count: failureCount,
       total_components: initialized.length
     };
-    analytics.track('components_initialized', componentsEvent);
+    withAnalytics(module => {
+      module.default.track('components_initialized', componentsEvent);
+    });
 
     this.components = initialized;
   },

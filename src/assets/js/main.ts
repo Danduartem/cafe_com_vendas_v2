@@ -30,6 +30,19 @@ function setVhVariable(): void {
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
 
+let resizeRafId: number | undefined;
+
+function scheduleVhUpdate(): void {
+  if (resizeRafId) {
+    window.cancelAnimationFrame(resizeRafId);
+  }
+
+  resizeRafId = window.requestAnimationFrame(() => {
+    setVhVariable();
+    resizeRafId = undefined;
+  });
+}
+
 /**
  * Initialize application when DOM is ready
  */
@@ -37,9 +50,9 @@ document.addEventListener('DOMContentLoaded', (): void => {
   // Initialize viewport height variable for Safari
   setVhVariable();
   
-  // Update on resize and orientation change
-  window.addEventListener('resize', setVhVariable);
-  window.addEventListener('orientationchange', setVhVariable);
+  // Update on resize and orientation change without forcing repeated reflow
+  window.addEventListener('resize', scheduleVhUpdate);
+  window.addEventListener('orientationchange', scheduleVhUpdate);
   
   // Initialize main application
   CafeComVendas.init().catch(error => {
