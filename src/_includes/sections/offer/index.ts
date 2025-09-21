@@ -6,8 +6,8 @@
 import { CONFIG } from '../../../assets/js/config/constants.js';
 import { safeQuery, safeQueryAll } from '../../../utils/dom.js';
 import { Animations } from '../../../components/ui/index.js';
-import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 import type { Component } from '../../../types/components/base.js';
+import { initSectionTracking, trackEvent } from '../../../utils/analytics-helpers.js';
 
 interface OfferComponent extends Component {
   initMBWayToggle(): void;
@@ -65,7 +65,7 @@ export const Offer: OfferComponent = {
       }, CONFIG.animations.duration.normal);
     }
 
-    analytics.track('view_mbway_option', {
+    trackEvent('view_mbway_option', {
       section: 'offer',
       element_type: 'mbway_toggle',
       action: isHidden ? 'open' : 'close'
@@ -100,6 +100,6 @@ export const Offer: OfferComponent = {
    */
   initSectionTracking() {
     // Lower threshold to 30% visibility to ensure firing on tall sections
-    AnalyticsHelpers.initSectionTracking('offer', 0.3);
+    initSectionTracking('offer', 0.3);
   }
 };

@@ -6,7 +6,7 @@
 import { safeQuery } from '../../../utils/dom.js';
 import { logger } from '../../../utils/logger.js';
 import { Animations } from '../animations/index.js';
-import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
+import { trackConversion, trackEvent } from '../../../utils/analytics-helpers.js';
 
 interface ThankYouConfig {
   progressTarget?: number;
@@ -74,7 +74,7 @@ export const PlatformThankYou = {
 
       // Track animation
       try {
-        analytics.track('ui_interaction', {
+        trackEvent('ui_interaction', {
           interaction: 'progress_bar_animated',
           progress_value: targetProgress
         });
@@ -129,7 +129,7 @@ export const PlatformThankYou = {
 
       // Track event
       try {
-        analytics.track('ui_interaction', {
+        trackEvent('ui_interaction', {
           interaction: 'celebration_shown',
           page: 'thank_you'
         });
@@ -182,7 +182,7 @@ export const PlatformThankYou = {
 
       // Track personalization
       try {
-        analytics.track('personalization', {
+        trackEvent('personalization', {
           type: 'greeting_personalized',
           page: 'thank_you'
         });
@@ -198,13 +198,13 @@ export const PlatformThankYou = {
   trackPageView(): void {
     try {
       // Track page view
-      analytics.track('page_view', {
+      trackEvent('page_view', {
         page: 'thank_you',
         conversion: true
       });
 
       // Track purchase completion
-      AnalyticsHelpers.trackConversion('purchase_completed', {
+      trackConversion('purchase_completed', {
         value: 1
       });
 
@@ -213,7 +213,7 @@ export const PlatformThankYou = {
       const sessionId = params.get('session_id');
 
       if (sessionId) {
-        AnalyticsHelpers.trackConversion('stripe_payment_success', {
+        trackConversion('stripe_payment_success', {
           session_id: sessionId
         });
       }

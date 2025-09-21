@@ -3,9 +3,9 @@
  * Handles countdown timer and interactive behaviors for the top banner
  */
 
-import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 import type { Component } from '../../../types/components/base.js';
 import { safeQuery } from '../../../utils/dom.js';
+import { initSectionTracking, trackEvent } from '../../../utils/analytics-helpers.js';
 
 interface TopBannerComponent extends Component {
   countdownInterval?: number;
@@ -34,7 +34,7 @@ export const TopBanner: TopBannerComponent = {
    * Initialize section view tracking using standardized approach
    */
   initSectionTracking(): void {
-    AnalyticsHelpers.initSectionTracking('top-banner');
+    initSectionTracking('top-banner');
   },
 
   /**
@@ -52,7 +52,7 @@ export const TopBanner: TopBannerComponent = {
     const bannerCTA = section.querySelectorAll('[data-banner-cta]');
     bannerCTA.forEach((button) => {
       button.addEventListener('click', () => {
-        analytics.track('banner_cta_click', {
+        trackEvent('banner_cta_click', {
           section: 'top-banner',
           element_type: 'banner_cta',
           element_text: button.textContent?.trim() || 'unknown'
@@ -64,7 +64,7 @@ export const TopBanner: TopBannerComponent = {
     const urgencyMessages = section.querySelectorAll('[data-urgency-message]');
     urgencyMessages.forEach((message) => {
       message.addEventListener('click', () => {
-        analytics.track('urgency_message_click', {
+        trackEvent('urgency_message_click', {
           section: 'top-banner',
           element_type: 'urgency_message',
           element_text: message.textContent?.trim().substring(0, 50) || 'unknown'
@@ -100,7 +100,7 @@ export const TopBanner: TopBannerComponent = {
     }, 1000);
 
     // Track countdown view
-    analytics.track('countdown_view', {
+    trackEvent('countdown_view', {
       section: 'top-banner',
       element_type: 'countdown_timer',
       event_date: eventDate.toISOString()
@@ -162,7 +162,7 @@ export const TopBanner: TopBannerComponent = {
       countdownContainer.innerHTML = '<span class="text-red-600 font-bold">EVENTO EM ANDAMENTO!</span>';
     }
 
-    analytics.track('countdown_expired', {
+    trackEvent('countdown_expired', {
       section: 'top-banner',
       element_type: 'countdown_timer'
     });

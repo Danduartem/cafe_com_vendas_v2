@@ -10,7 +10,11 @@ import { debounce } from '../../../assets/js/utils/throttle.js';
 import { embedYouTubeVideo } from '../../../utils/youtube.js';
 import { logger } from '../../../utils/logger.js';
 import type { Component } from '../../../types/components/base.js';
-import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
+import {
+  initSectionTracking,
+  trackEvent,
+  trackTestimonialSlide
+} from '../../../utils/analytics-helpers.js';
 
 // Constants for carousel layout
 const CAROUSEL_GAP_DEFAULT = 24;
@@ -254,7 +258,7 @@ export const SocialProof: SocialProofComponent = {
                          `tst_${String(this.currentIndex + 1).padStart(2, '0')}`;
 
     try {
-      AnalyticsHelpers.trackTestimonialSlide(testimonialId, this.currentIndex + 1, {
+      trackTestimonialSlide(testimonialId, this.currentIndex + 1, {
         section: 'social-proof'
       });
     } catch {
@@ -360,7 +364,7 @@ export const SocialProof: SocialProofComponent = {
 
     // Track engagement for embed start (video_play will be emitted by the YouTube API when playback starts)
     try {
-      analytics.track('section_engagement', {
+      trackEvent('section_engagement', {
         section: 'testimonials',
         action: 'video_embed_started',
         video_id: videoId
@@ -372,7 +376,7 @@ export const SocialProof: SocialProofComponent = {
 
   initSectionTracking(): void {
     try {
-      AnalyticsHelpers.initSectionTracking('social-proof');
+      initSectionTracking('social-proof');
     } catch {
       logger.debug('Section view analytics tracking unavailable');
     }

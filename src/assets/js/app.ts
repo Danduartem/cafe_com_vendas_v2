@@ -208,7 +208,7 @@ function setupAnalyticsActivation(): void {
   // If the user loads partway down the page, fire immediately.
   handleScroll();
 
-  const primaryCTASelector = '[data-cta="primary"]';
+  const primaryCTASelector = '[data-cta="primary"], [data-checkout-trigger]';
   const ctas = Array.from(document.querySelectorAll<HTMLElement>(primaryCTASelector));
   const handleCtaClick = (): void => dispatchActivation('cta_click');
 

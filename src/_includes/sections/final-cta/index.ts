@@ -5,7 +5,7 @@
 
 import type { Component } from '../../../types/components/base.js';
 import { safeQuery } from '../../../utils/dom.js';
-import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
+import { initSectionTracking, trackEvent } from '../../../utils/analytics-helpers.js';
 
 interface FinalCTAComponent extends Component {
   bindEvents(): void;
@@ -27,7 +27,7 @@ export const FinalCTA: FinalCTAComponent = {
    * Initialize section view tracking using standardized approach
    */
   initSectionTracking(): void {
-    AnalyticsHelpers.initSectionTracking('final-cta');
+    initSectionTracking('final-cta');
   },
 
   /**
@@ -45,7 +45,7 @@ export const FinalCTA: FinalCTAComponent = {
     const ctaButtons = section.querySelectorAll('[data-final-cta-button]');
     ctaButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        analytics.track('final_cta_click', {
+        trackEvent('final_cta_click', {
           section: 'final-cta',
           element_type: 'final_cta_button',
           element_text: button.textContent?.trim() || 'unknown'
@@ -57,7 +57,7 @@ export const FinalCTA: FinalCTAComponent = {
     const urgencyElements = section.querySelectorAll('[data-urgency-message]');
     urgencyElements.forEach((element) => {
       element.addEventListener('click', () => {
-        analytics.track('urgency_message_click', {
+        trackEvent('urgency_message_click', {
           section: 'final-cta',
           element_type: 'urgency_message',
           element_text: element.textContent?.trim().substring(0, 50) || 'unknown'

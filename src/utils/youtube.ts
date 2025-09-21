@@ -13,7 +13,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
 import { logger } from './logger.js';
-import { AnalyticsHelpers } from '../analytics/index.js';
+import { trackVideoPlay, trackVideoProgress } from './analytics-helpers.js';
 
 // Global YouTube API types
 declare global {
@@ -187,7 +187,7 @@ export const YouTube: YouTubeUtility = {
   trackVideoPlay(videoId: string): void {
     // Track initial video play using the GTM method
     try {
-      AnalyticsHelpers.trackVideoPlay(`Testimonial Video ${videoId}`, {
+      trackVideoPlay(`Testimonial Video ${videoId}`, {
         video_id: videoId,
         section: 'testimonials'
       });
@@ -235,7 +235,7 @@ export const YouTube: YouTubeUtility = {
             
             // Track progress
             try {
-              AnalyticsHelpers.trackVideoProgress(`Testimonial Video ${videoId}`, interval, {
+              trackVideoProgress(`Testimonial Video ${videoId}`, interval, {
                 video_id: videoId,
                 current_time: Math.floor(Number(currentTime) || 0),
                 duration: Math.floor(Number(duration) || 0),

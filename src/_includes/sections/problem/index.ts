@@ -5,7 +5,7 @@
 
 import type { Component } from '../../../types/components/base.js';
 import { safeQuery } from '../../../utils/dom.js';
-import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
+import { initSectionTracking, trackEvent } from '../../../utils/analytics-helpers.js';
 
 interface VisionComponent extends Component {
   bindEvents(): void;
@@ -37,7 +37,7 @@ export const Vision: VisionComponent = {
    * Initialize section view tracking using standardized approach
    */
   initSectionTracking(): void {
-    AnalyticsHelpers.initSectionTracking('vision');
+    initSectionTracking('vision');
   },
   
   /**
@@ -191,7 +191,7 @@ export const Vision: VisionComponent = {
         if (hoverStartTime) {
           const hoverDuration = Date.now() - hoverStartTime;
           if (hoverDuration > 1000) { // Only track meaningful engagement
-            analytics.track('vision_outcome_engagement', {
+            trackEvent('vision_outcome_engagement', {
               section: 'vision',
               element_type: 'vision_outcome',
               element_index: index,
@@ -205,7 +205,7 @@ export const Vision: VisionComponent = {
       // Enhanced click tracking
       item.addEventListener('click', () => {
         itemInteractionCount++;
-        analytics.track('vision_outcome_click', {
+        trackEvent('vision_outcome_click', {
           section: 'vision',
           element_type: 'vision_outcome',
           element_index: index,
@@ -216,7 +216,7 @@ export const Vision: VisionComponent = {
       
       // Track focus for accessibility
       item.addEventListener('focus', () => {
-        analytics.track('vision_outcome_focus', {
+        trackEvent('vision_outcome_focus', {
           section: 'vision',
           element_index: index,
           navigation_method: 'keyboard'
@@ -228,7 +228,7 @@ export const Vision: VisionComponent = {
     const ctaElement = section.querySelector('[data-analytics-event="click_vision_cta"]');
     if (ctaElement) {
       ctaElement.addEventListener('click', () => {
-        analytics.track('vision_cta_click', {
+        trackEvent('vision_cta_click', {
           section: 'vision',
           total_vision_outcome_interactions: itemInteractionCount,
           user_engagement_level: itemInteractionCount > 3 ? 'high' : itemInteractionCount > 0 ? 'medium' : 'low'

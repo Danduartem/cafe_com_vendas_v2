@@ -6,7 +6,10 @@
 import { safeQuery, safeQueryAll } from '../../../utils/dom.js';
 import { logger } from '../../../utils/logger.js';
 import { Animations } from '../animations/index.js';
-import { AnalyticsHelpers } from '../../../analytics/index.js';
+import {
+  trackFAQ,
+  trackFAQMeaningfulEngagement
+} from '../../../utils/analytics-helpers.js';
 
 interface AccordionConfig {
   containerSelector: string;
@@ -113,13 +116,13 @@ export const PlatformAccordion = {
 
           try {
             // Track individual FAQ toggle
-            AnalyticsHelpers.trackFAQ(itemNumber, isOpen, questionText);
+            trackFAQ(itemNumber, isOpen, questionText);
 
             // Check for meaningful engagement threshold
             if (faqEngagementState.toggleCount >= FAQ_MEANINGFUL_ENGAGEMENT_THRESHOLD && 
                 !faqEngagementState.hasFiredMeaningfulEngagement) {
               faqEngagementState.hasFiredMeaningfulEngagement = true;
-              AnalyticsHelpers.trackFAQMeaningfulEngagement(faqEngagementState.toggleCount, {
+              trackFAQMeaningfulEngagement(faqEngagementState.toggleCount, {
                 section_name: 'faq',
                 last_question: questionText,
                 last_item: itemNumber

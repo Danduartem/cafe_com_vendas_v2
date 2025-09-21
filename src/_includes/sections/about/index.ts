@@ -4,8 +4,8 @@
  */
 
 import { safeQuery } from '../../../utils/dom.js';
-import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
 import type { Component } from '../../../types/components/base.js';
+import { initSectionTracking, trackEvent } from '../../../utils/analytics-helpers.js';
 
 interface AboutComponent extends Component {
   bindEvents(): void;
@@ -25,7 +25,7 @@ export const About: AboutComponent = {
    * Initialize section view tracking using standardized approach
    */
   initSectionTracking(): void {
-    AnalyticsHelpers.initSectionTracking('about');
+    initSectionTracking('about');
   },
 
   /**
@@ -41,7 +41,7 @@ export const About: AboutComponent = {
     const credentialItems = section.querySelectorAll('[data-credential]');
     credentialItems.forEach((item) => {
       item.addEventListener('click', () => {
-        analytics.track('credential_click', {
+        trackEvent('credential_click', {
           section: 'about',
           element_type: 'credential_item',
           element_text: item.textContent?.trim().substring(0, 50) || 'unknown'
@@ -53,7 +53,7 @@ export const About: AboutComponent = {
     const presenterPhoto = section.querySelector('[data-presenter-photo]');
     if (presenterPhoto) {
       presenterPhoto.addEventListener('click', () => {
-        analytics.track('presenter_photo_click', {
+        trackEvent('presenter_photo_click', {
           section: 'about',
           element_type: 'presenter_photo'
         });
@@ -64,7 +64,7 @@ export const About: AboutComponent = {
     const authorityElements = section.querySelectorAll('[data-authority-element]');
     authorityElements.forEach((element) => {
       element.addEventListener('click', () => {
-        analytics.track('authority_element_click', {
+        trackEvent('authority_element_click', {
           section: 'about',
           element_type: 'authority_element',
           element_text: element.textContent?.trim().substring(0, 50) || 'unknown'

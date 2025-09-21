@@ -6,7 +6,7 @@
 import { CONFIG } from '../../../assets/js/config/constants.js';
 import { safeQuery } from '../../../utils/dom.js';
 import { Animations } from '../../../components/ui/index.js';
-import { AnalyticsHelpers } from '../../../analytics/index.js';
+import { initSectionTracking } from '../../../utils/analytics-helpers.js';
 import type { Component } from '../../../types/components/base.js';
 
 interface HeroComponent extends Component {
@@ -194,7 +194,7 @@ export const Hero: HeroComponent = {
    * Initialize section view tracking for Hero section
    */
   initSectionTracking() {
-    AnalyticsHelpers.initSectionTracking('hero');
+    initSectionTracking('hero');
   }
 
 };

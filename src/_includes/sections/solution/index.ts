@@ -5,7 +5,7 @@
 
 import type { Component } from '../../../types/components/base.js';
 import { safeQuery } from '../../../utils/dom.js';
-import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
+import { initSectionTracking, trackEvent } from '../../../utils/analytics-helpers.js';
 
 interface SolutionComponent extends Component {
   bindEvents(): void;
@@ -26,7 +26,7 @@ export const Solution: SolutionComponent = {
    */
   initSectionTracking(): void {
     // Lower threshold to 30% visibility to ensure firing on tall sections
-    AnalyticsHelpers.initSectionTracking('solution', 0.3);
+    initSectionTracking('solution', 0.3);
   },
 
   /**
@@ -42,7 +42,7 @@ export const Solution: SolutionComponent = {
     const solutionPillars = section.querySelectorAll('[data-solution-pillar]');
     solutionPillars.forEach((pillar, index) => {
       pillar.addEventListener('click', () => {
-        analytics.track('solution_pillar_click', {
+        trackEvent('solution_pillar_click', {
           section: 'solution',
           element_type: 'solution_pillar',
           pillar_number: index + 1,
@@ -55,7 +55,7 @@ export const Solution: SolutionComponent = {
     const ctaButtons = section.querySelectorAll('[data-cta-button]');
     ctaButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        analytics.track('solution_cta_click', {
+        trackEvent('solution_cta_click', {
           section: 'solution',
           element_type: 'cta_button',
           element_text: button.textContent?.trim() || 'unknown'

@@ -4,7 +4,7 @@
  */
 
 import siteData from '../../../_data/site.js';
-import analytics from '../../../analytics/index.js';
+import { trackEvent } from '../../../utils/analytics-helpers.js';
 import { Animations } from '../../../components/ui/index.js';
 import {
   createCafeComVendasEvent,
@@ -400,7 +400,7 @@ export const ThankYou = {
 
   trackCalendarInteraction(provider: string, method: string) {
     try {
-      analytics.track('ui_interaction', {
+      trackEvent('ui_interaction', {
         interaction: 'calendar_add',
         calendar_provider: provider,
         integration_method: method,
@@ -533,7 +533,7 @@ export const ThankYou = {
 
     try {
       // Track voucher display event
-      analytics.track('payment_flow', {
+      trackEvent('payment_flow', {
         event_type: 'multibanco_voucher_displayed',
         payment_intent: paymentIntent ? paymentIntent.substring(0, 20) + '...' : undefined,
         payment_method: paymentMethod || 'multibanco',
@@ -546,7 +546,7 @@ export const ThankYou = {
       });
 
       // Track as intermediate conversion step
-      analytics.track('conversion_funnel', {
+      trackEvent('conversion_funnel', {
         funnel_step: 'payment_initiated',
         payment_method: 'multibanco',
         voucher_status: hasEntity && hasReference ? 'complete' : 'incomplete',
@@ -574,7 +574,7 @@ export const ThankYou = {
 
     try {
       // Do not send GA4 purchase on client; emit UI diagnostic instead
-      analytics.track('purchase_completed_ui', {
+      trackEvent('purchase_completed_ui', {
         payment_intent_id: paymentIntent,
         value: amount,
         currency: 'EUR',
@@ -585,7 +585,7 @@ export const ThankYou = {
       });
 
       // Track payment flow completion
-      analytics.track('payment_flow', {
+      trackEvent('payment_flow', {
         event_type: 'purchase_completed',
         payment_intent: paymentIntent.substring(0, 20) + '...',
         payment_method: paymentMethod,
@@ -616,7 +616,7 @@ export const ThankYou = {
 
     try {
       // Track payment failure
-      analytics.track('payment_flow', {
+      trackEvent('payment_flow', {
         event_type: 'payment_failed',
         payment_intent: paymentIntent ? paymentIntent.substring(0, 20) + '...' : undefined,
         payment_method: paymentMethod || 'unknown',
@@ -627,7 +627,7 @@ export const ThankYou = {
       });
 
       // Track conversion funnel dropout
-      analytics.track('conversion_funnel', {
+      trackEvent('conversion_funnel', {
         funnel_step: 'payment_failed',
         payment_method: paymentMethod || 'unknown',
         failure_reason: reason,

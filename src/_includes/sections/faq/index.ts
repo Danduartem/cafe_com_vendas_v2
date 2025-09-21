@@ -5,8 +5,8 @@
  */
 
 import { PlatformAccordion } from '../../../components/ui/index.js';
-import { AnalyticsHelpers } from '../../../analytics/index.js';
 import type { Component } from '../../../types/components/base.js';
+import { initSectionTracking } from '../../../utils/analytics-helpers.js';
 
 interface FAQSectionComponent extends Component {
   initializeFAQ(): void;
@@ -29,7 +29,7 @@ export const FAQ: FAQSectionComponent = {
    * Initialize section view tracking using standardized approach
    */
   initSectionTracking(): void {
-    AnalyticsHelpers.initSectionTracking('faq');
+    initSectionTracking('faq');
   },
 
   initializeFAQ(): void {

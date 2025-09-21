@@ -36,7 +36,11 @@ import { isValidEmail, isValidPhone } from '../../../utils/validation.js';
 import { 
   getEventData
 } from '../../../utils/event-tracking.js';
-import analytics, { AnalyticsHelpers } from '../../../analytics/index.js';
+import {
+  trackCTAClick,
+  trackConversion,
+  trackEvent
+} from '../../../utils/analytics-helpers.js';
 import { getMetaUserData } from '../../../analytics/utils/meta-ids.js';
 import { buildHashedUserData } from '../../../analytics/utils/pii-hash.js';
 
@@ -289,7 +293,7 @@ export const Checkout: CheckoutSectionComponent = {
         items: [{ item_id: 'cafe-com-vendas-ticket', item_name: eventName, price: basePrice, quantity: 1 }]
       };
 
-      AnalyticsHelpers.trackCTAClick(sourceSection, {
+      trackCTAClick(sourceSection, {
         trigger_location: sourceSection,
         action: 'modal_opened',
         ...checkoutContext
@@ -637,7 +641,7 @@ export const Checkout: CheckoutSectionComponent = {
             const currentType = (event as unknown as { value?: { type?: string } }).value?.type;
             const lastType = this._lastPaymentTypeTracked;
             if (this.userInteractedWithPayment && currentType && currentType !== lastType) {
-              analytics.track('add_payment_info', {
+              trackEvent('add_payment_info', {
                 payment_type: currentType,
                 currency: 'EUR',
                 value: basePrice,
@@ -646,7 +650,7 @@ export const Checkout: CheckoutSectionComponent = {
               this._lastPaymentTypeTracked = currentType;
 
               // Also push a normalized dataLayer event for GTM audiences/logic
-              analytics.track('payment_method_selected', {
+              trackEvent('payment_method_selected', {
                 payment_type: currentType,
                 currency: 'EUR',
                 value: basePrice,
@@ -733,7 +737,7 @@ export const Checkout: CheckoutSectionComponent = {
                 promoMsg.classList.remove('hidden');
               }
               try {
-                analytics.track('add_promotion', {
+                trackEvent('add_promotion', {
                   promotion_code: data.coupon.code,
                   discount_type: data.coupon.percent_off ? 'percent' : 'amount',
                   discount_value: (data.original_amount - data.discounted_amount) / 100
@@ -1038,13 +1042,13 @@ export const Checkout: CheckoutSectionComponent = {
           if (hashed.ph) userData.ph = hashed.ph;
         }
 
-        AnalyticsHelpers.trackConversion('lead_form_submitted', {
+        trackConversion('lead_form_submitted', {
           lead_id: this.leadId,
           form_location: 'checkout_modal',
           pricing_tier: 'early_bird',
           user_data: userData
         });
-        analytics.track('form_submission', {
+        trackEvent('form_submission', {
           section: 'checkout',
           action: 'lead_submitted',
           lead_id: this.leadId || undefined
@@ -1132,7 +1136,7 @@ export const Checkout: CheckoutSectionComponent = {
 
         // Track payment error with enhanced data
         try {
-          analytics.track('section_engagement', {
+          trackEvent('section_engagement', {
             section: 'checkout',
             action: 'payment_error',
             error_type: error.type,
@@ -1154,7 +1158,7 @@ export const Checkout: CheckoutSectionComponent = {
 
         // Do not emit GA4 purchase client-side; use server webhook. Fire UI diagnostic only.
         try {
-          analytics.track('purchase_completed_ui', {
+          trackEvent('purchase_completed_ui', {
             payment_intent_id: paymentIntent.id,
             value: basePrice,
             currency: 'EUR',
@@ -1207,7 +1211,7 @@ export const Checkout: CheckoutSectionComponent = {
 
         // Track payment initiation (not completion yet)
         try {
-          analytics.track('section_engagement', {
+          trackEvent('section_engagement', {
             section: 'checkout',
             action: 'payment_processing',
             payment_method: paymentMethod,

@@ -27,6 +27,32 @@ interface GTMPluginState {
   eventCount: number;
   isPreviewMode: boolean;
   activated: boolean;
+  pendingEvents: PendingGTMEvent[];
+}
+
+interface PendingGTMEvent {
+  payload: Record<string, unknown> & { event: string };
+  eventId: string;
+  queuedAt: number;
+}
+
+interface GTMDiagnosticsSnapshot {
+  activated: boolean;
+  initialized: boolean;
+  previewMode: boolean;
+  queueSize: number;
+  eventCount: number;
+  trackedTransactions: number;
+  lastEvent?: string;
+  lastEventId?: string;
+  lastEventTimestamp?: string;
+  lastQueuedEvent?: string;
+  lastQueuedEventId?: string;
+  lastQueuedAt?: string;
+  lastFlushedCount?: number;
+  lastFlushReason?: string;
+  lastActivationTimestamp?: string;
+  lastUpdate: string;
 }
 
 /**
@@ -68,7 +94,172 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
     initialized: false,
     eventCount: 0,
     isPreviewMode: detectGTMPreviewMode(),
-    activated: checkAnalyticsActivated()
+    activated: checkAnalyticsActivated(),
+    pendingEvents: []
+  };
+
+  const diagnosticsState: GTMDiagnosticsSnapshot = {
+    activated: state.activated,
+    initialized: state.initialized,
+    previewMode: state.isPreviewMode,
+    queueSize: state.pendingEvents.length,
+    eventCount: state.eventCount,
+    trackedTransactions: state.trackedTransactions.size,
+    lastUpdate: new Date().toISOString()
+  };
+
+  const analyticsDebugWindow = window as typeof window & {
+    __analyticsDebug?: Record<string, {
+      state: GTMDiagnosticsSnapshot;
+      getState: () => GTMDiagnosticsSnapshot;
+      dumpState: () => GTMDiagnosticsSnapshot;
+    }>;
+  };
+
+  const diagnosticsBridge = {
+    getState: () => ({ ...diagnosticsState }),
+    dumpState: () => ({ ...diagnosticsState })
+  };
+
+  const updateDiagnostics = (partial?: Partial<GTMDiagnosticsSnapshot>): void => {
+    Object.assign(diagnosticsState, partial);
+    diagnosticsState.activated = state.activated;
+    diagnosticsState.initialized = state.initialized;
+    diagnosticsState.previewMode = state.isPreviewMode;
+    diagnosticsState.queueSize = state.pendingEvents.length;
+    diagnosticsState.eventCount = state.eventCount;
+    diagnosticsState.trackedTransactions = state.trackedTransactions.size;
+    diagnosticsState.lastUpdate = new Date().toISOString();
+
+    if (!analyticsDebugWindow.__analyticsDebug) {
+      analyticsDebugWindow.__analyticsDebug = {};
+    }
+
+    analyticsDebugWindow.__analyticsDebug.gtm = {
+      state: diagnosticsState,
+      ...diagnosticsBridge
+    };
+  };
+
+  updateDiagnostics();
+
+  const pushEnhancedPayload = (
+    payload: Record<string, unknown> & { event: string },
+    eventIdOverride?: string
+  ): string => {
+    state.eventCount++;
+
+    let userData: Record<string, unknown> | undefined;
+    try {
+      const metaUserData = getMetaUserData();
+      if (metaUserData && Object.keys(metaUserData).length > 0) {
+        userData = metaUserData;
+      }
+    } catch {
+      // ignore
+    }
+
+    const eventId = eventIdOverride ?? generateEventId(payload.event);
+    const enhancedPayload = normalizeEventPayload({
+      ...payload,
+      event_id: eventId,
+      ...(userData && !('user_data' in payload) ? { user_data: userData } : {}),
+      timestamp: new Date().toISOString(),
+      debug_info: debug ? {
+        event_count: state.eventCount,
+        preview_mode: state.isPreviewMode,
+        plugin_version: '2.0.0'
+      } : undefined
+    });
+
+    (window as unknown as { dataLayer: unknown[] }).dataLayer.push(enhancedPayload);
+
+    pluginDebugLog(debug, '[GTM Plugin] Enhanced event pushed:', {
+      event: payload.event,
+      event_id: eventId,
+      queueSize: state.pendingEvents.length,
+      eventCount: state.eventCount,
+      activated: state.activated
+    });
+
+    updateDiagnostics({
+      lastEvent: payload.event,
+      lastEventId: eventId,
+      lastEventTimestamp: new Date().toISOString()
+    });
+
+    return eventId;
+  };
+
+  const queueEventUntilActivation = (
+    payload: Record<string, unknown> & { event: string }
+  ): string => {
+    const eventId = generateEventId(payload.event);
+    state.pendingEvents.push({
+      payload,
+      eventId,
+      queuedAt: Date.now()
+    });
+
+    pluginDebugLog(debug, '[GTM Plugin] Event queued pending activation', {
+      event: payload.event,
+      queueSize: state.pendingEvents.length,
+      activated: state.activated
+    });
+
+    updateDiagnostics({
+      lastQueuedEvent: payload.event,
+      lastQueuedEventId: eventId,
+      lastQueuedAt: new Date().toISOString()
+    });
+
+    return eventId;
+  };
+
+  const flushPendingEvents = (reason: 'initialize' | 'activation_event'): void => {
+    if (state.pendingEvents.length === 0) {
+      pluginDebugLog(debug, '[GTM Plugin] Flush requested with empty queue', {
+        reason,
+        activated: state.activated,
+        eventCount: state.eventCount
+      });
+      updateDiagnostics({
+        lastFlushReason: reason,
+        lastFlushedCount: 0
+      });
+      return;
+    }
+
+    const queued = state.pendingEvents.splice(0);
+    for (const pending of queued) {
+      pushEnhancedPayload(pending.payload, pending.eventId);
+    }
+
+    pluginDebugLog(debug, '[GTM Plugin] Flushed queued events after activation', {
+      flushedCount: queued.length,
+      queueSize: state.pendingEvents.length,
+      reason,
+      activated: state.activated,
+      eventCount: state.eventCount
+    });
+
+    updateDiagnostics({
+      lastFlushReason: reason,
+      lastFlushedCount: queued.length
+    });
+  };
+
+  const handleActivation = (): void => {
+    state.activated = true;
+    pluginDebugLog(debug, '[GTM Plugin] Activation detected. Events can flow.', {
+      pendingQueue: state.pendingEvents.length,
+      eventCount: state.eventCount,
+      activated: state.activated
+    });
+    flushPendingEvents('activation_event');
+    updateDiagnostics({
+      lastActivationTimestamp: new Date().toISOString()
+    });
   };
 
   // Define the plugin object to enable proper method binding
@@ -87,18 +278,23 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
 
       state.initialized = true;
       state.isPreviewMode = detectGTMPreviewMode();
+      state.activated = state.activated || checkAnalyticsActivated();
       
       pluginDebugLog(debug, '[GTM Plugin] Initialized with dataLayer', {
         previewMode: state.isPreviewMode,
         duplicatePreventionTTL: duplicatePreventionTTL,
-        maxTransactionCache: maxTransactionCache
+        maxTransactionCache: maxTransactionCache,
+        activated: state.activated,
+        queuedEvents: state.pendingEvents.length,
+        eventCount: state.eventCount
       });
 
-      if (!state.activated) {
-        window.addEventListener('analytics:activated', () => {
-          state.activated = true;
-          pluginDebugLog(debug, '[GTM Plugin] Activation detected. Events can flow.');
-        }, { once: true });
+      updateDiagnostics();
+
+      if (state.activated) {
+        flushPendingEvents('initialize');
+      } else {
+        window.addEventListener('analytics:activated', handleActivation, { once: true });
       }
 
       // Setup periodic cleanup of old transactions
@@ -126,6 +322,8 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
           removedCount: idsToRemove.length,
           currentCacheSize: state.trackedTransactions.size
         });
+
+        updateDiagnostics();
       };
 
       setInterval(cleanupOldTransactions, duplicatePreventionTTL / 4);
@@ -166,40 +364,10 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
      */
     pushToDataLayerWithEventId(payload: Record<string, unknown> & { event: string }) {
       if (!state.activated) {
-        pluginDebugLog(debug, '[GTM Plugin] Event blocked before activation:', payload.event);
-        return undefined;
+        return queueEventUntilActivation(payload);
       }
 
-      state.eventCount++;
-      
-      // Build Meta user_data (fbp/fbc) without relying on GTM ParamBuilder
-      let userData: Record<string, unknown> | undefined;
-      try {
-        const metaUserData = getMetaUserData();
-        if (metaUserData && Object.keys(metaUserData).length > 0) {
-          userData = metaUserData;
-        }
-      } catch {
-        // ignore
-      }
-
-      const enhancedPayload = normalizeEventPayload({
-        ...payload,
-        event_id: generateEventId(payload.event),
-        // Attach user_data if not explicitly provided by caller
-        ...(userData && !('user_data' in payload) ? { user_data: userData } : {}),
-        timestamp: new Date().toISOString(),
-        debug_info: debug ? {
-          event_count: state.eventCount,
-          preview_mode: state.isPreviewMode,
-          plugin_version: '2.0.0'
-        } : undefined
-      });
-
-      (window as unknown as { dataLayer: unknown[] }).dataLayer.push(enhancedPayload);
-
-      pluginDebugLog(debug, '[GTM Plugin] Enhanced event pushed:', enhancedPayload);
-      return enhancedPayload.event_id;
+      return pushEnhancedPayload(payload);
     },
 
     /**
