@@ -46,7 +46,7 @@ const analyticsActivationPromise = new Promise<AnalyticsActivationDetail>(resolv
   resolveAnalyticsActivation = resolve;
 });
 
-const ANALYTICS_ACTIVATION_FALLBACK_DELAY_MS = 15000; // 15s safety net instead of immediate timeout
+const ANALYTICS_ACTIVATION_FALLBACK_DELAY_MS = 10000; // 10s safety net instead of immediate timeout
 
 async function loadAnalyticsModule(): Promise<AnalyticsModule> {
   if (analyticsModuleCache) {
