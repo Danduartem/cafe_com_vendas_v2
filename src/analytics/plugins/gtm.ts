@@ -26,6 +26,7 @@ interface GTMPluginState {
   initialized: boolean;
   eventCount: number;
   isPreviewMode: boolean;
+  activated: boolean;
 }
 
 /**
@@ -47,6 +48,10 @@ function detectGTMPreviewMode(): boolean {
            window.location.search.includes('gtm_debug'));
 }
 
+function checkAnalyticsActivated(): boolean {
+  return Boolean((window as unknown as { __analyticsActivated?: boolean }).__analyticsActivated);
+}
+
 /**
  * GTM Plugin - handles all dataLayer interactions with enterprise features
  */
@@ -62,7 +67,8 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
     trackedTransactions: new Map(),
     initialized: false,
     eventCount: 0,
-    isPreviewMode: detectGTMPreviewMode()
+    isPreviewMode: detectGTMPreviewMode(),
+    activated: checkAnalyticsActivated()
   };
 
   // Define the plugin object to enable proper method binding
@@ -87,6 +93,13 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
         duplicatePreventionTTL: duplicatePreventionTTL,
         maxTransactionCache: maxTransactionCache
       });
+
+      if (!state.activated) {
+        window.addEventListener('analytics:activated', () => {
+          state.activated = true;
+          pluginDebugLog(debug, '[GTM Plugin] Activation detected. Events can flow.');
+        }, { once: true });
+      }
 
       // Setup periodic cleanup of old transactions
       const cleanupOldTransactions = () => {
@@ -152,6 +165,11 @@ export const gtmPlugin: PluginFactory<GTMPluginConfig> = (config = {}) => {
      * Enhanced push to dataLayer with event ID
      */
     pushToDataLayerWithEventId(payload: Record<string, unknown> & { event: string }) {
+      if (!state.activated) {
+        pluginDebugLog(debug, '[GTM Plugin] Event blocked before activation:', payload.event);
+        return undefined;
+      }
+
       state.eventCount++;
       
       // Build Meta user_data (fbp/fbc) without relying on GTM ParamBuilder

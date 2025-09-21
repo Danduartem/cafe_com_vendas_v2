@@ -7,6 +7,8 @@
 import { pluginDebugLog } from '../utils/debug.js';
 import type { PluginFactory, PerformanceTrackingPayload, AnalyticsInstance } from '../types/index.js';
 
+const isAnalyticsActivated = (): boolean => Boolean((window as unknown as { __analyticsActivated?: boolean }).__analyticsActivated);
+
 interface PerformancePluginConfig extends Record<string, unknown> {
   trackCoreWebVitals?: boolean;
   trackPageLoad?: boolean;
@@ -42,6 +44,9 @@ export const performancePlugin: PluginFactory<PerformancePluginConfig> = (config
     clsThreshold = 0.1,
     debug = false
   } = config;
+
+  let trackingStarted = false;
+  let analyticsInstance: AnalyticsInstance | null = null;
 
   // Setup Core Web Vitals tracking
   const setupCoreWebVitals = (instance: AnalyticsInstance) => {
@@ -146,24 +151,41 @@ export const performancePlugin: PluginFactory<PerformancePluginConfig> = (config
     });
   };
 
+  const beginTracking = (): void => {
+    if (trackingStarted || !analyticsInstance) {
+      return;
+    }
+    trackingStarted = true;
+
+    try {
+      if (trackCoreWebVitals && 'PerformanceObserver' in window) {
+        setupCoreWebVitals(analyticsInstance);
+      }
+
+      if (trackPageLoad) {
+        setupPageLoadTracking(analyticsInstance);
+      }
+
+      pluginDebugLog(debug, '[Performance Plugin] Performance tracking initialized after activation');
+    } catch (error) {
+      console.error('[Performance Plugin] Initialization failed after activation:', error);
+    }
+  };
+
   return {
     name: 'performance',
 
     initialize({ instance }) {
-      if (!trackCoreWebVitals && !trackPageLoad) return;
+      if (!trackCoreWebVitals && !trackPageLoad) {
+        return;
+      }
 
-      try {
-        if (trackCoreWebVitals && 'PerformanceObserver' in window) {
-          setupCoreWebVitals(instance);
-        }
+      analyticsInstance = instance;
 
-        if (trackPageLoad) {
-          setupPageLoadTracking(instance);
-        }
-
-        pluginDebugLog(debug, '[Performance Plugin] Performance tracking initialized');
-      } catch (error) {
-        console.error('[Performance Plugin] Initialization failed:', error);
+      if (isAnalyticsActivated()) {
+        beginTracking();
+      } else {
+        window.addEventListener('analytics:activated', beginTracking, { once: true });
       }
     },
 

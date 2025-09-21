@@ -16,6 +16,8 @@ interface SectionTrackingPluginConfig extends Record<string, unknown> {
 /**
  * Section Tracking Plugin - handles section view events
  */
+const isAnalyticsActivated = (): boolean => Boolean((window as unknown as { __analyticsActivated?: boolean }).__analyticsActivated);
+
 export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> = (config = {}) => {
   const {
     threshold = 0.5,
@@ -26,6 +28,66 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
   // Track which sections have already been viewed
   const viewedSections = new Set<string>();
   let analyticsInstance: AnalyticsInstance | null = null;
+  let activated = false;
+  const pendingSections = new Map<string, number>();
+
+  const activationHandler = (): void => {
+    if (activated) {
+      return;
+    }
+    activated = true;
+
+    // Drain any queued sections now that analytics is permitted
+    for (const [sectionName, customThreshold] of pendingSections) {
+      pendingSections.delete(sectionName);
+      initializeSectionObserver(sectionName, customThreshold ?? threshold);
+    }
+  };
+
+  const initializeSectionObserver = (sectionName: string, customThreshold: number): void => {
+    const section = document.querySelector(`#s-${sectionName}`);
+    if (!section) {
+      pluginDebugLog(debug, `[Section Tracking Plugin] Section #s-${sectionName} not found`);
+      return;
+    }
+
+    if (viewedSections.has(sectionName)) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !viewedSections.has(sectionName)) {
+            const sectionViewPayload: SectionTrackingPayload = {
+              section_name: sectionName,
+              section_id: `s-${sectionName}`,
+              percent_visible: Math.round(entry.intersectionRatio * 100),
+              timestamp: new Date().toISOString()
+            };
+
+            if (analyticsInstance) {
+              analyticsInstance.track('section_view', sectionViewPayload);
+              pluginDebugLog(debug, '[Section Tracking Plugin] Section view tracked:', sectionViewPayload);
+            }
+
+            viewedSections.add(sectionName);
+            observer.unobserve(entry.target);
+
+            pluginDebugLog(debug, `[Section Tracking Plugin] Section viewed: ${sectionName}`);
+          }
+        });
+      },
+      {
+        threshold: customThreshold,
+        rootMargin
+      }
+    );
+
+    observer.observe(section);
+
+    pluginDebugLog(debug, `[Section Tracking Plugin] Started tracking section: ${sectionName}`);
+  };
 
   return {
     name: 'section-tracking',
@@ -34,6 +96,12 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
       // Store analytics instance reference for methods
       analyticsInstance = context?.instance;
       pluginDebugLog(debug, '[Section Tracking Plugin] Initialized with threshold:', threshold);
+
+      if (isAnalyticsActivated()) {
+        activationHandler();
+      } else {
+        window.addEventListener('analytics:activated', activationHandler, { once: true });
+      }
     },
 
     methods: {
@@ -43,50 +111,17 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
        * Combined from both systems
        */
       initSectionTracking(sectionName: string, customThreshold: number = threshold) {
-        const section = document.querySelector(`#s-${sectionName}`);
-        if (!section) {
-          pluginDebugLog(debug, `[Section Tracking Plugin] Section #s-${sectionName} not found`);
-          return;
-        }
-
-        // Skip if already tracking this section
         if (viewedSections.has(sectionName)) {
           return;
         }
 
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting && !viewedSections.has(sectionName)) {
-                const sectionViewPayload: SectionTrackingPayload = {
-                  section_name: sectionName,
-                  section_id: `s-${sectionName}`,
-                  percent_visible: Math.round(entry.intersectionRatio * 100),
-                  timestamp: new Date().toISOString()
-                };
+        if (!activated) {
+          pendingSections.set(sectionName, customThreshold);
+          pluginDebugLog(debug, '[Section Tracking Plugin] Section queued until activation:', sectionName);
+          return;
+        }
 
-                if (analyticsInstance) {
-                  analyticsInstance.track('section_view', sectionViewPayload);
-                  pluginDebugLog(debug, '[Section Tracking Plugin] Section view tracked:', sectionViewPayload);
-                }
-                
-                // Mark as viewed and unobserve (fire once per session)
-                viewedSections.add(sectionName);
-                observer.unobserve(entry.target);
-
-                pluginDebugLog(debug, `[Section Tracking Plugin] Section viewed: ${sectionName}`);
-              }
-            });
-          },
-          { 
-            threshold: customThreshold,
-            rootMargin 
-          }
-        );
-
-        observer.observe(section);
-
-        pluginDebugLog(debug, `[Section Tracking Plugin] Started tracking section: ${sectionName}`);
+        initializeSectionObserver(sectionName, customThreshold);
       },
 
       /**
@@ -117,6 +152,7 @@ export const sectionTrackingPlugin: PluginFactory<SectionTrackingPluginConfig> =
        */
       resetSectionTracking() {
         viewedSections.clear();
+        pendingSections.clear();
         
         pluginDebugLog(debug, '[Section Tracking Plugin] Section tracking reset');
       },

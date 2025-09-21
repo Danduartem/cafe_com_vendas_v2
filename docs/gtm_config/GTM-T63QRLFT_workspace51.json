@@ -1,6 +1,6 @@
 {
     "exportFormatVersion": 2,
-    "exportTime": "2025-09-21 08:55:59",
+    "exportTime": "2025-09-21 12:33:07",
     "containerVersion": {
         "path": "accounts/6308553599/containers/227494781/versions/0",
         "accountId": "6308553599",
@@ -56,9 +56,9 @@
                         "value": "{{Config | Google Tag Defaults}}"
                     }
                 ],
-                "fingerprint": "1758116534431",
+                "fingerprint": "1758446196484",
                 "firingTriggerId": [
-                    "2147479553"
+                    "164"
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -222,9 +222,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758116553504",
+                "fingerprint": "1758446356560",
                 "firingTriggerId": [
                     "9"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -358,9 +363,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758116598574",
+                "fingerprint": "1758446534811",
                 "firingTriggerId": [
                     "38"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -494,9 +504,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758116630884",
+                "fingerprint": "1758446913611",
                 "firingTriggerId": [
                     "56"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -600,9 +615,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758116646382",
+                "fingerprint": "1758446516422",
                 "firingTriggerId": [
                     "39"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -676,9 +696,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758116662067",
+                "fingerprint": "1758446490029",
                 "firingTriggerId": [
                     "40"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -752,9 +777,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758116689973",
+                "fingerprint": "1758446896513",
                 "firingTriggerId": [
                     "42"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -858,9 +888,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758116710724",
+                "fingerprint": "1758446313787",
                 "firingTriggerId": [
                     "88"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -1009,9 +1044,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758116726525",
+                "fingerprint": "1758446733118",
                 "firingTriggerId": [
                     "94"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -1130,9 +1170,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758116741405",
+                "fingerprint": "1758446397889",
                 "firingTriggerId": [
                     "95"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -1221,9 +1266,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758117097830",
+                "fingerprint": "1758446877312",
                 "firingTriggerId": [
                     "122"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -1237,7 +1287,7 @@
                 "accountId": "6308553599",
                 "containerId": "227494781",
                 "tagId": "101",
-                "name": "GA4 | Event | cta_click (test)",
+                "name": "GA4 | Event | cta_click",
                 "type": "gaawe",
                 "parameter": [
                     {
@@ -1327,9 +1377,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758117182324",
+                "fingerprint": "1758455284009",
                 "firingTriggerId": [
                     "100"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -1403,9 +1458,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758117129186",
+                "fingerprint": "1758446711245",
                 "firingTriggerId": [
                     "107"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -1494,9 +1554,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758117139831",
+                "fingerprint": "1758446839248",
                 "firingTriggerId": [
                     "117"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -1570,9 +1635,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758117113937",
+                "fingerprint": "1758446860529",
                 "firingTriggerId": [
                     "98"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -1801,9 +1871,9 @@
                         "value": "false"
                     }
                 ],
-                "fingerprint": "1758117377142",
+                "fingerprint": "1758447828565",
                 "firingTriggerId": [
-                    "69"
+                    "165"
                 ],
                 "tagFiringOption": "ONCE_PER_LOAD",
                 "monitoringMetadata": {
@@ -1912,9 +1982,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758117222178",
+                "fingerprint": "1758446335805",
                 "firingTriggerId": [
                     "143"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -2003,9 +2078,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758117239707",
+                "fingerprint": "1758446374561",
                 "firingTriggerId": [
                     "150"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -2124,9 +2204,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758117250602",
+                "fingerprint": "1758446801263",
                 "firingTriggerId": [
                     "157"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -2215,9 +2300,14 @@
                         "value": "{{Config | GA4 Event Defaults}}"
                     }
                 ],
-                "fingerprint": "1758117261310",
+                "fingerprint": "1758446675555",
                 "firingTriggerId": [
                     "162"
+                ],
+                "setupTag": [
+                    {
+                        "tagName": "GA4 | Config | Cafe Com Vendas"
+                    }
                 ],
                 "tagFiringOption": "ONCE_PER_EVENT",
                 "monitoringMetadata": {
@@ -2939,6 +3029,56 @@
                     }
                 ],
                 "fingerprint": "1758117862380"
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "triggerId": "164",
+                "name": "Signal | Custom Event | ga4_activate",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [
+                    {
+                        "type": "EQUALS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{_event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "ga4_activate"
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1758445909879"
+            },
+            {
+                "accountId": "6308553599",
+                "containerId": "227494781",
+                "triggerId": "165",
+                "name": "Signal | Custom Event | meta_activate",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [
+                    {
+                        "type": "EQUALS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{_event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "meta_activate"
+                            }
+                        ]
+                    }
+                ],
+                "fingerprint": "1758447755729"
             }
         ],
         "variable": [
@@ -4760,7 +4900,7 @@
                 "name": "Scroll Direction"
             }
         ],
-        "fingerprint": "1758444959013",
+        "fingerprint": "1758457987297",
         "tagManagerUrl": "https://tagmanager.google.com/#/versions/accounts/6308553599/containers/227494781/versions/0?apiLink=version"
     }
 }

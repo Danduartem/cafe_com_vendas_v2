@@ -22,6 +22,11 @@ type AnalyticsModule = typeof import('../../analytics/index.js');
 
 let analyticsModulePromise: Promise<AnalyticsModule> | undefined;
 let analyticsModuleCache: AnalyticsModule | undefined;
+let analyticsInitializationStarted = false;
+let analyticsInitialized = false;
+
+type AnalyticsCallback = (module: AnalyticsModule) => void;
+const pendingAnalyticsCallbacks: AnalyticsCallback[] = [];
 
 type AnalyticsActivationSource = 'first_scroll' | 'cta_click' | 'timeout_fallback';
 
@@ -30,12 +35,18 @@ interface AnalyticsActivationDetail {
   timestamp: string;
 }
 
+let latestActivationDetail: AnalyticsActivationDetail | undefined;
+type ActivationCallback = (detail: AnalyticsActivationDetail) => void;
+const activationCallbacks: ActivationCallback[] = [];
+
 let analyticsActivationSetup = false;
 let resolveAnalyticsActivation: ((detail: AnalyticsActivationDetail) => void) | undefined;
 
 const analyticsActivationPromise = new Promise<AnalyticsActivationDetail>(resolve => {
   resolveAnalyticsActivation = resolve;
 });
+
+const ANALYTICS_ACTIVATION_FALLBACK_DELAY_MS = 15000; // 15s safety net instead of immediate timeout
 
 async function loadAnalyticsModule(): Promise<AnalyticsModule> {
   if (analyticsModuleCache) {
@@ -51,11 +62,31 @@ async function loadAnalyticsModule(): Promise<AnalyticsModule> {
 }
 
 function withAnalytics(callback: (module: AnalyticsModule) => void): void {
-  loadAnalyticsModule()
-    .then(callback)
-    .catch(error => {
-      console.warn('[Analytics] Skipped analytics callback; module failed to load.', error);
-    });
+  if (analyticsInitialized && analyticsModuleCache) {
+    try {
+      callback(analyticsModuleCache);
+    } catch (error) {
+      console.warn('[Analytics] Callback execution failed after initialization.', error);
+    }
+    return;
+  }
+
+  pendingAnalyticsCallbacks.push(callback);
+}
+
+function flushPendingAnalyticsCallbacks(module: AnalyticsModule): void {
+  while (pendingAnalyticsCallbacks.length > 0) {
+    const queuedCallback = pendingAnalyticsCallbacks.shift();
+    if (!queuedCallback) {
+      continue;
+    }
+
+    try {
+      queuedCallback(module);
+    } catch (error) {
+      console.warn('[Analytics] Deferred callback execution failed.', error);
+    }
+  }
 }
 
 function trackAnalyticsError(type: string, error: Error, context?: Record<string, unknown>): void {
@@ -121,26 +152,45 @@ function setupAnalyticsActivation(): void {
       activation_source: source,
       activation_timestamp: timestamp
     };
+    const detail: AnalyticsActivationDetail = { source, timestamp };
+    latestActivationDetail = detail;
+    (window as typeof window & { __analyticsActivated?: boolean }).__analyticsActivated = true;
 
     dataLayer.push(normalizeEventPayload({
       event: 'ga4_activate',
       engagement_type: source,
+      analytics_activated: true,
       ...basePayload
     }));
 
     dataLayer.push(normalizeEventPayload({
       event: 'meta_activate',
       intent: source,
+      analytics_activated: true,
+      ...basePayload
+    }));
+
+    dataLayer.push(normalizeEventPayload({
+      event: 'analytics_state',
+      analytics_activated: true,
       ...basePayload
     }));
 
     if (resolveAnalyticsActivation) {
-      resolveAnalyticsActivation({ source, timestamp });
+      resolveAnalyticsActivation(detail);
       resolveAnalyticsActivation = undefined;
     }
 
+    activationCallbacks.splice(0).forEach(callback => {
+      try {
+        callback(detail);
+      } catch (error) {
+        console.warn('[Analytics] Activation callback failed.', error);
+      }
+    });
+
     window.dispatchEvent(new CustomEvent<AnalyticsActivationDetail>('analytics:activated', {
-      detail: { source, timestamp }
+      detail
     }));
   };
 
@@ -169,13 +219,26 @@ function setupAnalyticsActivation(): void {
 
   fallbackTimerId = window.setTimeout(() => {
     dispatchActivation('timeout_fallback');
-  }, 7000);
+  }, ANALYTICS_ACTIVATION_FALLBACK_DELAY_MS);
 
   cleanupTasks.push(() => {
     if (fallbackTimerId !== undefined) {
       window.clearTimeout(fallbackTimerId);
     }
   });
+}
+
+function onAnalyticsActivated(callback: ActivationCallback): void {
+  if (latestActivationDetail) {
+    try {
+      callback(latestActivationDetail);
+    } catch (error) {
+      console.warn('[Analytics] Activation callback failed post-activation.', error);
+    }
+    return;
+  }
+
+  activationCallbacks.push(callback);
 }
 
 /**
@@ -233,49 +296,75 @@ export const CafeComVendas: CafeComVendasInterface = {
   /**
    * Initialize all components and functionality with enhanced error handling
    */
-  async init(): Promise<void> {
+  init(): Promise<void> {
     if (state.isInitialized) {
       console.warn('CafeComVendas already initialized');
-      return;
+      return Promise.resolve();
     }
 
     try {
-      // Initialize unified analytics system lazily to reduce initial bundle size
-      const analyticsModule = await loadAnalyticsModule();
-      await analyticsModule.initializeAnalytics();
+      const ensureAnalyticsInitialized = async (detail: AnalyticsActivationDetail): Promise<void> => {
+        if (analyticsInitializationStarted) {
+          return;
+        }
 
-      // Attach global error listeners now that analytics is ready
-      this.setupGlobalErrorHandling();
+        analyticsInitializationStarted = true;
 
-      // Initialize all components
+        try {
+          const analyticsModule = await loadAnalyticsModule();
+          await analyticsModule.initializeAnalytics();
+
+          analyticsInitialized = true;
+          flushPendingAnalyticsCallbacks(analyticsModule);
+
+          this.setupGlobalErrorHandling();
+        } catch (initError) {
+          analyticsInitialized = false;
+          analyticsInitializationStarted = false;
+          trackAnalyticsError('analytics_initialization_failed', initError as Error, {
+            activation_source: detail.source
+          });
+          console.error('[Analytics] Initialization failed after activation:', initError);
+        }
+      };
+
+      onAnalyticsActivated(detail => {
+        void ensureAnalyticsInitialized(detail);
+      });
+
+      // Initialize all components before analytics to avoid blocking UI work
       this.initializeComponents();
 
-      // Register activation listeners so GA4/Meta load only after engagement
-      setupAnalyticsActivation();
-
-      // Setup global click handlers
+      // Setup global click handlers (analytics events will queue until activation)
       this.setupGlobalClickHandlers();
 
       StateManager.setInitialized(true);
 
-      // Track page view (standard GA4 event for E2E tests)
-      analyticsModule.default.page({
-        page_title: document.title,
-        page_location: window.location.href
+      withAnalytics(module => {
+        module.default.page({
+          page_title: document.title,
+          page_location: window.location.href
+        });
       });
 
-      // Track successful initialization
-      const initEvent: AppInitializedEvent = {
-        event: 'app_initialized',
-        event_category: 'Application',
-        components_count: this.getComponentCount()
-      };
-      analyticsModule.default.track('app_initialized', initEvent);
+      withAnalytics(module => {
+        const initEvent: AppInitializedEvent = {
+          event: 'app_initialized',
+          event_category: 'Application',
+          components_count: this.getComponentCount()
+        };
+        module.default.track('app_initialized', initEvent);
+      });
+
+      // Activation guard registers after callbacks so no events are missed
+      setupAnalyticsActivation();
 
     } catch (error) {
       trackAnalyticsError('app_initialization_failed', error as Error);
       console.error('Failed to initialize Café com Vendas:', error);
     }
+
+    return Promise.resolve();
   },
 
   /**
